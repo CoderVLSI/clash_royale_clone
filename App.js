@@ -2272,7 +2272,12 @@ export default function App() {
         }
 
         // Defensive check: ensure nextTowers is an array before filtering
-        let targets = (nextTowers || []).filter(t => t.isOpponent !== u.isOpponent && t.hp > 0);
+        // Initial targets: Only Princess towers (King tower added conditionally below)
+        let targets = (nextTowers || []).filter(t => 
+          t.isOpponent !== u.isOpponent && 
+          t.hp > 0 && 
+          t.type === 'princess'
+        );
 
         // King tower becomes targetable when princess tower on that side is destroyed
         // Check if we should add king tower to targets
