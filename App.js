@@ -50,6 +50,10 @@ const CARDS = [
   { id: 'tombstone', name: 'Tombstone', cost: 3, color: '#95a5a6', hp: 450, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 40, spawns: 'skeletons', spawnRate: 3.1, spawnCount: 2, deathSpawnCount: 4, rarity: 'rare' },
   { id: 'sword_goblins', name: 'Sword Gobs', cost: 3, color: '#2ecc71', hp: 160, speed: 3, type: 'ground', range: 25, damage: 100, attackSpeed: 900, projectile: null, count: 3, rarity: 'common' },
   { id: 'ice_wizard', name: 'Ice Wiz', cost: 3, color: '#3498db', hp: 590, speed: 1.5, type: 'ground', range: 55, damage: 75, attackSpeed: 1700, projectile: 'ice_shard', count: 1, splash: true, rarity: 'legendary', slow: 0.35, spawnDamage: 75 },
+
+  // Lava Hound & Lava Pups
+  { id: 'lava_hound', name: 'Lava Hound', cost: 7, color: '#c0392b', hp: 3150, speed: 1, type: 'flying', range: 25, damage: 35, attackSpeed: 1300, projectile: null, count: 1, targetType: 'buildings', rarity: 'legendary', deathSpawns: 'lava_pups', deathSpawnCount: 6 },
+  { id: 'lava_pups', name: 'Lava Pups', cost: 0, color: '#e74c3c', hp: 180, speed: 2, type: 'flying', range: 50, damage: 45, attackSpeed: 1000, projectile: 'lava_shot', count: 1, rarity: 'common', isToken: true },
 ];
 
 const RARITY_COLORS = {
@@ -306,11 +310,11 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Circle cx="35" cy="40" r="6" fill="white" />
           <Circle cx="33" cy="40" r="1.5" fill="black" />
           <Circle cx="37" cy="40" r="1.5" fill="black" />
-          
+
           <Circle cx="65" cy="60" r="6" fill="white" />
           <Circle cx="63" cy="60" r="1.5" fill="black" />
           <Circle cx="67" cy="60" r="1.5" fill="black" />
-          
+
           <Circle cx="50" cy="30" r="5" fill="white" />
           <Circle cx="48" cy="30" r="1.5" fill="black" />
           <Circle cx="52" cy="30" r="1.5" fill="black" />
@@ -389,6 +393,48 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Path d="M20 30 L30 40" stroke="#bdc3c7" strokeWidth="5" />
           <Circle cx="40" cy="45" r="5" fill="black" />
           <Circle cx="60" cy="45" r="5" fill="black" />
+        </Svg>
+      );
+    case 'lava_hound':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Outer glow */}
+          <Circle cx="50" cy="50" r="48" fill="rgba(231, 76, 60, 0.3)" />
+          {/* Main body */}
+          <Circle cx="50" cy="55" r="40" fill="#c0392b" stroke="#e74c3c" strokeWidth="3" />
+          {/* Lava cracks/veins */}
+          <Path d="M30 45 Q50 35 70 45" stroke="#f39c12" strokeWidth="3" fill="none" />
+          <Path d="M35 60 Q50 50 65 60" stroke="#f39c12" strokeWidth="2" fill="none" />
+          {/* Glowing eyes */}
+          <Circle cx="38" cy="50" r="6" fill="#f1c40f" />
+          <Circle cx="62" cy="50" r="6" fill="#f1c40f" />
+          <Circle cx="38" cy="50" r="3" fill="#e74c3c" />
+          <Circle cx="62" cy="50" r="3" fill="#e74c3c" />
+          {/* Small wings */}
+          <Path d="M15 35 Q5 25 20 20 Q25 30 25 40" fill="#8e44ad" opacity="0.6" />
+          <Path d="M85 35 Q95 25 80 20 Q75 30 75 40" fill="#8e44ad" opacity="0.6" />
+          {/* Horns */}
+          <Path d="M35 25 L30 10 L40 20" fill="#7f8c8d" />
+          <Path d="M65 25 L70 10 L60 20" fill="#7f8c8d" />
+        </Svg>
+      );
+    case 'lava_pups':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Glow */}
+          <Circle cx="50" cy="50" r="42" fill="rgba(231, 76, 60, 0.2)" />
+          {/* Body */}
+          <Circle cx="50" cy="55" r="30" fill="#e74c3c" stroke="#c0392b" strokeWidth="2" />
+          {/* Lava pattern */}
+          <Path d="M35 50 Q50 40 65 50" stroke="#f39c12" strokeWidth="2" fill="none" />
+          {/* Eyes */}
+          <Circle cx="40" cy="50" r="5" fill="#f1c40f" />
+          <Circle cx="60" cy="50" r="5" fill="#f1c40f" />
+          <Circle cx="40" cy="50" r="2" fill="black" />
+          <Circle cx="60" cy="50" r="2" fill="black" />
+          {/* Tiny wings */}
+          <Path d="M25 40 Q15 30 25 25" stroke="#c0392b" strokeWidth="2" fill="none" />
+          <Path d="M75 40 Q85 30 75 25" stroke="#c0392b" strokeWidth="2" fill="none" />
         </Svg>
       );
     default:
@@ -610,11 +656,11 @@ const Projectile = ({ type, position }) => {
           <Circle cx="35" cy="40" r="6" fill="white" opacity="0.8" />
           <Circle cx="33" cy="40" r="1.5" fill="black" />
           <Circle cx="37" cy="40" r="1.5" fill="black" />
-          
+
           <Circle cx="65" cy="60" r="6" fill="white" opacity="0.8" />
           <Circle cx="63" cy="60" r="1.5" fill="black" />
           <Circle cx="67" cy="60" r="1.5" fill="black" />
-          
+
           <Circle cx="50" cy="30" r="5" fill="white" opacity="0.8" />
           <Circle cx="48" cy="30" r="1.5" fill="black" />
           <Circle cx="52" cy="30" r="1.5" fill="black" />
@@ -636,6 +682,26 @@ const Projectile = ({ type, position }) => {
         shadowOpacity: 0.5,
         shadowRadius: 2,
         elevation: 3
+      }} />
+    );
+  }
+  if (type === 'lava_shot') {
+    // Small fiery projectile for Lava Pups
+    return (
+      <View style={{
+        position: 'absolute',
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: '#e74c3c',
+        left: position.x - 5,
+        top: position.y - 5,
+        shadowColor: '#f39c12',
+        shadowOpacity: 0.8,
+        shadowRadius: 4,
+        elevation: 3,
+        borderWidth: 1,
+        borderColor: '#f39c12'
       }} />
     );
   }
@@ -1286,14 +1352,15 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
 
       {/* All Cards Section */}
       <Text style={styles.deckBoxTitle}>Collection</Text>
-      <View style={[styles.deckBox, { flex: 1, paddingVertical: 8, paddingHorizontal: 4 }]}>
+      <View style={[styles.deckBox, { flex: 1, paddingVertical: 8, paddingHorizontal: 4, overflow: 'hidden' }]}>
         <ScrollView
           style={[styles.allCardsScroll, { marginBottom: 0 }]}
           showsVerticalScrollIndicator={true}
           contentContainerStyle={{ paddingBottom: 20 }}
+          nestedScrollEnabled={true}
         >
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-evenly' }}>
-            {CARDS.map(card => (
+            {CARDS.filter(card => !card.isToken).map(card => (
               <View key={card.id} style={{ marginBottom: 10 }}>
                 <CollectionCard card={card} />
               </View>
@@ -1665,36 +1732,36 @@ const GameBoard = ({
           animationType="fade"
           onRequestClose={() => setShowSettings(false)}
         >
-          <View style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center'}}>
-            <View style={{width: 300, backgroundColor: 'white', padding: 20, borderRadius: 10, alignItems: 'center', elevation: 5}}>
-              <Text style={{fontSize: 24, fontWeight: 'bold', marginBottom: 20, color: '#2c3e50'}}>Settings</Text>
-              
-              <TouchableOpacity 
-                style={{padding: 15, backgroundColor: audioEnabled ? '#2ecc71' : '#95a5a6', width: '100%', alignItems: 'center', borderRadius: 5, marginBottom: 10}}
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
+            <View style={{ width: 300, backgroundColor: 'white', padding: 20, borderRadius: 10, alignItems: 'center', elevation: 5 }}>
+              <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 20, color: '#2c3e50' }}>Settings</Text>
+
+              <TouchableOpacity
+                style={{ padding: 15, backgroundColor: audioEnabled ? '#2ecc71' : '#95a5a6', width: '100%', alignItems: 'center', borderRadius: 5, marginBottom: 10 }}
                 onPress={() => setAudioEnabled(!audioEnabled)}
               >
-                <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>Audio: {audioEnabled ? 'ON' : 'OFF'}</Text>
+                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>Audio: {audioEnabled ? 'ON' : 'OFF'}</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity 
-                style={{padding: 15, backgroundColor: '#3498db', width: '100%', alignItems: 'center', borderRadius: 5, marginBottom: 10}}
+              <TouchableOpacity
+                style={{ padding: 15, backgroundColor: '#3498db', width: '100%', alignItems: 'center', borderRadius: 5, marginBottom: 10 }}
                 onPress={() => { setShowSettings(false); onRestart('game'); }}
               >
-                <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>Restart Game</Text>
+                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>Restart Game</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity 
-                style={{padding: 15, backgroundColor: '#e74c3c', width: '100%', alignItems: 'center', borderRadius: 5, marginBottom: 10}}
+              <TouchableOpacity
+                style={{ padding: 15, backgroundColor: '#e74c3c', width: '100%', alignItems: 'center', borderRadius: 5, marginBottom: 10 }}
                 onPress={() => { setShowSettings(false); onConcede(); }}
               >
-                <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>Concede</Text>
+                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>Concede</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity 
-                style={{padding: 10, marginTop: 5}}
+              <TouchableOpacity
+                style={{ padding: 10, marginTop: 5 }}
                 onPress={() => setShowSettings(false)}
               >
-                <Text style={{color: '#7f8c8d', fontSize: 16}}>Close</Text>
+                <Text style={{ color: '#7f8c8d', fontSize: 16 }}>Close</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -2008,7 +2075,7 @@ export default function App() {
     console.log('[handleDragEnd] Card:', card?.name, 'dropX:', dropX, 'dropY:', dropY);
 
     setDraggingCard(null);
-    
+
     if (!card) return;
 
     const footerHeight = 135;
@@ -2033,10 +2100,10 @@ export default function App() {
         // Standard river Y is height / 2.
         // We allow slightly higher (smaller Y) for better UX.
         let deploymentBoundary = riverY - 15; // Basic tolerance
-        
+
         // Hog Rider (jumps) and Flying units can be deployed further forward (over river/bridge)
         if (card.id === 'hog_rider' || card.type === 'flying') {
-            deploymentBoundary = riverY - 50; 
+          deploymentBoundary = riverY - 50;
         }
 
         // Allow deployment on own side (player's side)
@@ -2159,7 +2226,8 @@ export default function App() {
             spawns: card.spawns,
             spawnRate: card.spawnRate,
             spawnCount: card.spawnCount,  // Custom spawn count (e.g., Tombstone: 2, Witch: 3)
-            deathSpawnCount: card.deathSpawnCount,  // Skeletons to spawn on death (Tombstone: 4)
+            deathSpawnCount: card.deathSpawnCount,  // Units to spawn on death (Tombstone: 4, Lava Hound: 6)
+            deathSpawns: card.deathSpawns,  // What unit type to spawn on death (e.g., 'lava_pups')
             lastSpawn: card.spawnRate ? Date.now() : 0,  // Initialize to now for buildings with spawnRate
             lifetimeDuration: card.lifetime,  // Store lifetime duration in seconds
             spawnTime: Date.now(),  // Track when building was spawned for HP depreciation
@@ -2475,7 +2543,7 @@ export default function App() {
             // Tesla emerges - visible and can attack with full stats
             u.hidden.lastCombatTime = now;
             if (u.hidden.active) {
-               u.hidden.wakeTime = now;
+              u.hidden.wakeTime = now;
             }
             u.hidden.active = false;
           } else {
@@ -2505,9 +2573,9 @@ export default function App() {
         // Defensive check: ensure nextTowers is an array before filtering
         // Initial targets: Only Princess towers (King tower added conditionally below)
         // This applies to ALL units (Ground, Flying, Building-targeters)
-        let targets = (nextTowers || []).filter(t => 
-          t.isOpponent !== u.isOpponent && 
-          t.hp > 0 && 
+        let targets = (nextTowers || []).filter(t =>
+          t.isOpponent !== u.isOpponent &&
+          t.hp > 0 &&
           t.type === 'princess'
         );
 
@@ -2597,10 +2665,10 @@ export default function App() {
           }
 
           const isWakingUp = u.hidden && u.hidden.wakeTime && (now - u.hidden.wakeTime < 500);
-          
+
           let currentAttackSpeed = u.attackSpeed;
           if (u.slowUntil > now) {
-             currentAttackSpeed = u.attackSpeed / (1 - (u.slowAmount || 0.35));
+            currentAttackSpeed = u.attackSpeed / (1 - (u.slowAmount || 0.35));
           }
 
           if (now - u.lastAttack > currentAttackSpeed && !isWakingUp) {
@@ -2776,16 +2844,22 @@ export default function App() {
         }
       });
 
-      // Check for Tombstone death spawn (before filtering dead units)
+      // Check for death spawns (Tombstone -> skeletons, Lava Hound -> lava pups)
       const deathSpawns = [];
       currentUnits.forEach(u => {
-        if (u.hp <= 0 && u.spriteId === 'tombstone') {
-          // Tombstone destroyed - spawn skeletons (uses deathSpawnCount, defaults to 4)
-          const spawnCard = CARDS.find(c => c.id === 'skeletons');
+        // Generic death spawn check - works for Tombstone, Lava Hound, etc.
+        if (u.hp <= 0 && (u.spriteId === 'tombstone' || u.deathSpawns)) {
+          // Determine what to spawn
+          let spawnId = 'skeletons'; // Default for Tombstone
+          if (u.deathSpawns) {
+            spawnId = u.deathSpawns; // Use custom spawn type (e.g., 'lava_pups')
+          }
+
+          const spawnCard = CARDS.find(c => c.id === spawnId);
           if (spawnCard) {
             const deathSpawnCount = u.deathSpawnCount || 4;
             for (let i = 0; i < deathSpawnCount; i++) {
-              // Spawn skeletons in a spread pattern around the destroyed Tombstone
+              // Spawn units in a spread pattern around the destroyed unit
               const angle = (i / deathSpawnCount) * Math.PI * 2 + Math.random() * 0.5;
               const distance = 50 + Math.random() * 30;  // 50-80 pixels away
               const offsetX = Math.cos(angle) * distance;
@@ -2820,7 +2894,7 @@ export default function App() {
       // Add death spawns to collection
       if (deathSpawns.length > 0) {
         unitsToSpawn.push(...deathSpawns);
-        console.log('[DEATH SPAWN]', 'adding', deathSpawns.length, 'units from destroyed Tombstone');
+        console.log('[DEATH SPAWN]', 'adding', deathSpawns.length, 'units from death spawn');
       }
 
       // Filter out dead units
