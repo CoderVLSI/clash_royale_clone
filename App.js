@@ -2440,10 +2440,19 @@ export default function App() {
           const speedMultiplier = (u.charge && u.charge.active) ? 2 : 1;
           const effectiveSpeed = u.speed * speedMultiplier;
 
-          if (u.isOpponent) {
-            nextY += effectiveSpeed;
+          // Movement Calculation
+          if ((u.jumps || u.type === 'flying') && closestTarget) {
+            // Direct pathfinding for units that ignore terrain
+            const angle = Math.atan2(closestTarget.y - u.y, closestTarget.x - u.x);
+            nextX += Math.cos(angle) * effectiveSpeed;
+            nextY += Math.sin(angle) * effectiveSpeed;
           } else {
-            nextY -= effectiveSpeed;
+            // Standard vertical movement for ground units (bridges will handle steering)
+            if (u.isOpponent) {
+              nextY += effectiveSpeed;
+            } else {
+              nextY -= effectiveSpeed;
+            }
           }
 
           // Track distance for charge
