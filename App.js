@@ -1145,39 +1145,75 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
               </View>
 
               <View style={styles.cardDetailStatsBig}>
+                {/* Special Abilities */}
+                {(selectedCard.charge || selectedCard.spawns || selectedCard.splash || selectedCard.stun || selectedCard.jumps) && (
+                  <View style={{ marginBottom: 15, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.2)' }}>
+                    {selectedCard.charge && (
+                      <View style={styles.statRow}>
+                        <Text style={[styles.statLabel, { color: '#f1c40f' }]}>⚡ Special:</Text>
+                        <Text style={[styles.statValue, { color: '#fff' }]}>Charge Attack</Text>
+                      </View>
+                    )}
+                    {selectedCard.spawns && (
+                      <View style={styles.statRow}>
+                        <Text style={[styles.statLabel, { color: '#9b59b6' }]}>💀 Spawns:</Text>
+                        <Text style={[styles.statValue, { color: '#fff' }]}>{selectedCard.spawnCount}x {selectedCard.spawns}</Text>
+                      </View>
+                    )}
+                    {selectedCard.splash && (
+                      <View style={styles.statRow}>
+                        <Text style={[styles.statLabel, { color: '#e74c3c' }]}>💥 Area:</Text>
+                        <Text style={[styles.statValue, { color: '#fff' }]}>Splash Damage</Text>
+                      </View>
+                    )}
+                    {selectedCard.stun > 0 && (
+                      <View style={styles.statRow}>
+                        <Text style={[styles.statLabel, { color: '#3498db' }]}>💫 Effect:</Text>
+                        <Text style={[styles.statValue, { color: '#fff' }]}>Stun ({selectedCard.stun}s)</Text>
+                      </View>
+                    )}
+                    {selectedCard.jumps && (
+                      <View style={styles.statRow}>
+                        <Text style={[styles.statLabel, { color: '#e67e22' }]}>🐇 Trait:</Text>
+                        <Text style={[styles.statValue, { color: '#fff' }]}>River Jump</Text>
+                      </View>
+                    )}
+                  </View>
+                )}
+
                 {selectedCard.hp && (
                   <View style={styles.statRow}>
-                    <Text style={styles.statLabel}>Hitpoints:</Text>
+                    <Text style={styles.statLabel}>❤️ Hitpoints:</Text>
                     <Text style={styles.statValue}>{selectedCard.hp}</Text>
                   </View>
                 )}
                 {selectedCard.damage && (
                   <View style={styles.statRow}>
-                    <Text style={styles.statLabel}>Damage:</Text>
+                    <Text style={styles.statLabel}>⚔️ Damage:</Text>
                     <Text style={styles.statValue}>{selectedCard.damage}</Text>
                   </View>
                 )}
                 {selectedCard.speed !== undefined && selectedCard.speed > 0 && (
                   <View style={styles.statRow}>
-                    <Text style={styles.statLabel}>Speed:</Text>
+                    <Text style={styles.statLabel}>👟 Speed:</Text>
                     <Text style={styles.statValue}>{selectedCard.speed}</Text>
                   </View>
                 )}
                 {selectedCard.range && (
                   <View style={styles.statRow}>
-                    <Text style={styles.statLabel}>Range:</Text>
+                    <Text style={styles.statLabel}>🎯 Range:</Text>
                     <Text style={styles.statValue}>{selectedCard.range}</Text>
                   </View>
                 )}
                 {selectedCard.count > 1 && (
                   <View style={styles.statRow}>
-                    <Text style={styles.statLabel}>Count:</Text>
+                    <Text style={styles.statLabel}>👥 Count:</Text>
                     <Text style={styles.statValue}>{selectedCard.count}</Text>
                   </View>
                 )}
                 {selectedCard.attackSpeed && (
                   <View style={styles.statRow}>
-                    <Text style={styles.statLabel}>Attack Speed:</Text>
+                    <Text style={styles.statLabel}>⚡ Hit Speed:</Text>
                     <Text style={styles.statValue}>{selectedCard.attackSpeed}ms</Text>
                   </View>
                 )}
