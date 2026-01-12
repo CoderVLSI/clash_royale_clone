@@ -325,6 +325,7 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
     case 'prince':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
+          {unit?.charge?.active && <Circle cx="50" cy="50" r="48" fill="rgba(255, 255, 0, 0.6)" stroke="orange" strokeWidth="2" />}
           <Circle cx="50" cy="50" r="45" fill={color} />
           <Rect x="45" y="10" width="10" height="70" fill="#95a5a6" />
           <Path d="M30 40 L50 10 L70 40" fill="#f1c40f" />
@@ -1697,6 +1698,8 @@ export default function App() {
     console.log('[handleDragEnd] Card:', card?.name, 'dropX:', dropX, 'dropY:', dropY);
 
     setDraggingCard(null);
+    
+    if (!card) return;
 
     const footerHeight = 135;
     const gameAreaBottom = height - footerHeight;
