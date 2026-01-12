@@ -1093,30 +1093,17 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
 
       {/* All Cards Section */}
       <Text style={styles.deckBoxTitle}>Collection</Text>
-      <View style={[styles.deckBox, { flex: 1, paddingVertical: 5 }]}>
+      <View style={[styles.deckBox, { flex: 1, paddingVertical: 8, paddingHorizontal: 4 }]}>
         <ScrollView
-          style={styles.allCardsScroll}
+          style={[styles.allCardsScroll, { marginBottom: 0 }]}
           showsVerticalScrollIndicator={true}
           contentContainerStyle={{ paddingBottom: 20 }}
         >
-          <View style={styles.cardRow}>
-            {CARDS.slice(8, 12).map(card => (
-              <CollectionCard key={card.id} card={card} />
-            ))}
-          </View>
-          <View style={styles.cardRow}>
-            {CARDS.slice(12, 16).map(card => (
-              <CollectionCard key={card.id} card={card} />
-            ))}
-          </View>
-          <View style={styles.cardRow}>
-            {CARDS.slice(16, 20).map(card => (
-              <CollectionCard key={card.id} card={card} />
-            ))}
-          </View>
-          <View style={styles.cardRow}>
-            {CARDS.slice(20, 24).map(card => (
-              <CollectionCard key={card.id} card={card} />
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-evenly' }}>
+            {CARDS.map(card => (
+              <View key={card.id} style={{ marginBottom: 10 }}>
+                <CollectionCard card={card} />
+              </View>
             ))}
           </View>
         </ScrollView>
@@ -3799,6 +3786,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     paddingTop: 15,
+    width: width,
   },
   deckHeaderRow: {
     flexDirection: 'row',
