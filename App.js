@@ -300,10 +300,19 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
     case 'poison':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
-          <Circle cx="50" cy="50" r="45" fill="rgba(231, 76, 60, 0.3)" stroke="#e74c3c" strokeWidth="2" />
-          <Circle cx="35" cy="40" r="8" fill="#e74c3c" />
-          <Circle cx="65" cy="60" r="10" fill="#e74c3c" />
-          <Circle cx="50" cy="30" r="5" fill="#e74c3c" />
+          <Circle cx="50" cy="50" r="45" fill="rgba(255, 140, 0, 0.4)" stroke="#FF8C00" strokeWidth="2" />
+          {/* Skeletons/Skulls */}
+          <Circle cx="35" cy="40" r="6" fill="white" />
+          <Circle cx="33" cy="40" r="1.5" fill="black" />
+          <Circle cx="37" cy="40" r="1.5" fill="black" />
+          
+          <Circle cx="65" cy="60" r="6" fill="white" />
+          <Circle cx="63" cy="60" r="1.5" fill="black" />
+          <Circle cx="67" cy="60" r="1.5" fill="black" />
+          
+          <Circle cx="50" cy="30" r="5" fill="white" />
+          <Circle cx="48" cy="30" r="1.5" fill="black" />
+          <Circle cx="52" cy="30" r="1.5" fill="black" />
         </Svg>
       );
     case 'witch':
@@ -543,9 +552,24 @@ const Projectile = ({ type, position }) => {
     );
   }
   if (type === 'poison_spell') {
-    // Purple cloud for Poison - centered on position
+    // Orange Graveyard-style spell
     return (
-      <View style={[styles.poisonSpell, { left: position.x - 50, top: position.y - 50 }]} />
+      <View style={{ position: 'absolute', left: position.x - 50, top: position.y - 50, width: 100, height: 100 }}>
+        <Svg width="100" height="100" viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="rgba(255, 140, 0, 0.3)" stroke="#FF8C00" strokeWidth="2" />
+          <Circle cx="35" cy="40" r="6" fill="white" opacity="0.8" />
+          <Circle cx="33" cy="40" r="1.5" fill="black" />
+          <Circle cx="37" cy="40" r="1.5" fill="black" />
+          
+          <Circle cx="65" cy="60" r="6" fill="white" opacity="0.8" />
+          <Circle cx="63" cy="60" r="1.5" fill="black" />
+          <Circle cx="67" cy="60" r="1.5" fill="black" />
+          
+          <Circle cx="50" cy="30" r="5" fill="white" opacity="0.8" />
+          <Circle cx="48" cy="30" r="1.5" fill="black" />
+          <Circle cx="52" cy="30" r="1.5" fill="black" />
+        </Svg>
+      </View>
     );
   }
   if (type === 'dark_ball') {
