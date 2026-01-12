@@ -248,10 +248,10 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
     case 'minion_horde':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
-          <Circle cx="50" cy="50" r="40" fill={color} />
-          <Path d="M20 40 Q5 20 20 10 M80 40 Q95 20 80 10" stroke="#95a5a6" strokeWidth="3" fill="none" />
-          <Circle cx="40" cy="45" r="5" fill="white" />
-          <Circle cx="60" cy="45" r="5" fill="white" />
+          <Circle cx="50" cy="50" r="30" fill={color} />
+          <Path d="M25 40 Q10 20 25 10 M75 40 Q90 20 75 10" stroke="#95a5a6" strokeWidth="3" fill="none" />
+          <Circle cx="42" cy="45" r="4" fill="white" />
+          <Circle cx="58" cy="45" r="4" fill="white" />
         </Svg>
       );
     case 'skeletons':
