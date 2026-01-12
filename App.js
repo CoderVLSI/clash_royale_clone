@@ -1814,8 +1814,18 @@ export default function App() {
 
         const isLeftSide = dropX < width / 2;
 
+        // Deployment tolerance - allow placing slightly into the river area
+        // Standard river Y is height / 2.
+        // We allow slightly higher (smaller Y) for better UX.
+        let deploymentBoundary = riverY - 15; // Basic tolerance
+        
+        // Hog Rider (jumps) and Flying units can be deployed further forward (over river/bridge)
+        if (card.id === 'hog_rider' || card.type === 'flying') {
+            deploymentBoundary = riverY - 50; 
+        }
+
         // Allow deployment on own side (player's side)
-        if (dropY > riverY) {
+        if (dropY > deploymentBoundary) {
           canDeploy = true;
         }
         // Allow deployment in enemy territory if that side's princess tower is destroyed
