@@ -36,12 +36,12 @@ const CARDS = [
   { id: 'barbarians', name: 'Barbarians', cost: 5, color: '#CD853F', hp: 300, speed: 1.5, type: 'ground', range: 30, damage: 75, attackSpeed: 1500, projectile: null, count: 5, rarity: 'common' },
   { id: 'arrows', name: 'Arrows', cost: 3, color: '#2ecc71', type: 'spell', damage: 115, radius: 40, count: 1, rarity: 'common' },
   { id: 'zap', name: 'Zap', cost: 2, color: '#3498db', type: 'spell', damage: 140, radius: 35, count: 1, stun: 0.5, rarity: 'common' },
-  { id: 'minions', name: 'Minions', cost: 3, color: '#9b59b6', hp: 90, speed: 3, type: 'flying', range: 50, damage: 80, attackSpeed: 1000, projectile: null, count: 3, rarity: 'common' },
+  { id: 'minions', name: 'Minions', cost: 3, color: '#9b59b6', hp: 90, speed: 3, type: 'flying', range: 50, damage: 80, attackSpeed: 1000, projectile: 'dark_ball', count: 3, rarity: 'common' },
   { id: 'skeleton_army', name: 'Skeleton Army', cost: 3, color: '#ecf0f1', hp: 40, speed: 2, type: 'ground', range: 25, damage: 40, attackSpeed: 1000, projectile: null, count: 15, rarity: 'epic' },
   { id: 'skeletons', name: 'Skelly', cost: 1, color: '#bdc3c7', hp: 40, speed: 2, type: 'ground', range: 25, damage: 40, attackSpeed: 1000, projectile: null, count: 3, rarity: 'common' },
   { id: 'valkyrie', name: 'Valkyrie', cost: 4, color: '#e74c3c', hp: 1200, speed: 1.5, type: 'ground', range: 25, damage: 120, attackSpeed: 1500, projectile: null, count: 1, splash: true, rarity: 'rare' },
   { id: 'poison', name: 'Poison', cost: 4, color: '#27ae60', type: 'spell', damage: 70, radius: 50, count: 1, duration: 5, rarity: 'epic' },
-  { id: 'minion_horde', name: 'Minion H', cost: 5, color: '#8e44ad', hp: 90, speed: 3, type: 'flying', range: 50, damage: 80, attackSpeed: 1000, projectile: null, count: 6, rarity: 'common' },
+  { id: 'minion_horde', name: 'Minion H', cost: 5, color: '#8e44ad', hp: 90, speed: 3, type: 'flying', range: 50, damage: 80, attackSpeed: 1000, projectile: 'dark_ball', count: 6, rarity: 'common' },
   { id: 'witch', name: 'Witch', cost: 5, color: '#9b59b6', hp: 700, speed: 1.5, type: 'ground', range: 55, damage: 100, attackSpeed: 1000, projectile: 'witch_projectile', count: 1, splash: true, spawns: 'skeletons', spawnRate: 5, spawnCount: 3, rarity: 'epic' },
   { id: 'hog_rider', name: 'Hog', cost: 4, color: '#e67e22', hp: 1600, speed: 3.5, type: 'ground', range: 25, damage: 180, attackSpeed: 1600, projectile: null, count: 1, targetType: 'buildings', jumps: true, rarity: 'rare' },
   { id: 'prince', name: 'Prince', cost: 5, color: '#f39c12', hp: 1100, speed: 2, type: 'ground', range: 30, damage: 245, attackSpeed: 1500, projectile: null, count: 1, charge: true, rarity: 'epic' },
@@ -546,6 +546,23 @@ const Projectile = ({ type, position }) => {
     // Purple cloud for Poison - centered on position
     return (
       <View style={[styles.poisonSpell, { left: position.x - 50, top: position.y - 50 }]} />
+    );
+  }
+  if (type === 'dark_ball') {
+    return (
+      <View style={{
+        position: 'absolute',
+        width: 12,
+        height: 12,
+        borderRadius: 6,
+        backgroundColor: '#2c3e50',
+        left: position.x - 6,
+        top: position.y - 6,
+        shadowColor: 'black',
+        shadowOpacity: 0.5,
+        shadowRadius: 2,
+        elevation: 3
+      }} />
     );
   }
   if (type === 'tesla_lightning') {
