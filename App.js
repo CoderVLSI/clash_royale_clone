@@ -855,8 +855,14 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
     const sourceCard = showSlotSelector || cardMenuCard;
     if (sourceCard) {
       const fromIndex = cards.findIndex(c => c.id === sourceCard.id);
-      if (fromIndex !== -1 && fromIndex !== deckIndex) {
-        onSwapCards(fromIndex, deckIndex);
+      if (fromIndex !== -1) {
+        // Source is in deck - swap indices
+        if (fromIndex !== deckIndex) {
+          onSwapCards(fromIndex, deckIndex);
+        }
+      } else {
+        // Source is from collection - pass card object
+        onSwapCards(sourceCard, deckIndex);
       }
       // Clear both states
       setCardMenuCard(null);
@@ -1824,23 +1830,26 @@ export default function App() {
   const [draggingCard, setDraggingCard] = useState(null);
   const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
 
-  const handleSwapCards = (fromIndex, toIndex) => {
-    // fromIndex can be from collection (8-23) or deck (0-7)
+  const handleSwapCards = (source, toIndex) => {
+    // source can be index (deck swap) or card object (collection swap)
     // toIndex is always a deck slot (0-7)
     setAllDecks(prevDecks => {
       const newDecks = [...prevDecks];
       const currentDeck = [...newDecks[selectedDeckIndex]];
 
-      // If fromIndex is in collection range, get the card from CARDS array
-      if (fromIndex >= 8) {
-        // Swap deck slot with collection card
-        const collectionCard = CARDS[fromIndex];
-        currentDeck[toIndex] = collectionCard;
-      } else {
-        // Swap within deck (0-7)
-        const temp = currentDeck[fromIndex];
-        currentDeck[fromIndex] = currentDeck[toIndex];
-        currentDeck[toIndex] = temp;
+      if (typeof source === 'object' && source !== null) {
+        // Swap with collection card object
+        currentDeck[toIndex] = source;
+      } else if (typeof source === 'number') {
+        if (source >= 8) {
+          // Legacy: Swap with collection card by index
+          currentDeck[toIndex] = CARDS[source];
+        } else {
+          // Swap within deck (0-7)
+          const temp = currentDeck[source];
+          currentDeck[source] = currentDeck[toIndex];
+          currentDeck[toIndex] = temp;
+        }
       }
 
       newDecks[selectedDeckIndex] = currentDeck;
