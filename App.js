@@ -669,12 +669,27 @@ const Unit = ({ unit }) => {
   const spriteId = unit.spriteId || 'knight';
   const isEnemy = unit.isOpponent;
   const unitSize = 30; // Same size for both teams
+  const isSlowed = unit.slowUntil && unit.slowUntil > Date.now();
 
   return (
     <View style={[styles.unit, { left: unit.x - unitSize / 2, top: unit.y - unitSize / 2, width: unitSize, height: unitSize }]}>
       <UnitSprite id={spriteId} isOpponent={isEnemy} size={unitSize} unit={unit} />
+      {/* Ice/Slow Effect Overlay */}
+      {isSlowed && (
+        <View style={{
+          position: 'absolute',
+          top: -2, left: -2, right: -2, bottom: -2,
+          backgroundColor: 'rgba(135, 206, 250, 0.4)',
+          borderRadius: unitSize / 2,
+          borderWidth: 1,
+          borderColor: '#00BFFF',
+          zIndex: 5
+        }}>
+          <Text style={{ position: 'absolute', top: -10, right: -10, fontSize: 10 }}>❄️</Text>
+        </View>
+      )}
       {/* Health bar for enemy units */}
-      <View style={{ position: 'absolute', top: -8, width: unitSize, height: 6, backgroundColor: '#333', borderRadius: 3, left: 0 }}>
+      <View style={{ position: 'absolute', top: -8, width: unitSize, height: 6, backgroundColor: '#333', borderRadius: 3, left: 0, zIndex: 10 }}>
         <View style={{ width: `${(unit.hp / unit.maxHp) * 100}%`, height: '100%', backgroundColor: '#ff4444' }} />
       </View>
     </View>
@@ -1699,9 +1714,26 @@ const GameBoard = ({
             position: 'absolute'
           };
 
+          const isSlowed = tower.slowUntil && tower.slowUntil > Date.now();
+
           return (
             <View key={tower.id} style={[styles.towerContainer, styleObj]}>
               <TowerSprite type={tower.type} isOpponent={tower.isOpponent} size={size} />
+              {isSlowed && (
+                <View style={{
+                  position: 'absolute',
+                  top: -5, left: -5, right: -5, bottom: -5,
+                  backgroundColor: 'rgba(135, 206, 250, 0.4)',
+                  borderRadius: 10,
+                  borderWidth: 2,
+                  borderColor: '#00BFFF',
+                  zIndex: 15,
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <Text style={{ fontSize: 16 }}>❄️</Text>
+                </View>
+              )}
               <HealthBar current={tower.hp} max={tower.maxHp} isOpponent={tower.isOpponent} />
             </View>
           );
