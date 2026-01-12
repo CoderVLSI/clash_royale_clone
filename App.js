@@ -578,12 +578,12 @@ const Projectile = ({ type, position }) => {
         <Svg width="100%" height="100%" viewBox={`0 0 ${Math.abs(position.targetX - position.x) + 10} ${Math.abs(position.targetY - position.y) + 10}`}>
           <Path
             d={`M${position.x > position.targetX ? 0 : Math.abs(position.targetX - position.x) + 10} 0 L${position.x > position.targetX ? Math.abs(position.targetX - position.x) + 10 : 0} ${Math.abs(position.targetY - position.y)}`}
-            stroke="#f1c40f"
+            stroke="#00BFFF"
             strokeWidth="3"
             fill="none"
             opacity="0.8"
           />
-          <Circle cx={position.x > position.targetX ? 0 : Math.abs(position.targetX - position.x) + 10} cy="0" r="5" fill="#f1c40f" opacity="0.6" />
+          <Circle cx={position.x > position.targetX ? 0 : Math.abs(position.targetX - position.x) + 10} cy="0" r="5" fill="#00BFFF" opacity="0.6" />
         </Svg>
       </View>
     );
@@ -2623,6 +2623,16 @@ export default function App() {
         const dy = targetY - p.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
+        if (p.type === 'tesla_lightning') {
+          return {
+            ...p,
+            targetX,
+            targetY,
+            hit: !p.damageDealt, // Only hit if not yet dealt damage
+            keepVisual: true
+          };
+        }
+
         if (dist < p.speed + 10) {
           return { ...p, hit: true };
         }
@@ -2637,10 +2647,11 @@ export default function App() {
         };
       });
 
-      const hits = activeProjectiles.filter(p => p.hit);
+      const hits = activeProjectiles.filter(p => p.hit && !p.damageDealt);
       if (hits.length > 0) {
 
         hits.forEach(h => {
+          h.damageDealt = true;
           if (h.isSpell) {
             // Handle spell effects (Fireball, Arrows, Zap, Poison)
             if (h.isPoison) {
@@ -2745,10 +2756,16 @@ export default function App() {
           }
         });
 
-        // Remove hit projectiles, but keep poison until it expires
-        activeProjectiles = activeProjectiles.filter(p =>
-          !p.hit || (p.isPoison && ((now - p.spawnTime) / 1000 < p.duration))
-        );
+        // Remove hit projectiles, but keep poison and visual-only projectiles
+        activeProjectiles = activeProjectiles.filter(p => {
+          if (p.keepVisual && p.type === 'tesla_lightning') {
+            return (now - Math.floor(p.id)) < 150;
+          }
+          if (p.isPoison) {
+            return ((now - p.spawnTime) / 1000 < p.duration);
+          }
+          return !p.hit;
+        });
       }
 
       activeProjectiles = activeProjectiles.filter(p =>
