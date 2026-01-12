@@ -1,20 +1,5007 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View, Text, Dimensions, TouchableOpacity, PanResponder, Animated, Image, ImageBackground, ScrollView, Modal, TextInput, KeyboardAvoidingView, FlatList } from 'react-native';
+import { useState, useEffect, useRef, memo } from 'react';
+import Svg, { Circle, Rect, Path, G, Defs, LinearGradient, Stop, Polygon } from 'react-native-svg';
 
-export default function App() {
+const { width, height } = Dimensions.get('window');
+
+// --- Constants ---
+const KING_TOWER_SIZE = 65;
+const PRINCESS_TOWER_SIZE = 50;
+const TOWER_RANGE = 150; 
+const KING_RANGE = 180;
+const UNIT_ATTACK_RANGE = 40; 
+const UNIT_DAMAGE = 10;
+const UNIT_ATTACK_SPEED = 1000;
+
+const PROJECTILE_SPEED_ARROW = 12; 
+const PROJECTILE_SPEED_CANNON = 8;
+const FIRE_RATE_PRINCESS = 800; 
+const FIRE_RATE_KING = 1000; 
+
+// Card Definitions & Unit Stats
+const CARDS = [
+  // Original 8 cards
+  { id: 'knight', name: 'Knight', cost: 3, color: '#f1c40f', hp: 1400, speed: 1.5, type: 'ground', range: 40, damage: 150, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common' },
+  { id: 'archers', name: 'Archers', cost: 3, color: '#e67e22', hp: 140, speed: 2, type: 'ground', range: 80, damage: 80, attackSpeed: 1000, projectile: 'arrow', count: 2, rarity: 'common' },
+  { id: 'giant', name: 'Giant', cost: 5, color: '#e74c3c', hp: 3000, speed: 1, type: 'ground', range: 20, damage: 200, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', rarity: 'rare' },
+  { id: 'pekka', name: 'Mini P', cost: 4, color: '#9b59b6', hp: 1100, speed: 2.5, type: 'ground', range: 25, damage: 350, attackSpeed: 1400, projectile: null, count: 1, rarity: 'rare' },
+  { id: 'goblins', name: 'Goblins', cost: 2, color: '#2ecc71', hp: 90, speed: 3, type: 'ground', range: 110, damage: 50, attackSpeed: 900, projectile: 'spear', count: 3, rarity: 'common' },
+  { id: 'musketeer', name: 'Musket', cost: 4, color: '#34495e', hp: 800, speed: 1.5, type: 'ground', range: 100, damage: 180, attackSpeed: 1100, projectile: 'bullet', count: 1, rarity: 'rare' },
+  { id: 'baby_dragon', name: 'Baby D', cost: 4, color: '#27ae60', hp: 1200, speed: 2, type: 'flying', range: 80, damage: 100, attackSpeed: 1300, projectile: 'dragon_fire', count: 1, splash: true, rarity: 'epic' },
+  { id: 'fireball', name: 'Fireball', cost: 4, color: '#ff4500', type: 'spell', damage: 325, radius: 60, count: 1, rarity: 'rare' },
+
+  // New cards
+  { id: 'cannon', name: 'Cannon', cost: 3, color: '#8B4513', hp: 380, speed: 0, type: 'building', range: 90, damage: 60, attackSpeed: 1000, projectile: 'cannonball', count: 1, lifetime: 30, rarity: 'common' },
+  { id: 'barbarians', name: 'Barbarians', cost: 5, color: '#CD853F', hp: 300, speed: 1.5, type: 'ground', range: 30, damage: 75, attackSpeed: 1500, projectile: null, count: 5, rarity: 'common' },
+  { id: 'arrows', name: 'Arrows', cost: 3, color: '#2ecc71', type: 'spell', damage: 115, radius: 40, count: 1, rarity: 'common' },
+  { id: 'zap', name: 'Zap', cost: 2, color: '#3498db', type: 'spell', damage: 140, radius: 35, count: 1, stun: 0.5, rarity: 'common' },
+  { id: 'minions', name: 'Minions', cost: 3, color: '#9b59b6', hp: 90, speed: 3, type: 'flying', range: 50, damage: 40, attackSpeed: 1000, projectile: null, count: 3, rarity: 'common' },
+  { id: 'skeleton_army', name: 'Skeleton Army', cost: 3, color: '#ecf0f1', hp: 40, speed: 2, type: 'ground', range: 25, damage: 40, attackSpeed: 1000, projectile: null, count: 15, rarity: 'epic' },
+  { id: 'skeletons', name: 'Skelly', cost: 1, color: '#bdc3c7', hp: 40, speed: 2, type: 'ground', range: 25, damage: 40, attackSpeed: 1000, projectile: null, count: 3, rarity: 'common' },
+  { id: 'valkyrie', name: 'Valkyrie', cost: 4, color: '#e74c3c', hp: 1200, speed: 1.5, type: 'ground', range: 25, damage: 120, attackSpeed: 1500, projectile: null, count: 1, splash: true, rarity: 'rare' },
+  { id: 'poison', name: 'Poison', cost: 4, color: '#27ae60', type: 'spell', damage: 70, radius: 50, count: 1, duration: 5, rarity: 'epic' },
+  { id: 'minion_horde', name: 'Minion H', cost: 5, color: '#8e44ad', hp: 90, speed: 3, type: 'flying', range: 50, damage: 40, attackSpeed: 1000, projectile: null, count: 6, rarity: 'common' },
+  { id: 'witch', name: 'Witch', cost: 5, color: '#9b59b6', hp: 560, speed: 1.5, type: 'ground', range: 50, damage: 70, attackSpeed: 700, projectile: 'witch_projectile', count: 1, splash: true, spawns: 'skeletons', spawnRate: 7, rarity: 'epic' },
+  { id: 'hog_rider', name: 'Hog', cost: 4, color: '#e67e22', hp: 1600, speed: 3.5, type: 'ground', range: 25, damage: 180, attackSpeed: 1600, projectile: null, count: 1, targetType: 'buildings', jumps: true, rarity: 'rare' },
+  { id: 'prince', name: 'Prince', cost: 5, color: '#f39c12', hp: 1100, speed: 2, type: 'ground', range: 30, damage: 245, attackSpeed: 1500, projectile: null, count: 1, charge: true, rarity: 'epic' },
+  { id: 'tesla', name: 'Tesla', cost: 4, color: '#f1c40f', hp: 600, speed: 0, type: 'building', range: 50, damage: 80, attackSpeed: 800, projectile: 'bullet', count: 1, hidden: true, rarity: 'common' },
+  { id: 'wizard', name: 'Wizard', cost: 5, color: '#9b59b6', hp: 590, speed: 1.5, type: 'ground', range: 55, damage: 130, attackSpeed: 1400, projectile: 'fireball_small', count: 1, splash: true, rarity: 'rare' },
+  { id: 'tombstone', name: 'Tombstone', cost: 3, color: '#95a5a6', hp: 380, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 40, spawns: 'skeletons', spawnRate: 3, rarity: 'rare' },
+  { id: 'sword_goblins', name: 'Sword Gobs', cost: 3, color: '#2ecc71', hp: 160, speed: 3, type: 'ground', range: 25, damage: 100, attackSpeed: 900, projectile: null, count: 3, rarity: 'common' },
+];
+
+const RARITY_COLORS = {
+  common: '#7f8c8d',    // Gray
+  rare: '#f39c12',      // Orange
+  epic: '#9b59b6',      // Purple
+  legendary: '#2ecc71'  // Emerald/Rainbow substitute
+};
+
+// --- Main Menu Component ---
+const MainMenu = ({ onStart }) => {
+  const [progress, setProgress] = useState(0);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setLoaded(true);
+          return 100;
+        }
+        return prev + 2; 
+      });
+    }, 50);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <ImageBackground source={require('./background.jpg')} style={styles.menuContainer}>
+      <View style={styles.menuOverlay}>
+        <View style={styles.headerContainer}>
+            <Text style={styles.title}>CLASH ROYALE</Text>
+            <Text style={styles.subtitle}>CLONE</Text>
+        </View>
+        
+        <View style={styles.bottomContainer}>
+          {!loaded ? (
+            <View style={styles.loadingContainer}>
+              <Text style={styles.loadingText}>Loading Arena... {progress}%</Text>
+              <View style={styles.progressBarBg}>
+                <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
+              </View>
+            </View>
+          ) : (
+            <TouchableOpacity style={styles.battleButton} onPress={onStart}>
+              <Text style={styles.battleButtonText}>BATTLE</Text>
+            </TouchableOpacity>
+          )}
+          <Text style={styles.footerText}>Made with React Native Expo</Text>
+        </View>
+      </View>
+    </ImageBackground>
+  );
+};
+
+// --- Game Over Component ---
+const GameOverScreen = ({ result, onRestart }) => {
+  const isVictory = result === 'VICTORY';
+  return (
+    <View style={styles.gameOverContainer}>
+      <Text style={[styles.gameOverTitle, { color: isVictory ? '#F1C40F' : '#E74C3C' }]}>
+        {result}!
+      </Text>
+      <TouchableOpacity style={styles.restartButton} onPress={() => onRestart('lobby')}>
+        <Text style={styles.restartButtonText}>RETURN TO LOBBY</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+// --- SVG Sprites ---
+const TowerSprite = ({ type, isOpponent, size }) => {
+  const color = isOpponent ? '#E74C3C' : '#3498DB';
+  const secondary = isOpponent ? '#C0392B' : '#2980B9';
+  
+  if (type === 'king') {
+    return (
+      <Svg width={size} height={size} viewBox="0 0 100 100">
+        <Rect x="10" y="40" width="80" height="50" rx="5" fill="#7f8c8d" stroke="black" strokeWidth="2" />
+        <Rect x="20" y="20" width="60" height="40" fill={color} stroke="black" strokeWidth="2" />
+        <Rect x="15" y="10" width="15" height="15" fill={secondary} stroke="black" strokeWidth="1" />
+        <Rect x="42.5" y="10" width="15" height="15" fill={secondary} stroke="black" strokeWidth="1" />
+        <Rect x="70" y="10" width="15" height="15" fill={secondary} stroke="black" strokeWidth="1" />
+        <Circle cx="50" cy="65" r="10" fill="black" />
+      </Svg>
+    );
+  }
+  return (
+    <Svg width={size} height={size} viewBox="0 0 100 100">
+      <Rect x="20" y="30" width="60" height="60" rx="5" fill="#95a5a6" stroke="black" strokeWidth="2" />
+      <Rect x="15" y="10" width="70" height="25" fill={color} stroke="black" strokeWidth="2" />
+      <Rect x="40" y="50" width="20" height="30" rx="10" fill="black" />
+    </Svg>
+  );
+};
+
+const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
+  const color = isOpponent ? '#E74C3C' : '#3498DB';
+  const isHidden = unit?.hidden?.active;
+
+  switch (id) {
+    case 'knight':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          <Path d="M50 20 L50 80 M30 35 L70 35" stroke="white" strokeWidth="8" strokeLinecap="round" />
+        </Svg>
+      );
+    case 'archers':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          <Path d="M30 20 Q70 50 30 80" stroke="white" strokeWidth="5" fill="none" />
+          <Path d="M30 20 L30 80" stroke="white" strokeWidth="2" />
+        </Svg>
+      );
+    case 'giant':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="48" fill={color} stroke="white" strokeWidth="2" />
+          <Circle cx="50" cy="50" r="25" fill="#e67e22" stroke="white" strokeWidth="2" />
+        </Svg>
+      );
+    case 'goblins':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          <Path d="M20 50 L50 80 L80 50 L50 20 Z" fill="#2ecc71" stroke="white" strokeWidth="2" />
+        </Svg>
+      );
+    case 'baby_dragon':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+           <Path d="M20 40 Q50 10 80 40" stroke="#27ae60" strokeWidth="5" fill="none" />
+           <Circle cx="50" cy="50" r="20" fill="#27ae60" />
+        </Svg>
+      );
+    case 'musketeer':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          <Path d="M20 50 Q50 10 80 50" fill="#8e44ad" stroke="black" strokeWidth="2" />
+          <Rect x="45" y="40" width="10" height="40" fill="#95a5a6" />
+        </Svg>
+      );
+    case 'pekka':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          <Path d="M20 30 L40 50 L60 50 L80 30" stroke="#2c3e50" strokeWidth="5" fill="none" />
+          <Circle cx="50" cy="60" r="10" fill="#3498db" />
+        </Svg>
+      );
+    case 'fireball':
+        return (
+          <Svg width={size} height={size} viewBox="0 0 100 100">
+            <Circle cx="50" cy="50" r="45" fill="#e74c3c" stroke="orange" strokeWidth="2" />
+            <Path d="M50 10 Q80 50 50 90 Q20 50 50 10" fill="orange" />
+          </Svg>
+        );
+    case 'cannon':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+           <Rect x="20" y="60" width="60" height="20" fill="#5D4037" />
+           <Circle cx="70" cy="70" r="10" fill="#3E2723" />
+           <Rect x="30" y="30" width="40" height="40" fill="#2c3e50" rx="5" transform="rotate(-30 50 50)" />
+        </Svg>
+      );
+    case 'barbarians':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          <Rect x="30" y="25" width="40" height="20" fill="#f1c40f" />
+          <Path d="M40 60 L60 60 L50 80 Z" fill="#f1c40f" />
+        </Svg>
+      );
+    case 'arrows':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Path d="M20 80 L80 20 M30 85 L85 30 M15 70 L70 15" stroke={color} strokeWidth="3" />
+          <Path d="M80 20 L70 20 L80 30 M85 30 L75 30 L85 40 M70 15 L60 15 L70 25" stroke={color} strokeWidth="3" fill="none" />
+        </Svg>
+      );
+    case 'zap':
+       return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Path d="M60 10 L30 50 L50 50 L40 90 L80 40 L60 40 Z" fill="#3498db" stroke="white" strokeWidth="2" />
+        </Svg>
+       );
+    case 'minions':
+    case 'minion_horde':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+           <Circle cx="50" cy="50" r="40" fill={color} />
+           <Path d="M20 40 Q5 20 20 10 M80 40 Q95 20 80 10" stroke="#95a5a6" strokeWidth="3" fill="none"/>
+           <Circle cx="40" cy="45" r="5" fill="white"/>
+           <Circle cx="60" cy="45" r="5" fill="white"/>
+        </Svg>
+      );
+    case 'skeletons':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+           <Circle cx="50" cy="45" r="20" fill="#ecf0f1" stroke="black" strokeWidth="1" />
+           <Rect x="48" y="65" width="4" height="20" fill="#ecf0f1" />
+           <Circle cx="43" cy="40" r="3" fill="black" />
+           <Circle cx="57" cy="40" r="3" fill="black" />
+        </Svg>
+      );
+    case 'skeleton_army':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+           {/* Skeleton 1 (Left) */}
+           <G transform="translate(-15, 10) scale(0.8)">
+             <Circle cx="50" cy="45" r="20" fill="#ecf0f1" stroke="black" strokeWidth="1" />
+             <Rect x="48" y="65" width="4" height="20" fill="#ecf0f1" />
+             <Circle cx="43" cy="40" r="3" fill="black" />
+             <Circle cx="57" cy="40" r="3" fill="black" />
+           </G>
+           {/* Skeleton 2 (Right) */}
+           <G transform="translate(35, 10) scale(0.8)">
+             <Circle cx="50" cy="45" r="20" fill="#ecf0f1" stroke="black" strokeWidth="1" />
+             <Rect x="48" y="65" width="4" height="20" fill="#ecf0f1" />
+             <Circle cx="43" cy="40" r="3" fill="black" />
+             <Circle cx="57" cy="40" r="3" fill="black" />
+           </G>
+           {/* Skeleton 3 (Center Front) */}
+           <G transform="translate(10, -5) scale(0.9)">
+             <Circle cx="50" cy="45" r="20" fill="#ecf0f1" stroke="black" strokeWidth="1" />
+             <Rect x="48" y="65" width="4" height="20" fill="#ecf0f1" />
+             <Circle cx="43" cy="40" r="3" fill="black" />
+             <Circle cx="57" cy="40" r="3" fill="black" />
+           </G>
+        </Svg>
+      );
+    case 'valkyrie':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          <Path d="M25 20 L75 20 L50 90 Z" fill="#e67e22" opacity="0.8" />
+          <Rect x="45" y="10" width="10" height="80" fill="#7f8c8d" />
+        </Svg>
+      );
+    case 'poison':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+           <Circle cx="50" cy="50" r="45" fill="rgba(231, 76, 60, 0.3)" stroke="#e74c3c" strokeWidth="2" />
+           <Circle cx="35" cy="40" r="8" fill="#e74c3c" />
+           <Circle cx="65" cy="60" r="10" fill="#e74c3c" />
+           <Circle cx="50" cy="30" r="5" fill="#e74c3c" />
+        </Svg>
+      );
+    case 'witch':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+           <Circle cx="50" cy="50" r="45" fill={color} />
+           <Path d="M20 20 L80 20 L50 50 Z" fill="#9b59b6" />
+           <Circle cx="50" cy="40" r="15" fill="#f1c40f" /> 
+        </Svg>
+      );
+    case 'hog_rider':
+       return (
+         <Svg width={size} height={size} viewBox="0 0 100 100">
+            <Circle cx="50" cy="50" r="45" fill={color} />
+            <Rect x="40" y="20" width="20" height="30" fill="#34495e" />
+            <Rect x="20" y="40" width="60" height="10" fill="#8B4513" />
+         </Svg>
+       );
+    case 'prince':
+       return (
+         <Svg width={size} height={size} viewBox="0 0 100 100">
+            <Circle cx="50" cy="50" r="45" fill={color} />
+            <Rect x="45" y="10" width="10" height="70" fill="#95a5a6" />
+            <Path d="M30 40 L50 10 L70 40" fill="#f1c40f" />
+         </Svg>
+       );
+    case 'tesla':
+        const opacity = isHidden ? 0.2 : 1; // Faint when underground
+        return (
+          <Svg width={size} height={size} viewBox="0 0 100 100" opacity={opacity}>
+             {isHidden && <Rect x="35" y="75" width="30" height="5" fill="#7f8c8d" rx="2" />}
+             <Rect x="30" y="60" width="40" height="30" fill="#95a5a6" />
+             <Rect x="45" y="20" width="10" height="40" fill="#3498db" />
+             <Circle cx="50" cy="20" r="10" fill="#f1c40f" />
+          </Svg>
+        );
+    case 'wizard':
+        return (
+          <Svg width={size} height={size} viewBox="0 0 100 100">
+             <Circle cx="50" cy="50" r="45" fill={color} />
+             <Path d="M20 20 L50 5 L80 20" fill="#3498db" />
+             <Circle cx="70" cy="60" r="10" fill="#e74c3c" />
+          </Svg>
+        );
+    case 'tombstone':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+           <Rect x="30" y="25" width="40" height="65" fill="#95a5a6" stroke="#7f8c8d" strokeWidth="3" rx="5" />
+           <Path d="M35 25 L50 5 L65 25" stroke="#7f8c8d" strokeWidth="4" fill="none" />
+           <Rect x="38" y="50" width="24" height="4" fill="#2c3e50" rx="2" />
+           <Rect x="38" y="58" width="24" height="4" fill="#2c3e50" rx="2" />
+           <Rect x="44" y="66" width="12" height="4" fill="#2c3e50" rx="2" />
+           <Circle cx="40" cy="82" r="3" fill="#34495e" />
+           <Circle cx="60" cy="82" r="3" fill="#34495e" />
+        </Svg>
+      );
+    case 'sword_goblins':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+           <Circle cx="50" cy="50" r="40" fill="#2ecc71" stroke="white" strokeWidth="2" />
+           <Path d="M20 30 L80 70" stroke="#bdc3c7" strokeWidth="5" />
+           <Path d="M20 30 L30 40" stroke="#bdc3c7" strokeWidth="5" />
+           <Circle cx="40" cy="45" r="5" fill="black" />
+           <Circle cx="60" cy="45" r="5" fill="black" />
+        </Svg>
+      );
+    default:
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          <Rect x="42" y="40" width="16" height="20" fill="white" rx="3" />
+          <Circle cx="50" cy="35" r="5" fill="white" />
+        </Svg>
+      );
+  }
+};
+
+const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd, isDragging }) => {
+  const callbacksRef = useRef({ onDragStart, onDragMove, onDragEnd });
+  const canAffordRef = useRef(canAfford);
+  const isNextRef = useRef(isNext);
+
+  // Update refs when props change
+  useEffect(() => {
+    callbacksRef.current = { onDragStart, onDragMove, onDragEnd };
+    canAffordRef.current = canAfford;
+    isNextRef.current = isNext;
+  }, [onDragStart, onDragMove, onDragEnd, canAfford, isNext]);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => {
+        console.log('[Card] Touch start on', card.name, 'canAfford:', canAffordRef.current, 'isNext:', isNextRef.current);
+        return true;
+      },
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: (evt, gestureState) => {
+        const currentCanAfford = canAffordRef.current;
+        const currentIsNext = isNextRef.current;
+        console.log('[Card] PanResponderGrant -', card.name, 'canAfford:', currentCanAfford);
+        const { onDragStart } = callbacksRef.current;
+        if (!currentIsNext && currentCanAfford && onDragStart) {
+          console.log('[Card] Calling onDragStart for', card.name);
+          onDragStart(card, gestureState);
+        } else {
+          console.log('[Card] onDragStart blocked - isNext:', currentIsNext, 'canAfford:', currentCanAfford);
+        }
+      },
+      onPanResponderMove: (evt, gestureState) => {
+        const { onDragMove } = callbacksRef.current;
+        if (!isNextRef.current && canAffordRef.current && onDragMove) {
+           onDragMove(gestureState);
+        }
+      },
+      onPanResponderRelease: (evt, gestureState) => {
+        console.log('[Card] PanResponderRelease -', card.name);
+        const { onDragEnd } = callbacksRef.current;
+        if (!isNextRef.current && canAffordRef.current && onDragEnd) {
+           onDragEnd(gestureState);
+        }
+      },
+    })
+  ).current;
+
+  // Always attach panHandlers - we check canAfford inside the callbacks
+  // This prevents the responder from being lost when elixir changes
+  const handlers = !isNext ? panResponder.panHandlers : {};
+
+  return (
+    <View
+      style={[
+        styles.card,
+        { borderColor: RARITY_COLORS[card.rarity] || '#000' },
+        isNext && styles.nextCard,
+        (!canAfford && !isNext) && styles.disabledCard,
+        isDragging && styles.hiddenCard
+      ]}
+      {...handlers}
+    >
+      <View style={styles.cardContent}>
+         <UnitSprite id={card.id} isOpponent={false} size={40} />
+         <Text style={styles.cardName}>{card.name}</Text>
+      </View>
+      
+      <View style={styles.elixirCostBubble}>
+        <Text style={styles.elixirCostText}>{card.cost}</Text>
+      </View>
+
+      {isNext && <Text style={styles.nextLabel}>Next</Text>}
+    </View>
+  );
+}, (prevProps, nextProps) => {
+  // Custom comparison: return true (skip re-render) ONLY when canAfford is the same
+  // If canAfford changed, return false to trigger re-render
+  return prevProps.canAfford === nextProps.canAfford &&
+         prevProps.isDragging === nextProps.isDragging &&
+         prevProps.card.id === nextProps.card.id;
+});
+
+const HealthBar = ({ current, max, isOpponent }) => {
+  if (current <= 0) return null;
+  const percentage = Math.max(0, Math.min(100, (current / max) * 100));
+  return (
+    <View style={styles.healthBarBack}>
+      <View 
+        style={[
+          styles.healthBarFront, 
+          { 
+            width: `${percentage}%`, 
+            backgroundColor: isOpponent ? '#ff6b6b' : '#6bff6b' 
+          }
+        ]} 
+      />
+    </View>
+  );
+};
+
+const Projectile = ({ type, position }) => {
+  const angleDeg = (Math.atan2(position.targetY - position.y, position.targetX - position.x) * 180 / Math.PI);
+  
+  if (type === 'arrow' || type === 'spear') {
+      return (
+        <View style={[styles.arrowContainer, { left: position.x, top: position.y, transform: [{ rotate: `${angleDeg}deg` }] }]}>
+            <View style={[styles.arrowShaft, type === 'spear' && { backgroundColor: '#2ecc71', height: 3 }]} />
+            <View style={[styles.arrowHead, type === 'spear' && { borderLeftColor: '#2ecc71' }]} />
+        </View>
+      );
+  }
+  if (type === 'bullet') {
+      return (
+        <View style={[styles.bullet, { left: position.x, top: position.y }]} />
+      );
+  }
+  if (type === 'witch_projectile') {
+      // Small purple projectile for Witch
+      return (
+        <View style={[styles.witchProjectile, { left: position.x - 4, top: position.y - 4 }]} />
+      );
+  }
+  if (type === 'dragon_fire') {
+      // Green fire projectile for Baby Dragon
+      return (
+        <View style={[styles.dragonFire, { left: position.x - 6, top: position.y - 6 }]} />
+      );
+  }
+  if (type === 'fireball_small') {
+      return (
+        <View style={[styles.fireballSmall, { left: position.x, top: position.y }]} />
+      );
+  }
+  if (type === 'fireball_spell') {
+      return (
+        <View style={[styles.fireballSpell, { left: position.x, top: position.y }]} />
+      );
+  }
+  if (type === 'zap_spell') {
+      // Lightning bolt effect for Zap
+      return (
+        <View style={[styles.zapSpell, { left: position.x - 25, top: position.y - 25 }]}>
+          <View style={styles.lightningBolt} />
+        </View>
+      );
+  }
+  if (type === 'arrows_spell') {
+      // Multiple arrows falling for Arrows
+      return (
+        <View style={[styles.arrowsSpell, { left: position.x - 20, top: position.y - 20 }]}>
+          <View style={styles.arrowVolley} />
+        </View>
+      );
+  }
+  if (type === 'poison_spell') {
+      // Purple cloud for Poison - centered on position
+      return (
+        <View style={[styles.poisonSpell, { left: position.x - 50, top: position.y - 50 }]} />
+      );
+  }
+  if (type === 'tesla_lightning') {
+      // Lightning bolt from Tesla to target
+      return (
+        <View style={{
+          position: 'absolute',
+          left: Math.min(position.x, position.targetX) - 5,
+          top: Math.min(position.y, position.targetY) - 5,
+          width: Math.abs(position.targetX - position.x) + 10,
+          height: Math.abs(position.targetY - position.y) + 10,
+        }}>
+          <Svg width="100%" height="100%" viewBox={`0 0 ${Math.abs(position.targetX - position.x) + 10} ${Math.abs(position.targetY - position.y) + 10}`}>
+            <Path
+              d={`M${position.x > position.targetX ? 0 : Math.abs(position.targetX - position.x) + 10} 0 L${position.x > position.targetX ? Math.abs(position.targetX - position.x) + 10 : 0} ${Math.abs(position.targetY - position.y)}`}
+              stroke="#f1c40f"
+              strokeWidth="3"
+              fill="none"
+              opacity="0.8"
+            />
+            <Circle cx={position.x > position.targetX ? 0 : Math.abs(position.targetX - position.x) + 10} cy="0" r="5" fill="#f1c40f" opacity="0.6" />
+          </Svg>
+        </View>
+      );
+  }
+  return <View style={[styles.cannonball, { left: position.x, top: position.y }]} />;
+};
+
+const Unit = ({ unit }) => {
+    const spriteId = unit.spriteId || 'knight';
+    const isEnemy = unit.isOpponent;
+    const unitSize = 30; // Same size for both teams
+
+  return (
+    <View style={[styles.unit, { left: unit.x - unitSize/2, top: unit.y - unitSize/2, width: unitSize, height: unitSize }]}>
+      <UnitSprite id={spriteId} isOpponent={isEnemy} size={unitSize} unit={unit} />
+      {/* Health bar for enemy units */}
+      <View style={{position: 'absolute', top: -8, width: unitSize, height: 6, backgroundColor: '#333', borderRadius: 3, left: 0}}>
+           <View style={{width: `${(unit.hp/unit.maxHp)*100}%`, height: '100%', backgroundColor: '#ff4444'}}/>
+      </View>
+    </View>
+  );
+};
+
+// --- Lobby Components ---
+
+const LobbyHeader = () => (
+  <View style={styles.lobbyHeader}>
+    <View style={styles.lobbyHeaderLeft}>
+      <View style={styles.xpLevelContainer}>
+        <Text style={styles.xpLevelText}>13</Text>
+      </View>
+      <View style={styles.playerIdentity}>
+        <Text style={styles.lobbyPlayerName}>You</Text>
+        <View style={styles.xpBarContainer}>
+           <View style={styles.xpBarFill} />
+        </View>
+      </View>
+    </View>
+    <View style={styles.lobbyHeaderRight}>
+      <View style={styles.currencyContainer}>
+        <Text style={styles.currencyIcon}>💰</Text>
+        <Text style={styles.currencyText}>5420</Text>
+      </View>
+      <View style={styles.currencyContainer}>
+        <Text style={styles.currencyIcon}>💎</Text>
+        <Text style={styles.currencyText}>150</Text>
+      </View>
+    </View>
+  </View>
+);
+
+const ChestSlots = () => (
+  <View style={styles.chestSlotsContainer}>
+    <Text style={styles.chestSlotsTitle}>CHESTS</Text>
+    <View style={styles.chestRow}>
+       <View style={styles.chestSlot}><Text style={styles.chestText}>SILVER</Text><Text style={styles.chestTimer}>3h</Text></View>
+       <View style={styles.chestSlot}><Text style={styles.chestText}>GOLD</Text><Text style={styles.chestTimer}>8h</Text></View>
+       <View style={styles.chestSlotEmpty}><Text style={styles.chestTextEmpty}>Empty Slot</Text></View>
+       <View style={styles.chestSlotEmpty}><Text style={styles.chestTextEmpty}>Empty Slot</Text></View>
+    </View>
+  </View>
+);
+
+const MiniCard = ({ card }) => (
+  <View style={[styles.miniCard, { borderColor: RARITY_COLORS[card.rarity] || '#000' }]}>
+    <UnitSprite id={card.id} isOpponent={false} size={35} />
+    <Text style={styles.miniCardName}>{card.name}</Text>
+    <View style={styles.miniCardCost}>
+      <Text style={styles.miniCardCostText}>{card.cost}</Text>
+    </View>
+  </View>
+);
+
+const ShopTab = () => {
+  const deals = [
+    { id: 'knight', name: 'Knight', count: 50, cost: 500, currency: 'GOLD', rarity: 'common' },
+    { id: 'musketeer', name: 'Musketeer', count: 20, cost: 1000, currency: 'GOLD', rarity: 'rare' },
+    { id: 'baby_dragon', name: 'Baby Dragon', count: 2, cost: 2000, currency: 'GOLD', rarity: 'epic' },
+    { id: 'archers', name: 'Archers', count: 50, cost: 0, currency: 'FREE', rarity: 'common' }, // Free daily
+    { id: 'hog_rider', name: 'Hog Rider', count: 20, cost: 1000, currency: 'GOLD', rarity: 'rare' },
+    { id: 'witch', name: 'Witch', count: 2, cost: 100, currency: 'GEM', rarity: 'epic' },
+  ];
+
+  return (
+    <ScrollView style={styles.shopContainer} contentContainerStyle={{paddingBottom: 100}}>
+      <View style={styles.shopSectionHeader}>
+        <Text style={styles.shopSectionTitle}>DAILY DEALS</Text>
+        <Text style={styles.shopSectionTimer}>Refreshes in 4h 20m</Text>
+      </View>
+      
+      <View style={styles.dealsGrid}>
+        {deals.map((deal, index) => (
+          <View key={index} style={styles.dealCard}>
+            <Text style={styles.dealHeader}>{deal.currency === 'FREE' ? 'FREE' : 'DAILY DEAL'}</Text>
+            <View style={styles.dealImageContainer}>
+               <UnitSprite id={deal.id} isOpponent={false} size={50} />
+               <Text style={styles.dealCount}>x{deal.count}</Text>
+            </View>
+            <Text style={styles.dealName}>{deal.name}</Text>
+            <TouchableOpacity style={[styles.buyButton, deal.currency === 'FREE' && styles.buyButtonFree]}>
+              <Text style={styles.buyButtonText}>
+                {deal.currency === 'FREE' ? 'CLAIM' : `${deal.cost} ${deal.currency === 'GEM' ? '💎' : '💰'}`}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ))}
+      </View>
+
+      <View style={styles.shopSectionHeader}>
+        <Text style={styles.shopSectionTitle}>ROYALE PASS</Text>
+      </View>
+      <View style={styles.passBanner}>
+         <View style={styles.passBannerLeft}>
+            <Text style={styles.passBannerTitle}>UNLOCK EXCLUSIVE REWARDS!</Text>
+            <TouchableOpacity style={styles.passButton}>
+               <Text style={styles.passButtonText}>GET PASS</Text>
+            </TouchableOpacity>
+         </View>
+         <View style={styles.passBannerRight}>
+             <UnitSprite id="king" isOpponent={false} size={60} />
+         </View>
+      </View>
+    </ScrollView>
+  );
+};
+
+const MagicItems = () => (
+  <View style={styles.magicItemsContainer}>
+    <View style={styles.magicItemIcon}><Text style={{fontSize: 16}}>⚡</Text></View>
+    <Text style={styles.magicItemsText}>Magic Items</Text>
+  </View>
+);
+
+const DeckStats = () => (
+  <View style={styles.deckStatsContainer}>
+    <View style={styles.deckStatItem}>
+       <Text style={styles.deckStatLabel}>Avg. Elixir</Text>
+       <Text style={styles.deckStatValue}>3.8</Text>
+    </View>
+    <View style={styles.deckStatDivider} />
+    <View style={styles.deckStatItem}>
+       <Text style={styles.deckStatLabel}>Tower Troop</Text>
+       <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <UnitSprite id="princess" isOpponent={false} size={20} />
+          <Text style={styles.deckStatValue}>Princess</Text>
+       </View>
+    </View>
+  </View>
+);
+
+const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeckIndex, setSelectedDeckIndex }) => {
+  const [selectedCard, setSelectedCard] = useState(null); // For detail modal
+  const [cardMenuCard, setCardMenuCard] = useState(null); // For popup menu
+  const [showSlotSelector, setShowSlotSelector] = useState(null); // For slot selector
+  
+  // Drag state
+  const [localDraggingCard, setLocalDraggingCard] = useState(null); 
+  const [scrollEnabled, setScrollEnabled] = useState(true);
+
+  // Show card menu for collection cards
+  const handleCollectionCardTap = (card) => {
+    setCardMenuCard(card);
+  };
+
+  // Handle tap on deck slot card
+  const handleDeckCardTap = (card, index) => {
+    // Just show details for deck cards
+    setSelectedCard(card);
+  };
+
+  // Handle swap from menu
+  const handleSwapFromMenu = (deckIndex) => {
+    // Use showSlotSelector as the source card (it's set when Swap is clicked)
+    const sourceCard = showSlotSelector || cardMenuCard;
+    if (sourceCard) {
+      const fromIndex = cards.findIndex(c => c.id === sourceCard.id);
+      if (fromIndex !== -1 && fromIndex !== deckIndex) {
+        onSwapCards(fromIndex, deckIndex);
+      }
+      // Clear both states
+      setCardMenuCard(null);
+      setShowSlotSelector(null);
+    }
+  };
+
+  // Card menu component (popup)
+  const CardMenu = ({ card }) => {
+    if (!card) return null;
+
+    return (
+    <Modal
+      animationType="fade"
+      transparent={true}
+      visible={!!card}
+      onRequestClose={() => setCardMenuCard(null)}
+    >
+      <TouchableOpacity style={styles.cardMenuOverlay} activeOpacity={1} onPress={() => setCardMenuCard(null)}>
+        <View style={styles.cardMenuContent}>
+          {/* Card Preview */}
+          <View style={styles.cardMenuPreview}>
+            <UnitSprite id={card.id} isOpponent={false} size={60} />
+            <View style={styles.cardMenuCostBadge}>
+              <Text style={styles.cardMenuCostText}>{card.cost}</Text>
+            </View>
+            <Text style={styles.cardMenuName}>{card.name}</Text>
+            <View style={styles.cardMenuRarityBadge}>
+              <Text style={styles.cardMenuRarityText}>{card.rarity?.toUpperCase()}</Text>
+            </View>
+          </View>
+
+          {/* Stats Preview */}
+          <View style={styles.cardMenuStats}>
+            {card.hp && <Text style={styles.cardMenuStat}>HP: {card.hp}</Text>}
+            {card.damage && <Text style={styles.cardMenuStat}>DMG: {card.damage}</Text>}
+            {card.speed > 0 && <Text style={styles.cardMenuStat}>SPD: {card.speed}</Text>}
+          </View>
+
+          {/* Action Buttons */}
+          <View style={styles.cardMenuButtons}>
+            <TouchableOpacity
+              style={[styles.cardMenuButton, styles.cardMenuButtonInfo]}
+              onPress={() => {
+                setCardMenuCard(null);
+                setSelectedCard(card);
+              }}
+            >
+              <Text style={styles.cardMenuButtonText}>📊 Info</Text>
+            </TouchableOpacity>
+
+            <Text style={styles.cardMenuOr}>OR</Text>
+
+            <TouchableOpacity
+              style={[styles.cardMenuButton, styles.cardMenuButtonSwap]}
+              onPress={() => {
+                setCardMenuCard(null);
+                setShowSlotSelector(card);
+              }}
+            >
+              <Text style={styles.cardMenuButtonText}>🔄 Swap</Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            style={styles.cardMenuCancel}
+            onPress={() => setCardMenuCard(null)}
+          >
+            <Text style={styles.cardMenuCancelText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    </Modal>
+    );
+  };
+
+  // Deck slot selector
+  const DeckSlotSelector = () => {
+    if (!showSlotSelector) return null;
+
+    return (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={!!showSlotSelector}
+      onRequestClose={() => setShowSlotSelector(null)}
+    >
+      <TouchableOpacity style={styles.cardMenuOverlay} activeOpacity={1} onPress={() => setShowSlotSelector(null)}>
+        <View style={styles.slotSelectorContent}>
+          <Text style={styles.slotSelectorTitle}>Select slot to swap with {showSlotSelector?.name || 'Card'}</Text>
+
+          <View style={styles.slotSelectorDeck}>
+            <View style={styles.slotSelectorSlotRow}>
+              {cards.slice(0, 4).map((card, index) => (
+                <TouchableOpacity
+                  key={card.id}
+                  style={styles.slotSelectorSlot}
+                  onPress={() => handleSwapFromMenu(index)}
+                >
+                  <UnitSprite id={card.id} isOpponent={false} size={45} />
+                  <Text style={styles.slotSelectorSlotName}>{card.name || 'Card'}</Text>
+                  <View style={styles.slotSelectorSlotCost}>
+                    <Text style={styles.slotSelectorSlotCostText}>{card.cost || 0}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <View style={styles.slotSelectorSlotRow}>
+              {cards.slice(4, 8).map((card, index) => (
+                <TouchableOpacity
+                  key={card.id}
+                  style={styles.slotSelectorSlot}
+                  onPress={() => handleSwapFromMenu(index + 4)}
+                >
+                  <UnitSprite id={card.id} isOpponent={false} size={45} />
+                  <Text style={styles.slotSelectorSlotName}>{card.name || 'Card'}</Text>
+                  <View style={styles.slotSelectorSlotCost}>
+                    <Text style={styles.slotSelectorSlotCostText}>{card.cost || 0}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={styles.slotSelectorCancel}
+            onPress={() => setShowSlotSelector(null)}
+          >
+            <Text style={styles.slotSelectorCancelText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    </Modal>
+    );
+  };
+
+  const measureDropZones = () => {
+    dropZones.current = [];
+    deckSlotRefs.current.forEach((ref, index) => {
+      if (ref) {
+        ref.measure((x, y, width, height, pageX, pageY) => {
+          dropZones.current[index] = { x: pageX, y: pageY, width, height, index };
+        });
+      }
+    });
+  };
+
+  const handleDragStart = (card, gesture, componentRef) => {
+    setScrollEnabled(false);
+    setLocalDraggingCard(card);
+    
+    componentRef.measure((x, y, width, height, pageX, pageY) => {
+       // Notify global handler
+       if (dragHandlers && dragHandlers.start) {
+           dragHandlers.start(card, pageX, pageY);
+       }
+       // Also measure drop zones now
+       measureDropZones();
+    });
+  };
+
+  const handleDragMove = (gesture) => {
+    if (dragHandlers && dragHandlers.move) {
+        dragHandlers.move(gesture.moveX, gesture.moveY);
+    }
+  };
+
+  const handleDragEnd = (gesture) => {
+    const dropX = gesture.moveX;
+    const dropY = gesture.moveY;
+
+    // Check collision with drop zones
+    const target = dropZones.current.find(zone => {
+       return dropX >= zone.x && dropX <= zone.x + zone.width &&
+              dropY >= zone.y && dropY <= zone.y + zone.height;
+    });
+
+    if (target) {
+       const fromIndex = cards.findIndex(c => c.id === localDraggingCard?.id);
+       const toIndex = target.index;
+       
+       if (fromIndex !== -1 && fromIndex !== toIndex) {
+           onSwapCards(fromIndex, toIndex);
+       }
+    }
+
+    if (dragHandlers && dragHandlers.end) {
+        dragHandlers.end();
+    }
+    setLocalDraggingCard(null);
+    setScrollEnabled(true);
+  };
+
+  // Simple card component for collection with Drag capability
+  const CollectionCard = ({ card }) => {
+    if (!card) return null;
+
+    // Check if this card is in the current deck
+    const isInDeck = cards.some(c => c && c.id === card.id);
+    
+    const componentRef = useRef(null);
+    const panResponder = useRef(
+        PanResponder.create({
+          onStartShouldSetPanResponder: () => true,
+          onMoveShouldSetPanResponder: () => true,
+          onPanResponderGrant: (evt, gestureState) => {
+             handleDragStart(card, gestureState, componentRef.current);
+          },
+          onPanResponderMove: (evt, gestureState) => {
+             handleDragMove(gestureState);
+          },
+          onPanResponderRelease: (evt, gestureState) => {
+             handleDragEnd(gestureState);
+          },
+          onPanResponderTerminate: () => {
+             if (dragHandlers && dragHandlers.end) dragHandlers.end();
+             setLocalDraggingCard(null);
+             setScrollEnabled(true);
+          }
+        })
+    ).current;
+
+    return (
+      <View ref={componentRef} style={{opacity: localDraggingCard?.id === card.id ? 0.3 : 1}}>
+          <TouchableOpacity
+            style={[
+              styles.deckCard,
+              {
+                borderColor: RARITY_COLORS[card.rarity] || '#000',
+                opacity: isInDeck ? 0.5 : 1
+              }
+            ]}
+            onPress={() => {
+                if (!localDraggingCard) handleCollectionCardTap(card);
+            }}
+            delayLongPress={200}
+            activeOpacity={0.7}
+            {...panResponder.panHandlers}
+          >
+            <UnitSprite id={card.id} isOpponent={false} size={40} />
+            <Text style={styles.deckCardName}>{card.name || 'Card'}</Text>
+            <View style={styles.deckCardCost}>
+              <Text style={styles.deckCardCostText}>{card.cost || 0}</Text>
+            </View>
+            {isInDeck && (
+              <View style={styles.deckCardBadge}>
+                <Text style={styles.deckCardBadgeText}>✓</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+      </View>
+    );
+  };
+
+  return (
+    <View style={styles.deckTabContainer}>
+      <View style={styles.deckHeaderRow}>
+         <Text style={styles.deckTabTitle}>Battle Deck 1</Text>
+         <MagicItems />
+      </View>
+
+      <DeckStats />
+
+      {/* Deck Selector - 3 Deck Slots */}
+      <View style={styles.deckSelectorContainer}>
+        <Text style={styles.deckSelectorLabel}>SELECT DECK:</Text>
+        <View style={styles.deckSelectorButtons}>
+          {[0, 1, 2].map(deckIndex => (
+            <TouchableOpacity
+              key={deckIndex}
+              style={[
+                styles.deckSelectorButton,
+                selectedDeckIndex === deckIndex && styles.deckSelectorButtonActive
+              ]}
+              onPress={() => setSelectedDeckIndex(deckIndex)}
+            >
+              <Text style={[
+                styles.deckSelectorButtonText,
+                selectedDeckIndex === deckIndex && styles.deckSelectorButtonTextActive
+              ]}>
+                Deck {deckIndex + 1}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+
+      {/* Current Battle Deck Box */}
+      <View style={styles.deckBox}>
+        <View style={styles.deckBoxInner}>
+          <View style={styles.cardRow}>
+            {cards.slice(0, 4).map((card, index) => {
+              if (!card) return null;
+              return (
+                <TouchableOpacity
+                  key={card.id}
+                  style={[
+                    styles.deckCard,
+                    { borderColor: RARITY_COLORS[card.rarity] || '#000' }
+                  ]}
+                  onPress={() => handleDeckCardTap(card, index)}
+                  activeOpacity={0.7}
+                >
+                  <UnitSprite id={card.id} isOpponent={false} size={40} />
+                  <Text style={styles.deckCardName}>{card.name || 'Card'}</Text>
+                  <View style={styles.deckCardCost}>
+                    <Text style={styles.deckCardCostText}>{card.cost || 0}</Text>
+                  </View>
+                  {card.type === 'spell' && <View style={styles.cardTypeBadge}><Text style={styles.cardTypeText}>SPELL</Text></View>}
+                  {card.type === 'flying' && <View style={styles.cardTypeBadgeFlying}><Text style={styles.cardTypeText}>FLY</Text></View>}
+                  {card.targetType === 'buildings' && <View style={styles.cardTypeBadgeBuilding}><Text style={styles.cardTypeText}>BLD</Text></View>}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+          <View style={styles.cardRow}>
+            {cards.slice(4, 8).map((card, index) => {
+              if (!card) return null;
+              return (
+              <TouchableOpacity
+                key={card.id}
+                style={[
+                  styles.deckCard,
+                  { borderColor: RARITY_COLORS[card.rarity] || '#000' }
+                ]}
+                onPress={() => handleDeckCardTap(card, index + 4)}
+                activeOpacity={0.7}
+              >
+                <UnitSprite id={card.id} isOpponent={false} size={40} />
+                <Text style={styles.deckCardName}>{card.name || 'Card'}</Text>
+                <View style={styles.deckCardCost}>
+                  <Text style={styles.deckCardCostText}>{card.cost || 0}</Text>
+                </View>
+                {card.type === 'spell' && <View style={styles.cardTypeBadge}><Text style={styles.cardTypeText}>SPELL</Text></View>}
+                {card.type === 'flying' && <View style={styles.cardTypeBadgeFlying}><Text style={styles.cardTypeText}>FLY</Text></View>}
+                {card.targetType === 'buildings' && <View style={styles.cardTypeBadgeBuilding}><Text style={styles.cardTypeText}>BLD</Text></View>}
+              </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+      </View>
+
+      {/* All Cards Section */}
+      <Text style={styles.deckBoxTitle}>Collection</Text>
+      <ScrollView
+        style={styles.allCardsScroll}
+        showsVerticalScrollIndicator={true}
+      >
+        <View style={styles.cardRow}>
+          {CARDS.slice(8, 12).map(card => (
+            <CollectionCard key={card.id} card={card} />
+          ))}
+        </View>
+        <View style={styles.cardRow}>
+          {CARDS.slice(12, 16).map(card => (
+            <CollectionCard key={card.id} card={card} />
+          ))}
+        </View>
+        <View style={styles.cardRow}>
+          {CARDS.slice(16, 20).map(card => (
+            <CollectionCard key={card.id} card={card} />
+          ))}
+        </View>
+        <View style={styles.cardRow}>
+          {CARDS.slice(20, 24).map(card => (
+            <CollectionCard key={card.id} card={card} />
+          ))}
+        </View>
+      </ScrollView>
+
+      {/* Card Menu Modal */}
+      <CardMenu card={cardMenuCard} />
+
+      {/* Deck Slot Selector Modal */}
+      <DeckSlotSelector />
+
+      {/* Card Detail Modal */}
+      {selectedCard && (
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={!!selectedCard}
+          onRequestClose={() => setSelectedCard(null)}
+        >
+          <View style={styles.cardDetailModal}>
+            <View style={[styles.cardDetailModalContent, { borderColor: RARITY_COLORS[selectedCard.rarity] || '#F1C40F' }]}>
+              <View style={styles.cardDetailCostBig}>
+                <Text style={styles.cardDetailCostBigText}>{selectedCard.cost}</Text>
+              </View>
+
+              <TouchableOpacity style={styles.closeButton} onPress={() => setSelectedCard(null)}>
+                <Text style={styles.closeButtonText}>✕</Text>
+              </TouchableOpacity>
+
+              <View style={styles.cardDetailHeader}>
+                <View style={styles.cardDetailIconBig}>
+                  <UnitSprite id={selectedCard.id} isOpponent={false} size={80} />
+                </View>
+                <Text style={styles.cardDetailNameBig}>{selectedCard.name}</Text>
+                {selectedCard.type === 'spell' && <Text style={styles.cardDetailTypeBig}>🔥 SPELL</Text>}
+                {selectedCard.type === 'flying' && <Text style={styles.cardDetailTypeBigFlying}>🦅 FLYING</Text>}
+                {selectedCard.targetType === 'buildings' && <Text style={styles.cardDetailTypeBigBuilding}>🏠 TARGETS BUILDINGS</Text>}
+                {selectedCard.type === 'building' && <Text style={styles.cardDetailTypeBigBuilding}>🏠 BUILDING</Text>}
+              </View>
+
+              <View style={styles.cardDetailStatsBig}>
+                {selectedCard.hp && (
+                  <View style={styles.statRow}>
+                    <Text style={styles.statLabel}>Hitpoints:</Text>
+                    <Text style={styles.statValue}>{selectedCard.hp}</Text>
+                  </View>
+                )}
+                {selectedCard.damage && (
+                  <View style={styles.statRow}>
+                    <Text style={styles.statLabel}>Damage:</Text>
+                    <Text style={styles.statValue}>{selectedCard.damage}</Text>
+                  </View>
+                )}
+                {selectedCard.speed !== undefined && selectedCard.speed > 0 && (
+                  <View style={styles.statRow}>
+                    <Text style={styles.statLabel}>Speed:</Text>
+                    <Text style={styles.statValue}>{selectedCard.speed}</Text>
+                  </View>
+                )}
+                {selectedCard.range && (
+                  <View style={styles.statRow}>
+                    <Text style={styles.statLabel}>Range:</Text>
+                    <Text style={styles.statValue}>{selectedCard.range}</Text>
+                  </View>
+                )}
+                {selectedCard.count > 1 && (
+                  <View style={styles.statRow}>
+                    <Text style={styles.statLabel}>Count:</Text>
+                    <Text style={styles.statValue}>{selectedCard.count}</Text>
+                  </View>
+                )}
+                {selectedCard.attackSpeed && (
+                  <View style={styles.statRow}>
+                    <Text style={styles.statLabel}>Attack Speed:</Text>
+                    <Text style={styles.statValue}>{selectedCard.attackSpeed}ms</Text>
+                  </View>
+                )}
+              </View>
+
+              <TouchableOpacity style={styles.upgradeButton} onPress={() => setSelectedCard(null)}>
+                <Text style={styles.upgradeButtonText}>CLOSE</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      )}
+    </View>
+  );
+};
+
+const BattleTab = ({ currentDeck, onStartBattle }) => (
+  <View style={styles.battleTabContainer}>
+    <View style={styles.arenaTitleContainer}>
+        <Text style={styles.arenaTitle}>ARENA 1</Text>
+        <Text style={styles.arenaSubtitle}>Goblin Stadium</Text>
+    </View>
+    
+    <View style={styles.deckBox}>
+      <Text style={styles.deckBoxTitle}>Battle Deck</Text>
+      <View style={styles.deckBoxInner}>
+        <View style={styles.cardRow}>
+          {currentDeck.slice(0, 4).map(card => (
+            <View key={card.id} style={[styles.deckCard, { borderColor: RARITY_COLORS[card.rarity] || '#000' }]}>
+              <UnitSprite id={card.id} isOpponent={false} size={40} />
+              <Text style={styles.deckCardName}>{card.name}</Text>
+              <View style={styles.deckCardCost}>
+                <Text style={styles.deckCardCostText}>{card.cost}</Text>
+              </View>
+              {card.type === 'spell' && <View style={styles.cardTypeBadge}><Text style={styles.cardTypeText}>SPELL</Text></View>}
+              {card.type === 'flying' && <View style={styles.cardTypeBadgeFlying}><Text style={styles.cardTypeText}>FLY</Text></View>}
+              {card.targetType === 'buildings' && <View style={styles.cardTypeBadgeBuilding}><Text style={styles.cardTypeText}>BLD</Text></View>}
+            </View>
+          ))}
+        </View>
+        <View style={styles.cardRow}>
+          {currentDeck.slice(4, 8).map(card => (
+            <View key={card.id} style={[styles.deckCard, { borderColor: RARITY_COLORS[card.rarity] || '#000' }]}>
+              <UnitSprite id={card.id} isOpponent={false} size={40} />
+              <Text style={styles.deckCardName}>{card.name}</Text>
+              <View style={styles.deckCardCost}>
+                <Text style={styles.deckCardCostText}>{card.cost}</Text>
+              </View>
+              {card.type === 'spell' && <View style={styles.cardTypeBadge}><Text style={styles.cardTypeText}>SPELL</Text></View>}
+              {card.type === 'flying' && <View style={styles.cardTypeBadgeFlying}><Text style={styles.cardTypeText}>FLY</Text></View>}
+              {card.targetType === 'buildings' && <View style={styles.cardTypeBadgeBuilding}><Text style={styles.cardTypeText}>BLD</Text></View>}
+            </View>
+          ))}
+        </View>
+      </View>
+    </View>
+    
+    <TouchableOpacity style={styles.battleButton} onPress={onStartBattle}>
+      <Text style={styles.battleButtonText}>BATTLE</Text>
+      <Text style={styles.battleButtonSubtext}>Ranked 1v1</Text>
+    </TouchableOpacity>
+
+    <ChestSlots />
+  </View>
+);
+
+const ClanTab = () => {
+  const [messages, setMessages] = useState([
+    { id: '1', user: 'KingSlayer', text: 'Good game everyone!', role: 'Elder', time: '2h ago' },
+    { id: '2', user: 'PrincessLover', text: 'Can someone donate Wizards?', role: 'Member', time: '1h ago' },
+    { id: '3', user: 'System', text: 'Trainer Cheddar joined the clan.', role: 'System', time: '30m ago' },
+  ]);
+  const [inputText, setInputText] = useState('');
+
+  const sendMessage = () => {
+    if (inputText.trim().length === 0) return;
+    const newMsg = {
+      id: Date.now().toString(),
+      user: 'You',
+      text: inputText,
+      role: 'Leader',
+      time: 'Just now'
+    };
+    setMessages(prev => [...prev, newMsg]);
+    setInputText('');
+  };
+
+  const renderMessage = ({ item }) => {
+    if (item.role === 'System') {
+      return (
+        <View style={styles.systemMessage}>
+          <Text style={styles.systemMessageText}>{item.text}</Text>
+        </View>
+      );
+    }
+    const isMe = item.user === 'You';
+    return (
+      <View style={[styles.chatRow, isMe ? styles.chatRowMe : styles.chatRowOther]}>
+        {!isMe && <View style={styles.chatAvatar}><Text style={{fontSize: 12}}>👤</Text></View>}
+        <View style={[styles.chatBubble, isMe ? styles.chatBubbleMe : styles.chatBubbleOther]}>
+          {!isMe && <Text style={styles.chatUser}>{item.user} <Text style={styles.chatRole}>({item.role})</Text></Text>}
+          <Text style={styles.chatText}>{item.text}</Text>
+          <Text style={styles.chatTime}>{item.time}</Text>
+        </View>
+      </View>
+    );
+  };
+
+  return (
+    <View style={styles.clanTabContainer}>
+      {/* Clan Header */}
+      <View style={styles.clanHeader}>
+         <View style={styles.clanHeaderLeft}>
+            <View style={styles.clanBadge}><Text style={{fontSize: 24}}>🛡️</Text></View>
+            <View>
+               <Text style={styles.clanName}>Blue Kings</Text>
+               <Text style={styles.clanStats}>48/50 Members • 24000 🏆</Text>
+            </View>
+         </View>
+         <TouchableOpacity style={styles.clanInfoButton}><Text style={{color: '#fff', fontWeight:'bold'}}>i</Text></TouchableOpacity>
+      </View>
+
+      {/* Chat Area */}
+      <KeyboardAvoidingView behavior="padding" style={styles.chatContainer}>
+        <FlatList
+          data={messages}
+          renderItem={renderMessage}
+          keyExtractor={item => item.id}
+          style={styles.chatList}
+          contentContainerStyle={{padding: 10, paddingBottom: 20}}
+        />
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.chatInput}
+            placeholder="Type a message..."
+            placeholderTextColor="#888"
+            value={inputText}
+            onChangeText={setInputText}
+          />
+          <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
+            <Text style={styles.sendButtonText}>Send</Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </View>
+  );
+};
+
+const BottomNavigation = ({ activeTab, onTabChange }) => {
+  const tabs = [
+    { id: 0, name: 'Shop', icon: '🛒' },
+    { id: 1, name: 'Deck', icon: '📚' },
+    { id: 2, name: 'Battle', icon: '⚔️' },
+    { id: 3, name: 'Clan', icon: '👥' }
+  ];
+
+  return (
+    <View style={styles.bottomNavigation}>
+      {tabs.map(tab => (
+        <TouchableOpacity
+          key={tab.id}
+          style={[styles.tabButton, activeTab === tab.id && styles.tabButtonActive]}
+          onPress={() => onTabChange(tab.id)}
+        >
+          <Text style={styles.tabIcon}>{tab.icon}</Text>
+          <Text style={[styles.tabLabel, activeTab === tab.id && styles.tabLabelActive]}>
+            {tab.name}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+};
+
+const MainLobby = ({ 
+  activeTab, onTabChange, onStartGame, currentDeck, onSwapCards, 
+  dragHandlers, selectedDeckIndex, setSelectedDeckIndex, allDecks 
+}) => {
+  const renderTabContent = () => {
+    switch(activeTab) {
+      case 0: return <ShopTab />;
+      case 1: return <DeckTab 
+        cards={currentDeck} 
+        onSwapCards={onSwapCards} 
+        dragHandlers={dragHandlers}
+        selectedDeckIndex={selectedDeckIndex}
+        setSelectedDeckIndex={setSelectedDeckIndex}
+        allDecks={allDecks}
+      />;
+      case 2: return <BattleTab currentDeck={currentDeck} onStartBattle={onStartGame} />;
+      case 3: return <ClanTab />;
+      default: return <BattleTab currentDeck={currentDeck} onStartBattle={onStartGame} />;
+    }
+  };
+
+  return (
+    <ImageBackground source={require('./lobby-bg.jpg')} style={styles.lobbyContainer}>
+      <View style={styles.lobbyOverlay}>
+        <LobbyHeader />
+        <View style={styles.tabContentArea}>
+          {renderTabContent()}
+        </View>
+        <BottomNavigation activeTab={activeTab} onTabChange={onTabChange} />
+      </View>
+    </ImageBackground>
+  );
+};
+
+// --- Game Board Component (Extracted) ---
+const GameBoard = ({
+  towers, units, projectiles, timeLeft, gameOver,
+  elixir, hand, nextCard, draggingCard, dragPosition,
+  handleDragStart, handleDragMove, handleDragEnd,
+  spawnTestEnemy, formatTime, onRestart, score,
+  isDoubleElixir, showDoubleElixirAlert
+}) => {
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <View style={styles.gameBoard}>
+        {/* Top Info Bar (Opponent) */}
+        <View style={styles.topInfoBar}>
+            <View style={styles.playerInfoContainer}>
+                <Text style={styles.playerName}>Trainer Cheddar</Text>
+                <Text style={styles.clanName}>Training Camp</Text>
+            </View>
+        </View>
+        
+        {/* Score & Time Board */}
+        <View style={styles.scoreBoard}>
+             <View style={styles.crownContainer}>
+                 <Text style={styles.crownIcon}>👑</Text>
+                 <Text style={styles.scoreText}>{score[1]}</Text>
+             </View>
+             <View style={styles.timerContainer}>
+                 <Text style={[styles.timerText, timeLeft <= 10 && styles.timerTextRed]}>
+                    {formatTime(timeLeft)}
+                 </Text>
+             </View>
+             <View style={styles.crownContainer}>
+                 <Text style={styles.scoreText}>{score[0]}</Text>
+                 <Text style={styles.crownIcon}>👑</Text>
+             </View>
+        </View>
+        
+        {/* Settings Button */}
+        <TouchableOpacity style={styles.settingsButton}>
+            <Text style={{fontSize: 20}}>⚙️</Text>
+        </TouchableOpacity>
+
+        {towers.map(tower => {
+            if (tower.hp <= 0) return null;
+            const isPrincess = tower.type === 'princess';
+            const size = isPrincess ? PRINCESS_TOWER_SIZE : KING_TOWER_SIZE;
+
+            const styleObj = {
+                left: tower.x - size/2,
+                top: tower.y - size/2,
+                width: size,
+                height: size,
+                zIndex: 10,
+                position: 'absolute'
+            };
+
+            return (
+                <View key={tower.id} style={[styles.towerContainer, styleObj]}>
+                     <TowerSprite type={tower.type} isOpponent={tower.isOpponent} size={size} />
+                     <HealthBar current={tower.hp} max={tower.maxHp} isOpponent={tower.isOpponent} />
+                </View>
+            );
+        })}
+
+        <View style={styles.river}>
+          <View style={[styles.bridge, { left: 65 }]} />
+          <View style={[styles.bridge, { right: 65 }]} />
+        </View>
+
+        {units.map(u => <Unit key={u.id} unit={u} />)}
+        {projectiles.map(p => <Projectile key={p.id} type={p.type} position={p} />)}
+        
+        {/* Emote Button */}
+        <TouchableOpacity style={styles.emoteButton}>
+             <Text style={{fontSize: 24}}>😊</Text>
+        </TouchableOpacity>
+
+      </View>
+
+      {/* Double Elixir Alert */}
+      {showDoubleElixirAlert && (
+        <View style={styles.doubleElixirAlert}>
+          <View style={styles.doubleElixirAlertContent}>
+            <Text style={styles.doubleElixirAlertTitle}>⚡ DOUBLE ELIXIR! ⚡</Text>
+            <Text style={styles.doubleElixirAlertSubtitle}>Elixir generation 2x speed!</Text>
+          </View>
+        </View>
+      )}
+
+      <View style={styles.footerContainer}>
+        <View style={styles.deckContainer}>
+            <View style={styles.nextCardContainer}>
+                <Text style={styles.nextLabel}>NEXT</Text>
+                <Card card={nextCard} isNext={true} />
+            </View>
+
+            <View style={styles.handContainer}>
+                {hand.map((card, index) => (
+                    <Card
+                        key={`${card.id}-${index}`}
+                        card={card}
+                        isNext={false}
+                        canAfford={elixir >= card.cost}
+                        onDragStart={handleDragStart}
+                        onDragMove={handleDragMove}
+                        onDragEnd={handleDragEnd}
+                        isDragging={draggingCard && draggingCard.id === card.id}
+                    />
+                ))}
+            </View>
+        </View>
+
+        <View style={styles.elixirSection}>
+          <View style={styles.elixirContainer}>
+            <View style={[styles.elixirBubble, isDoubleElixir && styles.elixirBubbleDouble]}>
+                <Text style={styles.elixirText}>{Math.floor(elixir)}</Text>
+                {isDoubleElixir && <Text style={styles.elixirDoubleText}>2X</Text>}
+            </View>
+            <View style={styles.elixirBarBack}>
+              <View style={[styles.elixirBarFill, isDoubleElixir && styles.elixirBarFillDouble, { width: `${(elixir / 10) * 100}%` }]} />
+              {[...Array(9)].map((_, i) => (
+                <View key={i} style={[styles.elixirTick, { left: `${(i + 1) * 10}%` }]} />
+              ))}
+            </View>
+          </View>
+          {/* Hidden debug button for testing */}
+          <TouchableOpacity style={[styles.debugBtnSmall, {opacity: 0}]} onPress={spawnTestEnemy}>
+              <Text style={{color: '#fff', fontSize: 10}}>Enemy</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {draggingCard && (
+          <View style={[styles.dragProxy, { left: dragPosition.x - 30, top: dragPosition.y - 37.5 }]}>
+               <UnitSprite id={draggingCard.id} isOpponent={false} size={50} />
+               <View style={styles.dragProxyLabel}>
+                  <Text style={styles.cardName}>{draggingCard.name}</Text>
+               </View>
+          </View>
+      )}
+
+      {gameOver && <GameOverScreen result={gameOver} onRestart={onRestart} />}
+
+      <StatusBar style="auto" hidden />
     </View>
+  );
+};
+
+export default function App() {
+  // Main App Entry Point
+  const [inGame, setInGame] = useState(false);
+  const [inLobby, setInLobby] = useState(false);
+  const [activeTab, setActiveTab] = useState(2); // Default to Battle tab
+  const [gameOver, setGameOver] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(180);
+  const [score, setScore] = useState([0, 0]); // [Player, Opponent]
+  const [isDoubleElixir, setIsDoubleElixir] = useState(false);
+  const [showDoubleElixirAlert, setShowDoubleElixirAlert] = useState(false);
+  const doubleElixirTriggeredRef = useRef(false);
+
+  // Multiple deck slots - 3 decks of 8 cards each
+  const [allDecks, setAllDecks] = useState([
+    CARDS.slice(0, 8),  // Deck 1
+    CARDS.slice(8, 16), // Deck 2
+    CARDS.slice(16, 24) // Deck 3
+  ]);
+  const [selectedDeckIndex, setSelectedDeckIndex] = useState(0);
+
+  // Get currently selected deck
+  const userCards = allDecks[selectedDeckIndex];
+
+  // Global Drag State
+  const [globalDraggingCard, setGlobalDraggingCard] = useState(null);
+  const [globalDragPosition, setGlobalDragPosition] = useState({ x: 0, y: 0 });
+
+  const [elixir, setElixir] = useState(5);
+  const [hand, setHand] = useState([CARDS[0], CARDS[1], CARDS[2], CARDS[3]]);
+  const [nextCard, setNextCard] = useState(CARDS[4]);
+  const [deckQueue, setDeckQueue] = useState([CARDS[5], CARDS[6], CARDS[7]]);
+  const [draggingCard, setDraggingCard] = useState(null);
+  const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
+
+  const handleSwapCards = (fromIndex, toIndex) => {
+    // fromIndex can be from collection (8-23) or deck (0-7)
+    // toIndex is always a deck slot (0-7)
+    setAllDecks(prevDecks => {
+      const newDecks = [...prevDecks];
+      const currentDeck = [...newDecks[selectedDeckIndex]];
+
+      // If fromIndex is in collection range, get the card from CARDS array
+      if (fromIndex >= 8) {
+        // Swap deck slot with collection card
+        const collectionCard = CARDS[fromIndex];
+        currentDeck[toIndex] = collectionCard;
+      } else {
+        // Swap within deck (0-7)
+        const temp = currentDeck[fromIndex];
+        currentDeck[fromIndex] = currentDeck[toIndex];
+        currentDeck[toIndex] = temp;
+      }
+
+      newDecks[selectedDeckIndex] = currentDeck;
+      return newDecks;
+    });
+  };
+
+  const onGlobalDragStart = (card, x, y) => {
+      setGlobalDraggingCard(card);
+      setGlobalDragPosition({ x, y });
+  };
+
+  const onGlobalDragMove = (x, y) => {
+      setGlobalDragPosition({ x, y });
+  };
+
+  const onGlobalDragEnd = () => {
+      setGlobalDraggingCard(null);
+  };
+
+  // Enemy State
+  const [enemyElixir, setEnemyElixir] = useState(5);
+  const [enemyHand, setEnemyHand] = useState([CARDS[0], CARDS[3], CARDS[5], CARDS[6]]);
+  const [enemyNextCard, setEnemyNextCard] = useState(CARDS[1]);
+  const [enemyDeckQueue, setEnemyDeckQueue] = useState([CARDS[2], CARDS[4], CARDS[7]]);
+
+  const [towers, setTowers] = useState([
+    { id: 0, type: 'king', isOpponent: true, hp: 4000, maxHp: 4000, x: width / 2, y: 80, range: KING_RANGE, lastShot: 0 },
+    { id: 1, type: 'princess', isOpponent: true, hp: 2500, maxHp: 2500, x: 70, y: 150, range: TOWER_RANGE, lastShot: 0 },
+    { id: 2, type: 'princess', isOpponent: true, hp: 2500, maxHp: 2500, x: width - 70, y: 150, range: TOWER_RANGE, lastShot: 0 },
+    { id: 3, type: 'king', isOpponent: false, hp: 4000, maxHp: 4000, x: width / 2, y: height - 160, range: KING_RANGE, lastShot: 0 },
+    { id: 4, type: 'princess', isOpponent: false, hp: 2500, maxHp: 2500, x: 70, y: height - 230, range: TOWER_RANGE, lastShot: 0 },
+    { id: 5, type: 'princess', isOpponent: false, hp: 2500, maxHp: 2500, x: width - 70, y: height - 230, range: TOWER_RANGE, lastShot: 0 },
+  ]);
+  
+  const [units, setUnits] = useState([]);
+  const [projectiles, setProjectiles] = useState([]);
+
+  const towersRef = useRef(towers);
+  const unitsRef = useRef(units);
+  const projectilesRef = useRef(projectiles);
+  const enemyElixirRef = useRef(enemyElixir);
+  const enemyHandRef = useRef(enemyHand);
+  const enemyNextCardRef = useRef(enemyNextCard);
+  const enemyDeckQueueRef = useRef(enemyDeckQueue);
+
+  useEffect(() => { towersRef.current = towers; }, [towers]);
+  useEffect(() => { unitsRef.current = units; }, [units]);
+  useEffect(() => { projectilesRef.current = projectiles; }, [projectiles]);
+  useEffect(() => { enemyElixirRef.current = enemyElixir; }, [enemyElixir]);
+  useEffect(() => { enemyHandRef.current = enemyHand; }, [enemyHand]);
+  useEffect(() => { enemyNextCardRef.current = enemyNextCard; }, [enemyNextCard]);
+  useEffect(() => { enemyDeckQueueRef.current = enemyDeckQueue; }, [enemyDeckQueue]);
+
+  const resetGame = (destination = 'game') => {
+      setElixir(5);
+      setScore([0, 0]);
+      setIsDoubleElixir(false);
+      setShowDoubleElixirAlert(false);
+      doubleElixirTriggeredRef.current = false;
+      // Use the current user deck and randomize the starting hand
+      const currentDeck = userCards || CARDS;
+      // Shuffle the deck randomly
+      const shuffledDeck = [...currentDeck].sort(() => Math.random() - 0.5);
+      setHand([shuffledDeck[0], shuffledDeck[1], shuffledDeck[2], shuffledDeck[3]]);
+      setNextCard(shuffledDeck[4]);
+      setDeckQueue([shuffledDeck[5], shuffledDeck[6], shuffledDeck[7]]);
+      setUnits([]);
+      setProjectiles([]);
+      setTimeLeft(180);
+      setGameOver(null);
+      setTowers([
+        { id: 0, type: 'king', isOpponent: true, hp: 4000, maxHp: 4000, x: width / 2, y: 80, range: KING_RANGE, lastShot: 0 },
+        { id: 1, type: 'princess', isOpponent: true, hp: 2500, maxHp: 2500, x: 70, y: 150, range: TOWER_RANGE, lastShot: 0 },
+        { id: 2, type: 'princess', isOpponent: true, hp: 2500, maxHp: 2500, x: width - 70, y: 150, range: TOWER_RANGE, lastShot: 0 },
+        { id: 3, type: 'king', isOpponent: false, hp: 4000, maxHp: 4000, x: width / 2, y: height - 160, range: KING_RANGE, lastShot: 0 },
+        { id: 4, type: 'princess', isOpponent: false, hp: 2500, maxHp: 2500, x: 70, y: height - 230, range: TOWER_RANGE, lastShot: 0 },
+        { id: 5, type: 'princess', isOpponent: false, hp: 2500, maxHp: 2500, x: width - 70, y: height - 230, range: TOWER_RANGE, lastShot: 0 },
+      ]);
+
+      if (destination === 'lobby') {
+        setInLobby(true);
+        setInGame(false);
+      } else {
+        setInGame(true);
+      }
+  };
+
+  const handleDragStart = (card, gesture) => {
+    console.log('[handleDragStart] Card:', card.name, 'elixir:', elixir, 'cost:', card.cost);
+    setDraggingCard(card);
+    setDragPosition({ x: gesture.x0, y: gesture.y0 });
+  };
+
+  const handleDragMove = (gesture) => {
+    setDragPosition({ x: gesture.moveX, y: gesture.moveY });
+  };
+
+  const handleDragEnd = (gesture) => {
+    if (gameOver) return;
+    const dropX = gesture.moveX;
+    const dropY = gesture.moveY;
+    const card = draggingCard;
+
+    console.log('[handleDragEnd] Card:', card?.name, 'dropX:', dropX, 'dropY:', dropY);
+
+    setDraggingCard(null);
+
+    const footerHeight = 135;
+    const gameAreaBottom = height - footerHeight;
+    const riverY = height / 2;
+
+    if (dropY < gameAreaBottom) {
+        // Check if deployment is allowed based on tower status
+        let canDeploy = false;
+
+        if (card.type === 'spell') {
+          // Spells can be deployed anywhere
+          canDeploy = true;
+        } else {
+          // For non-spells: check if opponent's princess tower on that side is destroyed
+          const leftOpponentPrincess = towers.find(t => t.id === 1 && t.hp > 0);
+          const rightOpponentPrincess = towers.find(t => t.id === 2 && t.hp > 0);
+
+          const isLeftSide = dropX < width / 2;
+
+          // Allow deployment on own side (player's side)
+          if (dropY > riverY) {
+            canDeploy = true;
+          }
+          // Allow deployment in enemy territory if that side's princess tower is destroyed
+          // Can deploy anywhere in the enemy half (0 to riverY) when that side's tower is gone
+          else if (isLeftSide && !leftOpponentPrincess) {
+            // Left princess destroyed - can deploy anywhere on left side of enemy territory
+            canDeploy = true;
+          }
+          else if (!isLeftSide && !rightOpponentPrincess) {
+            // Right princess destroyed - can deploy anywhere on right side of enemy territory
+            canDeploy = true;
+          }
+        }
+
+        if (canDeploy) {
+             console.log('[handleDragEnd] Calling spawnCard for', card.name);
+             spawnCard(card, dropX, dropY);
+        } else {
+             console.log('[handleDragEnd] Drop blocked - must deploy on your side (or in destroyed tower zone)');
+        }
+    } else {
+        console.log('[handleDragEnd] Drop blocked - dropped in footer area');
+    }
+  };
+
+  const spawnCard = (card, x, y) => {
+    console.log('[spawnCard] Starting - Card:', card.name, 'cost:', card.cost, 'current elixir:', elixir);
+    setElixir(currentElixir => {
+      console.log('[spawnCard] Inside setElixir - currentElixir:', currentElixir, 'card.cost:', card.cost);
+      if (currentElixir < card.cost) {
+        console.log('[spawnCard] BLOCKED - Not enough elixir!');
+        return currentElixir;
+      }
+      const newElixir = currentElixir - card.cost;
+
+      if (card.type === 'spell') {
+        // Different spell types have different visuals and timing
+        let spellType = 'fireball_spell';
+        let spellSpeed = 15;
+        let startX = width / 2;
+        let startY = height;
+
+        if (card.id === 'zap') {
+          // Zap is instant with lightning
+          spellType = 'zap_spell';
+          spellSpeed = 100; // Very fast (instant)
+        } else if (card.id === 'arrows') {
+          // Arrows fall from sky with volley visual
+          spellType = 'arrows_spell';
+          startY = 0; // Start from top of screen
+          spellSpeed = 20;
+        } else if (card.id === 'poison') {
+          // Poison is instant area that stays and ticks damage
+          spellType = 'poison_spell';
+          spellSpeed = 100; // Instant - no travel time
+          startX = x; // Start at target location
+          startY = y;  // Start at target location
+        }
+
+        // For poison, mark it as already hit since it's instant
+        const isPoison = card.id === 'poison';
+        const currentTime = Date.now();
+
+        setProjectiles(prev => [...prev, {
+          id: Date.now(),
+          x: startX,
+          y: startY,
+          targetX: x,
+          targetY: y,
+          speed: spellSpeed,
+          damage: card.damage,
+          radius: card.radius,
+          type: spellType,
+          isSpell: true,
+          stun: card.stun || 0,
+          duration: card.duration || 0,
+          hit: isPoison, // Poison is instant
+          spawnTime: currentTime, // Track when poison was spawned
+          isPoison: isPoison // Mark as poison for special handling
+        }]);
+      } else {
+        const lane = x < width / 2 ? 'LEFT' : 'RIGHT';
+        const count = card.count || 1;
+        const newUnits = [];
+
+        for (let i = 0; i < count; i++) {
+          const offsetX = count > 1 ? (Math.random() * 40 - 20) : 0;
+          const offsetY = count > 1 ? (Math.random() * 40 - 20) : 0;
+
+          newUnits.push({
+            id: Date.now() + i,
+            x: x + offsetX,
+            y: y + offsetY,
+            hp: card.hp,
+            maxHp: card.hp,
+            isOpponent: false,
+            speed: card.speed,
+            lane: lane,
+            lastAttack: 0,
+            spriteId: card.id,
+            type: card.type,
+            range: card.range,
+            damage: card.damage,
+            attackSpeed: card.attackSpeed,
+            projectile: card.projectile,
+            targetType: card.targetType,
+            // Special properties
+            charge: card.charge ? {
+              active: false,
+              distance: 0,      // Distance traveled so far
+              threshold: 2      // Charge activates after 2 tiles
+            } : undefined,
+            hidden: card.hidden ? { active: true, visibleHp: card.hp } : undefined,
+            splash: card.splash || false,
+            spawns: card.spawns,
+            spawnRate: card.spawnRate,
+            lastSpawn: card.spawnRate ? Date.now() : 0,  // Initialize to now for buildings with spawnRate
+            lifetimeDuration: card.lifetime,  // Store lifetime duration in seconds
+            spawnTime: Date.now(),  // Track when building was spawned for HP depreciation
+            maxHp: card.hp,  // Store initial max HP for depreciation calculation
+            jumps: card.jumps || false,  // Hog Rider can jump over river
+            stunUntil: 0,
+            baseDamage: card.damage,
+            lockedTarget: null,  // Once locked, unit won't switch targets
+            wasPushed: false,    // Track if unit was pushed back (unlocks target)
+            wasStunned: false    // Track if unit was stunned (unlocks target when stun ends)
+          });
+          // Log spawn properties for debugging
+          if (card.spawns) {
+            console.log('[SPAWN CARD]', card.id, 'spawns:', card.spawns, 'spawnRate:', card.spawnRate);
+          }
+        }
+        setUnits(prev => [...prev, ...newUnits]);
+      }
+
+      // Cycle cards - use findIndex + splice to remove only first occurrence
+      setHand(currentHand => {
+        const newHand = [...currentHand];
+        const cardIndex = newHand.findIndex(c => c.id === card.id);
+        if (cardIndex !== -1) {
+          newHand.splice(cardIndex, 1);
+        }
+        newHand.push(nextCard);
+        console.log('[spawnCard] Card cycled successfully - removed', card.name, 'from hand, added', nextCard.name);
+        return newHand;
+      });
+
+      setDeckQueue(currentQueue => {
+        const newQueue = [...currentQueue];
+        const newNext = newQueue.shift();
+        newQueue.push(card);
+        setNextCard(newNext);
+        console.log('[spawnCard] Deck updated - new next card:', newNext?.name);
+        return newQueue;
+      });
+
+      console.log('[spawnCard] SUCCESS -', card.name, 'spawned, elixir:', newElixir);
+      return newElixir;
+    });
+  };
+
+  const spawnTestEnemy = () => {
+    if (gameOver) return;
+    const lane = Math.random() < 0.5 ? 'LEFT' : 'RIGHT';
+    const laneX = lane === 'LEFT' ? 70 : width - 70; 
+
+    const types = ['knight', 'giant', 'goblins', 'archers', 'musketeer'];
+    const type = types[Math.floor(Math.random() * types.length)];
+    const stats = CARDS.find(c => c.id === type) || CARDS[0];
+
+    const count = stats.count || 1;
+    const newUnits = [];
+
+    for (let i = 0; i < count; i++) {
+        const offsetX = count > 1 ? (Math.random() * 40 - 20) : 0;
+        const offsetY = count > 1 ? (Math.random() * 40 - 20) : 0;
+
+        newUnits.push({
+          id: Date.now() + i,
+          x: laneX + offsetX,
+          y: 50 + offsetY,
+          hp: stats.hp,
+          maxHp: stats.hp,
+          isOpponent: true,
+          speed: stats.speed,
+          lane: lane,
+          lastAttack: 0,
+          spriteId: type,
+          range: stats.range,
+          damage: stats.damage,
+          attackSpeed: stats.attackSpeed,
+          projectile: stats.projectile,
+          targetType: stats.targetType,
+          // Special properties
+          charge: stats.charge ? { active: false, distance: 0, threshold: 4 } : undefined,
+          hidden: stats.hidden ? { active: true, visibleHp: stats.hp } : undefined,
+          splash: stats.splash || false,
+          jumps: stats.jumps || false,  // Hog Rider can jump over river
+          spawns: stats.spawns,
+          spawnRate: stats.spawnRate,
+          lastSpawn: stats.spawnRate ? Date.now() : 0,
+          lifetimeDuration: stats.lifetime,  // Store lifetime duration in seconds
+          spawnTime: Date.now(),  // Track when building was spawned for HP depreciation
+          maxHp: stats.hp,  // Store initial max HP for depreciation calculation
+          stunUntil: 0,
+          baseDamage: stats.damage,
+          lockedTarget: null,
+          wasPushed: false,
+          wasStunned: false
+        });
+    }
+    setUnits(prev => [...prev, ...newUnits]);
+  };
+
+  const checkWinner = () => {
+      const playerTowers = towersRef.current.filter(t => !t.isOpponent && t.hp > 0).length;
+      const opponentTowers = towersRef.current.filter(t => t.isOpponent && t.hp > 0).length;
+      
+      if (playerTowers > opponentTowers) setGameOver('VICTORY');
+      else if (opponentTowers > playerTowers) setGameOver('DEFEAT');
+      else setGameOver('DRAW');
+  };
+
+  useEffect(() => {
+      if (!inGame || gameOver) return;
+      const timer = setInterval(() => {
+          setTimeLeft(prev => {
+              if (prev <= 1) {
+                  clearInterval(timer);
+                  checkWinner();
+                  return 0;
+              }
+              // Check for double elixir activation at 60 seconds (2 minutes into match)
+              if (prev === 60 && !doubleElixirTriggeredRef.current) {
+                  doubleElixirTriggeredRef.current = true;
+                  setIsDoubleElixir(true);
+                  setShowDoubleElixirAlert(true);
+                  // Hide alert after 3 seconds
+                  setTimeout(() => setShowDoubleElixirAlert(false), 3000);
+              }
+              return prev - 1;
+          });
+      }, 1000);
+      return () => clearInterval(timer);
+  }, [inGame, gameOver]);
+
+  useEffect(() => {
+    if (!inGame || gameOver) return; 
+
+    const loop = setInterval(() => {
+      const now = Date.now();
+
+      // Defensive check: ensure towersRef.current exists and is an array
+      const currentTowers = towersRef.current || [];
+      let nextTowers = [...currentTowers];
+      
+      const playerKing = nextTowers.find(t => !t.isOpponent && t.type === 'king');
+      const opponentKing = nextTowers.find(t => t.isOpponent && t.type === 'king');
+      
+      if (playerKing && playerKing.hp <= 0) {
+          setGameOver('DEFEAT');
+          return;
+      }
+      if (opponentKing && opponentKing.hp <= 0) {
+          setGameOver('VICTORY');
+          return;
+      }
+      
+      // Update Score
+      const destroyedOpponentTowers = nextTowers.filter(t => t.isOpponent && t.hp <= 0).length;
+      const destroyedPlayerTowers = nextTowers.filter(t => !t.isOpponent && t.hp <= 0).length;
+      
+      // Only set state if score changed (to avoid infinite loops) - though in this simple interval it might be fine, 
+      // best to be safe if we were using refs for score. But here we use functional state updates elsewhere. 
+      // Actually, we can just update it.
+      setScore([destroyedOpponentTowers, destroyedPlayerTowers]);
+
+      let nextProjectiles = [...projectilesRef.current];
+
+      // Collect splash damage events to apply after unit updates
+      let splashEvents = [];
+      // Collect units to spawn (will be added at the end)
+      let unitsToSpawn = [];
+
+      let currentUnits = unitsRef.current.map(u => {
+        // Check if stunned
+        const isCurrentlyStunned = u.stunUntil && now < u.stunUntil;
+        const wasPreviouslyStunned = u.wasStunned || false;
+
+        // If stun just ended, unlock target
+        if (wasPreviouslyStunned && !isCurrentlyStunned) {
+          u.lockedTarget = null;
+          u.wasStunned = false;
+        } else if (isCurrentlyStunned) {
+          u.wasStunned = true;
+          return u; // Can't move or attack while stunned
+        }
+
+        // Check building lifetime - depreciate HP over time
+        if (u.lifetimeDuration && u.spawnTime && u.maxHp) {
+          const elapsedSeconds = (now - u.spawnTime) / 1000;
+          const hpLostPerSecond = u.maxHp / u.lifetimeDuration;
+          const hpLostTotal = Math.floor(elapsedSeconds * hpLostPerSecond);
+          const currentHpFromDepreciation = Math.max(0, u.maxHp - hpLostTotal);
+          // Use the lower of current HP or depreciation HP
+          if (currentHpFromDepreciation < u.hp) {
+            return { ...u, hp: currentHpFromDepreciation };
+          }
+        }
+
+        // Handle periodic spawning (Tombstone spawns skeletons every spawnRate seconds)
+        if (u.spawns && u.spawnRate && u.lastSpawn !== undefined) {
+          const timeSinceLastSpawn = (now - u.lastSpawn) / 1000; // Convert to seconds
+          console.log('[SPAWN CHECK]', u.spriteId, 'timeSinceLastSpawn:', timeSinceLastSpawn, 'spawnRate:', u.spawnRate);
+          if (timeSinceLastSpawn >= u.spawnRate) {
+            // Spawn the units
+            const spawnCardId = u.spawns;
+            const spawnCard = CARDS.find(c => c.id === spawnCardId);
+            console.log('[SPAWN]', u.spriteId, 'spawning', spawnCardId, 'found:', !!spawnCard);
+
+            if (spawnCard) {
+              const newSpawns = [];
+              const spawnCount = spawnCard.count || 1;
+              console.log('[SPAWN]', 'count:', spawnCount, 'hp:', spawnCard.hp);
+
+              for (let i = 0; i < spawnCount; i++) {
+                const offsetX = (Math.random() * 80 - 40);  // Larger offset: -40 to 40
+                const offsetY = (Math.random() * 80 - 40);
+                const spawnX = u.x + offsetX;
+                const spawnY = u.y + offsetY;
+
+                newSpawns.push({
+                  id: Date.now() + Math.random() * 1000,
+                  x: spawnX,
+                  y: spawnY,
+                  hp: spawnCard.hp,
+                  maxHp: spawnCard.hp,
+                  isOpponent: u.isOpponent,
+                  speed: spawnCard.speed,
+                  lane: u.lane,
+                  lastAttack: 0,
+                  spriteId: spawnCard.id,
+                  type: spawnCard.type,
+                  range: spawnCard.range,
+                  damage: spawnCard.damage,
+                  attackSpeed: spawnCard.attackSpeed,
+                  projectile: spawnCard.projectile,
+                  lockedTarget: null,
+                  wasPushed: false,
+                  wasStunned: false
+                });
+                console.log('[SPAWN]', 'skeleton at', spawnX.toFixed(1), spawnY.toFixed(1), 'hp:', spawnCard.hp);
+              }
+
+              // Add spawned units to collection (will be added at end of loop)
+              console.log('[SPAWN]', 'adding', newSpawns.length, 'units to game');
+              newSpawns.forEach(spawn => {
+                console.log('[SPAWN]', 'NEW UNIT id:', spawn.id, 'spriteId:', spawn.spriteId, 'x:', spawn.x.toFixed(1), 'y:', spawn.y.toFixed(1), 'hp:', spawn.hp);
+              });
+              unitsToSpawn.push(...newSpawns);
+
+              // Update last spawn time
+              u.lastSpawn = now;
+            }
+          }
+        }
+
+        // Handle Tesla hidden mechanic
+        let inCombat = false;
+        let actualDamage = u.damage;
+        let actualRange = u.range;
+
+        if (u.hidden) {
+          // Check if enemy unit is in range
+          const hasEnemyInRange = unitsRef.current.some(enemy =>
+            enemy.isOpponent !== u.isOpponent && enemy.hp > 0 &&
+            Math.sqrt(Math.pow(enemy.x - u.x, 2) + Math.pow(enemy.y - u.y, 2)) <= u.range
+          );
+          const hasTowerInRange = nextTowers.some(tower =>
+            tower.isOpponent !== u.isOpponent && tower.hp > 0 &&
+            Math.sqrt(Math.pow(tower.x - u.x, 2) + Math.pow(tower.y - u.y, 2)) <= u.range
+          );
+
+          inCombat = hasEnemyInRange || hasTowerInRange;
+
+          // Track when Tesla was last in combat
+          if (!u.hidden.lastCombatTime) {
+            u.hidden.lastCombatTime = now;
+          }
+
+          if (inCombat) {
+            // Tesla emerges: visible, reduced range
+            u.hidden.lastCombatTime = now; // Update last combat time
+            actualRange = u.range * 0.6;
+            u.hidden.active = false;
+          } else {
+            // Check if been out of combat for 3+ seconds
+            const timeSinceCombat = (now - u.hidden.lastCombatTime) / 1000;
+            if (timeSinceCombat > 3) {
+              // Go underground
+              actualDamage = Math.floor(u.damage * 0.5);
+              u.hidden.active = true;
+            } else {
+              // Still emerging from recent combat - visible
+              actualRange = u.range * 0.6;
+              u.hidden.active = false;
+            }
+          }
+        }
+
+        // Handle Prince charge
+        if (u.charge) {
+          // Activate charge after traveling 2 tiles
+          if (u.charge.distance >= u.charge.threshold && !u.charge.active) {
+            u.charge.active = true;
+          }
+
+          // If charging, double the damage
+          if (u.charge.active) {
+            actualDamage = u.damage * 2;
+          }
+        }
+
+        // Defensive check: ensure nextTowers is an array before filtering
+        let targets = (nextTowers || []).filter(t => t.isOpponent !== u.isOpponent && t.hp > 0);
+
+        // King tower becomes targetable when princess tower on that side is destroyed
+        // Check if we should add king tower to targets
+        const isOpponent = u.isOpponent;
+        if (isOpponent) {
+          // Opponent unit targeting player towers
+          const leftPrincess = nextTowers.find(t => t.id === 4 && t.hp > 0);
+          const rightPrincess = nextTowers.find(t => t.id === 5 && t.hp > 0);
+          const king = nextTowers.find(t => t.id === 3 && t.hp > 0);
+
+          // If either princess is destroyed, king becomes targetable from anywhere
+          if (!leftPrincess || !rightPrincess) {
+            if (king) {
+              targets.push(king);
+            }
+          }
+        } else {
+          // Player unit targeting opponent towers
+          const leftPrincess = nextTowers.find(t => t.id === 1 && t.hp > 0);
+          const rightPrincess = nextTowers.find(t => t.id === 2 && t.hp > 0);
+          const king = nextTowers.find(t => t.id === 0 && t.hp > 0);
+
+          // If either princess is destroyed, king becomes targetable from anywhere
+          if (!leftPrincess || !rightPrincess) {
+            if (king) {
+              targets.push(king);
+            }
+          }
+        }
+
+        // Units that target buildings ONLY (Giant, Hog) ignore other units
+        if (u.targetType !== 'buildings') {
+             // For other units: PRIORITIZE towers, only target units if no towers in range
+             // Use unitsRef.current instead of currentUnits to avoid circular reference
+             // Exclude hidden Teslas from targets (they're underground and untargetable)
+             const unitTargets = unitsRef.current.filter(targetUnit =>
+               targetUnit.isOpponent !== u.isOpponent &&
+               targetUnit.hp > 0 &&
+               !(targetUnit.hidden?.active && targetUnit.spriteId === 'tesla')
+             );
+
+             // Check if any tower is in range
+             const hasTowerInRange = targets.some(t => {
+               const dist = Math.sqrt(Math.pow(t.x - u.x, 2) + Math.pow(t.y - u.y, 2));
+               return dist <= actualRange + 25;
+             });
+
+             // Only add unit targets if no towers are in range
+             if (!hasTowerInRange) {
+               targets = [...targets, ...unitTargets];
+             }
+        }
+
+        // LOCKED TARGET MECHANIC
+        // If unit has a locked target, check if it's still alive and valid
+        if (u.lockedTarget) {
+          // Check if locked target still exists and is alive
+          const lockedTargetAlive = targets.some(t => t.id === u.lockedTarget);
+
+          // Unlock if: target died or unit was pushed back
+          if (!lockedTargetAlive || u.wasPushed) {
+            u.lockedTarget = null;
+            u.wasPushed = false;
+          } else {
+            // Keep locked target - filter to only include locked target
+            targets = targets.filter(t => t.id === u.lockedTarget);
+          }
+        }
+
+        let closestTarget = null;
+        let minDist = Infinity;
+
+        targets.forEach(t => {
+            const dist = Math.sqrt(Math.pow(t.x - u.x, 2) + Math.pow(t.y - u.y, 2));
+            if (dist < minDist) {
+                minDist = dist;
+                closestTarget = t;
+            }
+        });
+
+        if (closestTarget && minDist <= actualRange + 25) {
+             // LOCK the target when starting to attack
+             if (!u.lockedTarget) {
+               u.lockedTarget = closestTarget.id;
+             }
+
+             if (now - u.lastAttack > u.attackSpeed) {
+                 // Calculate damage to deal
+                 let damageToDeal = actualDamage;
+
+                 // Witch spawns skeletons when attacking
+                 if (u.spawns === 'skeletons' && u.spawnRate === undefined) {
+                   // Witch spawns skeletons on each attack
+                   const skeletonCard = CARDS.find(c => c.id === 'skeletons');
+                   if (skeletonCard) {
+                     const newSkeletons = [];
+                     const skeletonCount = skeletonCard.count || 1;
+
+                     for (let i = 0; i < skeletonCount; i++) {
+                       const offsetX = (Math.random() * 40 - 20);
+                       const offsetY = (Math.random() * 40 - 20);
+
+                       newSkeletons.push({
+                         id: Date.now() + Math.random() * 1000,
+                         x: u.x + offsetX,
+                         y: u.y + offsetY,
+                         hp: skeletonCard.hp,
+                         maxHp: skeletonCard.hp,
+                         isOpponent: u.isOpponent,
+                         speed: skeletonCard.speed,
+                         lane: u.lane,
+                         lastAttack: 0,
+                         spriteId: 'skeletons',
+                         type: skeletonCard.type,
+                         range: skeletonCard.range,
+                         damage: skeletonCard.damage,
+                         attackSpeed: skeletonCard.attackSpeed,
+                         projectile: skeletonCard.projectile,
+                         lockedTarget: null,
+                         wasPushed: false,
+                         wasStunned: false
+                       });
+                     }
+
+                     // Add skeletons to the units array (they'll be included in next update)
+                     setUnits(prevUnits => [...prevUnits, ...newSkeletons]);
+                   }
+                 }
+
+                 if (u.projectile) {
+                     // Tesla uses lightning - special instant effect
+                     const projectileType = (u.spriteId === 'tesla') ? 'tesla_lightning' : u.projectile;
+                     const projectileSpeed = (u.spriteId === 'tesla') ? 100 : 12; // Instant for Tesla
+
+                     nextProjectiles.push({
+                        id: now + Math.random(),
+                        x: u.x,
+                        y: u.y,
+                        targetId: closestTarget.id,
+                        targetX: closestTarget.x,
+                        targetY: closestTarget.y,
+                        speed: projectileSpeed,
+                        damage: damageToDeal,
+                        type: projectileType,
+                        splash: u.splash,
+                        attackerId: u.id,
+                        isOpponent: u.isOpponent
+                     });
+                 } else {
+                     // Melee attack - apply damage directly
+                     // Check if target is a tower (id < 100) or a unit (id >= 100)
+                     if (closestTarget.id < 100) {
+                       // Target is a tower
+                       const targetIndex = nextTowers.findIndex(t => t.id === closestTarget.id);
+                       if (targetIndex !== -1) {
+                         nextTowers[targetIndex] = {
+                           ...nextTowers[targetIndex],
+                           hp: nextTowers[targetIndex].hp - damageToDeal
+                         };
+                       }
+                     } else {
+                       // Target is a unit - apply damage directly
+                       currentUnits = currentUnits.map(targetUnit => {
+                         if (targetUnit.id === closestTarget.id) {
+                           // Reset charge if Prince gets attacked
+                           const updatedCharge = targetUnit.charge ? { ...targetUnit.charge, distance: 0, active: false } : targetUnit.charge;
+                           return { ...targetUnit, hp: targetUnit.hp - damageToDeal, charge: updatedCharge };
+                         }
+                         return targetUnit;
+                       });
+                     }
+                     // Record splash damage event if attacker has splash
+                     if (u.splash) {
+                       splashEvents.push({
+                         attacker: u,
+                         targetX: closestTarget.x,
+                         targetY: closestTarget.y,
+                         damage: damageToDeal
+                       });
+                     }
+                 }
+                 // Reset charge when Prince attacks (consumes charge)
+                 const updatedCharge = u.charge ? { ...u.charge, distance: 0, active: false } : u.charge;
+                 return { ...u, lastAttack: now, hidden: u.hidden, charge: updatedCharge, lockedTarget: u.lockedTarget, wasPushed: false, wasStunned: u.wasStunned };
+             }
+             return { ...u, hidden: u.hidden, lockedTarget: u.lockedTarget, wasPushed: false, wasStunned: u.wasStunned };
+        } else {
+            // Movement logic
+            let nextY = u.y;
+            let nextX = u.x;
+
+            // Apply speed boost for charging Prince
+            const speedMultiplier = (u.charge && u.charge.active) ? 2 : 1;
+            const effectiveSpeed = u.speed * speedMultiplier;
+
+            if (u.isOpponent) {
+               nextY += effectiveSpeed;
+            } else {
+               nextY -= effectiveSpeed;
+            }
+
+            // Track distance for charge
+            if (u.charge && !u.charge.active) {
+              const moveDist = Math.sqrt(Math.pow(nextX - u.x, 2) + Math.pow(nextY - u.y, 2));
+              u.charge.distance = (u.charge.distance || 0) + moveDist;
+            }
+
+            // Defensive check: ensure nextTowers is an array
+            const allTowers = (nextTowers || []).filter(t => t.hp > 0);
+            let collision = false;
+            let avoidX = 0;
+
+            for (let t of allTowers) {
+                const distToTower = Math.sqrt(Math.pow(t.x - nextX, 2) + Math.pow(t.y - nextY, 2));
+                const minDistance = (t.type === 'king' ? 45 : 35);
+
+                if (distToTower < minDistance) {
+                    collision = true;
+                    if (nextX < t.x) {
+                        avoidX = -2;
+                    } else {
+                        avoidX = 2;
+                    }
+                    break;
+                }
+            }
+
+            if (collision && effectiveSpeed > 0) {
+                nextX += avoidX;
+                nextY = u.y + (u.isOpponent ? effectiveSpeed * 0.5 : -effectiveSpeed * 0.5);
+            } else if (!collision && effectiveSpeed > 0) {
+                const riverY = height / 2;
+                const distToRiver = Math.abs(nextY - riverY);
+
+                // Hog Rider can jump over river - skip bridge logic
+                // Flying units fly over river - skip bridge logic
+                if (u.jumps || u.type === 'flying') {
+                    // Jump/fly over river - just continue straight across
+                    // No bridge steering needed
+                } else if (distToRiver < 100) {
+                    // Other ground units must use bridges
+                    const bridgeCenterX = u.lane === 'LEFT' ? 95 : width - 95;
+                    const diffX = bridgeCenterX - nextX;
+                    if (Math.abs(diffX) > 2) {
+                        const steerSpeed = 1.5;
+                        nextX += Math.sign(diffX) * steerSpeed;
+                    }
+                }
+            }
+
+            return { ...u, x: nextX, y: nextY, hidden: u.hidden, charge: u.charge, lockedTarget: u.lockedTarget, wasPushed: u.wasPushed, wasStunned: u.wasStunned };
+        }
+      });
+
+      // Check for Tombstone death spawn (before filtering dead units)
+      const deathSpawns = [];
+      currentUnits.forEach(u => {
+        if (u.hp <= 0 && u.spriteId === 'tombstone') {
+          // Tombstone destroyed - spawn 3 skeletons
+          const spawnCard = CARDS.find(c => c.id === 'skeletons');
+          if (spawnCard) {
+            for (let i = 0; i < 3; i++) {
+              const offsetX = (Math.random() * 80 - 40);  // Larger offset
+              const offsetY = (Math.random() * 80 - 40);
+              deathSpawns.push({
+                id: Date.now() + Math.random() * 1000,
+                x: u.x + offsetX,
+                y: u.y + offsetY,
+                hp: spawnCard.hp,
+                maxHp: spawnCard.hp,
+                isOpponent: u.isOpponent,
+                speed: spawnCard.speed,
+                lane: u.lane,
+                lastAttack: 0,
+                spriteId: spawnCard.id,
+                type: spawnCard.type,
+                range: spawnCard.range,
+                damage: spawnCard.damage,
+                attackSpeed: spawnCard.attackSpeed,
+                projectile: spawnCard.projectile,
+                lockedTarget: null,
+                wasPushed: false,
+                wasStunned: false
+              });
+            }
+          }
+        }
+      });
+
+      // Add death spawns to collection
+      if (deathSpawns.length > 0) {
+        unitsToSpawn.push(...deathSpawns);
+        console.log('[DEATH SPAWN]', 'adding', deathSpawns.length, 'units from destroyed Tombstone');
+      }
+
+      // Filter out dead units
+      const beforeFilter = currentUnits.length;
+      currentUnits = currentUnits.filter(u => {
+        if (u.hp <= 0) {
+          if (u.spriteId === 'skeletons') {
+            console.log('[FILTER]', 'skeleton died - hp:', u.hp);
+          }
+          return false;
+        }
+        if (u.y <= -50 || u.y >= height + 50) {
+          if (u.spriteId === 'skeletons') {
+            console.log('[FILTER]', 'skeleton out of bounds - y:', u.y, 'height:', height);
+          }
+          return false;
+        }
+        return true;
+      });
+      const afterFilter = currentUnits.length;
+      if (beforeFilter !== afterFilter) {
+        console.log('[FILTER]', 'Removed', beforeFilter - afterFilter, 'units');
+      }
+
+      // Apply collected splash damage events
+      splashEvents.forEach(event => {
+        const splashRadius = 50;
+        // Damage all enemy units in splash radius
+        currentUnits = currentUnits.map(unit => {
+          if (unit.isOpponent !== event.attacker.isOpponent && unit.hp > 0) {
+            const dist = Math.sqrt(Math.pow(unit.x - event.targetX, 2) + Math.pow(unit.y - event.targetY, 2));
+            if (dist <= splashRadius) {
+              return { ...unit, hp: unit.hp - Math.floor(event.damage * 0.5) };
+            }
+          }
+          return unit;
+        });
+        // Also splash towers
+        nextTowers = nextTowers.map(tower => {
+          if (tower.isOpponent !== event.attacker.isOpponent && tower.hp > 0) {
+            const dist = Math.sqrt(Math.pow(tower.x - event.targetX, 2) + Math.pow(tower.y - event.targetY, 2));
+            if (dist <= splashRadius + 20) {
+              return { ...tower, hp: tower.hp - Math.floor(event.damage * 0.5) };
+            }
+          }
+          return tower;
+        });
+      });
+
+      let activeProjectiles = nextProjectiles.map(p => {
+        let targetX = p.targetX;
+        let targetY = p.targetY;
+        
+        if (!p.isSpell) {
+            const isTargetTower = p.targetId < 100; 
+            if (isTargetTower) {
+                const target = nextTowers.find(t => t.id === p.targetId);
+                if (target) {
+                    targetX = target.x;
+                    targetY = target.y;
+                }
+            } else {
+                const target = unitsRef.current.find(u => u.id === p.targetId);
+                if (target) {
+                    targetX = target.x;
+                    targetY = target.y;
+                }
+            }
+        }
+
+        const dx = targetX - p.x;
+        const dy = targetY - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist < p.speed + 10) { 
+          return { ...p, hit: true }; 
+        }
+        
+        const angle = Math.atan2(dy, dx);
+        return {
+          ...p,
+          x: p.x + Math.cos(angle) * p.speed,
+          y: p.y + Math.sin(angle) * p.speed,
+          targetX, 
+          targetY
+        };
+      });
+
+      const hits = activeProjectiles.filter(p => p.hit);
+      if (hits.length > 0) {
+
+        hits.forEach(h => {
+            if (h.isSpell) {
+                // Handle spell effects (Fireball, Arrows, Zap, Poison)
+                if (h.isPoison) {
+                  // Poison is special - stays on battlefield and ticks continuously
+                  // Check if poison has expired
+                  const poisonAge = (now - h.spawnTime) / 1000; // in seconds
+                  if (poisonAge < h.duration) {
+                    // Deal damage every second
+                    const lastTick = h.lastDamageTick || h.spawnTime;
+                    const timeSinceTick = (now - lastTick) / 1000;
+                    if (timeSinceTick >= 1) {
+                      // Deal damage to all units in radius
+                      currentUnits = currentUnits.map(u => {
+                        const dist = Math.sqrt(Math.pow(u.x - h.x, 2) + Math.pow(u.y - h.y, 2));
+                        if (dist < h.radius) {
+                          return { ...u, hp: u.hp - h.damage };
+                        }
+                        return u;
+                      });
+                      // Deal damage to towers in radius
+                      nextTowers = nextTowers.map(t => {
+                        const dist = Math.sqrt(Math.pow(t.x - h.x, 2) + Math.pow(t.y - h.y, 2));
+                        if (dist < h.radius + 30) {
+                          return { ...t, hp: t.hp - h.damage };
+                        }
+                        return t;
+                      });
+                      // Update last tick time by modifying the projectile
+                      h.lastDamageTick = now;
+                    }
+                  }
+                  // Poison will be filtered out after duration
+                } else {
+                  // Other spells (Fireball, Arrows, Zap) - one-time damage
+                  currentUnits = currentUnits.map(u => {
+                    const dist = Math.sqrt(Math.pow(u.x - h.targetX, 2) + Math.pow(u.y - h.targetY, 2));
+                    if (dist < h.radius) {
+                      let updatedUnit = { ...u, hp: u.hp - h.damage };
+
+                      // Zap stun effect - resets charge ONLY when stunned
+                      if (h.stun && h.stun > 0) {
+                        updatedUnit.stunUntil = now + (h.stun * 1000);
+                        // Reset charge if Prince gets stunned
+                        if (u.charge) {
+                          updatedUnit.charge = { ...u.charge, distance: 0, active: false };
+                        }
+                      }
+
+                      return updatedUnit;
+                    }
+                    return u;
+                  });
+                  nextTowers = nextTowers.map(t => {
+                    const dist = Math.sqrt(Math.pow(t.x - h.targetX, 2) + Math.pow(t.y - h.targetY, 2));
+                    if (dist < h.radius + 30) {
+                      return { ...t, hp: t.hp - h.damage };
+                    }
+                    return t;
+                  });
+                }
+
+            } else {
+                // Handle projectile hits (arrows, bullets, fireballs)
+                const hitX = h.targetX;
+                const hitY = h.targetY;
+
+                // Damage the primary target
+                currentUnits = currentUnits.map(u => {
+                  if (u.id === h.targetId) {
+                    return { ...u, hp: u.hp - h.damage };
+                  }
+                  return u;
+                });
+
+                // Apply splash damage if projectile has splash
+                if (h.splash) {
+                  const splashRadius = 50;
+                  currentUnits = currentUnits.map(u => {
+                    if (u.id !== h.targetId && u.hp > 0) {
+                      const isEnemy = h.isOpponent !== undefined ? !h.isOpponent : u.isOpponent;
+                      if (isEnemy) {
+                        const dist = Math.sqrt(Math.pow(u.x - hitX, 2) + Math.pow(u.y - hitY, 2));
+                        if (dist <= splashRadius) {
+                          return { ...u, hp: u.hp - Math.floor(h.damage * 0.5) };
+                        }
+                      }
+                    }
+                    return u;
+                  });
+                }
+
+                // Also damage towers (primary target)
+                if (h.targetId < 100) {
+                     const tIndex = nextTowers.findIndex(t => t.id === h.targetId);
+                     if (tIndex !== -1) {
+                         nextTowers[tIndex] = {
+                             ...nextTowers[tIndex],
+                             hp: nextTowers[tIndex].hp - h.damage
+                         };
+                     }
+                 }
+            }
+        });
+
+        // Remove hit projectiles, but keep poison until it expires
+        activeProjectiles = activeProjectiles.filter(p =>
+          !p.hit || (p.isPoison && ((now - p.spawnTime) / 1000 < p.duration))
+        );
+      }
+
+      activeProjectiles = activeProjectiles.filter(p =>
+          p.x > -50 && p.x < width + 50 && p.y > -50 && p.y < height + 50
+      );
+
+      nextTowers = nextTowers.map(tower => {
+        if (tower.hp <= 0) return tower;
+        
+        let isActive = true;
+        if (tower.type === 'king') {
+            const isDamaged = tower.hp < tower.maxHp;
+            const mySideTowers = nextTowers.filter(t => t.isOpponent === tower.isOpponent && t.type === 'princess');
+            const lostPrincess = mySideTowers.some(t => t.hp <= 0);
+            if (!isDamaged && !lostPrincess) {
+                isActive = false;
+            }
+        }
+        if (!isActive) return tower;
+
+        if (now - tower.lastShot < (tower.type === 'king' ? FIRE_RATE_KING : FIRE_RATE_PRINCESS)) return tower;
+
+        const targets = currentUnits.filter(u => u.isOpponent !== tower.isOpponent);
+        let closestTarget = null;
+        let minDist = Infinity;
+
+        targets.forEach(u => {
+            const dist = Math.sqrt(Math.pow(u.x - tower.x, 2) + Math.pow(u.y - tower.y, 2));
+            if (dist <= tower.range && dist < minDist) {
+                minDist = dist;
+                closestTarget = u;
+            }
+        });
+
+        if (closestTarget) {
+            activeProjectiles.push({
+                id: now + Math.random(),
+                x: tower.x,
+                y: tower.y,
+                targetId: closestTarget.id,
+                targetX: closestTarget.x,
+                targetY: closestTarget.y,
+                speed: tower.type === 'king' ? PROJECTILE_SPEED_CANNON : PROJECTILE_SPEED_ARROW,
+                damage: 50,
+                type: tower.type === 'king' ? 'cannon' : 'arrow'
+            });
+            return { ...tower, lastShot: now };
+        }
+        return tower;
+      });
+
+      setUnits([...currentUnits, ...unitsToSpawn]);
+      setProjectiles(activeProjectiles);
+      setTowers(nextTowers);
+
+      // Debug: Log total units in game
+      const allUnits = [...currentUnits, ...unitsToSpawn];
+      if (allUnits.length > 0) {
+        console.log('[GAME STATE]', 'Total units:', allUnits.length, 'skeletons:', allUnits.filter(u => u.spriteId === 'skeletons').length);
+      }
+
+      // Debug: Check if spawned units have valid positions
+      if (unitsToSpawn.length > 0) {
+        console.log('[SPAWN CHECK]', 'Spawned', unitsToSpawn.length, 'units - checking next frame...');
+        setTimeout(() => {
+          const currentCount = unitsRef.current.filter(u => u.spriteId === 'skeletons').length;
+          console.log('[SPAWN CHECK]', 'Next frame skeleton count:', currentCount);
+        }, 60);
+      }
+
+    }, 50);
+
+    return () => clearInterval(loop);
+  }, [inGame, gameOver]);
+
+  useEffect(() => {
+    if (!inGame || gameOver) return;
+    const interval = setInterval(() => {
+        setElixir(prev => Math.min(prev + (isDoubleElixir ? 0.07 : 0.035), 10));
+    }, 100);
+    return () => clearInterval(interval);
+  }, [inGame, gameOver, isDoubleElixir]);
+
+  // Enemy Elixir Generation
+  useEffect(() => {
+    if (!inGame || gameOver) return;
+    const interval = setInterval(() => {
+        setEnemyElixir(prev => Math.min(prev + (isDoubleElixir ? 0.07 : 0.035), 10));
+    }, 100);
+    return () => clearInterval(interval);
+  }, [inGame, gameOver, isDoubleElixir]);
+
+  // Enemy AI - Play Cards Automatically
+  useEffect(() => {
+    if (!inGame || gameOver) return;
+
+    const aiInterval = setInterval(() => {
+      const currentElixir = enemyElixirRef.current;
+      const currentHand = enemyHandRef.current;
+      const playerUnits = unitsRef.current.filter(u => !u.isOpponent && u.hp > 0);
+      const enemyUnits = unitsRef.current.filter(u => u.isOpponent && u.hp > 0);
+
+      console.log('[Enemy AI] Thinking - Elixir:', currentElixir, 'Hand:', currentHand.map(c => c.name), 'Player units:', playerUnits.length);
+
+      // SMART CARD SELECTION
+      let cardToPlay = null;
+      let cardIndex = -1;
+
+      // Priority 1: Counter swarm units with spells or splash
+      const swarmUnits = playerUnits.filter(u => (u.spriteId === 'skeleton_army' || u.spriteId === 'minions' || u.spriteId === 'minion_horde' || u.spriteId === 'goblins' || u.spriteId === 'barbarians' || u.spriteId === 'skeletons') && u.hp > 0);
+      if (swarmUnits.length >= 3) {
+        // Look for spells first (arrows, zap, fireball)
+        const spellCard = currentHand.findIndex(c => c.type === 'spell' && c.cost <= currentElixir && (c.id === 'arrows' || c.id === 'zap' || c.id === 'fireball'));
+        if (spellCard !== -1) {
+          cardToPlay = currentHand[spellCard];
+          cardIndex = spellCard;
+          console.log('[Enemy AI] COUNTER: Using spell on swarm');
+        } else {
+          // Look for splash units (Valkyrie, Wizard, Baby Dragon)
+          const splashCard = currentHand.findIndex(c => c.splash && c.cost <= currentElixir && c.type !== 'spell');
+          if (splashCard !== -1) {
+            cardToPlay = currentHand[splashCard];
+            cardIndex = splashCard;
+            console.log('[Enemy AI] COUNTER: Using splash on swarm');
+          }
+        }
+      }
+
+      // Priority 2: Counter buildings with building-targeting units
+      const playerBuildings = playerUnits.filter(u => u.type === 'building' && u.hp > 0);
+      if (playerBuildings.length > 0 && !cardToPlay) {
+        const buildingKiller = currentHand.findIndex(c => c.targetType === 'buildings' && c.cost <= currentElixir);
+        if (buildingKiller !== -1) {
+          cardToPlay = currentHand[buildingKiller];
+          cardIndex = buildingKiller;
+          console.log('[Enemy AI] COUNTER: Targeting buildings');
+        }
+      }
+
+      // Priority 3: Save elixir for big pushes in double elixir
+      const shouldSaveForBigPush = isDoubleElixir && currentElixir < 7 && currentHand.some(c => c.cost >= 5);
+      if (!shouldSaveForBigPush && !cardToPlay) {
+        // Priority 4: Tank + support combo (if we have many units)
+        if (enemyUnits.length >= 2 && currentElixir >= 5) {
+          const bigCard = currentHand.findIndex(c => c.cost >= 4 && c.cost <= currentElixir && (c.hp > 1000 || c.damage > 150));
+          if (bigCard !== -1) {
+            cardToPlay = currentHand[bigCard];
+            cardIndex = bigCard;
+            console.log('[Enemy AI] COMBO: Adding to push');
+          }
+        }
+
+        // Priority 5: Play best affordable card based on game state
+        if (!cardToPlay) {
+          const affordableCards = currentHand.map((card, idx) => ({ card, idx, priority: 0 }))
+            .filter(({ card }) => card.cost <= currentElixir);
+
+          if (affordableCards.length > 0) {
+            // Score each card
+            affordableCards.forEach(({ card, idx }) => {
+              // Prefer high HP tanks when we have few units
+              if (enemyUnits.length < 2 && card.hp > 1000) card.priority += 50;
+
+              // Prefer splash damage when player has many units
+              if (playerUnits.length >= 2 && card.splash) card.priority += 40;
+
+              // Prefer high damage units when player has low HP units
+              if (playerUnits.some(u => u.hp < 300) && card.damage > 100) card.priority += 30;
+
+              // Prefer ranged units when we're ahead on units
+              if (enemyUnits.length > playerUnits.length && card.range > 50) card.priority += 20;
+
+              // Prefer expensive cards in double elixir
+              if (isDoubleElixir && card.cost >= 5) card.priority += 25;
+
+              // Random factor for variety
+              card.priority += Math.random() * 10;
+            });
+
+            // Sort by priority and pick best
+            affordableCards.sort((a, b) => b.priority - a.priority);
+            cardToPlay = affordableCards[0].card;
+            cardIndex = affordableCards[0].idx;
+            console.log('[Enemy AI] BEST CARD:', cardToPlay.name, 'priority:', Math.floor(affordableCards[0].priority));
+          }
+        }
+      }
+
+      if (cardToPlay && cardIndex !== -1) {
+        const card = cardToPlay;
+
+        // SMART POSITIONING
+        let targetX, targetY;
+        const lane = Math.random() < 0.5 ? 'LEFT' : 'RIGHT';
+
+        if (card.type === 'spell') {
+          // Cast spell strategically
+          if (swarmUnits.length >= 3 && card.id !== 'poison') {
+            // Target spell at swarm center
+            const avgX = swarmUnits.reduce((sum, u) => sum + u.x, 0) / swarmUnits.length;
+            const avgY = swarmUnits.reduce((sum, u) => sum + u.y, 0) / swarmUnits.length;
+            targetX = avgX;
+            targetY = avgY;
+            console.log('[Enemy AI] SPELL: Targeting swarm at', targetX, targetY);
+          } else if (card.id === 'poison' && playerUnits.length > 0) {
+            // Poison targets unit clusters
+            const avgX = playerUnits.reduce((sum, u) => sum + u.x, 0) / playerUnits.length;
+            const avgY = playerUnits.reduce((sum, u) => sum + u.y, 0) / playerUnits.length;
+            targetX = avgX;
+            targetY = avgY;
+            console.log('[Enemy AI] SPELL: Poisoning cluster');
+          } else if (playerBuildings.length > 0) {
+            // Target buildings
+            const target = playerBuildings[0];
+            targetX = target.x;
+            targetY = target.y;
+            console.log('[Enemy AI] SPELL: Targeting building');
+          } else {
+            // Random spell placement
+            targetX = Math.random() * (width - 100) + 50;
+            targetY = height - 100 - Math.random() * 150;
+          }
+
+          const spellType = card.id === 'zap' ? 'zap_spell' :
+                          card.id === 'arrows' ? 'arrows_spell' :
+                          card.id === 'poison' ? 'poison_spell' : 'fireball_spell';
+
+          setProjectiles(prev => [...prev, {
+            id: Date.now(),
+            x: card.id === 'poison' ? targetX : width / 2,
+            y: card.id === 'poison' ? targetY : 0,
+            targetX: targetX,
+            targetY: targetY,
+            speed: card.id === 'zap' ? 100 : card.id === 'poison' ? 100 : 15,
+            damage: card.damage,
+            radius: card.radius,
+            type: spellType,
+            isSpell: true,
+            stun: card.stun || 0,
+            duration: card.duration || 0,
+            hit: card.id === 'poison',
+            spawnTime: Date.now(),
+            isPoison: card.id === 'poison'
+          }]);
+        } else {
+          // Smart unit deployment
+          const spawnX = lane === 'LEFT' ? 70 : width - 70;
+          let spawnY = 100;
+
+          // Position based on card type
+          if (card.targetType === 'buildings') {
+            // Target buildings - spawn closer to action
+            if (playerBuildings.length > 0) {
+              spawnY = playerBuildings[0].y - 80;
+            }
+          } else if (card.type === 'flying') {
+            // Flying units - spawn ahead
+            spawnY = 80;
+          } else if (card.hp > 1500) {
+            // Tanks - spawn in front
+            spawnY = 120;
+          } else if (card.range > 50) {
+            // Ranged - spawn behind
+            spawnY = 60;
+          }
+
+          console.log('[Enemy AI] DEPLOYING', card.name, 'at lane:', lane);
+
+          // Spawn enemy unit(s)
+          const count = card.count || 1;
+          const newUnits = [];
+
+          for (let i = 0; i < count; i++) {
+            const offsetX = count > 1 ? (Math.random() * 40 - 20) : 0;
+            const offsetY = count > 1 ? (Math.random() * 40 - 20) : 0;
+
+            const newUnit = {
+              id: Date.now() + i,
+              x: spawnX + offsetX,
+              y: spawnY + offsetY,
+              hp: card.hp,
+              maxHp: card.hp,
+              isOpponent: true,
+              speed: card.speed,
+              lane: lane,
+              lastAttack: 0,
+              spriteId: card.id,
+              type: card.type,
+              range: card.range,
+              damage: card.damage,
+              attackSpeed: card.attackSpeed,
+              projectile: card.projectile,
+              // Special properties
+              charge: card.charge ? {
+              active: false,
+              distance: 0,
+              threshold: 2
+            } : undefined,
+              hidden: card.hidden ? { active: true, visibleHp: card.hp } : undefined,
+              splash: card.splash || false,
+              spawns: card.spawns,
+              spawnRate: card.spawnRate,
+              lastSpawn: 0,
+              lifetime: card.lifetime ? Date.now() + card.lifetime * 1000 : undefined,
+              stunUntil: 0,
+              baseDamage: card.damage,
+              targetType: card.targetType,
+              lockedTarget: null,
+              wasPushed: false,
+              wasStunned: false
+            };
+            newUnits.push(newUnit);
+          }
+          setUnits(prev => [...prev, ...newUnits]);
+        }
+
+        // Deduct elixir
+        setEnemyElixir(prev => prev - card.cost);
+
+        // Cycle enemy cards
+        setEnemyHand(prevHand => {
+          const newHand = [...prevHand];
+          newHand.splice(cardIndex, 1);
+          newHand.push(enemyNextCardRef.current);
+          return newHand;
+        });
+
+        setEnemyDeckQueue(prevQueue => {
+          const newQueue = [...prevQueue];
+          const newNext = newQueue.shift();
+          newQueue.push(card);
+          setEnemyNextCard(newNext);
+          return newQueue;
+        });
+      } else {
+        console.log('[Enemy AI] Saving elixir for better play...');
+      }
+    }, 2400); // Faster AI thinking (2.4 seconds)
+
+    return () => clearInterval(aiInterval);
+  }, [inGame, gameOver]);
+
+  const formatTime = (seconds) => {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
+
+  const handleStartBattle = () => {
+    resetGame();
+    setInLobby(false);
+    setInGame(true);
+  };
+
+  // Render based on navigation state
+  if (!inGame && !inLobby) {
+    return <MainMenu onStart={() => setInLobby(true)} />;
+  }
+
+  if (!inGame && inLobby) {
+    return (
+      <MainLobby
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onStartGame={handleStartBattle}
+        currentDeck={userCards}
+        onSwapCards={handleSwapCards}
+        dragHandlers={{start: onGlobalDragStart, move: onGlobalDragMove, end: onGlobalDragEnd}}
+        selectedDeckIndex={selectedDeckIndex}
+        setSelectedDeckIndex={setSelectedDeckIndex}
+        allDecks={allDecks}
+      />
+    );
+  }
+
+  return (
+    <>
+    <GameBoard
+      towers={towers}
+      units={units}
+      projectiles={projectiles}
+      timeLeft={timeLeft}
+      gameOver={gameOver}
+      elixir={elixir}
+      hand={hand}
+      nextCard={nextCard}
+      draggingCard={draggingCard}
+      dragPosition={dragPosition}
+      handleDragStart={handleDragStart}
+      handleDragMove={handleDragMove}
+      handleDragEnd={handleDragEnd}
+      spawnTestEnemy={spawnTestEnemy}
+      formatTime={formatTime}
+      onRestart={(dest) => resetGame(dest)}
+      score={score}
+      isDoubleElixir={isDoubleElixir}
+      showDoubleElixirAlert={showDoubleElixirAlert}
+    />
+    {globalDraggingCard && (
+        <View style={[styles.dragProxy, { 
+            position: 'absolute',
+            left: globalDragPosition.x - 30, 
+            top: globalDragPosition.y - 37.5,
+            zIndex: 9999,
+            elevation: 100,
+            backgroundColor: 'transparent'
+        }]}>
+             <UnitSprite id={globalDraggingCard.id} isOpponent={false} size={50} />
+             <View style={styles.dragProxyLabel}>
+                <Text style={styles.cardName}>{globalDraggingCard.name}</Text>
+             </View>
+        </View>
+    )}
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#333',
+  },
+  menuContainer: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  menuBackgroundImage: {
+    resizeMode: 'cover',
+  },
+  menuOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerContainer: {
+    alignItems: 'center',
+    marginBottom: 80,
+  },
+  bottomContainer: {
+    alignItems: 'center',
+    width: '100%',
+  },
+  title: {
+    fontSize: 50,
+    fontWeight: '900',
+    color: '#FFD700',
+    textShadowColor: '#8B4500',
+    textShadowOffset: { width: 3, height: 3 },
+    textShadowRadius: 0,
+    marginBottom: 0,
+    letterSpacing: 2,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginTop: 5,
+    marginBottom: 0,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 4,
+    letterSpacing: 1,
+    textAlign: 'center',
+  },
+  loadingContainer: {
+    width: '80%',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    padding: 25,
+    borderRadius: 15,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  loadingText: {
+    color: '#FFD700',
+    fontSize: 18,
+    fontWeight: '800',
+    marginBottom: 15,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+  },
+  progressBarBg: {
+    width: '100%',
+    height: 30,
+    backgroundColor: '#333',
+    borderRadius: 15,
+    borderWidth: 3,
+    borderColor: '#BDC3C7', // Silver border
+    overflow: 'hidden',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: '#F39C12', // Orange base
+    borderRightWidth: 4,
+    borderRightColor: '#F1C40F', // Highlight edge
+  },
+  battleButton: {
+    backgroundColor: '#f1c40f',
+    paddingVertical: 18,
+    paddingHorizontal: 50,
+    borderRadius: 12,
+    borderWidth: 0,
+    borderBottomWidth: 6,
+    borderBottomColor: '#c29d0b', // darker shade for 3D effect
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 8,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  battleButtonText: {
+    color: '#3e2723', // Dark brown text
+    fontSize: 24,
+    fontWeight: '900',
+    letterSpacing: 1,
+    textShadowColor: 'rgba(255,255,255,0.4)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 0,
+  },
+  footerText: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 12,
+    marginTop: 25,
+  },
+  gameBoard: {
+    flex: 1,
+    backgroundColor: '#639c3e', // Better grass green
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  river: {
+    position: 'absolute',
+    top: '50%', 
+    marginTop: -25, 
+    height: 50,
+    backgroundColor: '#4fa3d1',
+    width: '100%',
+    borderTopWidth: 4,
+    borderBottomWidth: 4,
+    borderColor: '#8fb8d6', // Lighter foam edge
+    zIndex: 1, 
+    opacity: 0.9,
+  },
+  bridge: {
+    position: 'absolute',
+    width: 60,
+    height: 54, // Slightly longer than river to overlap
+    top: -2, 
+    backgroundColor: '#795548', // Wood brown
+    borderColor: '#3e2723',
+    borderWidth: 2,
+    borderRadius: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  towerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: "#000",
+    elevation: 8,
+  },
+  arrowContainer: {
+    position: 'absolute',
+    width: 20,
+    height: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 100,
+  },
+  arrowShaft: {
+    width: 15,
+    height: 2,
+    backgroundColor: '#8B4513', 
+    position: 'absolute',
+  },
+  arrowHead: {
+    width: 0,
+    height: 0,
+    borderTopWidth: 4,
+    borderBottomWidth: 4,
+    borderLeftWidth: 6,
+    borderTopColor: 'transparent',
+    borderBottomColor: 'transparent',
+    borderLeftColor: '#A9A9A9', 
+    position: 'absolute',
+    right: 0,
+  },
+  cannonball: {
+    position: 'absolute',
+    width: 12,
+    height: 12,
+    backgroundColor: 'black',
+    borderRadius: 6,
+    zIndex: 100,
+  },
+  bullet: {
+    position: 'absolute',
+    width: 8,
+    height: 8,
+    backgroundColor: '#2c3e50',
+    borderRadius: 4,
+    zIndex: 100,
+  },
+  witchProjectile: {
+    position: 'absolute',
+    width: 10,
+    height: 10,
+    backgroundColor: '#9b59b6',
+    borderRadius: 5,
+    zIndex: 100,
+    borderWidth: 1,
+    borderColor: '#8e44ad',
+    shadowColor: '#9b59b6',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  dragonFire: {
+    position: 'absolute',
+    width: 16,
+    height: 16,
+    backgroundColor: '#27ae60',
+    borderRadius: 8,
+    zIndex: 100,
+    borderWidth: 2,
+    borderColor: '#2ecc71',
+    shadowColor: '#27ae60',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.9,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  fireballSmall: {
+    position: 'absolute',
+    width: 14,
+    height: 14,
+    backgroundColor: '#e67e22',
+    borderRadius: 7,
+    zIndex: 100,
+    borderWidth: 1,
+    borderColor: '#f1c40f',
+  },
+  fireballSpell: {
+    position: 'absolute',
+    width: 30,
+    height: 30,
+    backgroundColor: '#e74c3c',
+    borderRadius: 15,
+    zIndex: 100,
+    borderWidth: 2,
+    borderColor: '#f1c40f',
+    shadowColor: 'orange',
+    shadowRadius: 10,
+    elevation: 10,
+  },
+  zapSpell: {
+    position: 'absolute',
+    width: 50,
+    height: 50,
+    zIndex: 100,
+  },
+  lightningBolt: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#3498db',
+    borderRadius: 25,
+    opacity: 0.8,
+    shadowColor: '#3498db',
+    shadowRadius: 15,
+    elevation: 15,
+  },
+  arrowsSpell: {
+    position: 'absolute',
+    width: 40,
+    height: 40,
+    zIndex: 100,
+  },
+  arrowVolley: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#2ecc71',
+    borderRadius: 20,
+    opacity: 0.7,
+    shadowColor: '#27ae60',
+    shadowRadius: 10,
+    elevation: 10,
+  },
+  poisonSpell: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    backgroundColor: 'rgba(155, 89, 182, 0.4)',
+    borderRadius: 50,
+    zIndex: 100,
+    borderWidth: 3,
+    borderColor: '#9b59b6',
+  },
+  unit: {
+    position: 'absolute',
+    width: 30,
+    height: 30,
+    zIndex: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  healthBarBack: {
+    position: 'absolute',
+    top: -10,
+    width: '120%',
+    height: 6,
+    backgroundColor: '#333',
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: '#000',
+    overflow: 'hidden',
+  },
+  healthBarFront: {
+    height: '100%',
+  },
+  footerContainer: {
+    backgroundColor: '#222',
+    paddingBottom: 5,
+    borderTopWidth: 2,
+    borderTopColor: '#444',
+  },
+  deckContainer: {
+    flexDirection: 'row',
+    padding: 5,
+    alignItems: 'flex-end',
+    height: 90,
+  },
+  nextCardContainer: {
+    width: 50,
+    marginRight: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  handContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  card: {
+    width: 60,
+    height: 75,
+    backgroundColor: '#ecf0f1',
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+    elevation: 4,
+  },
+  cardContent: {
+     alignItems: 'center',
+     justifyContent: 'center',
+     width: '100%',
+     height: '100%',
+  },
+  hiddenCard: {
+    opacity: 0.3,
+  },
+  nextCard: {
+    width: 40,
+    height: 50,
+    opacity: 0.8,
+  },
+  disabledCard: {
+    opacity: 0.5,
+  },
+  cardName: {
+    fontSize: 9,
+    fontWeight: 'bold',
+    color: '#000', 
+    textAlign: 'center',
+    marginTop: 2,
+  },
+  elixirCostBubble: {
+    position: 'absolute',
+    top: -5,
+    left: -5,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#D442F5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#fff',
+    zIndex: 5,
+  },
+  elixirCostText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 10,
+  },
+  nextLabel: {
+    position: 'absolute',
+    top: -15,
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  elixirSection: {
+    height: 40,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+  },
+  elixirContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  elixirText: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginRight: 10,
+    width: 25,
+    textAlign: 'center',
+    textShadowColor: '#000',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+  },
+  elixirBarBack: {
+    flex: 1,
+    height: 18,
+    backgroundColor: '#444',
+    borderRadius: 9,
+    borderWidth: 2,
+    borderColor: '#000',
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  elixirBarFill: {
+    height: '100%',
+    backgroundColor: '#D442F5',
+  },
+  elixirTick: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: 2,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+  },
+  debugBtnSmall: {
+    backgroundColor: '#555',
+    padding: 5,
+    borderRadius: 4,
+    marginLeft: 10,
+  },
+  dragProxy: {
+    position: 'absolute',
+    width: 60,
+    height: 75,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 9999,
+    elevation: 20,
+  },
+  dragProxyLabel: {
+      backgroundColor: 'rgba(0,0,0,0.7)',
+      paddingHorizontal: 5,
+      borderRadius: 4,
+      marginTop: 5,
+  },
+  timerContainer: {
+      position: 'absolute',
+      top: 10,
+      right: 20,
+      backgroundColor: 'rgba(0,0,0,0.6)',
+      padding: 5,
+      borderRadius: 5,
+      zIndex: 50,
+  },
+  timerText: {
+      color: '#fff',
+      fontWeight: 'bold',
+      fontSize: 18,
+  },
+  gameOverContainer: {
+      position: 'absolute',
+      top: 0, bottom: 0, left: 0, right: 0,
+      backgroundColor: 'rgba(0,0,0,0.85)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 1000,
+  },
+  gameOverTitle: {
+      fontSize: 48,
+      fontWeight: '900',
+      marginBottom: 30,
+      textShadowColor: '#fff',
+      textShadowOffset: { width: 0, height: 0 },
+      textShadowRadius: 10,
+  },
+  restartButton: {
+      backgroundColor: '#fff',
+      paddingVertical: 15,
+      paddingHorizontal: 30,
+      borderRadius: 25,
+  },
+  restartButtonText: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: '#333',
+  },
+  // Lobby Styles
+  lobbyContainer: {
+      flex: 1,
+      width: '100%',
+      height: '100%',
+  },
+  lobbyOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  tabContentArea: {
+      flex: 1,
+      padding: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+  },
+  bottomNavigation: {
+      height: 70,
+      backgroundColor: '#16213e',
+      flexDirection: 'row',
+      borderTopWidth: 2,
+      borderTopColor: '#0f3460',
+      paddingBottom: 10,
+  },
+  tabButton: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: 8,
+  },
+  tabButtonActive: {
+      borderTopWidth: 3,
+      borderTopColor: '#F1C40F',
+  },
+  tabIcon: {
+      fontSize: 24,
+      marginBottom: 4,
+  },
+  tabLabel: {
+      fontSize: 12,
+      fontWeight: 'bold',
+      color: '#888',
+  },
+  tabLabelActive: {
+      color: '#F1C40F',
+  },
+  placeholderContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+  },
+  placeholderTitle: {
+      fontSize: 36,
+      fontWeight: '900',
+      color: '#F1C40F',
+      marginBottom: 10,
+  },
+  placeholderText: {
+      fontSize: 18,
+      color: '#888',
+  },
+  battleTabContainer: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 20,
+  },
+  deckPreviewTitle: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: '#F1C40F',
+      marginBottom: 20,
+  },
+  deckPreview: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      marginBottom: 30,
+  },
+  miniCard: {
+      width: 70,
+      height: 90,
+      backgroundColor: '#fff',
+      borderRadius: 8,
+      margin: 5,
+      borderWidth: 3,
+      // borderColor set dynamically
+      justifyContent: 'center',
+      alignItems: 'center',
+      elevation: 4,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.23,
+      shadowRadius: 2.62,
+  },
+  miniCardName: {
+      fontSize: 10,
+      fontWeight: 'bold',
+      marginTop: 5,
+  },
+  miniCardCost: {
+      position: 'absolute',
+      top: -5,
+      right: -5,
+      width: 22,
+      height: 22,
+      borderRadius: 11,
+      backgroundColor: '#D442F5',
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: '#fff',
+  },
+  miniCardCostText: {
+      color: '#fff',
+      fontWeight: 'bold',
+      fontSize: 12,
+  },
+  // --- Deck Tab Styles ---
+  deckTabContainer: {
+      flex: 1,
+      padding: 10,
+      paddingTop: 15,
+  },
+  deckHeaderRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 10,
+      paddingHorizontal: 5,
+  },
+  deckTabTitle: {
+      fontSize: 22,
+      fontWeight: '900',
+      color: '#fff',
+      textShadowColor: 'black',
+      textShadowRadius: 2,
+  },
+  magicItemsContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#3498db',
+      paddingVertical: 5,
+      paddingHorizontal: 10,
+      borderRadius: 15,
+      borderWidth: 1,
+      borderColor: '#2980b9',
+  },
+  magicItemIcon: {
+      marginRight: 5,
+  },
+  magicItemsText: {
+      color: '#fff',
+      fontWeight: 'bold',
+      fontSize: 12,
+  },
+  deckStatsContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0,0,0,0.4)',
+      paddingVertical: 8,
+      borderRadius: 8,
+      marginBottom: 15,
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.1)',
+  },
+  deckStatItem: {
+      alignItems: 'center',
+  },
+  deckStatLabel: {
+      color: '#ccc',
+      fontSize: 10,
+      marginBottom: 2,
+      fontWeight: '600',
+  },
+  deckStatValue: {
+      color: '#D442F5',
+      fontSize: 14,
+      fontWeight: 'bold',
+      marginLeft: 5,
+  },
+  deckStatDivider: {
+      width: 1,
+      height: '80%',
+      backgroundColor: 'rgba(255,255,255,0.2)',
+  },
+  deckSelectorContainer: {
+      backgroundColor: 'rgba(0, 0, 0, 0.4)',
+      borderRadius: 12,
+      paddingVertical: 12,
+      paddingHorizontal: 15,
+      marginBottom: 15,
+      borderWidth: 2,
+      borderColor: '#3498db',
+  },
+  deckSelectorLabel: {
+      color: '#fff',
+      fontSize: 14,
+      fontWeight: 'bold',
+      marginBottom: 10,
+      textAlign: 'center',
+      textShadowColor: 'black',
+      textShadowRadius: 2,
+  },
+  deckSelectorButtons: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      gap: 10,
+  },
+  deckSelectorButton: {
+      flex: 1,
+      backgroundColor: 'rgba(52, 152, 219, 0.4)',
+      paddingVertical: 14,
+      paddingHorizontal: 12,
+      borderRadius: 10,
+      borderWidth: 2,
+      borderColor: '#2980b9',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: 50,
+  },
+  deckSelectorButtonActive: {
+      backgroundColor: '#2980b9',
+      borderColor: '#f1c40f',
+      shadowColor: '#f1c40f',
+      shadowRadius: 8,
+      elevation: 8,
+      transform: [{scale: 1.05}],
+  },
+  deckSelectorButtonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: 'bold',
+      textAlign: 'center',
+  },
+  deckSelectorButtonTextActive: {
+      color: '#f1c40f',
+      fontSize: 17,
+      textShadowColor: 'rgba(241, 196, 15, 0.5)',
+      textShadowRadius: 4,
+  },
+  deckBox: {
+      backgroundColor: 'rgba(0, 0, 0, 0.6)',
+      borderWidth: 3,
+      borderColor: '#F1C40F',
+      borderRadius: 12,
+      marginBottom: 12,
+      paddingVertical: 10,
+      paddingHorizontal: 8,
+  },
+  deckBoxTitle: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: '#F1C40F',
+      marginBottom: 8,
+      textAlign: 'center',
+  },
+  deckBoxInner: {
+      alignItems: 'center',
+  },
+  allCardsScroll: {
+      flex: 1,
+      marginBottom: 80,
+  },
+  cardRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-evenly',
+      marginBottom: 10,
+  },
+  deckCard: {
+      width: 70,
+      height: 85,
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderRadius: 8,
+      borderWidth: 2,
+      borderColor: '#F1C40F',
+      justifyContent: 'center',
+      alignItems: 'center',
+      position: 'relative',
+      marginHorizontal: 3,
+  },
+  deckCardBadge: {
+      position: 'absolute',
+      top: 2,
+      right: 2,
+      backgroundColor: 'rgba(46, 204, 113, 0.9)',
+      borderRadius: 10,
+      width: 18,
+      height: 18,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: '#27ae60',
+  },
+  deckCardBadgeText: {
+      color: '#fff',
+      fontSize: 12,
+      fontWeight: 'bold',
+  },
+  deckCardHighlight: {
+      backgroundColor: 'rgba(241, 196, 15, 0.4)',
+      borderWidth: 3,
+      transform: [{ scale: 1.05 }],
+  },
+  draggableCard: {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 3,
+      elevation: 2,
+  },
+  dragHandle: {
+      position: 'absolute',
+      top: 2,
+      right: 2,
+      backgroundColor: 'rgba(0,0,0,0.3)',
+      borderRadius: 3,
+      paddingHorizontal: 3,
+      paddingVertical: 1,
+  },
+  dragHandleIcon: {
+      color: '#fff',
+      fontSize: 10,
+      fontWeight: 'bold',
+      letterSpacing: -2,
+  },
+  deckCardSelected: {
+      backgroundColor: 'rgba(46, 204, 113, 0.3)',
+      borderWidth: 3,
+      shadowColor: '#2ecc71',
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0.8,
+      shadowRadius: 8,
+      elevation: 5,
+  },
+  selectedBadge: {
+      position: 'absolute',
+      top: -8,
+      left: -8,
+      backgroundColor: '#2ecc71',
+      paddingHorizontal: 4,
+      paddingVertical: 2,
+      borderRadius: 4,
+  },
+  selectedBadgeText: {
+      color: '#fff',
+      fontSize: 8,
+      fontWeight: '900',
+  },
+  swapInstructions: {
+      backgroundColor: 'rgba(46, 204, 113, 0.2)',
+      paddingHorizontal: 15,
+      paddingVertical: 10,
+      marginBottom: 10,
+      borderRadius: 8,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: '#2ecc71',
+  },
+  swapInstructionsText: {
+      color: '#2ecc71',
+      fontSize: 12,
+      fontWeight: 'bold',
+      flex: 1,
+  },
+  cancelButton: {
+      color: '#e74c3c',
+      fontSize: 12,
+      fontWeight: 'bold',
+      textDecorationLine: 'underline',
+  },
+  deckCardName: {
+      fontSize: 8,
+      fontWeight: 'bold',
+      color: '#333',
+      marginTop: 3,
+  },
+  deckCardCost: {
+      position: 'absolute',
+      top: -5,
+      right: -5,
+      width: 22,
+      height: 22,
+      borderRadius: 11,
+      backgroundColor: '#D442F5',
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 2,
+      borderColor: '#fff',
+  },
+  deckCardCostText: {
+      color: '#fff',
+      fontWeight: '900',
+      fontSize: 11,
+  },
+  cardTypeBadge: {
+      position: 'absolute',
+      bottom: 2,
+      backgroundColor: '#ff4500',
+      paddingHorizontal: 3,
+      paddingVertical: 1,
+      borderRadius: 3,
+  },
+  cardTypeBadgeFlying: {
+      position: 'absolute',
+      bottom: 2,
+      backgroundColor: '#27ae60',
+      paddingHorizontal: 3,
+      paddingVertical: 1,
+      borderRadius: 3,
+  },
+  cardTypeBadgeBuilding: {
+      position: 'absolute',
+      bottom: 2,
+      backgroundColor: '#8B4513',
+      paddingHorizontal: 3,
+      paddingVertical: 1,
+      borderRadius: 3,
+  },
+  cardTypeText: {
+      color: '#fff',
+      fontSize: 6,
+      fontWeight: '900',
+  },
+  // Card Detail Modal Styles
+  cardDetailModal: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 20,
+  },
+  cardDetailModalContent: {
+      backgroundColor: '#2c3e50',
+      borderRadius: 20,
+      padding: 25,
+      width: '90%',
+      maxWidth: 350,
+      borderWidth: 4,
+      borderColor: '#ecf0f1',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 15 },
+      shadowOpacity: 0.6,
+      shadowRadius: 20,
+      elevation: 25,
+  },
+  closeButton: {
+      position: 'absolute',
+      top: 10,
+      right: 10,
+      width: 35,
+      height: 35,
+      borderRadius: 17,
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+      justifyContent: 'center',
+      alignItems: 'center',
+  },
+  closeButtonText: {
+      color: '#e74c3c',
+      fontSize: 20,
+      fontWeight: 'bold',
+  },
+  cardDetailHeader: {
+      alignItems: 'center',
+      marginBottom: 20,
+  },
+  cardDetailIconBig: {
+      width: 120,
+      height: 120,
+      justifyContent: 'center',
+      alignItems: 'center',
+      position: 'relative',
+      marginBottom: 10,
+  },
+  cardDetailCostBig: {
+      position: 'absolute',
+      top: 10,
+      left: 10,
+      width: 45,
+      height: 45,
+      borderRadius: 22.5,
+      backgroundColor: '#D442F5',
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 3,
+      borderColor: '#fff',
+      zIndex: 10,
+  },
+  cardDetailCostBigText: {
+      color: '#fff',
+      fontWeight: '900',
+      fontSize: 20,
+  },
+  cardDetailNameBig: {
+      fontSize: 28,
+      fontWeight: '900',
+      color: '#F1C40F',
+      marginBottom: 8,
+      textAlign: 'center',
+  },
+  cardDetailTypeBig: {
+      fontSize: 14,
+      fontWeight: 'bold',
+      color: '#ff4500',
+      backgroundColor: 'rgba(255, 69, 0, 0.2)',
+      paddingVertical: 5,
+      paddingHorizontal: 15,
+      borderRadius: 15,
+  },
+  cardDetailTypeBigFlying: {
+      fontSize: 14,
+      fontWeight: 'bold',
+      color: '#27ae60',
+      backgroundColor: 'rgba(39, 174, 96, 0.2)',
+      paddingVertical: 5,
+      paddingHorizontal: 15,
+      borderRadius: 15,
+  },
+  cardDetailTypeBigBuilding: {
+      fontSize: 14,
+      fontWeight: 'bold',
+      color: '#8B4513',
+      backgroundColor: 'rgba(139, 69, 19, 0.2)',
+      paddingVertical: 5,
+      paddingHorizontal: 15,
+      borderRadius: 15,
+  },
+  cardDetailStatsBig: {
+      backgroundColor: 'rgba(255, 255, 255, 0.05)',
+      borderRadius: 12,
+      padding: 15,
+      marginBottom: 20,
+  },
+  statRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 10,
+  },
+  statLabel: {
+      fontSize: 14,
+      color: '#aaa',
+      fontWeight: '600',
+  },
+  statValue: {
+      fontSize: 14,
+      color: '#fff',
+      fontWeight: 'bold',
+  },
+  upgradeButton: {
+      backgroundColor: '#F1C40F',
+      paddingVertical: 12,
+      paddingHorizontal: 30,
+      borderRadius: 25,
+      alignSelf: 'center',
+  },
+  upgradeButtonText: {
+      color: '#000',
+      fontSize: 16,
+      fontWeight: '900',
+  },
+  // --- New Battle Screen Styles ---
+  topInfoBar: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    zIndex: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  bottomInfoBar: {
+    position: 'absolute',
+    bottom: 145, // Just above the footer
+    left: 10,
+    zIndex: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  playerInfoContainer: {
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    marginRight: 10,
+  },
+  playerName: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+    textShadowColor: 'black',
+    textShadowRadius: 2,
+  },
+  clanName: {
+    color: '#ccc',
+    fontSize: 10,
+    fontStyle: 'italic',
+  },
+  trophyContainer: {
+    backgroundColor: 'rgba(241, 196, 15, 0.2)',
+    padding: 5,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: '#F1C40F',
+  },
+  trophyText: {
+    color: '#F1C40F',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  scoreBoard: {
+    position: 'absolute',
+    top: 5,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 15,
+  },
+  crownContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 15,
+  },
+  crownIcon: {
+    fontSize: 18,
+    marginHorizontal: 2,
+  },
+  scoreText: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: '#fff',
+    textShadowColor: 'black',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+  },
+  settingsButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 35,
+    height: 35,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+    zIndex: 60,
+  },
+  emoteButton: {
+    position: 'absolute',
+    bottom: 145,
+    left: 10,
+    width: 40,
+    height: 40,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 20,
+    zIndex: 60,
+    display: 'none', // Hidden for now as it overlaps with player info, or we can move it
+  },
+  timerTextRed: {
+    color: '#e74c3c',
+  },
+  elixirBubble: {
+    width: 35,
+    height: 35,
+    borderRadius: 17.5,
+    backgroundColor: '#D442F5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+    marginRight: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 3,
+    elevation: 5,
+    zIndex: 10,
+  },
+  elixirBubbleDouble: {
+    backgroundColor: '#FFD700',
+    shadowColor: '#FFD700',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  elixirDoubleText: {
+    position: 'absolute',
+    bottom: -2,
+    fontSize: 10,
+    fontWeight: '900',
+    color: '#fff',
+    textShadowColor: '#000',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 3,
+  },
+  elixirBarFillDouble: {
+    backgroundColor: '#FFD700',
+  },
+  // --- Double Elixir Alert Styles ---
+  doubleElixirAlert: {
+    position: 'absolute',
+    top: 100,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2000,
+  },
+  doubleElixirAlertContent: {
+    backgroundColor: 'rgba(255, 215, 0, 0.95)',
+    paddingHorizontal: 30,
+    paddingVertical: 15,
+    borderRadius: 15,
+    borderWidth: 3,
+    borderColor: '#FFA500',
+    shadowColor: '#FFD700',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1,
+    shadowRadius: 15,
+    elevation: 10,
+    alignItems: 'center',
+  },
+  doubleElixirAlertTitle: {
+    fontSize: 32,
+    fontWeight: '900',
+    color: '#8B4500',
+    textShadowColor: '#FFA500',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 4,
+    marginBottom: 5,
+  },
+  doubleElixirAlertSubtitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#8B4500',
+  },
+  // --- Lobby Header Styles ---
+  lobbyHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 45, // More space for notch
+    paddingHorizontal: 15,
+    paddingBottom: 15,
+    backgroundColor: 'rgba(30, 39, 46, 0.9)', // Darker semi-transparent
+    borderBottomWidth: 2,
+    borderBottomColor: '#34495e',
+  },
+  lobbyHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  xpLevelContainer: {
+    width: 35,
+    height: 35,
+    backgroundColor: '#3498db',
+    justifyContent: 'center',
+    alignItems: 'center',
+    transform: [{ rotate: '45deg' }],
+    borderWidth: 2,
+    borderColor: '#2980b9',
+    marginRight: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+  },
+  xpLevelText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+    transform: [{ rotate: '-45deg' }],
+  },
+  playerIdentity: {
+    justifyContent: 'center',
+  },
+  lobbyPlayerName: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginBottom: 2,
+    textShadowColor: 'black',
+    textShadowRadius: 1,
+  },
+  xpBarContainer: {
+    width: 80,
+    height: 8,
+    backgroundColor: '#2c3e50',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  xpBarFill: {
+    width: '70%',
+    height: '100%',
+    backgroundColor: '#3498db',
+  },
+  lobbyHeaderRight: {
+    flexDirection: 'row',
+  },
+  currencyContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 15,
+    marginLeft: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  currencyIcon: {
+    fontSize: 12,
+    marginRight: 5,
+  },
+  currencyText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  // --- Chest Slots Styles ---
+  chestSlotsContainer: {
+    width: '100%',
+    marginTop: 20,
+    paddingHorizontal: 10,
+  },
+  chestSlotsTitle: {
+    color: '#ccc',
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    textAlign: 'center',
+    letterSpacing: 1,
+  },
+  chestRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  chestSlot: {
+    width: '23%',
+    height: 60,
+    backgroundColor: '#5D4037', // Brown
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#8D6E63',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 3,
+  },
+  chestSlotEmpty: {
+    width: '23%',
+    height: 60,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.1)',
+    borderStyle: 'dashed',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  chestText: {
+    color: '#FFD700',
+    fontWeight: 'bold',
+    fontSize: 10,
+    marginBottom: 2,
+  },
+  chestTimer: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    paddingHorizontal: 4,
+    borderRadius: 3,
+  },
+  chestTextEmpty: {
+    color: '#777',
+    fontSize: 9,
+    textAlign: 'center',
+  },
+  // --- Arena Title Styles ---
+  arenaTitleContainer: {
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  arenaTitle: {
+    color: '#F1C40F',
+    fontSize: 24,
+    fontWeight: '900',
+    textShadowColor: 'black',
+    textShadowRadius: 2,
+  },
+  arenaSubtitle: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+    opacity: 0.8,
+  },
+  battleButtonSubtext: {
+    color: 'rgba(0,0,0,0.5)',
+    fontSize: 10,
+    fontWeight: 'bold',
+    marginTop: 2,
+    textTransform: 'uppercase',
+  },
+  // --- Shop Styles ---
+  shopContainer: {
+    flex: 1,
+    padding: 10,
+  },
+  shopSectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    marginBottom: 10,
+    marginTop: 10,
+    paddingHorizontal: 5,
+  },
+  shopSectionTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '900',
+    textShadowColor: 'black',
+    textShadowRadius: 2,
+  },
+  shopSectionTimer: {
+    color: '#f1c40f',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  dealsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  dealCard: {
+    width: '32%',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 5,
+    marginBottom: 10,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#bdc3c7',
+  },
+  dealHeader: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#7f8c8d',
+    marginBottom: 5,
+  },
+  dealImageContainer: {
+    marginVertical: 5,
+    alignItems: 'center',
+  },
+  dealCount: {
+    position: 'absolute',
+    bottom: 0,
+    right: -5,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
+    paddingHorizontal: 3,
+    borderRadius: 3,
+  },
+  dealName: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 5,
+    height: 25,
+  },
+  buyButton: {
+    backgroundColor: '#2ecc71',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 4,
+    width: '100%',
+    alignItems: 'center',
+    borderBottomWidth: 3,
+    borderBottomColor: '#27ae60',
+  },
+  buyButtonFree: {
+    backgroundColor: '#f1c40f',
+    borderBottomColor: '#f39c12',
+  },
+  buyButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 10,
+  },
+  passBanner: {
+    backgroundColor: '#f1c40f',
+    borderRadius: 10,
+    padding: 15,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+    borderWidth: 2,
+    borderColor: '#f39c12',
+  },
+  passBannerLeft: {
+    flex: 1,
+  },
+  passBannerTitle: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '900',
+    marginBottom: 10,
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowRadius: 2,
+  },
+  passButton: {
+    backgroundColor: '#fff',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
+  },
+  passButtonText: {
+    color: '#f1c40f',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  
+  // --- Clan Styles ---
+  clanTabContainer: {
+    flex: 1,
+  },
+  clanHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    marginBottom: 5,
+  },
+  clanHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  clanBadge: {
+    width: 40,
+    height: 45,
+    backgroundColor: '#3498db',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+    borderRadius: 5,
+    borderWidth: 2,
+    borderColor: '#2980b9',
+  },
+  clanName: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textShadowColor: 'black',
+    textShadowRadius: 2,
+  },
+  clanStats: {
+    color: '#ccc',
+    fontSize: 12,
+  },
+  clanInfoButton: {
+    width: 25,
+    height: 25,
+    borderRadius: 12.5,
+    backgroundColor: '#3498db',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#fff',
+  },
+  chatContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+  },
+  chatList: {
+    flex: 1,
+  },
+  chatRow: {
+    flexDirection: 'row',
+    marginBottom: 10,
+    alignItems: 'flex-end',
+  },
+  chatRowMe: {
+    justifyContent: 'flex-end',
+  },
+  chatRowOther: {
+    justifyContent: 'flex-start',
+  },
+  chatAvatar: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#555',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 5,
+  },
+  chatBubble: {
+    padding: 10,
+    borderRadius: 10,
+    maxWidth: '80%',
+  },
+  chatBubbleMe: {
+    backgroundColor: '#3498db',
+    borderBottomRightRadius: 0,
+  },
+  chatBubbleOther: {
+    backgroundColor: '#fff',
+    borderBottomLeftRadius: 0,
+  },
+  chatUser: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#e67e22',
+    marginBottom: 2,
+  },
+  chatRole: {
+    color: '#999',
+    fontWeight: 'normal',
+  },
+  chatText: {
+    color: '#333', // Default text color
+    fontSize: 14,
+  },
+  chatTime: {
+    fontSize: 8,
+    color: 'rgba(0,0,0,0.5)',
+    alignSelf: 'flex-end',
+    marginTop: 2,
+  },
+  systemMessage: {
+    alignSelf: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    paddingVertical: 3,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  systemMessageText: {
+    color: '#ccc',
+    fontSize: 10,
+    fontStyle: 'italic',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    padding: 10,
+    backgroundColor: '#2c3e50',
+    alignItems: 'center',
+  },
+  chatInput: {
+    flex: 1,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    marginRight: 10,
+    height: 40,
+  },
+  sendButton: {
+    backgroundColor: '#f1c40f',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+  },
+  sendButtonText: {
+    color: '#333',
+    fontWeight: 'bold',
+  },
+  // --- Card Menu Styles ---
+  cardMenuOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  cardMenuContent: {
+    backgroundColor: '#1a1a2e',
+    borderRadius: 20,
+    padding: 20,
+    width: '100%',
+    maxWidth: 320,
+    borderWidth: 3,
+    borderColor: '#F1C40F',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.5,
+    shadowRadius: 12,
+    elevation: 10,
+  },
+  cardMenuPreview: {
+    alignItems: 'center',
+    marginBottom: 15,
+    position: 'relative',
+  },
+  cardMenuIconWrapper: {
+    width: 80,
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 12,
+    marginBottom: 10,
+  },
+  cardMenuIcon: {
+    fontSize: 50,
+  },
+  cardMenuCostBadge: {
+    position: 'absolute',
+    top: -5,
+    left: -5,
+    width: 35,
+    height: 35,
+    borderRadius: 17.5,
+    backgroundColor: '#D442F5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+    zIndex: 10,
+  },
+  cardMenuCostText: {
+    color: '#fff',
+    fontWeight: '900',
+    fontSize: 16,
+  },
+  cardMenuName: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#F1C40F',
+    textAlign: 'center',
+    marginBottom: 5,
+  },
+  cardMenuRarityBadge: {
+    backgroundColor: '#f39c12',
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 10,
+    marginTop: 5,
+  },
+  cardMenuRarityText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+  },
+  cardMenuStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 15,
+  },
+  cardMenuStat: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  cardMenuStatLabel: {
+    color: '#aaa',
+    fontSize: 10,
+    marginBottom: 2,
+    fontWeight: '600',
+  },
+  cardMenuStatValue: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  cardMenuButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  cardMenuButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cardMenuButtonInfo: {
+    backgroundColor: '#3498db',
+    borderBottomWidth: 3,
+    borderBottomColor: '#2980b9',
+  },
+  cardMenuButtonSwap: {
+    backgroundColor: '#2ecc71',
+    borderBottomWidth: 3,
+    borderBottomColor: '#27ae60',
+  },
+  cardMenuButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '900',
+  },
+  cardMenuOr: {
+    color: '#aaa',
+    fontSize: 12,
+    textAlign: 'center',
+    marginVertical: 10,
+    fontStyle: 'italic',
+  },
+  cardMenuCancel: {
+    marginTop: 10,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  cardMenuCancelText: {
+    color: '#e74c3c',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  // --- Deck Slot Selector Styles ---
+  deckSelectorContainer: {
+    width: '100%',
+    paddingHorizontal: 10,
+    marginBottom: 10,
+  },
+  deckSelectorLabel: {
+    color: '#ccc',
+    fontSize: 10,
+    fontWeight: 'bold',
+    marginBottom: 5,
+    letterSpacing: 1,
+  },
+  deckSelectorButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderRadius: 8,
+    padding: 3,
+  },
+  deckSelectorButton: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: 'center',
+    borderRadius: 6,
+  },
+  deckSelectorButtonActive: {
+    backgroundColor: '#F1C40F',
+  },
+  deckSelectorButtonText: {
+    color: '#aaa',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  deckSelectorButtonTextActive: {
+    color: '#000',
+  },
+  slotSelectorContent: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  slotSelectorTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  slotSelectorDeck: {
+    width: '100%',
+    maxWidth: 350,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    borderRadius: 15,
+    padding: 12,
+    borderWidth: 2,
+    borderColor: '#F1C40F',
+  },
+  slotSelectorSlotRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 8,
+  },
+  slotSelectorSlot: {
+    width: 70,
+    height: 85,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#F1C40F',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  slotSelectorSlotHighlighted: {
+    backgroundColor: 'rgba(46, 204, 113, 0.3)',
+    borderWidth: 3,
+    shadowColor: '#2ecc71',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  slotSelectorSlotIcon: {
+    fontSize: 40,
+    marginBottom: 5,
+  },
+  slotSelectorSlotName: {
+    fontSize: 8,
+    fontWeight: 'bold',
+    color: '#333',
+    marginTop: 3,
+    textAlign: 'center',
+  },
+  slotSelectorSlotCost: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#D442F5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  slotSelectorSlotCostText: {
+    color: '#fff',
+    fontWeight: '900',
+    fontSize: 11,
+  },
+  slotSelectorCancel: {
+    marginTop: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    backgroundColor: '#e74c3c',
+    borderRadius: 25,
+  },
+  slotSelectorCancelText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
 });
