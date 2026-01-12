@@ -473,10 +473,20 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
     >
       {isLegendary && (
         <Svg width="60" height="75" viewBox="0 0 60 75" style={{ position: 'absolute', top: 0, left: 0 }}>
+          <Defs>
+            <LinearGradient id="rainbow" x1="0" y1="0" x2="1" y2="1">
+              <Stop offset="0%" stopColor="#ff0000" />
+              <Stop offset="20%" stopColor="#ffff00" />
+              <Stop offset="40%" stopColor="#00ff00" />
+              <Stop offset="60%" stopColor="#00ffff" />
+              <Stop offset="80%" stopColor="#0000ff" />
+              <Stop offset="100%" stopColor="#ff00ff" />
+            </LinearGradient>
+          </Defs>
           <Polygon
             points="30,2 58,18 58,57 30,73 2,57 2,18"
             fill="#ecf0f1"
-            stroke={RARITY_COLORS['legendary']}
+            stroke="url(#rainbow)"
             strokeWidth="3"
           />
         </Svg>
@@ -1087,10 +1097,20 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
         >
           {isLegendary && (
             <Svg width="70" height="85" viewBox="0 0 60 75" style={{ position: 'absolute', top: 0, left: 0 }}>
+              <Defs>
+                <LinearGradient id="rainbow_collection" x1="0" y1="0" x2="1" y2="1">
+                  <Stop offset="0%" stopColor="#ff0000" />
+                  <Stop offset="20%" stopColor="#ffff00" />
+                  <Stop offset="40%" stopColor="#00ff00" />
+                  <Stop offset="60%" stopColor="#00ffff" />
+                  <Stop offset="80%" stopColor="#0000ff" />
+                  <Stop offset="100%" stopColor="#ff00ff" />
+                </LinearGradient>
+              </Defs>
               <Polygon
                 points="30,2 58,18 58,57 30,73 2,57 2,18"
                 fill="rgba(255, 255, 255, 0.95)"
-                stroke={RARITY_COLORS['legendary']}
+                stroke="url(#rainbow_collection)"
                 strokeWidth="2"
               />
             </Svg>
@@ -1163,10 +1183,20 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
                 >
                   {isLegendary && (
                     <Svg width="70" height="85" viewBox="0 0 60 75" style={{ position: 'absolute', top: 0, left: 0 }}>
+                      <Defs>
+                        <LinearGradient id="rainbow_deck" x1="0" y1="0" x2="1" y2="1">
+                          <Stop offset="0%" stopColor="#ff0000" />
+                          <Stop offset="20%" stopColor="#ffff00" />
+                          <Stop offset="40%" stopColor="#00ff00" />
+                          <Stop offset="60%" stopColor="#00ffff" />
+                          <Stop offset="80%" stopColor="#0000ff" />
+                          <Stop offset="100%" stopColor="#ff00ff" />
+                        </LinearGradient>
+                      </Defs>
                       <Polygon
                         points="30,2 58,18 58,57 30,73 2,57 2,18"
                         fill="rgba(255, 255, 255, 0.95)"
-                        stroke={RARITY_COLORS['legendary']}
+                        stroke="url(#rainbow_deck)"
                         strokeWidth="2"
                       />
                     </Svg>
@@ -1200,10 +1230,20 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
                 >
                   {isLegendary && (
                     <Svg width="70" height="85" viewBox="0 0 60 75" style={{ position: 'absolute', top: 0, left: 0 }}>
+                      <Defs>
+                        <LinearGradient id="rainbow_deck" x1="0" y1="0" x2="1" y2="1">
+                          <Stop offset="0%" stopColor="#ff0000" />
+                          <Stop offset="20%" stopColor="#ffff00" />
+                          <Stop offset="40%" stopColor="#00ff00" />
+                          <Stop offset="60%" stopColor="#00ffff" />
+                          <Stop offset="80%" stopColor="#0000ff" />
+                          <Stop offset="100%" stopColor="#ff00ff" />
+                        </LinearGradient>
+                      </Defs>
                       <Polygon
                         points="30,2 58,18 58,57 30,73 2,57 2,18"
                         fill="rgba(255, 255, 255, 0.95)"
-                        stroke={RARITY_COLORS['legendary']}
+                        stroke="url(#rainbow_deck)"
                         strokeWidth="2"
                       />
                     </Svg>
