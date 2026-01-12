@@ -2233,6 +2233,9 @@ export default function App() {
           if (hasEnemyInRange) {
             // Tesla emerges - visible and can attack with full stats
             u.hidden.lastCombatTime = now;
+            if (u.hidden.active) {
+               u.hidden.wakeTime = now;
+            }
             u.hidden.active = false;
           } else {
             // Check if been out of combat for 3+ seconds
@@ -2346,7 +2349,9 @@ export default function App() {
             u.lockedTarget = closestTarget.id;
           }
 
-          if (now - u.lastAttack > u.attackSpeed) {
+          const isWakingUp = u.hidden && u.hidden.wakeTime && (now - u.hidden.wakeTime < 500);
+
+          if (now - u.lastAttack > u.attackSpeed && !isWakingUp) {
             // Calculate damage to deal
             let damageToDeal = actualDamage;
 
