@@ -1780,10 +1780,25 @@ const GameBoard = ({
       </View>
 
       {draggingCard && (
-        <View style={[styles.dragProxy, { left: dragPosition.x - 30, top: dragPosition.y - 37.5 }]}>
-          <UnitSprite id={draggingCard.id} isOpponent={false} size={50} />
-          <View style={styles.dragProxyLabel}>
-            <Text style={styles.cardName}>{draggingCard.name}</Text>
+        <View style={{ position: 'absolute', left: dragPosition.x, top: dragPosition.y, zIndex: 9999, elevation: 100 }} pointerEvents="none">
+          {draggingCard.spawnDamage && (
+            <View style={{
+              position: 'absolute',
+              left: -50,
+              top: -50,
+              width: 100,
+              height: 100,
+              borderRadius: 50,
+              backgroundColor: 'rgba(52, 152, 219, 0.3)',
+              borderColor: '#3498db',
+              borderWidth: 1
+            }} />
+          )}
+          <View style={[styles.dragProxy, { position: 'absolute', left: -30, top: -37.5, margin: 0 }]}>
+            <UnitSprite id={draggingCard.id} isOpponent={false} size={50} />
+            <View style={styles.dragProxyLabel}>
+              <Text style={styles.cardName}>{draggingCard.name}</Text>
+            </View>
           </View>
         </View>
       )}
