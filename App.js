@@ -700,22 +700,25 @@ const MagicItems = () => (
   </View>
 );
 
-const DeckStats = () => (
-  <View style={styles.deckStatsContainer}>
-    <View style={styles.deckStatItem}>
-      <Text style={styles.deckStatLabel}>Avg. Elixir</Text>
-      <Text style={styles.deckStatValue}>3.8</Text>
-    </View>
-    <View style={styles.deckStatDivider} />
-    <View style={styles.deckStatItem}>
-      <Text style={styles.deckStatLabel}>Tower Troop</Text>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <UnitSprite id="princess" isOpponent={false} size={20} />
-        <Text style={styles.deckStatValue}>Princess</Text>
+const DeckStats = ({ cards = [] }) => {
+  const avgElixir = (cards.reduce((sum, c) => sum + (c?.cost || 0), 0) / (cards.length || 1)).toFixed(1);
+  return (
+    <View style={styles.deckStatsContainer}>
+      <View style={styles.deckStatItem}>
+        <Text style={styles.deckStatLabel}>Avg. Elixir</Text>
+        <Text style={[styles.deckStatValue, { color: '#E74C3C' }]}>{avgElixir}</Text>
+      </View>
+      <View style={styles.deckStatDivider} />
+      <View style={styles.deckStatItem}>
+        <Text style={styles.deckStatLabel}>Tower Troop</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <UnitSprite id="princess" isOpponent={false} size={20} />
+          <Text style={styles.deckStatValue}>Princess</Text>
+        </View>
       </View>
     </View>
-  </View>
-);
+  );
+};
 
 const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeckIndex, setSelectedDeckIndex }) => {
   const [selectedCard, setSelectedCard] = useState(null); // For detail modal
@@ -1006,7 +1009,7 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
         <MagicItems />
       </View>
 
-      <DeckStats />
+      <DeckStats cards={cards} />
 
       {/* Deck Selector - 3 Deck Slots */}
       <View style={styles.deckSelectorContainer}>
@@ -1090,31 +1093,34 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
 
       {/* All Cards Section */}
       <Text style={styles.deckBoxTitle}>Collection</Text>
-      <ScrollView
-        style={styles.allCardsScroll}
-        showsVerticalScrollIndicator={true}
-      >
-        <View style={styles.cardRow}>
-          {CARDS.slice(8, 12).map(card => (
-            <CollectionCard key={card.id} card={card} />
-          ))}
-        </View>
-        <View style={styles.cardRow}>
-          {CARDS.slice(12, 16).map(card => (
-            <CollectionCard key={card.id} card={card} />
-          ))}
-        </View>
-        <View style={styles.cardRow}>
-          {CARDS.slice(16, 20).map(card => (
-            <CollectionCard key={card.id} card={card} />
-          ))}
-        </View>
-        <View style={styles.cardRow}>
-          {CARDS.slice(20, 24).map(card => (
-            <CollectionCard key={card.id} card={card} />
-          ))}
-        </View>
-      </ScrollView>
+      <View style={[styles.deckBox, { flex: 1, paddingVertical: 5 }]}>
+        <ScrollView
+          style={styles.allCardsScroll}
+          showsVerticalScrollIndicator={true}
+          contentContainerStyle={{ paddingBottom: 20 }}
+        >
+          <View style={styles.cardRow}>
+            {CARDS.slice(8, 12).map(card => (
+              <CollectionCard key={card.id} card={card} />
+            ))}
+          </View>
+          <View style={styles.cardRow}>
+            {CARDS.slice(12, 16).map(card => (
+              <CollectionCard key={card.id} card={card} />
+            ))}
+          </View>
+          <View style={styles.cardRow}>
+            {CARDS.slice(16, 20).map(card => (
+              <CollectionCard key={card.id} card={card} />
+            ))}
+          </View>
+          <View style={styles.cardRow}>
+            {CARDS.slice(20, 24).map(card => (
+              <CollectionCard key={card.id} card={card} />
+            ))}
+          </View>
+        </ScrollView>
+      </View>
 
       {/* Card Menu Modal */}
       <CardMenu card={cardMenuCard} />
