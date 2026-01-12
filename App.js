@@ -2746,16 +2746,18 @@ export default function App() {
                 if (timeSinceTick >= 1) {
                   // Deal damage to all units in radius
                   currentUnits = currentUnits.map(u => {
+                    const isEnemy = u.isOpponent !== (h.isOpponent || false);
                     const dist = Math.sqrt(Math.pow(u.x - h.x, 2) + Math.pow(u.y - h.y, 2));
-                    if (dist < h.radius) {
+                    if (isEnemy && dist < h.radius) {
                       return { ...u, hp: u.hp - h.damage };
                     }
                     return u;
                   });
                   // Deal damage to towers in radius
                   nextTowers = nextTowers.map(t => {
+                    const isEnemy = t.isOpponent !== (h.isOpponent || false);
                     const dist = Math.sqrt(Math.pow(t.x - h.x, 2) + Math.pow(t.y - h.y, 2));
-                    if (dist < h.radius + 30) {
+                    if (isEnemy && dist < h.radius + 30) {
                       return { ...t, hp: t.hp - h.damage };
                     }
                     return t;
@@ -2768,8 +2770,9 @@ export default function App() {
             } else {
               // Other spells (Fireball, Arrows, Zap) - one-time damage
               currentUnits = currentUnits.map(u => {
+                const isEnemy = u.isOpponent !== (h.isOpponent || false);
                 const dist = Math.sqrt(Math.pow(u.x - h.targetX, 2) + Math.pow(u.y - h.targetY, 2));
-                if (dist < h.radius) {
+                if (isEnemy && dist < h.radius) {
                   let updatedUnit = { ...u, hp: u.hp - h.damage };
 
                   // Zap stun effect - resets charge ONLY when stunned
@@ -2786,8 +2789,9 @@ export default function App() {
                 return u;
               });
               nextTowers = nextTowers.map(t => {
+                const isEnemy = t.isOpponent !== (h.isOpponent || false);
                 const dist = Math.sqrt(Math.pow(t.x - h.targetX, 2) + Math.pow(t.y - h.targetY, 2));
-                if (dist < h.radius + 30) {
+                if (isEnemy && dist < h.radius + 30) {
                   return { ...t, hp: t.hp - h.damage };
                 }
                 return t;
