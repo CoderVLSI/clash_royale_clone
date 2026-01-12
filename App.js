@@ -1399,8 +1399,11 @@ const GameBoard = ({
   elixir, hand, nextCard, draggingCard, dragPosition,
   handleDragStart, handleDragMove, handleDragEnd,
   spawnTestEnemy, formatTime, onRestart, score,
-  isDoubleElixir, showDoubleElixirAlert
+  isDoubleElixir, showDoubleElixirAlert,
+  audioEnabled, setAudioEnabled, onConcede
 }) => {
+  const [showSettings, setShowSettings] = useState(false);
+
   return (
     <View style={styles.container}>
       <View style={styles.gameBoard}>
@@ -1430,9 +1433,50 @@ const GameBoard = ({
         </View>
 
         {/* Settings Button */}
-        <TouchableOpacity style={styles.settingsButton}>
+        <TouchableOpacity style={styles.settingsButton} onPress={() => setShowSettings(true)}>
           <Text style={{ fontSize: 20 }}>⚙️</Text>
         </TouchableOpacity>
+
+        <Modal
+          transparent={true}
+          visible={showSettings}
+          animationType="fade"
+          onRequestClose={() => setShowSettings(false)}
+        >
+          <View style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center'}}>
+            <View style={{width: 300, backgroundColor: 'white', padding: 20, borderRadius: 10, alignItems: 'center', elevation: 5}}>
+              <Text style={{fontSize: 24, fontWeight: 'bold', marginBottom: 20, color: '#2c3e50'}}>Settings</Text>
+              
+              <TouchableOpacity 
+                style={{padding: 15, backgroundColor: audioEnabled ? '#2ecc71' : '#95a5a6', width: '100%', alignItems: 'center', borderRadius: 5, marginBottom: 10}}
+                onPress={() => setAudioEnabled(!audioEnabled)}
+              >
+                <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>Audio: {audioEnabled ? 'ON' : 'OFF'}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={{padding: 15, backgroundColor: '#3498db', width: '100%', alignItems: 'center', borderRadius: 5, marginBottom: 10}}
+                onPress={() => { setShowSettings(false); onRestart('game'); }}
+              >
+                <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>Restart Game</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={{padding: 15, backgroundColor: '#e74c3c', width: '100%', alignItems: 'center', borderRadius: 5, marginBottom: 10}}
+                onPress={() => { setShowSettings(false); onConcede(); }}
+              >
+                <Text style={{color: 'white', fontWeight: 'bold', fontSize: 16}}>Concede</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={{padding: 10, marginTop: 5}}
+                onPress={() => setShowSettings(false)}
+              >
+                <Text style={{color: '#7f8c8d', fontSize: 16}}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
         {(towers || []).map(tower => {
           if (tower.hp <= 0) return null;
@@ -1550,6 +1594,7 @@ export default function App() {
   const [score, setScore] = useState([0, 0]); // [Player, Opponent]
   const [isDoubleElixir, setIsDoubleElixir] = useState(false);
   const [showDoubleElixirAlert, setShowDoubleElixirAlert] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(true);
   const doubleElixirTriggeredRef = useRef(false);
 
   // Multiple deck slots - 3 decks of 8 cards each
@@ -1644,6 +1689,10 @@ export default function App() {
   useEffect(() => { enemyHandRef.current = enemyHand; }, [enemyHand]);
   useEffect(() => { enemyNextCardRef.current = enemyNextCard; }, [enemyNextCard]);
   useEffect(() => { enemyDeckQueueRef.current = enemyDeckQueue; }, [enemyDeckQueue]);
+
+  const concedeGame = () => {
+    setGameOver('LOSE');
+  };
 
   const resetGame = (destination = 'game') => {
     setElixir(5);
@@ -3086,6 +3135,9 @@ export default function App() {
         score={score}
         isDoubleElixir={isDoubleElixir}
         showDoubleElixirAlert={showDoubleElixirAlert}
+        audioEnabled={audioEnabled}
+        setAudioEnabled={setAudioEnabled}
+        onConcede={concedeGame}
       />
       {globalDraggingCard && (
         <View style={[styles.dragProxy, {
