@@ -2005,6 +2005,7 @@ export default function App() {
       let splashEvents = [];
       // Collect units to spawn (will be added at the end)
       let unitsToSpawn = [];
+      let damageEvents = [];
 
       let currentUnits = (unitsRef.current || []).map(u => {
         // Check if stunned
@@ -2286,14 +2287,15 @@ export default function App() {
                 }
               } else {
                 // Target is a unit - apply damage directly
-                currentUnits = currentUnits.map(targetUnit => {
-                  if (targetUnit.id === closestTarget.id) {
-                    // Reset charge if Prince gets attacked
-                    const updatedCharge = targetUnit.charge ? { ...targetUnit.charge, distance: 0, active: false } : targetUnit.charge;
-                    return { ...targetUnit, hp: targetUnit.hp - damageToDeal, charge: updatedCharge };
-                  }
-                  return targetUnit;
+                // Target is a unit - apply damage directly via event queue (cannot modify currentUnits inside map)
+                damageEvents.push({
+                  targetId: closestTarget.id,
+                  damage: damageToDeal,
+                  attackerId: u.id
                 });
+
+                // Reset charge if Prince gets attacked - handled in damage application
+                /* Note: We handle charge reset when applying damage */
               }
               // Record splash damage event if attacker has splash
               if (u.splash) {
@@ -2700,14 +2702,46 @@ export default function App() {
         return tower;
       });
 
-      setUnits([...currentUnits, ...unitsToSpawn]);
+
+
+      // Apply unit-vs-unit damage events
+      if (damageEvents.length > 0) {
+        currentUnits = currentUnits.map(u => {
+          const events = damageEvents.filter(e => e.targetId === u.id);
+          if (events.length > 0) {
+            const totalDamage = events.reduce((sum, e) => sum + e.damage, 0);
+            // Also reset charge if taking damage
+            const updatedCharge = u.charge ? { ...u.charge, distance: 0, active: false } : u.charge;
+            return { ...u, hp: u.hp - totalDamage, charge: updatedCharge };
+          }
+          return u;
+        });
+      }
+
+      // Filter dead units
+      // Filter dead units
+      let deadCount = 0;
+      currentUnits = currentUnits.filter(u => {
+        if (u.hp <= 0) {
+          deadCount++;
+          return false;
+        }
+        return true;
+      });
+
+      if (deadCount > 0) {
+        console.log('[FILTER]', 'Removed', deadCount, 'units');
+      }
+
+      // Update state
+      const allUnits = [...currentUnits, ...unitsToSpawn];
+      setUnits(allUnits);
       setProjectiles(activeProjectiles);
       setTowers(nextTowers);
 
       // Debug: Log total units in game
-      const allUnits = [...currentUnits, ...unitsToSpawn];
       if (allUnits.length > 0) {
-        console.log('[GAME STATE]', 'Total units:', allUnits.length, 'skeletons:', allUnits.filter(u => u.spriteId === 'skeletons').length);
+        // console.log('[GAME STATE]', 'Total units:', allUnits.length);
       }
 
       // Debug: Check if spawned units have valid positions
