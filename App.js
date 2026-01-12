@@ -1146,7 +1146,7 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
 
               <View style={styles.cardDetailStatsBig}>
                 {/* Special Abilities */}
-                {(selectedCard.charge || selectedCard.spawns || selectedCard.splash || selectedCard.stun || selectedCard.jumps) && (
+                {Boolean(selectedCard.charge || selectedCard.spawns || selectedCard.splash || (selectedCard.stun && selectedCard.stun > 0) || selectedCard.jumps) && (
                   <View style={{ marginBottom: 15, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.2)' }}>
                     {selectedCard.charge && (
                       <View style={styles.statRow}>
