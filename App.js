@@ -483,16 +483,19 @@ const HealthBar = ({ current, max, isOpponent }) => {
   if (current <= 0) return null;
   const percentage = Math.max(0, Math.min(100, (current / max) * 100));
   return (
-    <View style={styles.healthBarBack}>
-      <View
-        style={[
-          styles.healthBarFront,
-          {
+    <View style={{ position: 'absolute', top: -22, width: '120%', alignItems: 'center', zIndex: 20 }}>
+      <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#fff', textShadowColor: '#000', textShadowRadius: 3, marginBottom: 1 }}>
+        {current}
+      </Text>
+      <View style={{ width: '100%', height: 8, backgroundColor: '#333', borderRadius: 4, borderWidth: 1, borderColor: '#000', overflow: 'hidden' }}>
+        <View
+          style={{
             width: `${percentage}%`,
-            backgroundColor: isOpponent ? '#ff6b6b' : '#6bff6b'
-          }
-        ]}
-      />
+            height: '100%',
+            backgroundColor: isOpponent ? '#e74c3c' : '#2ecc71'
+          }}
+        />
+      </View>
     </View>
   );
 };
