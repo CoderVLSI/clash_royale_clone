@@ -49,7 +49,7 @@ const CARDS = [
   { id: 'wizard', name: 'Wizard', cost: 5, color: '#9b59b6', hp: 600, speed: 1.5, type: 'ground', range: 60, damage: 170, attackSpeed: 1400, projectile: 'fireball_small', count: 1, splash: true, rarity: 'rare' },
   { id: 'tombstone', name: 'Tombstone', cost: 3, color: '#95a5a6', hp: 450, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 40, spawns: 'skeletons', spawnRate: 3.1, spawnCount: 2, deathSpawnCount: 4, rarity: 'rare' },
   { id: 'sword_goblins', name: 'Sword Gobs', cost: 3, color: '#2ecc71', hp: 160, speed: 3, type: 'ground', range: 25, damage: 100, attackSpeed: 900, projectile: null, count: 3, rarity: 'common' },
-  { id: 'ice_wizard', name: 'Ice Wiz', cost: 3, color: '#3498db', hp: 590, speed: 1.5, type: 'ground', range: 55, damage: 75, attackSpeed: 1700, projectile: 'ice_shard', count: 1, splash: true, rarity: 'legendary', slow: 0.35 },
+  { id: 'ice_wizard', name: 'Ice Wiz', cost: 3, color: '#3498db', hp: 590, speed: 1.5, type: 'ground', range: 55, damage: 75, attackSpeed: 1700, projectile: 'ice_shard', count: 1, splash: true, rarity: 'legendary', slow: 0.35, spawnDamage: 75 },
 ];
 
 const RARITY_COLORS = {
@@ -1044,8 +1044,8 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
   const CollectionCard = ({ card }) => {
     if (!card) return null;
 
-    // Check if this card is in the current deck
     const isInDeck = cards.some(c => c && c.id === card.id);
+    const isLegendary = card.rarity === 'legendary';
 
     const componentRef = useRef(null);
     const panResponder = useRef(
@@ -1074,10 +1074,9 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
         <TouchableOpacity
           style={[
             styles.deckCard,
-            {
-              borderColor: RARITY_COLORS[card.rarity] || '#000',
-              opacity: isInDeck ? 0.5 : 1
-            }
+            !isLegendary && { borderColor: RARITY_COLORS[card.rarity] || '#000' },
+            isLegendary && { backgroundColor: 'transparent', borderWidth: 0 },
+            { opacity: isInDeck ? 0.5 : 1 }
           ]}
           onPress={() => {
             if (!localDraggingCard) handleCollectionCardTap(card);
@@ -1086,6 +1085,16 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
           activeOpacity={0.7}
           {...panResponder.panHandlers}
         >
+          {isLegendary && (
+            <Svg width="70" height="85" viewBox="0 0 60 75" style={{ position: 'absolute', top: 0, left: 0 }}>
+              <Polygon
+                points="30,2 58,18 58,57 30,73 2,57 2,18"
+                fill="rgba(255, 255, 255, 0.95)"
+                stroke={RARITY_COLORS['legendary']}
+                strokeWidth="2"
+              />
+            </Svg>
+          )}
           <UnitSprite id={card.id} isOpponent={false} size={40} />
           <Text style={styles.deckCardName}>{card.name || 'Card'}</Text>
           <View style={styles.deckCardCost}>
@@ -1140,16 +1149,28 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
           <View style={styles.cardRow}>
             {(cards || []).slice(0, 4).map((card, index) => {
               if (!card) return null;
+              const isLegendary = card.rarity === 'legendary';
               return (
                 <TouchableOpacity
                   key={card.id}
                   style={[
                     styles.deckCard,
-                    { borderColor: RARITY_COLORS[card.rarity] || '#000' }
+                    !isLegendary && { borderColor: RARITY_COLORS[card.rarity] || '#000' },
+                    isLegendary && { backgroundColor: 'transparent', borderWidth: 0 }
                   ]}
                   onPress={() => handleDeckCardTap(card, index)}
                   activeOpacity={0.7}
                 >
+                  {isLegendary && (
+                    <Svg width="70" height="85" viewBox="0 0 60 75" style={{ position: 'absolute', top: 0, left: 0 }}>
+                      <Polygon
+                        points="30,2 58,18 58,57 30,73 2,57 2,18"
+                        fill="rgba(255, 255, 255, 0.95)"
+                        stroke={RARITY_COLORS['legendary']}
+                        strokeWidth="2"
+                      />
+                    </Svg>
+                  )}
                   <UnitSprite id={card.id} isOpponent={false} size={40} />
                   <Text style={styles.deckCardName}>{card.name || 'Card'}</Text>
                   <View style={styles.deckCardCost}>
@@ -1165,16 +1186,28 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
           <View style={styles.cardRow}>
             {(cards || []).slice(4, 8).map((card, index) => {
               if (!card) return null;
+              const isLegendary = card.rarity === 'legendary';
               return (
                 <TouchableOpacity
                   key={card.id}
                   style={[
                     styles.deckCard,
-                    { borderColor: RARITY_COLORS[card.rarity] || '#000' }
+                    !isLegendary && { borderColor: RARITY_COLORS[card.rarity] || '#000' },
+                    isLegendary && { backgroundColor: 'transparent', borderWidth: 0 }
                   ]}
                   onPress={() => handleDeckCardTap(card, index + 4)}
                   activeOpacity={0.7}
                 >
+                  {isLegendary && (
+                    <Svg width="70" height="85" viewBox="0 0 60 75" style={{ position: 'absolute', top: 0, left: 0 }}>
+                      <Polygon
+                        points="30,2 58,18 58,57 30,73 2,57 2,18"
+                        fill="rgba(255, 255, 255, 0.95)"
+                        stroke={RARITY_COLORS['legendary']}
+                        strokeWidth="2"
+                      />
+                    </Svg>
+                  )}
                   <UnitSprite id={card.id} isOpponent={false} size={40} />
                   <Text style={styles.deckCardName}>{card.name || 'Card'}</Text>
                   <View style={styles.deckCardCost}>
@@ -2026,6 +2059,7 @@ export default function App() {
             } : undefined,
             hidden: card.hidden ? { active: true, visibleHp: card.hp } : undefined,
             splash: card.splash || false,
+            spawnDamage: card.spawnDamage,
             spawns: card.spawns,
             spawnRate: card.spawnRate,
             spawnCount: card.spawnCount,  // Custom spawn count (e.g., Tombstone: 2, Witch: 3)
@@ -2307,6 +2341,19 @@ export default function App() {
               u.lastSpawn = now;
             }
           }
+        }
+
+        // Handle spawn damage (one-time effect on spawn)
+        if (u.spawnDamage && !u.spawnEffectProcessed) {
+          u.spawnEffectProcessed = true;
+          // Add splash event centered on unit
+          splashEvents.push({
+            attacker: u,
+            targetX: u.x,
+            targetY: u.y,
+            damage: u.spawnDamage,
+            slow: u.slow
+          });
         }
 
         // Handle Tesla hidden mechanic
@@ -2710,7 +2757,12 @@ export default function App() {
           if (unit.isOpponent !== event.attacker.isOpponent && unit.hp > 0) {
             const dist = Math.sqrt(Math.pow(unit.x - event.targetX, 2) + Math.pow(unit.y - event.targetY, 2));
             if (dist <= splashRadius) {
-              return { ...unit, hp: unit.hp - Math.floor(event.damage * 0.5) };
+              let updatedUnit = { ...unit, hp: unit.hp - Math.floor(event.damage * 0.5) };
+              if (event.slow) {
+                updatedUnit.slowUntil = Date.now() + 2000;
+                updatedUnit.slowAmount = event.slow;
+              }
+              return updatedUnit;
             }
           }
           return unit;
