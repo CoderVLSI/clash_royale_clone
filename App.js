@@ -463,8 +463,8 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
         <Text style={styles.cardName}>{card.name}</Text>
       </View>
 
-      <View style={styles.elixirCostBubble}>
-        <Text style={styles.elixirCostText}>{card.cost}</Text>
+      <View style={{ position: 'absolute', top: -8, left: -8, zIndex: 10 }}>
+        <ElixirDroplet size={24} value={card.cost} />
       </View>
 
       {isNext && <Text style={styles.nextLabel}>Next</Text>}
@@ -739,8 +739,26 @@ const ShopTab = () => {
 
 const MagicItems = () => (
   <View style={styles.magicItemsContainer}>
-    <View style={styles.magicItemIcon}><Text style={{ fontSize: 16 }}>⚡</Text></View>
-    <Text style={styles.magicItemsText}>Magic Items</Text>
+    <View style={styles.magicItem}><Text style={{ fontSize: 12 }}>✨</Text></View>
+    <View style={styles.magicItem}><Text style={{ fontSize: 12 }}>🃏</Text></View>
+  </View>
+);
+
+const ElixirDroplet = ({ size = 20, value, isDouble }) => (
+  <View style={{ width: size, height: size, justifyContent: 'center', alignItems: 'center' }}>
+    <Svg width={size} height={size} viewBox="0 0 100 100" style={{ position: 'absolute' }}>
+      <Path
+        d="M50 5 Q85 45 85 70 A35 35 0 1 1 15 70 Q15 45 50 5 Z"
+        fill={isDouble ? '#FFD700' : '#D442F5'}
+        stroke="white"
+        strokeWidth="4"
+      />
+    </Svg>
+    {value !== undefined && (
+      <Text style={{ color: 'white', fontWeight: 'bold', fontSize: size * 0.5, textShadowColor: 'black', textShadowRadius: 2 }}>
+        {value}
+      </Text>
+    )}
   </View>
 );
 
@@ -1623,9 +1641,13 @@ const GameBoard = ({
 
         <View style={styles.elixirSection}>
           <View style={styles.elixirContainer}>
-            <View style={[styles.elixirBubble, isDoubleElixir && styles.elixirBubbleDouble]}>
-              <Text style={styles.elixirText}>{Math.floor(elixir)}</Text>
-              {isDoubleElixir && <Text style={styles.elixirDoubleText}>2X</Text>}
+            <View style={{ marginRight: 5, zIndex: 10 }}>
+              <ElixirDroplet size={40} value={Math.floor(elixir)} isDouble={isDoubleElixir} />
+              {isDoubleElixir && (
+                <View style={{ position: 'absolute', bottom: -2, right: -2, backgroundColor: 'black', borderRadius: 5, paddingHorizontal: 2 }}>
+                  <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#FFD700' }}>2X</Text>
+                </View>
+              )}
             </View>
             <View style={styles.elixirBarBack}>
               <View style={[styles.elixirBarFill, isDoubleElixir && styles.elixirBarFillDouble, { width: `${(elixir / 10) * 100}%` }]} />
