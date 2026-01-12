@@ -669,7 +669,7 @@ const Unit = ({ unit }) => {
   const spriteId = unit.spriteId || 'knight';
   const isEnemy = unit.isOpponent;
   const unitSize = 30; // Same size for both teams
-  const isSlowed = unit.slowUntil && unit.slowUntil > Date.now();
+  const isSlowed = unit.slowUntil > Date.now();
 
   return (
     <View style={[styles.unit, { left: unit.x - unitSize / 2, top: unit.y - unitSize / 2, width: unitSize, height: unitSize }]}>
@@ -1714,7 +1714,7 @@ const GameBoard = ({
             position: 'absolute'
           };
 
-          const isSlowed = tower.slowUntil && tower.slowUntil > Date.now();
+          const isSlowed = tower.slowUntil > Date.now();
 
           return (
             <View key={tower.id} style={[styles.towerContainer, styleObj]}>
