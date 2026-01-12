@@ -2273,6 +2273,7 @@ export default function App() {
 
         // Defensive check: ensure nextTowers is an array before filtering
         // Initial targets: Only Princess towers (King tower added conditionally below)
+        // This applies to ALL units (Ground, Flying, Building-targeters)
         let targets = (nextTowers || []).filter(t => 
           t.isOpponent !== u.isOpponent && 
           t.hp > 0 && 
