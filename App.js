@@ -49,6 +49,7 @@ const CARDS = [
   { id: 'wizard', name: 'Wizard', cost: 5, color: '#9b59b6', hp: 600, speed: 1.5, type: 'ground', range: 60, damage: 170, attackSpeed: 1400, projectile: 'fireball_small', count: 1, splash: true, rarity: 'rare' },
   { id: 'tombstone', name: 'Tombstone', cost: 3, color: '#95a5a6', hp: 450, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 40, spawns: 'skeletons', spawnRate: 3.1, spawnCount: 2, deathSpawnCount: 4, rarity: 'rare' },
   { id: 'sword_goblins', name: 'Sword Gobs', cost: 3, color: '#2ecc71', hp: 160, speed: 3, type: 'ground', range: 25, damage: 100, attackSpeed: 900, projectile: null, count: 3, rarity: 'common' },
+  { id: 'ice_wizard', name: 'Ice Wiz', cost: 3, color: '#3498db', hp: 590, speed: 1.5, type: 'ground', range: 55, damage: 75, attackSpeed: 1700, projectile: 'ice_shard', count: 1, splash: true, rarity: 'legendary', slow: 0.35 },
 ];
 
 const RARITY_COLORS = {
@@ -358,6 +359,16 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Circle cx="70" cy="60" r="10" fill="#e74c3c" />
         </Svg>
       );
+    case 'ice_wizard':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="#3498db" strokeWidth="2" />
+          <Path d="M20 40 Q50 5 80 40" fill="#ecf0f1" stroke="#bdc3c7" strokeWidth="2" />
+          <Circle cx="50" cy="50" r="20" fill="#3498db" />
+          <Circle cx="40" cy="48" r="3" fill="white" />
+          <Circle cx="60" cy="48" r="3" fill="white" />
+        </Svg>
+      );
     case 'tombstone':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
@@ -446,18 +457,30 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
   // Always attach panHandlers - we check canAfford inside the callbacks
   // This prevents the responder from being lost when elixir changes
   const handlers = !isNext ? panResponder.panHandlers : {};
+  const isLegendary = card.rarity === 'legendary';
 
   return (
     <View
       style={[
         styles.card,
-        { borderColor: RARITY_COLORS[card.rarity] || '#000' },
+        !isLegendary && { borderColor: RARITY_COLORS[card.rarity] || '#000' },
+        isLegendary && { backgroundColor: 'transparent', borderWidth: 0 },
         isNext && styles.nextCard,
         (!canAfford && !isNext) && styles.disabledCard,
         isDragging && styles.hiddenCard
       ]}
       {...handlers}
     >
+      {isLegendary && (
+        <Svg width="60" height="75" viewBox="0 0 60 75" style={{ position: 'absolute', top: 0, left: 0 }}>
+          <Polygon
+            points="30,2 58,18 58,57 30,73 2,57 2,18"
+            fill="#ecf0f1"
+            stroke={RARITY_COLORS['legendary']}
+            strokeWidth="3"
+          />
+        </Svg>
+      )}
       <View style={styles.cardContent}>
         <UnitSprite id={card.id} isOpponent={false} size={40} />
         <Text style={styles.cardName}>{card.name}</Text>
@@ -531,6 +554,20 @@ const Projectile = ({ type, position }) => {
   if (type === 'fireball_small') {
     return (
       <View style={[styles.fireballSmall, { left: position.x, top: position.y }]} />
+    );
+  }
+  if (type === 'ice_shard') {
+    return (
+      <View style={{
+        position: 'absolute',
+        width: 10,
+        height: 10,
+        backgroundColor: '#3498db',
+        borderRadius: 2,
+        transform: [{ rotate: '45deg' }],
+        left: position.x - 5,
+        top: position.y - 5
+      }} />
     );
   }
   if (type === 'fireball_spell') {
@@ -1998,6 +2035,8 @@ export default function App() {
             spawnTime: Date.now(),  // Track when building was spawned for HP depreciation
             maxHp: card.hp,  // Store initial max HP for depreciation calculation
             jumps: card.jumps || false,  // Hog Rider can jump over river
+            slow: card.slow || 0,
+            slowUntil: 0,
             stunUntil: 0,
             baseDamage: card.damage,
             lockedTarget: null,  // Once locked, unit won't switch targets
@@ -2415,8 +2454,13 @@ export default function App() {
           }
 
           const isWakingUp = u.hidden && u.hidden.wakeTime && (now - u.hidden.wakeTime < 500);
+          
+          let currentAttackSpeed = u.attackSpeed;
+          if (u.slowUntil > now) {
+             currentAttackSpeed = u.attackSpeed / (1 - (u.slowAmount || 0.35));
+          }
 
-          if (now - u.lastAttack > u.attackSpeed && !isWakingUp) {
+          if (now - u.lastAttack > currentAttackSpeed && !isWakingUp) {
             // Calculate damage to deal
             let damageToDeal = actualDamage;
 
@@ -2438,6 +2482,7 @@ export default function App() {
                 damage: damageToDeal,
                 type: projectileType,
                 splash: u.splash,
+                slow: u.slow,
                 attackerId: u.id,
                 isOpponent: u.isOpponent
               });
@@ -2487,7 +2532,12 @@ export default function App() {
 
           // Apply speed boost for charging Prince
           const speedMultiplier = (u.charge && u.charge.active) ? 2 : 1;
-          const effectiveSpeed = u.speed * speedMultiplier;
+          let effectiveSpeed = u.speed * speedMultiplier;
+
+          // Apply slow effect
+          if (u.slowUntil > now) {
+            effectiveSpeed *= (1 - (u.slowAmount || 0.35));
+          }
 
           // Movement Calculation
           if ((u.jumps || u.type === 'flying') && closestTarget) {
@@ -2784,6 +2834,12 @@ export default function App() {
                     }
                   }
 
+                  // Apply slow effect (Ice Wizard)
+                  if (h.slow && h.slow > 0) {
+                    updatedUnit.slowUntil = now + 2000; // Slow lasts 2s
+                    updatedUnit.slowAmount = h.slow;
+                  }
+
                   return updatedUnit;
                 }
                 return u;
@@ -2806,7 +2862,12 @@ export default function App() {
             // Damage the primary target
             currentUnits = currentUnits.map(u => {
               if (u.id === h.targetId) {
-                return { ...u, hp: u.hp - h.damage };
+                let updatedUnit = { ...u, hp: u.hp - h.damage };
+                if (h.slow && h.slow > 0) {
+                  updatedUnit.slowUntil = now + 2000;
+                  updatedUnit.slowAmount = h.slow;
+                }
+                return updatedUnit;
               }
               return u;
             });
@@ -2820,7 +2881,12 @@ export default function App() {
                   if (isEnemy) {
                     const dist = Math.sqrt(Math.pow(u.x - hitX, 2) + Math.pow(u.y - hitY, 2));
                     if (dist <= splashRadius) {
-                      return { ...u, hp: u.hp - Math.floor(h.damage * 0.5) };
+                      let updatedUnit = { ...u, hp: u.hp - Math.floor(h.damage * 0.5) };
+                      if (h.slow && h.slow > 0) {
+                        updatedUnit.slowUntil = now + 2000;
+                        updatedUnit.slowAmount = h.slow;
+                      }
+                      return updatedUnit;
                     }
                   }
                 }
