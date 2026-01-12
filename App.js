@@ -2704,11 +2704,13 @@ export default function App() {
         };
       });
 
-      const hits = activeProjectiles.filter(p => p.hit && !p.damageDealt);
+      const hits = activeProjectiles.filter(p => (p.hit && !p.damageDealt) || p.isPoison);
       if (hits.length > 0) {
 
         hits.forEach(h => {
-          h.damageDealt = true;
+          if (!h.isPoison) {
+            h.damageDealt = true;
+          }
           if (h.isSpell) {
             // Handle spell effects (Fireball, Arrows, Zap, Poison)
             if (h.isPoison) {
