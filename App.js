@@ -65,6 +65,14 @@ const CARDS = [
   { id: 'elite_barbarians', name: 'Elite Barbs', cost: 6, color: '#c0392b', hp: 600, speed: 3, type: 'ground', range: 30, damage: 200, attackSpeed: 1400, projectile: null, count: 2, rarity: 'epic' },
   { id: 'golem', name: 'Golem', cost: 8, color: '#7f8c8d', hp: 4000, speed: 0.9, type: 'ground', range: 20, damage: 200, attackSpeed: 1700, projectile: null, count: 1, targetType: 'buildings', rarity: 'epic', deathSpawns: 'golemite', deathSpawnCount: 2, spawnDelay: 1000 },
   { id: 'golemite', name: 'Golemite', cost: 0, color: '#95a5a6', hp: 1300, speed: 1, type: 'ground', range: 20, damage: 100, attackSpeed: 1700, projectile: null, count: 1, targetType: 'buildings', rarity: 'common', isToken: true, deathSpawns: 'golemite', deathSpawnCount: 1, spawnDelay: 500 },
+
+  // Next set of additions
+  { id: 'pekka', name: 'P.E.K.K.A', cost: 7, color: '#8e44ad', hp: 2900, speed: 1, type: 'ground', range: 25, damage: 650, attackSpeed: 1800, projectile: null, count: 1, rarity: 'epic' },
+  { id: 'mega_knight', name: 'Mega Knight', cost: 7, color: '#e67e22', hp: 3300, speed: 1.5, type: 'ground', range: 25, damage: 240, attackSpeed: 1600, projectile: null, count: 1, splash: true, spawnDamage: 180, jumps: true, rarity: 'legendary' },
+  { id: 'electro_wizard', name: 'Electro Wiz', cost: 4, color: '#3498db', hp: 590, speed: 1.5, type: 'ground', range: 55, damage: 170, attackSpeed: 1100, projectile: 'electric_bolt', count: 1, splash: true, stun: 0.5, rarity: 'legendary' },
+  { id: 'lightning', name: 'Lightning', cost: 6, color: '#f1c40f', type: 'spell', damage: 900, radius: 15, count: 1, rarity: 'epic' },
+  { id: 'x_bow', name: 'X-Bow', cost: 6, color: '#95a5a6', hp: 700, speed: 0, type: 'building', range: 180, damage: 40, attackSpeed: 500, projectile: 'arrow', count: 1, lifetime: 35, rarity: 'epic' },
+  { id: 'mirror', name: 'Mirror', cost: 1, color: '#ecf0f1', type: 'spell', isMirror: true, rarity: 'legendary' },
 ];
 
 const RARITY_COLORS = {
@@ -643,6 +651,110 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Circle cx="70" cy="50" r="6" fill="#bdc3c7" stroke="#95a5a6" strokeWidth="1" />
           {/* Mouth */}
           <Rect x="45" y="62" width="10" height="5" fill="#2c3e50" rx="2" />
+        </Svg>
+      );
+    case 'pekka':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Main body - armored robot */}
+          <Circle cx="50" cy="50" r="45" fill="#8e44ad" stroke="#9b59b6" strokeWidth="3" />
+          {/* Dark armor plates */}
+          <Path d="M25 30 L50 20 L75 30" fill="#2c3e50" stroke="#34495e" strokeWidth="2" />
+          <Rect x="30" y="35" width="40" height="30" fill="#34495e" rx="5" stroke="#2c3e50" strokeWidth="2" />
+          {/* Glowing red eyes */}
+          <Circle cx="40" cy="50" r="5" fill="#e74c3c" />
+          <Circle cx="60" cy="50" r="5" fill="#e74c3c" />
+          <Circle cx="40" cy="50" r="2" fill="#f1c40f" opacity="0.8" />
+          <Circle cx="60" cy="50" r="2" fill="#f1c40f" opacity="0.8" />
+          <!-- Huge scythe -->
+          <Path d="M75 40 L95 60" stroke="#bdc3c7" strokeWidth="4" strokeLinecap="round" />
+          <Path d="M85 30 L90 40 L95 60 L85 50 Z" fill="#95a5a6" />
+          {/* Spikes on armor */}
+          <Path d="M30 35 L25 25 M70 35 L75 25" stroke="#7f8c8d" strokeWidth="3" />
+        </Svg>
+      );
+    case 'mega_knight':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Big muscular body */}
+          <Circle cx="50" cy="50" r="45" fill="#e67e22" stroke="#d35400" strokeWidth="3" />
+          {/* Armor/abs */}
+          <Path d="M30 40 L35 30 L45 35 L50 30 L55 35 L65 30 L70 40" fill="#34495e" strokeWidth="3" stroke="none" />
+          <Rect x="30" y="40" width="40" height="25" fill="#2c3e50" rx="3" />
+          {/* Furious eyes */}
+          <Circle cx="38" cy="48" r="5" fill="#e74c3c" />
+          <Circle cx="62" cy="48" r="5" fill="#e74c3c" />
+          <Circle cx="38" cy="48" r="2" fill="#f1c40f" />
+          <Circle cx="62" cy="48" r="2" fill="#f1c40f" />
+          {/* Mighty eyebrows */}
+          <Path d="M30 40 L38 42 M70 40 L62 42" stroke="#2c3e50" strokeWidth="3" />
+          {/* Gold belt */}
+          <Rect x="35" y="60" width="30" height="8" fill="#f1c40f" stroke="#e74c3c" strokeWidth="2" />
+        </Svg>
+      );
+    case 'electro_wizard':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Base like Wizard, electric colors */}
+          <Circle cx="50" cy="50" r="45" fill="#3498db" stroke="#2980b9" strokeWidth="2" />
+          {/* Lightning hat instead of fire hat */}
+          <Path d="M20 20 L50 5 L80 20" fill="#f1c40f" stroke="#f39c12" strokeWidth="2" />
+          {/* Lightning bolt on hat */}
+          <Path d="M45 15 L55 15 L50 25 Z" fill="#3498db" stroke="#2980b9" strokeWidth="1" />
+          {/* Electric staff */}
+          <Rect x="47" y="35" width="6" height="50" fill="#34495e" />
+          {/* Sparks flying from staff */}
+          <Circle cx="42" cy="40" r="3" fill="#f1c40f" />
+          <Circle cx="58" cy="40" r="3" fill="#f1c40f" />
+          <Circle cx="50" cy="38" r="2" fill="#f39c12" />
+        </Svg>
+      );
+    case 'lightning':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Storm cloud background */}
+          <Circle cx="50" cy="50" r="45" fill="#34495e" stroke="#2c3e50" strokeWidth="2" />
+          {/* Main lightning bolt */}
+          <Path d="M60 10 L35 50 L55 50 L40 90 L70 50 L50 50 Z" fill="#f1c40f" stroke="#f39c12" strokeWidth="2" />
+          {/* Secondary bolt */}
+          <Path d="M25 30 L35 40 L30 50" stroke="#f39c12" strokeWidth="2" fill="none" opacity="0.7" />
+          {/* Electric aura */}
+          <Circle cx="50" cy="50" r="40" fill="none" stroke="#f1c40f" strokeWidth="1" strokeDasharray="4 2" opacity="0.5" />
+        </Svg>
+      );
+    case 'x_bow':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Base like Cannon but X-Bow design */}
+          <Rect x="20" y="50" width="60" height="30" fill="#7f8c8d" stroke="#95a5a6" strokeWidth="2" rx="3" />
+          {/* X-shaped bow arms */}
+          <Path d="M30 50 L45 30 M70 50 L55 30" stroke="#2c3e50" strokeWidth="4" />
+          <Path d="M30 50 L55 70 M70 50 L45 70" stroke="#2c3e50" strokeWidth="4" />
+          {/* Crossbow body */}
+          <Circle cx="50" cy="50" r="12" fill="#34495e" stroke="#2c3e50" strokeWidth="2" />
+          {/* Arrow loaded */}
+          <Path d="M50 50 L50 20" stroke="#8B4513" strokeWidth="3" />
+          <Path d="M50 20 L47 15 L50 10 L53 15" fill="#95a5a6" />
+          {/* Wheels/stand */}
+          <Circle cx="30" cy="70" r="5" fill="#2c3e50" />
+          <Circle cx="70" cy="70" r="5" fill="#2c3e50" />
+        </Svg>
+      );
+    case 'mirror':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Mirror frame */}
+          <Circle cx="50" cy="50" r="45" fill="#ecf0f1" stroke="#bdc3c7" strokeWidth="3" />
+          {/* Glass surface with reflection */}
+          <Circle cx="50" cy="50" r="35" fill="#e8f4f8" stroke="#bdc3c7" strokeWidth="2" />
+          {/* Reflection shimmer */}
+          <Path d="M35 40 L50 35 L65 40" stroke="white" strokeWidth="2" opacity="0.6" fill="none" />
+          {/* Magic sparkles */}
+          <Circle cx="40" cy="35" r="2" fill="#f1c40f" />
+          <Circle cx="60" cy="40" r="2" fill="#f1c40f" />
+          <Circle cx="50" cy="55" r="2" fill="#3498db" />
+          {/* Handle */}
+          <Rect x="47" y="90" width="6" height="8" fill="#95a5a6" rx="2" />
         </Svg>
       );
     default:
