@@ -25,7 +25,7 @@ const CARDS = [
   { id: 'knight', name: 'Knight', cost: 3, color: '#f1c40f', hp: 1400, speed: 1.5, type: 'ground', range: 40, damage: 150, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common' },
   { id: 'archers', name: 'Archers', cost: 3, color: '#e67e22', hp: 250, speed: 2, type: 'ground', range: 80, damage: 100, attackSpeed: 1000, projectile: 'arrow', count: 2, rarity: 'common' },
   { id: 'giant', name: 'Giant', cost: 5, color: '#e74c3c', hp: 3000, speed: 1, type: 'ground', range: 20, damage: 200, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', rarity: 'rare' },
-  { id: 'pekka', name: 'Mini P', cost: 4, color: '#9b59b6', hp: 1100, speed: 2.5, type: 'ground', range: 25, damage: 350, attackSpeed: 1400, projectile: null, count: 1, rarity: 'rare' },
+  { id: 'mini_pekka', name: 'Mini P', cost: 4, color: '#9b59b6', hp: 1100, speed: 2.5, type: 'ground', range: 25, damage: 350, attackSpeed: 1400, projectile: null, count: 1, rarity: 'rare' },
   { id: 'spear_goblins', name: 'Spear Gobs', cost: 2, color: '#2ecc71', hp: 110, speed: 3, type: 'ground', range: 110, damage: 65, attackSpeed: 1100, projectile: 'spear', count: 3, rarity: 'common' },
   { id: 'musketeer', name: 'Musket', cost: 4, color: '#34495e', hp: 800, speed: 1.5, type: 'ground', range: 100, damage: 180, attackSpeed: 1100, projectile: 'bullet', count: 1, rarity: 'rare' },
   { id: 'baby_dragon', name: 'Baby D', cost: 4, color: '#27ae60', hp: 1200, speed: 2, type: 'flying', range: 80, damage: 130, attackSpeed: 1300, projectile: 'dragon_fire', count: 1, splash: true, rarity: 'epic' },
@@ -69,7 +69,7 @@ const CARDS = [
   // Next set of additions
   { id: 'pekka', name: 'P.E.K.K.A', cost: 7, color: '#8e44ad', hp: 2900, speed: 1, type: 'ground', range: 25, damage: 650, attackSpeed: 1800, projectile: null, count: 1, rarity: 'epic' },
   { id: 'mega_knight', name: 'Mega Knight', cost: 7, color: '#e67e22', hp: 3300, speed: 1.5, type: 'ground', range: 25, damage: 240, attackSpeed: 1600, projectile: null, count: 1, splash: true, spawnDamage: 180, jumps: true, rarity: 'legendary' },
-  { id: 'electro_wizard', name: 'Electro Wiz', cost: 4, color: '#3498db', hp: 590, speed: 1.5, type: 'ground', range: 55, damage: 170, attackSpeed: 1100, projectile: 'electric_bolt', count: 1, splash: true, stun: 0.5, rarity: 'legendary' },
+  { id: 'electro_wizard', name: 'Electro Wiz', cost: 4, color: '#3498db', hp: 590, speed: 1.5, type: 'ground', range: 55, damage: 170, attackSpeed: 1100, projectile: 'electric_bolt', count: 1, stun: 0.5, rarity: 'legendary', spawnDamage: 170, dualTarget: true },
   { id: 'lightning', name: 'Lightning', cost: 6, color: '#f1c40f', type: 'spell', damage: 900, radius: 15, count: 1, rarity: 'epic' },
   { id: 'x_bow', name: 'X-Bow', cost: 6, color: '#95a5a6', hp: 700, speed: 0, type: 'building', range: 180, damage: 40, attackSpeed: 500, projectile: 'arrow', count: 1, lifetime: 35, rarity: 'epic' },
   { id: 'mirror', name: 'Mirror', cost: 1, color: '#ecf0f1', type: 'spell', isMirror: true, rarity: 'epic' },
@@ -224,7 +224,7 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Rect x="45" y="40" width="10" height="40" fill="#95a5a6" />
         </Svg>
       );
-    case 'pekka':
+    case 'mini_pekka':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
           <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
@@ -666,7 +666,7 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Circle cx="60" cy="50" r="5" fill="#e74c3c" />
           <Circle cx="40" cy="50" r="2" fill="#f1c40f" opacity="0.8" />
           <Circle cx="60" cy="50" r="2" fill="#f1c40f" opacity="0.8" />
-          <!-- Huge scythe -->
+          {/* Huge scythe */}
           <Path d="M75 40 L95 60" stroke="#bdc3c7" strokeWidth="4" strokeLinecap="round" />
           <Path d="M85 30 L90 40 L95 60 L85 50 Z" fill="#95a5a6" />
           {/* Spikes on armor */}
@@ -3182,9 +3182,45 @@ export default function App() {
                 type: projectileType,
                 splash: u.splash,
                 slow: u.slow,
+                stun: u.stun,
                 attackerId: u.id,
                 isOpponent: u.isOpponent
               });
+
+              // Dual Target attack (Electro Wizard) - fire second bolt at different target
+              if (u.dualTarget) {
+                const secondTarget = (unitsRef.current || [])
+                  .filter(enemy =>
+                    enemy.isOpponent !== u.isOpponent &&
+                    enemy.hp > 0 &&
+                    enemy.id !== closestTarget.id &&
+                    Math.sqrt(Math.pow(enemy.x - u.x, 2) + Math.pow(enemy.y - u.y, 2)) <= actualRange
+                  )
+                  .sort((a, b) => {
+                    const distA = Math.sqrt(Math.pow(a.x - u.x, 2) + Math.pow(a.y - u.y, 2));
+                    const distB = Math.sqrt(Math.pow(b.x - u.x, 2) + Math.pow(b.y - u.y, 2));
+                    return distA - distB;
+                  })[0];
+
+                if (secondTarget) {
+                  nextProjectiles.push({
+                    id: now + Math.random() + 0.001,
+                    x: u.x,
+                    y: u.y,
+                    targetId: secondTarget.id,
+                    targetX: secondTarget.x,
+                    targetY: secondTarget.y,
+                    speed: projectileSpeed,
+                    damage: damageToDeal,
+                    type: projectileType,
+                    splash: false,
+                    slow: u.slow,
+                    stun: u.stun,
+                    attackerId: u.id,
+                    isOpponent: u.isOpponent
+                  });
+                }
+              }
             } else {
               // Melee attack - apply damage directly
               // Check if target is a tower (id < 100) or a unit (id >= 100)
@@ -3520,6 +3556,15 @@ export default function App() {
             currentUnits = currentUnits.map(u => {
               if (u.id === h.targetId) {
                 let updatedUnit = { ...u, hp: u.hp - h.damage };
+                // Apply stun effect (Electro Wizard)
+                if (h.stun && h.stun > 0) {
+                  updatedUnit.stunUntil = now + (h.stun * 1000);
+                  // Reset charge if Prince gets stunned
+                  if (u.charge) {
+                    updatedUnit.charge = { ...u.charge, distance: 0, active: false };
+                  }
+                }
+                // Apply slow effect (Ice Wizard)
                 if (h.slow && h.slow > 0) {
                   updatedUnit.slowUntil = now + 2000;
                   updatedUnit.slowAmount = h.slow;
