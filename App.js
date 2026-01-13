@@ -59,6 +59,12 @@ const CARDS = [
   { id: 'three_musketeers', name: '3 Musketeers', cost: 9, color: '#34495e', hp: 800, speed: 1.5, type: 'ground', range: 100, damage: 180, attackSpeed: 1100, projectile: 'bullet', count: 3, rarity: 'rare' },
   { id: 'royal_giant', name: 'Royal Giant', cost: 6, color: '#e67e22', hp: 1800, speed: 1.2, type: 'ground', range: 90, damage: 140, attackSpeed: 1300, projectile: 'cannonball', count: 1, targetType: 'buildings', rarity: 'rare' },
   { id: 'rocket', name: 'Rocket', cost: 6, color: '#ff4500', type: 'spell', damage: 600, radius: 30, count: 1, rarity: 'rare' },
+
+  // Medium easy additions
+  { id: 'dark_prince', name: 'Dark Prince', cost: 4, color: '#2c3e50', hp: 1100, speed: 2, type: 'ground', range: 30, damage: 220, attackSpeed: 1500, projectile: null, count: 1, splash: true, charge: true, rarity: 'epic' },
+  { id: 'elite_barbarians', name: 'Elite Barbs', cost: 6, color: '#c0392b', hp: 600, speed: 3, type: 'ground', range: 30, damage: 200, attackSpeed: 1400, projectile: null, count: 2, rarity: 'epic' },
+  { id: 'golem', name: 'Golem', cost: 8, color: '#7f8c8d', hp: 4000, speed: 0.9, type: 'ground', range: 20, damage: 200, attackSpeed: 1700, projectile: null, count: 1, targetType: 'buildings', rarity: 'epic', deathSpawns: 'golemite', deathSpawnCount: 2 },
+  { id: 'golemite', name: 'Golemite', cost: 0, color: '#95a5a6', hp: 1300, speed: 1, type: 'ground', range: 20, damage: 100, attackSpeed: 1700, projectile: null, count: 1, targetType: 'buildings', rarity: 'common', isToken: true, deathSpawns: 'golemite', deathSpawnCount: 1 },
 ];
 
 const RARITY_COLORS = {
@@ -516,6 +522,109 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           {/* Flame */}
           <Path d="M45 75 Q50 90 55 75 Q50 82 45 75" fill="#f39c12" />
           <Path d="M47 75 Q50 85 53 75 Q50 80 47 75" fill="#e74c3c" />
+        </Svg>
+      );
+    case 'dark_prince':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Shield/charge aura */}
+          {unit?.charge?.active && <Circle cx="50" cy="50" r="48" fill="rgba(100, 100, 100, 0.6)" stroke="#2c3e50" strokeWidth="2" />}
+          <Circle cx="50" cy="50" r="45" fill="#2c3e50" stroke="#34495e" strokeWidth="3" />
+          {/* Dark armor */}
+          <Path d="M30 30 L70 30 L50 80 Z" fill="#34495e" />
+          {/* Dark lance */}
+          <Rect x="47" y="15" width="6" height="65" fill="#2c3e50" />
+          {/* Shield */}
+          <Circle cx="70" cy="60" r="15" fill="#7f8c8d" stroke="#2c3e50" strokeWidth="3" />
+          <Path d="M60 50 L80 70" stroke="#2c3e50" strokeWidth="3" />
+          <Path d="M80 50 L60 70" stroke="#2c3e50" strokeWidth="3" />
+          {/* Dark helm */}
+          <Rect x="35" y="20" width="30" height="20" fill="#2c3e50" rx="5" />
+          {/* Eyes */}
+          <Circle cx="42" cy="30" r="3" fill="#e74c3c" />
+          <Circle cx="58" cy="30" r="3" fill="#e74c3c" />
+        </Svg>
+      );
+    case 'elite_barbarians':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Background */}
+          <Circle cx="50" cy="50" r="45" fill="#c0392b" stroke="#e74c3c" strokeWidth="3" />
+          {/* Left elite barbarian */}
+          <G transform="translate(10, 15) scale(0.8)">
+            <Circle cx="25" cy="40" r="12" fill="#ecf0f1" stroke="#bdc3c7" strokeWidth="2" />
+            <Rect x="18" y="52" width="14" height="28" fill="#c0392b" stroke="#e74c3c" strokeWidth="2" />
+            {/* Sword */}
+            <Rect x="38" y="45" width="6" height="30" fill="#bdc3c7" stroke="#7f8c8d" strokeWidth="1" />
+            <Path d="M38 45 L41 38 L44 45" fill="#f39c12" />
+            {/* Angry eyes */}
+            <Circle cx="22" cy="38" r="2" fill="#2c3e50" />
+            <Circle cx="28" cy="38" r="2" fill="#2c3e50" />
+            {/* Helmet horns */}
+            <Path d="M18 32 L15 25 L22 30" fill="#bdc3c7" />
+            <Path d="M32 32 L35 25 L28 30" fill="#bdc3c7" />
+          </G>
+          {/* Right elite barbarian */}
+          <G transform="translate(35, 10) scale(0.85)">
+            <Circle cx="25" cy="40" r="12" fill="#ecf0f1" stroke="#bdc3c7" strokeWidth="2" />
+            <Rect x="18" y="52" width="14" height="28" fill="#c0392b" stroke="#e74c3c" strokeWidth="2" />
+            {/* Sword */}
+            <Rect x="38" y="45" width="6" height="30" fill="#bdc3c7" stroke="#7f8c8d" strokeWidth="1" />
+            <Path d="M38 45 L41 38 L44 45" fill="#f39c12" />
+            {/* Angry eyes */}
+            <Circle cx="22" cy="38" r="2" fill="#2c3e50" />
+            <Circle cx="28" cy="38" r="2" fill="#2c3e50" />
+            {/* Helmet horns */}
+            <Path d="M18 32 L15 25 L22 30" fill="#bdc3c7" />
+            <Path d="M32 32 L35 25 L28 30" fill="#bdc3c7" />
+          </G>
+        </Svg>
+      );
+    case 'golem':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Rocky aura */}
+          <Circle cx="50" cy="50" r="48" fill="rgba(127, 140, 148, 0.3)" />
+          {/* Main body - rock formation */}
+          <Circle cx="50" cy="55" r="42" fill="#7f8c8d" stroke="#95a5a6" strokeWidth="3" />
+          {/* Rock cracks */}
+          <Path d="M30 40 L40 50 L35 65" stroke="#5d6d7e" strokeWidth="2" fill="none" />
+          <Path d="M65 45 L55 55 L60 70" stroke="#5d6d7e" strokeWidth="2" fill="none" />
+          <Path d="M45 30 L50 40 L55 30" stroke="#5d6d7e" strokeWidth="2" fill="none" />
+          {/* Glowing eyes */}
+          <Circle cx="40" cy="50" r="6" fill="#e74c3c" />
+          <Circle cx="60" cy="50" r="6" fill="#e74c3c" />
+          <Circle cx="40" cy="50" r="3" fill="#f1c40f" />
+          <Circle cx="60" cy="50" r="3" fill="#f1c40f" />
+          {/* Rocky protrusions */}
+          <Circle cx="25" cy="50" r="8" fill="#95a5a6" stroke="#7f8c8d" strokeWidth="2" />
+          <Circle cx="75" cy="50" r="8" fill="#95a5a6" stroke="#7f8c8d" strokeWidth="2" />
+          <Circle cx="35" cy="25" r="6" fill="#95a5a6" stroke="#7f8c8d" strokeWidth="2" />
+          <Circle cx="65" cy="25" r="6" fill="#95a5a6" stroke="#7f8c8d" strokeWidth="2" />
+          {/* Mouth */}
+          <Rect x="43" y="65" width="14" height="6" fill="#2c3e50" rx="3" />
+        </Svg>
+      );
+    case 'golemite':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Smaller rocky aura */}
+          <Circle cx="50" cy="50" r="42" fill="rgba(149, 165, 166, 0.2)" />
+          {/* Smaller body */}
+          <Circle cx="50" cy="55" r="35" fill="#95a5a6" stroke="#bdc3c7" strokeWidth="2" />
+          {/* Rock cracks */}
+          <Path d="M35 45 L40 55 L38 65" stroke="#7f8c8d" strokeWidth="2" fill="none" />
+          <Path d="M60 48 L55 58 L62 68" stroke="#7f8c8d" strokeWidth="2" fill="none" />
+          {/* Eyes */}
+          <Circle cx="42" cy="50" r="5" fill="#e74c3c" />
+          <Circle cx="58" cy="50" r="5" fill="#e74c3c" />
+          <Circle cx="42" cy="50" r="2" fill="#f1c40f" />
+          <Circle cx="58" cy="50" r="2" fill="#f1c40f" />
+          {/* Small rocky protrusions */}
+          <Circle cx="30" cy="50" r="6" fill="#bdc3c7" stroke="#95a5a6" strokeWidth="1" />
+          <Circle cx="70" cy="50" r="6" fill="#bdc3c7" stroke="#95a5a6" strokeWidth="1" />
+          {/* Mouth */}
+          <Rect x="45" y="62" width="10" height="5" fill="#2c3e50" rx="2" />
         </Svg>
       );
     default:
