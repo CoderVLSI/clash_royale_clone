@@ -87,7 +87,7 @@ const CARDS = [
   { id: 'goblin_hut', name: 'Goblin Hut', cost: 5, color: '#2ecc71', hp: 500, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 30, spawns: 'sword_goblins', spawnRate: 4.5, spawnCount: 1, rarity: 'rare' },
   { id: 'furnace', name: 'Furnace', cost: 4, color: '#e74c3c', hp: 600, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 35, spawns: 'fire_spirit', spawnRate: 10, spawnCount: 2, rarity: 'rare' },
   { id: 'earthquake', name: 'Earthquake', cost: 3, color: '#7f8c8d', type: 'spell', damage: 160, radius: 100, count: 1, slow: 0.35, rarity: 'rare' },
-  { id: 'graveyard', name: 'Graveyard', cost: 5, color: '#2c3e50', type: 'spell', damage: 0, radius: 20, count: 15, spawns: 'skeletons', spawnCount: 15, rarity: 'legendary' },
+  { id: 'graveyard', name: 'Graveyard', cost: 5, color: '#2c3e50', type: 'spell', damage: 0, radius: 80, count: 15, spawns: 'skeletons', spawnCount: 15, rarity: 'legendary' },
   { id: 'lumberjack', name: 'Lumberjack', cost: 4, color: '#e67e22', hp: 1000, speed: 2.5, type: 'ground', range: 25, damage: 200, attackSpeed: 1100, projectile: null, count: 1, splash: true, deathRage: true, rarity: 'legendary' },
 ];
 
@@ -1680,7 +1680,7 @@ const Unit = ({ unit }) => {
   const isRaged = unit.rageUntil > Date.now();
 
   // Check if unit is in spawn delay (Golem, Golemite)
-  const isSpawning = (unit.spawnDelay > 0) && unit.spawnTime && (Date.now() - unit.spawnTime < unit.spawnDelay);
+  const isSpawning = Boolean((unit.spawnDelay > 0) && unit.spawnTime && (Date.now() - unit.spawnTime < unit.spawnDelay));
   const rotationAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -1705,7 +1705,7 @@ const Unit = ({ unit }) => {
   return (
     <View style={[styles.unit, { left: unit.x - unitSize / 2, top: unit.y - unitSize / 2, width: unitSize, height: unitSize }]}>
       {/* Range Indicator Circle */}
-      {unit.range && unit.range > 0 && (
+      {Boolean(unit.range && unit.range > 0) && (
         <View style={{
           position: 'absolute',
           left: unitSize / 2 - unit.range,
@@ -2933,7 +2933,7 @@ const GameBoard = ({
       {draggingCard && (
         <View style={{ position: 'absolute', left: dragPosition.x, top: dragPosition.y, zIndex: 9999, elevation: 100 }} pointerEvents="none">
           {/* Range/Radius Indicator */}
-          {(draggingCard.radius || draggingCard.range) && (
+          {Boolean(draggingCard.radius || draggingCard.range) && (
             <View style={{
               position: 'absolute',
               left: -(draggingCard.radius || draggingCard.range),
@@ -2947,7 +2947,7 @@ const GameBoard = ({
               borderStyle: draggingCard.type === 'spell' ? 'solid' : 'dashed'
             }} />
           )}
-          {draggingCard.spawnDamage && (
+          {Boolean(draggingCard.spawnDamage) && (
             <View style={{
               position: 'absolute',
               left: -50,
@@ -3802,9 +3802,9 @@ export default function App() {
                   let offsetX, offsetY;
 
                   if (u.type === 'graveyard_zone') {
-                    // Graveyard: spawn randomly in a circle around the zone
+                    // Graveyard: spawn randomly in a 4-tile radius circle (80 pixels)
                     const angle = Math.random() * Math.PI * 2;
-                    const distance = 20 + Math.random() * 40; // 20-60 pixels from center
+                    const distance = Math.random() * 80; // 0-80 pixels from center (4 tiles)
                     offsetX = Math.cos(angle) * distance;
                     offsetY = Math.sin(angle) * distance;
                   } else if (u.speed === 0) {
