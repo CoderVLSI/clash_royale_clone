@@ -48,7 +48,7 @@ const CARDS = [
   { id: 'tesla', name: 'Tesla', cost: 4, color: '#f1c40f', hp: 600, speed: 0, type: 'building', range: 55, damage: 100, attackSpeed: 800, projectile: 'tesla_lightning', count: 1, lifetime: 35, hidden: true, rarity: 'common' },
   { id: 'wizard', name: 'Wizard', cost: 5, color: '#9b59b6', hp: 600, speed: 1.5, type: 'ground', range: 60, damage: 170, attackSpeed: 1400, projectile: 'fireball_small', count: 1, splash: true, rarity: 'rare' },
   { id: 'tombstone', name: 'Tombstone', cost: 3, color: '#95a5a6', hp: 450, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 40, spawns: 'skeletons', spawnRate: 3.1, spawnCount: 2, deathSpawnCount: 4, rarity: 'rare' },
-  { id: 'sword_goblins', name: 'Sword Gobs', cost: 3, color: '#2ecc71', hp: 160, speed: 3, type: 'ground', range: 25, damage: 100, attackSpeed: 900, projectile: null, count: 3, rarity: 'common' },
+  { id: 'sword_goblins', name: 'Sword Gobs', cost: 3, color: '#2ecc71', hp: 162, speed: 3, type: 'ground', range: 25, damage: 100, attackSpeed: 900, projectile: null, count: 3, rarity: 'common' },
   { id: 'ice_wizard', name: 'Ice Wiz', cost: 3, color: '#3498db', hp: 590, speed: 1.5, type: 'ground', range: 55, damage: 75, attackSpeed: 1700, projectile: 'ice_shard', count: 1, splash: true, rarity: 'legendary', slow: 0.35, spawnDamage: 75 },
 
   // Lava Hound & Lava Pups
@@ -81,14 +81,14 @@ const CARDS = [
   { id: 'heal_spirit', name: 'Heal Spirit', cost: 1, color: '#2ecc71', hp: 110, speed: 4, type: 'ground', range: 25, damage: 230, attackSpeed: 1000, projectile: null, count: 1, splash: true, rarity: 'rare', kamikaze: true, healsOnAttack: 400, healRadius: 50 },
 
   // Additional cards for new decks
-  { id: 'bomber', name: 'Bomber', cost: 2, color: '#e67e22', hp: 160, speed: 2, type: 'ground', range: 55, damage: 145, attackSpeed: 1200, projectile: 'bomb', count: 1, splash: true, rarity: 'common' },
+  { id: 'bomber', name: 'Bomber', cost: 2, color: '#e67e22', hp: 340, speed: 2, type: 'ground', range: 55, damage: 145, attackSpeed: 1600, projectile: 'bomb', count: 1, splash: true, rarity: 'common' },
   { id: 'goblin_barrel', name: 'Goblin B', cost: 3, color: '#2ecc71', type: 'spell', damage: 0, radius: 20, count: 3, spawns: 'sword_goblins', spawnCount: 3, rarity: 'epic' },
-  { id: 'elixir_collector', name: 'Elixir G', cost: 6, color: '#9b59b6', hp: 700, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 70, rarity: 'rare', generatesElixir: true },
-  { id: 'goblin_hut', name: 'Goblin Hut', cost: 5, color: '#2ecc71', hp: 500, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 30, spawns: 'sword_goblins', spawnRate: 4.5, spawnCount: 1, rarity: 'rare' },
-  { id: 'furnace', name: 'Furnace', cost: 4, color: '#e74c3c', hp: 600, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 35, spawns: 'fire_spirit', spawnRate: 10, spawnCount: 2, rarity: 'rare' },
-  { id: 'earthquake', name: 'Earthquake', cost: 3, color: '#7f8c8d', type: 'spell', damage: 160, radius: 100, count: 1, slow: 0.35, rarity: 'rare' },
+  { id: 'elixir_collector', name: 'Elixir G', cost: 6, color: '#9b59b6', hp: 1070, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 93, rarity: 'rare', generatesElixir: true },
+  { id: 'goblin_hut', name: 'Goblin Hut', cost: 5, color: '#2ecc71', hp: 1293, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 60, spawns: 'sword_goblins', spawnRate: 4.7, spawnCount: 1, rarity: 'rare' },
+  { id: 'furnace', name: 'Furnace', cost: 4, color: '#e74c3c', hp: 727, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 60, spawns: 'fire_spirit', spawnRate: 7, spawnCount: 1, rarity: 'rare' },
+  { id: 'earthquake', name: 'Earthquake', cost: 3, color: '#7f8c8d', type: 'spell', damage: 243, radius: 70, count: 1, slow: 0.35, rarity: 'rare' },
   { id: 'graveyard', name: 'Graveyard', cost: 5, color: '#2c3e50', type: 'spell', damage: 0, radius: 80, count: 15, spawns: 'skeletons', spawnCount: 15, rarity: 'legendary' },
-  { id: 'lumberjack', name: 'Lumberjack', cost: 4, color: '#e67e22', hp: 1000, speed: 2.5, type: 'ground', range: 25, damage: 200, attackSpeed: 1100, projectile: null, count: 1, splash: true, deathRage: true, rarity: 'legendary' },
+  { id: 'lumberjack', name: 'Lumberjack', cost: 4, color: '#e67e22', hp: 820, speed: 2.5, type: 'ground', range: 25, damage: 200, attackSpeed: 700, projectile: null, count: 1, splash: true, deathRage: true, rarity: 'legendary' },
 ];
 
 const RARITY_COLORS = {
