@@ -305,6 +305,24 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           </G>
         </Svg>
       );
+    case 'barbarians':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          {/* Angry face */}
+          <Circle cx="40" cy="45" r="3" fill="white" />
+          <Circle cx="60" cy="45" r="3" fill="white" />
+          <Circle cx="40" cy="45" r="1.5" fill="black" />
+          <Circle cx="60" cy="45" r="1.5" fill="black" />
+          {/* Viking helmet with horns */}
+          <Path d="M30 35 L20 20 L35 32" stroke="#bdc3c7" strokeWidth="3" fill="none" />
+          <Path d="M70 35 L80 20 L65 32" stroke="#bdc3c7" strokeWidth="3" fill="none" />
+          <Rect x="35" y="30" width="30" height="15" fill="#95a5a6" rx="3" />
+          {/* Sword */}
+          <Rect x="70" y="40" width="5" height="35" fill="#bdc3c7" />
+          <Path d="M70 40 L72 32 L75 40" fill="#f39c12" />
+        </Svg>
+      );
     case 'valkyrie':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
@@ -453,27 +471,24 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
         <Svg width={size} height={size} viewBox="0 0 100 100">
           {/* Background circle */}
           <Circle cx="50" cy="50" r="45" fill="#34495e" stroke="white" strokeWidth="2" />
-          {/* Three musketeer figures */}
+          {/* Three musketeers - using same design as Musketeer card */}
           {/* Left musketeer */}
           <G transform="translate(15, 20) scale(0.7)">
-            <Circle cx="20" cy="50" r="15" fill="#ecf0f1" />
-            <Rect x="15" y="65" width="10" height="25" fill="#34495e" />
-            <Rect x="10" y="40" width="20" height="8" fill="#2c3e50" rx="2" />
+            <Circle cx="25" cy="50" r="20" fill="#ecf0f1" stroke="#bdc3c7" strokeWidth="1" />
+            <Path d="M10 50 Q25 30 40 50" fill="#8e44ad" />
+            <Rect x="22" y="45" width="6" height="25" fill="#95a5a6" />
           </G>
-          {/* Center musketeer (larger, in front) */}
+          {/* Center musketeer (larger) */}
           <G transform="translate(25, 15) scale(0.85)">
-            <Circle cx="20" cy="50" r="15" fill="#ecf0f1" />
-            <Rect x="15" y="65" width="10" height="25" fill="#34495e" />
-            <Rect x="10" y="40" width="20" height="8" fill="#2c3e50" rx="2" />
-            {/* Musketeer hat with feather */}
-            <Path d="M10 35 L20 25 L30 35" fill="#e74c3c" />
-            <Path d="M20 25 L20 15 L25 18" stroke="#f1c40f" strokeWidth="2" fill="none" />
+            <Circle cx="25" cy="50" r="20" fill="#ecf0f1" stroke="#bdc3c7" strokeWidth="1" />
+            <Path d="M10 50 Q25 30 40 50" fill="#8e44ad" />
+            <Rect x="22" y="45" width="6" height="25" fill="#95a5a6" />
           </G>
           {/* Right musketeer */}
           <G transform="translate(35, 20) scale(0.7)">
-            <Circle cx="20" cy="50" r="15" fill="#ecf0f1" />
-            <Rect x="15" y="65" width="10" height="25" fill="#34495e" />
-            <Rect x="10" y="40" width="20" height="8" fill="#2c3e50" rx="2" />
+            <Circle cx="25" cy="50" r="20" fill="#ecf0f1" stroke="#bdc3c7" strokeWidth="1" />
+            <Path d="M10 50 Q25 30 40 50" fill="#8e44ad" />
+            <Rect x="22" y="45" width="6" height="25" fill="#95a5a6" />
           </G>
         </Svg>
       );
@@ -527,22 +542,21 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
     case 'dark_prince':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
-          {/* Shield/charge aura */}
-          {unit?.charge?.active && <Circle cx="50" cy="50" r="48" fill="rgba(100, 100, 100, 0.6)" stroke="#2c3e50" strokeWidth="2" />}
-          <Circle cx="50" cy="50" r="45" fill="#2c3e50" stroke="#34495e" strokeWidth="3" />
-          {/* Dark armor */}
-          <Path d="M30 30 L70 30 L50 80 Z" fill="#34495e" />
-          {/* Dark lance */}
-          <Rect x="47" y="15" width="6" height="65" fill="#2c3e50" />
-          {/* Shield */}
-          <Circle cx="70" cy="60" r="15" fill="#7f8c8d" stroke="#2c3e50" strokeWidth="3" />
-          <Path d="M60 50 L80 70" stroke="#2c3e50" strokeWidth="3" />
-          <Path d="M80 50 L60 70" stroke="#2c3e50" strokeWidth="3" />
-          {/* Dark helm */}
-          <Rect x="35" y="20" width="30" height="20" fill="#2c3e50" rx="5" />
-          {/* Eyes */}
-          <Circle cx="42" cy="30" r="3" fill="#e74c3c" />
-          <Circle cx="58" cy="30" r="3" fill="#e74c3c" />
+          {/* Charge aura - like Prince */}
+          {unit?.charge?.active && <Circle cx="50" cy="50" r="48" fill="rgba(50, 50, 50, 0.6)" stroke="#2c3e50" strokeWidth="2" />}
+          {/* Base design same as Prince, just dark colors */}
+          <Circle cx="50" cy="50" r="45" fill="#2c3e50" stroke="#34495e" strokeWidth="2" />
+          {/* Dark lance (like Prince's silver lance) */}
+          <Rect x="45" y="10" width="10" height="70" fill="#34495e" />
+          {/* Dark helmet (like Prince's gold helmet) */}
+          <Path d="M30 40 L50 10 L70 40" fill="#2c3e50" stroke="#34495e" strokeWidth="2" />
+          {/* Shield (unique to Dark Prince) */}
+          <Circle cx="72" cy="55" r="12" fill="#7f8c8d" stroke="#2c3e50" strokeWidth="2" />
+          <Path d="M62 45 L82 65" stroke="#2c3e50" strokeWidth="2" />
+          <Path d="M82 45 L62 65" stroke="#2c3e50" strokeWidth="2" />
+          {/* Red eyes to show it's dark */}
+          <Circle cx="45" cy="35" r="3" fill="#e74c3c" />
+          <Circle cx="55" cy="35" r="3" fill="#e74c3c" />
         </Svg>
       );
     case 'elite_barbarians':
@@ -550,33 +564,37 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
         <Svg width={size} height={size} viewBox="0 0 100 100">
           {/* Background */}
           <Circle cx="50" cy="50" r="45" fill="#c0392b" stroke="#e74c3c" strokeWidth="3" />
-          {/* Left elite barbarian */}
+          {/* Left elite barbarian - same design as regular Barbarians */}
           <G transform="translate(10, 15) scale(0.8)">
-            <Circle cx="25" cy="40" r="12" fill="#ecf0f1" stroke="#bdc3c7" strokeWidth="2" />
-            <Rect x="18" y="52" width="14" height="28" fill="#c0392b" stroke="#e74c3c" strokeWidth="2" />
-            {/* Sword */}
-            <Rect x="38" y="45" width="6" height="30" fill="#bdc3c7" stroke="#7f8c8d" strokeWidth="1" />
-            <Path d="M38 45 L41 38 L44 45" fill="#f39c12" />
+            <Circle cx="25" cy="40" r="15" fill="#CD853F" stroke="#e74c3c" strokeWidth="2" />
             {/* Angry eyes */}
-            <Circle cx="22" cy="38" r="2" fill="#2c3e50" />
-            <Circle cx="28" cy="38" r="2" fill="#2c3e50" />
-            {/* Helmet horns */}
-            <Path d="M18 32 L15 25 L22 30" fill="#bdc3c7" />
-            <Path d="M32 32 L35 25 L28 30" fill="#bdc3c7" />
+            <Circle cx="20" cy="38" r="2.5" fill="white" />
+            <Circle cx="30" cy="38" r="2.5" fill="white" />
+            <Circle cx="20" cy="38" r="1" fill="black" />
+            <Circle cx="30" cy="38" r="1" fill="black" />
+            {/* Viking helmet horns - like regular Barbarians */}
+            <Path d="M12 32 L5 20 L18 28" stroke="#bdc3c7" strokeWidth="2" fill="none" />
+            <Path d="M38 32 L45 20 L32 28" stroke="#bdc3c7" strokeWidth="2" fill="none" />
+            <Rect x="15" y="28" width="20" height="10" fill="#95a5a6" rx="2" />
+            {/* Sword */}
+            <Rect x="38" y="35" width="4" height="25" fill="#bdc3c7" />
+            <Path d="M38 35 L40 28 L43 35" fill="#f39c12" />
           </G>
-          {/* Right elite barbarian */}
+          {/* Right elite barbarian - same design, larger */}
           <G transform="translate(35, 10) scale(0.85)">
-            <Circle cx="25" cy="40" r="12" fill="#ecf0f1" stroke="#bdc3c7" strokeWidth="2" />
-            <Rect x="18" y="52" width="14" height="28" fill="#c0392b" stroke="#e74c3c" strokeWidth="2" />
-            {/* Sword */}
-            <Rect x="38" y="45" width="6" height="30" fill="#bdc3c7" stroke="#7f8c8d" strokeWidth="1" />
-            <Path d="M38 45 L41 38 L44 45" fill="#f39c12" />
+            <Circle cx="25" cy="40" r="15" fill="#CD853F" stroke="#e74c3c" strokeWidth="2" />
             {/* Angry eyes */}
-            <Circle cx="22" cy="38" r="2" fill="#2c3e50" />
-            <Circle cx="28" cy="38" r="2" fill="#2c3e50" />
-            {/* Helmet horns */}
-            <Path d="M18 32 L15 25 L22 30" fill="#bdc3c7" />
-            <Path d="M32 32 L35 25 L28 30" fill="#bdc3c7" />
+            <Circle cx="20" cy="38" r="2.5" fill="white" />
+            <Circle cx="30" cy="38" r="2.5" fill="white" />
+            <Circle cx="20" cy="38" r="1" fill="black" />
+            <Circle cx="30" cy="38" r="1" fill="black" />
+            {/* Viking helmet horns */}
+            <Path d="M12 32 L5 20 L18 28" stroke="#bdc3c7" strokeWidth="2" fill="none" />
+            <Path d="M38 32 L45 20 L32 28" stroke="#bdc3c7" strokeWidth="2" fill="none" />
+            <Rect x="15" y="28" width="20" height="10" fill="#95a5a6" rx="2" />
+            {/* Sword */}
+            <Rect x="38" y="35" width="4" height="25" fill="#bdc3c7" />
+            <Path d="M38 35 L40 28 L43 35" fill="#f39c12" />
           </G>
         </Svg>
       );
