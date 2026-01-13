@@ -989,9 +989,49 @@ const Unit = ({ unit }) => {
   const unitSize = 30; // Same size for both teams
   const isSlowed = unit.slowUntil > Date.now();
 
+  // Check if unit is in spawn delay (Golem, Golemite)
+  const isSpawning = unit.spawnDelay && unit.spawnTime && (Date.now() - unit.spawnTime < unit.spawnDelay);
+  const [rotationAnim] = useState(new Animated.Value(0));
+
+  useEffect(() => {
+    if (isSpawning) {
+      Animated.loop(
+        Animated.timing(rotationAnim, {
+          toValue: 360,
+          duration: 1000,
+          useNativeDriver: true,
+        })
+      ).start();
+    } else {
+      rotationAnim.setValue(0);
+    }
+  }, [isSpawning]);
+
+  const rotation = rotationAnim.interpolate({
+    inputRange: [0, 360],
+    outputRange: ['0deg', '360deg'],
+  });
+
   return (
     <View style={[styles.unit, { left: unit.x - unitSize / 2, top: unit.y - unitSize / 2, width: unitSize, height: unitSize }]}>
       <UnitSprite id={spriteId} isOpponent={isEnemy} size={unitSize} unit={unit} />
+      {/* Spawn Delay Indicator (rotating swirl) */}
+      {isSpawning && (
+        <Animated.View style={{
+          position: 'absolute',
+          top: -8, left: -8, right: -8, bottom: -8,
+          transform: [{ rotate: rotation }],
+          zIndex: 5
+        }}>
+          <Svg width={unitSize + 16} height={unitSize + 16} viewBox="0 0 50 50">
+            {/* Rotating swirl */}
+            <Circle cx="25" cy="25" r="22" fill="none" stroke="#95a5a6" strokeWidth="2" strokeDasharray="8 4" opacity="0.6" />
+            <Circle cx="25" cy="25" r="18" fill="none" stroke="#7f8c8d" strokeWidth="2" strokeDasharray="6 3" opacity="0.8" />
+            {/* Inner circle */}
+            <Circle cx="25" cy="25" r="12" fill="rgba(149, 165, 166, 0.3)" stroke="#bdc3c7" strokeWidth="1" />
+          </Svg>
+        </Animated.View>
+      )}
       {/* Ice/Slow Effect Overlay */}
       {isSlowed && (
         <View style={{
