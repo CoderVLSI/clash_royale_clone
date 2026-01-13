@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Text, Dimensions, TouchableOpacity, PanResponder, Animated, Image, ImageBackground, ScrollView, Modal, TextInput, KeyboardAvoidingView, FlatList } from 'react-native';
 import { useState, useEffect, useRef, memo } from 'react';
-import Svg, { Circle, Rect, Path, G, Defs, LinearGradient, Stop, Polygon } from 'react-native-svg';
+import Svg, { Circle, Rect, Path, G, Defs, LinearGradient, Stop, Polygon, Text as SvgText } from 'react-native-svg';
 
 const { width, height } = Dimensions.get('window');
 
@@ -1248,14 +1248,14 @@ const VisualEffects = ({ effects, setEffects }) => {
                   fill="white"
                   opacity={0.3}
                 />
-                {/* Snowflake symbol */}
-                <Text style={{
-                  position: 'absolute',
-                  fontSize: 24,
-                  color: 'white',
-                  opacity: opacity
-                }}>❄️</Text>
               </Svg>
+              {/* Snowflake symbol - outside SVG */}
+              <View style={{
+                position: 'absolute',
+                opacity: opacity
+              }}>
+                <Text style={{ fontSize: 24 }}>❄️</Text>
+              </View>
             </View>
           );
         }
@@ -1289,15 +1289,19 @@ const VisualEffects = ({ effects, setEffects }) => {
                   opacity={0.2}
                 />
               </Svg>
-              <Text style={{
+              {/* Plus symbol - outside SVG */}
+              <View style={{
                 position: 'absolute',
-                fontSize: 28,
-                color: '#2ecc71',
-                fontWeight: 'bold',
-                textShadowColor: 'white',
-                textShadowRadius: 5,
                 opacity: opacity
-              }}>+</Text>
+              }}>
+                <Text style={{
+                  fontSize: 28,
+                  color: '#2ecc71',
+                  fontWeight: 'bold',
+                  textShadowColor: 'white',
+                  textShadowRadius: 5
+                }}>+</Text>
+              </View>
             </View>
           );
         }
@@ -1507,7 +1511,7 @@ const Projectile = ({ type, position }) => {
              // Rage Spell Visuals - Anger symbol / Energy
              <>
                 <Circle cx="50" cy="50" r="35" fill="none" stroke="#9b59b6" strokeWidth="2" strokeDasharray="5 5" opacity="0.6" />
-                <Text x="50" y="55" fontSize="30" textAnchor="middle" fill="#8e44ad" opacity="0.8">😡</Text>
+                <SvgText x="50" y="55" fontSize="30" textAnchor="middle" fill="#8e44ad" opacity="0.8">😡</SvgText>
              </>
           ) : (
              // Poison Spell Visuals - Skulls/Bubbles
@@ -2009,9 +2013,9 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
 
             {/* Stats Preview */}
             <View style={styles.cardMenuStats}>
-              {card.hp && <Text style={styles.cardMenuStat}>HP: {card.hp}</Text>}
-              {card.damage && <Text style={styles.cardMenuStat}>DMG: {card.damage}</Text>}
-              {card.speed !== undefined && card.speed > 0 && <Text style={styles.cardMenuStat}>SPD: {card.speed}</Text>}
+              {Boolean(card.hp) && <Text style={styles.cardMenuStat}>HP: {card.hp}</Text>}
+              {Boolean(card.damage) && <Text style={styles.cardMenuStat}>DMG: {card.damage}</Text>}
+              {Boolean(card.speed !== undefined && card.speed > 0) && <Text style={styles.cardMenuStat}>SPD: {card.speed}</Text>}
             </View>
 
             {/* Action Buttons */}
