@@ -1969,17 +1969,17 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
   return (
     <View style={styles.deckTabContainer}>
       <View style={styles.deckHeaderRow}>
-        <Text style={styles.deckTabTitle}>Battle Deck 1</Text>
+        <Text style={styles.deckTabTitle}>Battle Deck {selectedDeckIndex + 1}</Text>
         <MagicItems />
       </View>
 
       <DeckStats cards={cards} />
 
-      {/* Deck Selector - 3 Deck Slots */}
+      {/* Deck Selector - 5 Deck Slots */}
       <View style={styles.deckSelectorContainer}>
         <Text style={styles.deckSelectorLabel}>SELECT DECK:</Text>
         <View style={styles.deckSelectorButtons}>
-          {[0, 1, 2].map(deckIndex => (
+          {allDecks.map((_, deckIndex) => (
             <TouchableOpacity
               key={deckIndex}
               style={[
