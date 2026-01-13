@@ -147,6 +147,8 @@ const MainMenu = ({ onStart }) => {
           <Text style={styles.logoTextRoyale}>ROYALE</Text>
         </View>
 
+        <View style={{ flex: 1 }} />
+
         <View style={styles.loadingBottomContainer}>
           <Text style={styles.tipText}>{TIPS[tipIndex]}</Text>
           
@@ -1381,6 +1383,192 @@ const VisualEffects = ({ effects, setEffects }) => {
           return <View key={effect.id}>{lines}</View>;
         }
 
+        if (effect.type === 'fireball_explosion') {
+          // Fireball impact - large explosion
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * (0.5 + progress * 0.5)} fill="#e74c3c" opacity={0.7} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * (0.3 + progress * 0.4)} fill="#f39c12" opacity={0.9} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.2} fill="#fff" opacity={1 - progress} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'zap_impact') {
+          // Zap impact - electric spark
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.8} fill="#3498db" opacity={0.8} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.5} fill="#fff" opacity={0.9} />
+                <Path d={`M${effect.radius * 0.3} ${effect.radius * 0.2} L${effect.radius * 0.5} ${effect.radius * 0.4}`} stroke="#fff" strokeWidth="2" />
+                <Path d={`M${effect.radius * 0.7} ${effect.radius * 0.2} L${effect.radius * 0.5} ${effect.radius * 0.4}`} stroke="#fff" strokeWidth="2" />
+                <Path d={`M${effect.radius * 0.3} ${effect.radius * 0.8} L${effect.radius * 0.5} ${effect.radius * 0.6}`} stroke="#fff" strokeWidth="2" />
+                <Path d={`M${effect.radius * 0.7} ${effect.radius * 0.8} L${effect.radius * 0.5} ${effect.radius * 0.6}`} stroke="#fff" strokeWidth="2" />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'arrows_impact') {
+          // Arrows impact - multiple arrows in ground
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.6} fill="#2ecc71" opacity={0.3} />
+                <Path d="M20 40 L25 50 L30 40" stroke="#8B4513" strokeWidth="2" fill="none" transform={`rotate(${30}, ${effect.radius}, ${effect.radius})`} />
+                <Path d="M40 20 L45 30 L50 20" stroke="#8B4513" strokeWidth="2" fill="none" transform={`rotate(${-15}, ${effect.radius}, ${effect.radius})`} />
+                <Path d="M50 50 L55 60 L60 50" stroke="#8B4513" strokeWidth="2" fill="none" transform={`rotate(${60}, ${effect.radius}, ${effect.radius})`} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'poison_cloud') {
+          // Poison spell - green cloud
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity * 0.7,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius} fill="#27ae60" opacity={0.4} />
+                <Circle cx={effect.radius * 0.7} cy={effect.radius * 0.6} r={effect.radius * 0.25} fill="#2ecc71" opacity={0.6} />
+                <Circle cx={effect.radius * 1.3} cy={effect.radius * 0.7} r={effect.radius * 0.2} fill="#2ecc71" opacity={0.6} />
+                <Circle cx={effect.radius * 0.8} cy={effect.radius * 1.3} r={effect.radius * 0.22} fill="#2ecc71" opacity={0.6} />
+                <Circle cx={effect.radius * 0.5} cy={effect.radius * 1.5} r={effect.radius * 0.1} fill="#a9dfbf" opacity={progress} />
+                <Circle cx={effect.radius * 1.2} cy={effect.radius * 1.4} r={effect.radius * 0.12} fill="#a9dfbf" opacity={progress} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'rocket_explosion') {
+          // Rocket impact - massive explosion
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius} fill="#7f8c8d" opacity={0.8} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.7} fill="#e74c3c" opacity={0.9} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.4} fill="#f39c12" opacity={1} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.15} fill="#fff" opacity={1 - progress} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'rage_aura') {
+          // Rage spell - purple energy aura
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity * 0.6,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius} fill="none" stroke="#9b59b6" strokeWidth="3" strokeDasharray="10 5" />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.7} fill="none" stroke="#8e44ad" strokeWidth="2" opacity={0.7} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.4} fill="none" stroke="#9b59b6" strokeWidth="2" opacity={0.5} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'earthquake_crack') {
+          // Earthquake - cracking ground effect
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Rect x="5" y="5" width={effect.radius * 2 - 10} height={effect.radius * 2 - 10} fill="#7f8c8d" stroke="#5d6d7e" strokeWidth="2" rx="5" opacity={0.9} />
+                <Path d={`M${effect.radius} 5 L${effect.radius * 0.7} ${effect.radius * 0.5} L${effect.radius} ${effect.radius}`} stroke="#2c3e50" strokeWidth="3" fill="none" />
+                <Path d={`M${effect.radius} 5 L${effect.radius * 1.3} ${effect.radius * 0.5} L${effect.radius} ${effect.radius}`} stroke="#2c3e50" strokeWidth="3" fill="none" />
+                <Path d={`M5 ${effect.radius} L${effect.radius * 0.5} ${effect.radius * 0.7} L${effect.radius} ${effect.radius}`} stroke="#2c3e50" strokeWidth="2" fill="none" />
+                <Path d={`M${effect.radius * 2} ${effect.radius} L${effect.radius * 1.5} ${effect.radius * 1.3} L${effect.radius} ${effect.radius}`} stroke="#2c3e50" strokeWidth="2" fill="none" />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'lightning_strike') {
+          // Lightning spell - bolt from sky
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Path d={`M${effect.radius} 0 L${effect.radius * 0.7} ${effect.radius * 0.5} L${effect.radius * 1.2} ${effect.radius * 0.5} L${effect.radius * 0.5} ${effect.radius} L${effect.radius * 0.8} ${effect.radius} L${effect.radius} ${effect.radius * 2}`} stroke="#f1c40f" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                <Path d={`M${effect.radius} 0 L${effect.radius * 0.7} ${effect.radius * 0.5} L${effect.radius * 1.2} ${effect.radius * 0.5} L${effect.radius * 0.5} ${effect.radius} L${effect.radius * 0.8} ${effect.radius} L${effect.radius} ${effect.radius * 2}`} stroke="#fff" strokeWidth="8" fill="none" opacity={0.5} strokeLinecap="round" strokeLinejoin="round" />
+                <Circle cx={effect.radius} cy={effect.radius * 1.8} r={effect.radius * 0.3} fill="#f1c40f" opacity={1 - progress} />
+              </Svg>
+            </View>
+          );
+        }
+
         return null;
       })}
     </>
@@ -1968,17 +2156,64 @@ const LobbyHeader = () => (
   </View>
 );
 
-const ChestSlots = () => (
-  <View style={styles.chestSlotsContainer}>
-    <Text style={styles.chestSlotsTitle}>CHESTS</Text>
-    <View style={styles.chestRow}>
-      <View style={styles.chestSlot}><Text style={styles.chestText}>SILVER</Text><Text style={styles.chestTimer}>3h</Text></View>
-      <View style={styles.chestSlot}><Text style={styles.chestText}>GOLD</Text><Text style={styles.chestTimer}>8h</Text></View>
-      <View style={styles.chestSlotEmpty}><Text style={styles.chestTextEmpty}>Empty Slot</Text></View>
-      <View style={styles.chestSlotEmpty}><Text style={styles.chestTextEmpty}>Empty Slot</Text></View>
+const ChestSlots = ({ chests, onUnlock, onOpen }) => {
+  const getChestColor = (type) => {
+    switch (type) {
+      case 'SILVER': return '#bdc3c7';
+      case 'GOLD': return '#f1c40f';
+      case 'GIANT': return '#e67e22';
+      case 'MAGICAL': return '#9b59b6';
+      default: return '#bdc3c7';
+    }
+  };
+
+  const formatChestTime = (seconds) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    if (h > 0) return `${h}h ${m}m`;
+    return `${m}m`;
+  };
+
+  return (
+    <View style={styles.chestSlotsContainer}>
+      <Text style={styles.chestSlotsTitle}>CHESTS</Text>
+      <View style={styles.chestRow}>
+        {[0, 1, 2, 3].map(index => {
+          const chest = chests.find(c => c.slotIndex === index);
+          if (!chest) {
+            return (
+              <View key={index} style={styles.chestSlotEmpty}>
+                <Text style={styles.chestTextEmpty}>Empty Slot</Text>
+              </View>
+            );
+          }
+
+          const isUnlocking = chest.state === 'UNLOCKING';
+          const isUnlocked = chest.state === 'UNLOCKED';
+          
+          return (
+            <TouchableOpacity 
+              key={index} 
+              style={[styles.chestSlot, { borderColor: getChestColor(chest.type), borderWidth: 2 }]}
+              onPress={() => isUnlocked ? onOpen(chest) : onUnlock(chest)}
+              disabled={isUnlocking}
+            >
+              <Text style={[styles.chestText, { color: getChestColor(chest.type) }]}>{chest.type}</Text>
+              {isUnlocked ? (
+                <Text style={styles.chestOpenText}>OPEN!</Text>
+              ) : isUnlocking ? (
+                <Text style={styles.chestTimer}>{formatChestTime(chest.timeLeft)}</Text>
+              ) : (
+                <Text style={styles.chestLockedText}>{formatChestTime(chest.unlockTime)}</Text>
+              )}
+              {isUnlocking && <Text style={{fontSize: 10, color: '#f1c40f'}}>Unlocking...</Text>}
+            </TouchableOpacity>
+          );
+        })}
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 const MiniCard = ({ card }) => (
   <View style={[styles.miniCard, { borderColor: RARITY_COLORS[card.rarity] || '#000' }]}>
@@ -2092,10 +2327,24 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
   const [selectedCard, setSelectedCard] = useState(null); // For detail modal
   const [cardMenuCard, setCardMenuCard] = useState(null); // For popup menu
   const [showSlotSelector, setShowSlotSelector] = useState(null); // For slot selector
+  const [filterRarity, setFilterRarity] = useState('all');
+  const [sortByElixir, setSortByElixir] = useState(false);
 
   // Drag state
   const [localDraggingCard, setLocalDraggingCard] = useState(null);
   const [scrollEnabled, setScrollEnabled] = useState(true);
+
+  // Filter Logic
+  const filteredCards = CARDS.filter(card => !card.isToken).filter(card => {
+    if (filterRarity === 'all') return true;
+    return card.rarity === filterRarity;
+  }).sort((a, b) => {
+    if (sortByElixir) {
+      return a.cost - b.cost;
+    }
+    // Default sort by id/name stability or rarity if needed
+    return 0;
+  });
 
   // Show card menu for collection cards
   const handleCollectionCardTap = (card) => {
@@ -2530,6 +2779,36 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
 
       {/* All Cards Section */}
       <Text style={styles.deckBoxTitle}>Collection</Text>
+      
+      {/* Filters */}
+      <View style={styles.filterContainer}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 10 }}>
+          <TouchableOpacity 
+            style={[styles.filterButton, filterRarity === 'all' && styles.filterButtonActive]} 
+            onPress={() => setFilterRarity('all')}
+          >
+            <Text style={[styles.filterButtonText, filterRarity === 'all' && styles.filterButtonTextActive]}>All</Text>
+          </TouchableOpacity>
+          {['common', 'rare', 'epic', 'legendary'].map(rarity => (
+            <TouchableOpacity 
+              key={rarity}
+              style={[styles.filterButton, filterRarity === rarity && styles.filterButtonActive, { borderColor: RARITY_COLORS[rarity] }]} 
+              onPress={() => setFilterRarity(rarity)}
+            >
+              <Text style={[styles.filterButtonText, filterRarity === rarity && styles.filterButtonTextActive, { color: filterRarity === rarity ? '#fff' : RARITY_COLORS[rarity] }]}>
+                {rarity.charAt(0).toUpperCase() + rarity.slice(1)}
+              </Text>
+            </TouchableOpacity>
+          ))}
+          <TouchableOpacity 
+            style={[styles.filterButton, sortByElixir && styles.filterButtonActive]} 
+            onPress={() => setSortByElixir(!sortByElixir)}
+          >
+            <Text style={[styles.filterButtonText, sortByElixir && styles.filterButtonTextActive]}>Elixir {sortByElixir ? '▲' : '▼'}</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
+
       <View style={[styles.deckBox, { flex: 1, paddingVertical: 8, paddingHorizontal: 4, overflow: 'hidden' }]}>
         <ScrollView
           style={[styles.allCardsScroll, { marginBottom: 0 }]}
@@ -2538,7 +2817,7 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
           nestedScrollEnabled={true}
         >
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-evenly' }}>
-            {CARDS.filter(card => !card.isToken).map(card => (
+            {filteredCards.map(card => (
               <View key={card.id} style={{ marginBottom: 10 }}>
                 <CollectionCard card={card} />
               </View>
@@ -2668,7 +2947,7 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
   );
 };
 
-const BattleTab = ({ currentDeck, onStartBattle }) => (
+const BattleTab = ({ currentDeck, onStartBattle, chests, onUnlockChest, onOpenChest }) => (
   <View style={styles.battleTabContainer}>
     <View style={styles.arenaTitleContainer}>
       <Text style={styles.arenaTitle}>ARENA 1</Text>
@@ -2714,7 +2993,7 @@ const BattleTab = ({ currentDeck, onStartBattle }) => (
       <Text style={styles.battleButtonSubtext}>Ranked 1v1</Text>
     </TouchableOpacity>
 
-    <ChestSlots />
+    <ChestSlots chests={chests} onUnlock={onUnlockChest} onOpen={onOpenChest} />
   </View>
 );
 
@@ -2828,7 +3107,8 @@ const BottomNavigation = ({ activeTab, onTabChange }) => {
 
 const MainLobby = ({
   activeTab, onTabChange, onStartGame, currentDeck, onSwapCards,
-  dragHandlers, selectedDeckIndex, setSelectedDeckIndex, allDecks
+  dragHandlers, selectedDeckIndex, setSelectedDeckIndex, allDecks,
+  chests, onUnlockChest, onOpenChest
 }) => {
   const renderTabContent = () => {
     switch (activeTab) {
@@ -2841,9 +3121,21 @@ const MainLobby = ({
         setSelectedDeckIndex={setSelectedDeckIndex}
         allDecks={allDecks}
       />;
-      case 2: return <BattleTab currentDeck={currentDeck} onStartBattle={onStartGame} />;
+      case 2: return <BattleTab 
+        currentDeck={currentDeck} 
+        onStartBattle={onStartGame} 
+        chests={chests}
+        onUnlockChest={onUnlockChest}
+        onOpenChest={onOpenChest}
+      />;
       case 3: return <ClanTab />;
-      default: return <BattleTab currentDeck={currentDeck} onStartBattle={onStartGame} />;
+      default: return <BattleTab 
+        currentDeck={currentDeck} 
+        onStartBattle={onStartGame}
+        chests={chests}
+        onUnlockChest={onUnlockChest}
+        onOpenChest={onOpenChest} 
+      />;
     }
   };
 
@@ -3815,13 +4107,99 @@ export default function App() {
     setUnits(prev => [...(prev || []), ...newUnits]);
   };
 
+  // Chest State
+  const [chests, setChests] = useState([
+    { id: 'chest_1', slotIndex: 0, type: 'SILVER', state: 'LOCKED', unlockTime: 3 * 60 * 60, timeLeft: 3 * 60 * 60 },
+    { id: 'chest_2', slotIndex: 1, type: 'GOLD', state: 'LOCKED', unlockTime: 8 * 60 * 60, timeLeft: 8 * 60 * 60 },
+  ]);
+
+  // Chest Timer Logic
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setChests(prevChests => {
+        return prevChests.map(chest => {
+          if (chest.state === 'UNLOCKING') {
+            const newTimeLeft = Math.max(0, chest.timeLeft - 1);
+            if (newTimeLeft === 0) {
+              return { ...chest, state: 'UNLOCKED', timeLeft: 0 };
+            }
+            return { ...chest, timeLeft: newTimeLeft };
+          }
+          return chest;
+        });
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleUnlockChest = (chestToUnlock) => {
+    // Check if another chest is already unlocking
+    const isAnyUnlocking = chests.some(c => c.state === 'UNLOCKING');
+    if (isAnyUnlocking) {
+      // In real game, you can queue one, but for now simple 1 at a time
+      console.log('Already unlocking a chest!');
+      return;
+    }
+
+    setChests(prev => prev.map(c => {
+      if (c.id === chestToUnlock.id) {
+        return { ...c, state: 'UNLOCKING' };
+      }
+      return c;
+    }));
+  };
+
+  const handleOpenChest = (chestToOpen) => {
+    // Reward player (Gold, Gems, Cards) - simplified for now
+    console.log('Opening chest:', chestToOpen.type);
+    
+    // Remove chest from slot
+    setChests(prev => prev.filter(c => c.id !== chestToOpen.id));
+  };
+
   const checkWinner = () => {
     const playerTowers = towersRef.current.filter(t => !t.isOpponent && t.hp > 0).length;
     const opponentTowers = towersRef.current.filter(t => t.isOpponent && t.hp > 0).length;
 
-    if (playerTowers > opponentTowers) setGameOver('VICTORY');
-    else if (opponentTowers > playerTowers) setGameOver('DEFEAT');
-    else setGameOver('DRAW');
+    let result = 'DRAW';
+    if (playerTowers > opponentTowers) result = 'VICTORY';
+    else if (opponentTowers > playerTowers) result = 'DEFEAT';
+    
+    setGameOver(result);
+
+    // Reward Chest on Victory
+    if (result === 'VICTORY') {
+      setChests(prev => {
+        // Find first empty slot (0-3)
+        const occupiedSlots = prev.map(c => c.slotIndex);
+        let emptySlot = -1;
+        for (let i = 0; i < 4; i++) {
+          if (!occupiedSlots.includes(i)) {
+            emptySlot = i;
+            break;
+          }
+        }
+
+        if (emptySlot !== -1) {
+          const chestTypes = ['SILVER', 'SILVER', 'SILVER', 'GOLD', 'GIANT', 'MAGICAL'];
+          const randomType = chestTypes[Math.floor(Math.random() * chestTypes.length)];
+          let unlockTime = 3 * 60 * 60; // Silver default
+          if (randomType === 'GOLD') unlockTime = 8 * 60 * 60;
+          if (randomType === 'GIANT' || randomType === 'MAGICAL') unlockTime = 12 * 60 * 60;
+
+          const newChest = {
+            id: `chest_${Date.now()}`,
+            slotIndex: emptySlot,
+            type: randomType,
+            state: 'LOCKED',
+            unlockTime: unlockTime,
+            timeLeft: unlockTime
+          };
+          return [...prev, newChest];
+        }
+        return prev;
+      });
+    }
   };
 
   useEffect(() => {
@@ -4860,6 +5238,20 @@ export default function App() {
                     }
                     return t;
                  });
+
+                 // Create persistent rage visual effect (recreated every frame to show continuous effect)
+                 if (!h.rageEffectCreated) {
+                   setVisualEffects(prev => [...prev, {
+                     id: Date.now() + Math.random(),
+                     type: 'rage_aura',
+                     x: h.x,
+                     y: h.y,
+                     radius: h.radius || 50,
+                     startTime: Date.now(),
+                     duration: h.duration * 1000
+                   }]);
+                   h.rageEffectCreated = true;
+                 }
               }
             } else if (h.isGoblinBarrel) {
               // Goblin Barrel hits - spawn goblins around impact point
@@ -4954,6 +5346,79 @@ export default function App() {
                 }
                 return t;
               });
+
+              // Create visual effects for spells
+              if (h.type === 'fireball_spell') {
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'fireball_explosion',
+                  x: h.targetX,
+                  y: h.targetY,
+                  radius: h.radius || 60,
+                  startTime: Date.now(),
+                  duration: 600
+                }]);
+              } else if (h.type === 'zap_spell') {
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'zap_impact',
+                  x: h.targetX,
+                  y: h.targetY,
+                  radius: h.radius || 35,
+                  startTime: Date.now(),
+                  duration: 400
+                }]);
+              } else if (h.type === 'arrows_spell') {
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'arrows_impact',
+                  x: h.targetX,
+                  y: h.targetY,
+                  radius: h.radius || 40,
+                  startTime: Date.now(),
+                  duration: 500
+                }]);
+              } else if (h.type === 'poison_spell') {
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'poison_cloud',
+                  x: h.targetX,
+                  y: h.targetY,
+                  radius: h.radius || 50,
+                  startTime: Date.now(),
+                  duration: 5000
+                }]);
+              } else if (h.type === 'rocket_spell') {
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'rocket_explosion',
+                  x: h.targetX,
+                  y: h.targetY,
+                  radius: h.radius || 30,
+                  startTime: Date.now(),
+                  duration: 800
+                }]);
+              } else if (h.type === 'earthquake_spell') {
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'earthquake_crack',
+                  x: h.targetX,
+                  y: h.targetY,
+                  radius: h.radius || 70,
+                  startTime: Date.now(),
+                  duration: 1000
+                }]);
+              } else if (h.type === 'lightning_bolt') {
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'lightning_strike',
+                  x: h.targetX,
+                  y: h.targetY,
+                  radius: h.radius || 50,
+                  startTime: Date.now(),
+                  duration: 500
+                }]);
+              }
             }
 
           } else {
@@ -5513,6 +5978,9 @@ export default function App() {
         selectedDeckIndex={selectedDeckIndex}
         setSelectedDeckIndex={setSelectedDeckIndex}
         allDecks={allDecks}
+        chests={chests}
+        onUnlockChest={handleUnlockChest}
+        onOpenChest={handleOpenChest}
       />
     );
   }
@@ -5584,8 +6052,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.3)', // Lighter overlay for better bg visibility
     width: '100%',
     alignItems: 'center',
-    justifyContent: 'space-between', // Space between logo and bottom
-    paddingVertical: 50,
+    paddingVertical: 30,
   },
   logoContainer: {
     alignItems: 'center',
@@ -5613,7 +6080,7 @@ const styles = StyleSheet.create({
   loadingBottomContainer: {
     width: '90%',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   tipText: {
     color: '#fff',
@@ -6409,6 +6876,31 @@ const styles = StyleSheet.create({
     fontSize: 17,
     textShadowColor: 'rgba(241, 196, 15, 0.5)',
     textShadowRadius: 4,
+  },
+  filterContainer: {
+    paddingHorizontal: 5,
+    marginBottom: 5,
+  },
+  filterButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: '#bdc3c7',
+    marginRight: 8,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+  },
+  filterButtonActive: {
+    backgroundColor: '#34495e',
+    borderColor: '#fff',
+  },
+  filterButtonText: {
+    color: '#bdc3c7',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  filterButtonTextActive: {
+    color: '#fff',
   },
   deckBox: {
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
