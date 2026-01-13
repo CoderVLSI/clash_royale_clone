@@ -63,8 +63,8 @@ const CARDS = [
   // Medium easy additions
   { id: 'dark_prince', name: 'Dark Prince', cost: 4, color: '#2c3e50', hp: 1100, speed: 2, type: 'ground', range: 30, damage: 220, attackSpeed: 1500, projectile: null, count: 1, splash: true, charge: true, rarity: 'epic' },
   { id: 'elite_barbarians', name: 'Elite Barbs', cost: 6, color: '#c0392b', hp: 600, speed: 3, type: 'ground', range: 30, damage: 200, attackSpeed: 1400, projectile: null, count: 2, rarity: 'epic' },
-  { id: 'golem', name: 'Golem', cost: 8, color: '#7f8c8d', hp: 4000, speed: 0.9, type: 'ground', range: 20, damage: 200, attackSpeed: 1700, projectile: null, count: 1, targetType: 'buildings', rarity: 'epic', deathSpawns: 'golemite', deathSpawnCount: 2 },
-  { id: 'golemite', name: 'Golemite', cost: 0, color: '#95a5a6', hp: 1300, speed: 1, type: 'ground', range: 20, damage: 100, attackSpeed: 1700, projectile: null, count: 1, targetType: 'buildings', rarity: 'common', isToken: true, deathSpawns: 'golemite', deathSpawnCount: 1 },
+  { id: 'golem', name: 'Golem', cost: 8, color: '#7f8c8d', hp: 4000, speed: 0.9, type: 'ground', range: 20, damage: 200, attackSpeed: 1700, projectile: null, count: 1, targetType: 'buildings', rarity: 'epic', deathSpawns: 'golemite', deathSpawnCount: 2, spawnDelay: 1000 },
+  { id: 'golemite', name: 'Golemite', cost: 0, color: '#95a5a6', hp: 1300, speed: 1, type: 'ground', range: 20, damage: 100, attackSpeed: 1700, projectile: null, count: 1, targetType: 'buildings', rarity: 'common', isToken: true, deathSpawns: 'golemite', deathSpawnCount: 1, spawnDelay: 500 },
 ];
 
 const RARITY_COLORS = {
@@ -2508,6 +2508,7 @@ export default function App() {
             lastSpawn: card.spawnRate ? Date.now() : 0,  // Initialize to now for buildings with spawnRate
             lifetimeDuration: card.lifetime,  // Store lifetime duration in seconds
             spawnTime: Date.now(),  // Track when building was spawned for HP depreciation
+            spawnDelay: card.spawnDelay || 0,  // Spawn delay before unit can move/attack (Golem: 1000ms, Golemite: 500ms)
             maxHp: card.hp,  // Store initial max HP for depreciation calculation
             jumps: card.jumps || false,  // Hog Rider can jump over river
             slow: card.slow || 0,
@@ -2839,6 +2840,15 @@ export default function App() {
           // If charging, double the damage
           if (u.charge.active) {
             actualDamage = u.damage * 2;
+          }
+        }
+
+        // Handle spawn delay (Golem, Golemite) - unit cannot move or attack during spawn delay
+        if (u.spawnDelay && u.spawnTime) {
+          const timeSinceSpawn = now - u.spawnTime;
+          if (timeSinceSpawn < u.spawnDelay) {
+            // Still in spawn delay - skip all movement and attack logic
+            return u;
           }
         }
 
@@ -3468,7 +3478,9 @@ export default function App() {
                 wasPushed: false,
                 wasStunned: false,
                 stunUntil: 0,
-                baseDamage: spawnCard.damage
+                baseDamage: spawnCard.damage,
+                spawnTime: Date.now(),  // Track spawn time for spawn delay
+                spawnDelay: spawnCard.spawnDelay || 0  // Inherit spawn delay from card
               });
             }
           }
