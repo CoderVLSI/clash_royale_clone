@@ -951,6 +951,25 @@ const Projectile = ({ type, position }) => {
       }} />
     );
   }
+  if (type === 'electric_bolt') {
+    // Electric bolt for Electro Wizard - blue lightning bolt
+    return (
+      <View style={{
+        position: 'absolute',
+        width: 12,
+        height: 12,
+        backgroundColor: '#3498db',
+        borderRadius: 6,
+        borderWidth: 2,
+        borderColor: '#f1c40f',
+        shadowColor: '#3498db',
+        shadowRadius: 8,
+        shadowOpacity: 0.8,
+        left: position.x - 6,
+        top: position.y - 6
+      }} />
+    );
+  }
   if (type === 'fireball_spell') {
     return (
       <View style={[styles.fireballSpell, { left: position.x, top: position.y }]} />
