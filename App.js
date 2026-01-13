@@ -974,6 +974,47 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Path d="M35 55 Q50 75 65 55" fill="#e67e22" />
         </Svg>
       );
+    case 'goblin_barrel_spell':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Wooden barrel falling from sky */}
+          <Circle cx="50" cy="50" r="40" fill="#8B4513" stroke="#654321" strokeWidth="3" />
+          {/* Barrel metal bands */}
+          <Rect x="10" y="35" width="80" height="8" fill="#2c3e50" />
+          <Rect x="10" y="55" width="80" height="8" fill="#2c3e50" />
+          {/* Barrel wood grain */}
+          <Path d="M20 30 L20 70 M35 25 L35 75 M50 20 L50 80 M65 25 L65 75 M80 30 L80 70" stroke="#654321" strokeWidth="2" opacity="0.5" />
+          {/* Goblin face peeking out */}
+          <Circle cx="35" cy="45" r="3" fill="#2ecc71" />
+          <Circle cx="65" cy="45" r="3" fill="#2ecc71" />
+          {/* Motion lines (falling effect) */}
+          <Path d="M30 10 L25 5 M50 5 L50 0 M70 10 L75 5" stroke="#bdc3c7" strokeWidth="2" opacity="0.6" />
+        </Svg>
+      );
+    case 'graveyard_zone':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Green mystical zone */}
+          <Circle cx="50" cy="50" r="45" fill="#2c3e50" stroke="#2ecc71" strokeWidth="3" opacity="0.8" />
+          {/* Inner green glow */}
+          <Circle cx="50" cy="50" r="35" fill="#27ae60" opacity="0.4" />
+          {/* Skull symbol in center */}
+          <Circle cx="50" cy="48" r="18" fill="#ecf0f1" stroke="#bdc3c7" strokeWidth="2" />
+          {/* Skull eye sockets */}
+          <Circle cx="43" cy="45" r="4" fill="#2c3e50" />
+          <Circle cx="57" cy="45" r="4" fill="#2c3e50" />
+          {/* Skull nose */}
+          <Path d="M50 50 L47 55 L53 55 Z" fill="#2c3e50" />
+          {/* Crossed bones below skull */}
+          <Rect x="35" y="58" width="30" height="4" fill="#ecf0f1" transform="rotate(-30, 50, 60)" rx="2" />
+          <Rect x="35" y="58" width="30" height="4" fill="#ecf0f1" transform="rotate(30, 50, 60)" rx="2" />
+          {/* Mystical green particles */}
+          <Circle cx="25" cy="30" r="2" fill="#2ecc71" opacity="0.8" />
+          <Circle cx="75" cy="35" r="2" fill="#2ecc71" opacity="0.8" />
+          <Circle cx="30" cy="70" r="2" fill="#2ecc71" opacity="0.8" />
+          <Circle cx="70" cy="65" r="2" fill="#2ecc71" opacity="0.8" />
+        </Svg>
+      );
     default:
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
@@ -1729,7 +1770,7 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
             <View style={styles.cardMenuStats}>
               {card.hp && <Text style={styles.cardMenuStat}>HP: {card.hp}</Text>}
               {card.damage && <Text style={styles.cardMenuStat}>DMG: {card.damage}</Text>}
-              {card.speed > 0 && <Text style={styles.cardMenuStat}>SPD: {card.speed}</Text>}
+              {card.speed !== undefined && card.speed > 0 && <Text style={styles.cardMenuStat}>SPD: {card.speed}</Text>}
             </View>
 
             {/* Action Buttons */}
@@ -3046,12 +3087,77 @@ export default function App() {
           spellType = 'rocket_spell';
           startY = height;
           spellSpeed = 12; // Slower than fireball
+        } else if (actualCard.id === 'goblin_barrel') {
+          // Goblin Barrel - spawns 3 goblins around target after delay
+          spellType = 'goblin_barrel_spell';
+          spellSpeed = 25; // Barrel falls from sky
+          startX = x;
+          startY = 0; // Start from top of screen
+
+          // Create barrel projectile that will spawn goblins on impact
+          const spawnCardId = actualCard.spawns;
+          const spawnCard = CARDS.find(c => c.id === spawnCardId);
+          const spawnCount = actualCard.spawnCount || 3;
+
+          setProjectiles(prev => [...prev, {
+            id: Date.now(),
+            x: startX,
+            y: startY,
+            targetX: x,
+            targetY: y,
+            speed: spellSpeed,
+            damage: 0,
+            radius: actualCard.radius,
+            type: spellType,
+            isSpell: true,
+            hit: false,
+            spawnTime: Date.now(),
+            isGoblinBarrel: true,
+            spawns: spawnCardId,
+            spawnCount: spawnCount
+          }]);
+        } else if (actualCard.id === 'graveyard') {
+          // Graveyard - spawns skeletons gradually over time
+          spellType = 'graveyard_spell';
+          spellSpeed = 100; // Instant
+
+          const spawnCardId = actualCard.spawns;
+          const spawnCard = CARDS.find(c => c.id === spawnCardId);
+          const spawnCount = actualCard.spawnCount || 15;
+
+          // Create a graveyard zone that spawns skeletons over 4 seconds
+          const newUnit = {
+            id: 'graveyard_' + Date.now(),
+            x: x,
+            y: y,
+            hp: 1, // Fragile, dies on any hit
+            maxHp: 1,
+            isOpponent: false,
+            speed: 0, // Stationary
+            lane: x < width / 2 ? 'LEFT' : 'RIGHT',
+            lastAttack: 0,
+            spriteId: 'graveyard_zone',
+            type: 'graveyard_zone', // Special type
+            range: 0,
+            damage: 0,
+            attackSpeed: 0,
+            spawns: spawnCardId,
+            spawnRate: 0.3, // Spawn every 0.3 seconds
+            spawnCount: 1, // Spawn 1 skeleton at a time
+            lastSpawn: Date.now(),
+            lifetimeDuration: 4, // Lasts 4 seconds
+            spawnTime: Date.now(),
+            totalToSpawn: spawnCount,
+            spawnedSoFar: 0,
+            isOpponent: false
+          };
+          setUnits(prev => [...prev, newUnit]);
         }
 
         // For poison, mark it as already hit since it's instant
         const isPoison = actualCard.id === 'poison';
-        // Skip default projectile creation for Lightning as we handled it
-        if (actualCard.id !== 'lightning') {
+        // Skip default projectile creation for Lightning, Goblin Barrel, and Graveyard as we handled them
+        if (actualCard.id !== 'lightning' && actualCard.id !== 'goblin_barrel' && actualCard.id !== 'graveyard') {
           const currentTime = Date.now();
           setProjectiles(prev => [...prev, {
             id: Date.now(),
@@ -3418,72 +3524,92 @@ export default function App() {
 
         // Handle periodic spawning (Tombstone spawns skeletons every spawnRate seconds)
         if (u.spawns && u.spawnRate && u.lastSpawn !== undefined) {
-          const timeSinceLastSpawn = (now - u.lastSpawn) / 1000; // Convert to seconds
-          if (timeSinceLastSpawn >= u.spawnRate) {
-            // Spawn the units
-            const spawnCardId = u.spawns;
-            const spawnCard = CARDS.find(c => c.id === spawnCardId);
+          // Check if we've reached the spawn limit (for graveyard)
+          const maxSpawned = u.totalToSpawn || Infinity;
+          const spawnedSoFar = u.spawnedSoFar || 0;
 
-            if (spawnCard) {
-              const newSpawns = [];
-              // Use unit's spawnCount if defined, otherwise fall back to spawn card's count
-              const spawnCount = u.spawnCount || spawnCard.count || 1;
+          if (spawnedSoFar < maxSpawned) {
+            const timeSinceLastSpawn = (now - u.lastSpawn) / 1000; // Convert to seconds
+            if (timeSinceLastSpawn >= u.spawnRate) {
+              // Spawn the units
+              const spawnCardId = u.spawns;
+              const spawnCard = CARDS.find(c => c.id === spawnCardId);
 
-              for (let i = 0; i < spawnCount; i++) {
-                // Calculate spawn position - ensure skeletons spawn AWAY from parent, not inside
-                // For buildings (speed === 0), spawn in direction toward enemy
-                // For moving units like Witch, spawn around them with minimum distance
-                let offsetX, offsetY;
-                const minOffset = 50;  // Minimum distance from parent center
-                const maxOffset = 80;  // Maximum distance from parent center
+              if (spawnCard) {
+                const newSpawns = [];
+                // Use unit's spawnCount if defined, otherwise fall back to spawn card's count
+                let spawnCount = u.spawnCount || spawnCard.count || 1;
 
-                if (u.speed === 0) {
-                  // Building (Tombstone) - spawn skeletons toward enemy side
-                  const angle = (Math.random() * Math.PI / 2) - Math.PI / 4; // -45 to +45 degrees from forward
-                  const distance = minOffset + Math.random() * (maxOffset - minOffset);
-                  offsetX = Math.sin(angle) * distance;
-                  // Spawn toward enemy: player buildings spawn up (-Y), opponent buildings spawn down (+Y)
-                  offsetY = u.isOpponent ? distance * Math.cos(angle) : -distance * Math.cos(angle);
-                } else {
-                  // Moving unit (Witch) - spawn around with minimum distance
-                  const angle = (i / spawnCount) * Math.PI * 2 + Math.random() * 0.5; // Spread evenly around
-                  const distance = minOffset + Math.random() * (maxOffset - minOffset);
-                  offsetX = Math.cos(angle) * distance;
-                  offsetY = Math.sin(angle) * distance;
+                // Limit spawn count to not exceed totalToSpawn
+                if (spawnedSoFar + spawnCount > maxSpawned) {
+                  spawnCount = maxSpawned - spawnedSoFar;
                 }
 
-                const spawnX = u.x + offsetX;
-                const spawnY = u.y + offsetY;
+                for (let i = 0; i < spawnCount; i++) {
+                  // Calculate spawn position - ensure skeletons spawn AWAY from parent, not inside
+                  // For buildings (speed === 0), spawn in direction toward enemy
+                  // For moving units like Witch, spawn around them with minimum distance
+                  let offsetX, offsetY;
 
-                newSpawns.push({
-                  id: Date.now() + Math.random() * 1000 + i,
-                  x: spawnX,
-                  y: spawnY,
-                  hp: spawnCard.hp,
-                  maxHp: spawnCard.hp,
-                  isOpponent: u.isOpponent,
-                  speed: spawnCard.speed,
-                  lane: u.lane,
-                  lastAttack: 0,
-                  spriteId: spawnCard.id,
-                  type: spawnCard.type,
-                  range: spawnCard.range,
-                  damage: spawnCard.damage,
-                  attackSpeed: spawnCard.attackSpeed,
-                  projectile: spawnCard.projectile,
-                  lockedTarget: null,
-                  wasPushed: false,
-                  wasStunned: false,
-                  stunUntil: 0,
-                  baseDamage: spawnCard.damage
-                });
+                  if (u.type === 'graveyard_zone') {
+                    // Graveyard: spawn randomly in a circle around the zone
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = 20 + Math.random() * 40; // 20-60 pixels from center
+                    offsetX = Math.cos(angle) * distance;
+                    offsetY = Math.sin(angle) * distance;
+                  } else if (u.speed === 0) {
+                    // Building (Tombstone) - spawn skeletons toward enemy side
+                    const minOffset = 50;
+                    const maxOffset = 80;
+                    const angle = (Math.random() * Math.PI / 2) - Math.PI / 4; // -45 to +45 degrees from forward
+                    const distance = minOffset + Math.random() * (maxOffset - minOffset);
+                    offsetX = Math.sin(angle) * distance;
+                    // Spawn toward enemy: player buildings spawn up (-Y), opponent buildings spawn down (+Y)
+                    offsetY = u.isOpponent ? distance * Math.cos(angle) : -distance * Math.cos(angle);
+                  } else {
+                    // Moving unit (Witch) - spawn around with minimum distance
+                    const minOffset = 50;
+                    const maxOffset = 80;
+                    const angle = (i / spawnCount) * Math.PI * 2 + Math.random() * 0.5; // Spread evenly around
+                    const distance = minOffset + Math.random() * (maxOffset - minOffset);
+                    offsetX = Math.cos(angle) * distance;
+                    offsetY = Math.sin(angle) * distance;
+                  }
+
+                  const spawnX = u.x + offsetX;
+                  const spawnY = u.y + offsetY;
+
+                  newSpawns.push({
+                    id: Date.now() + Math.random() * 1000 + i,
+                    x: spawnX,
+                    y: spawnY,
+                    hp: spawnCard.hp,
+                    maxHp: spawnCard.hp,
+                    isOpponent: u.isOpponent,
+                    speed: spawnCard.speed,
+                    lane: u.lane,
+                    lastAttack: 0,
+                    spriteId: spawnCard.id,
+                    type: spawnCard.type,
+                    range: spawnCard.range,
+                    damage: spawnCard.damage,
+                    attackSpeed: spawnCard.attackSpeed,
+                    projectile: spawnCard.projectile,
+                    lockedTarget: null,
+                    wasPushed: false,
+                    wasStunned: false,
+                    stunUntil: 0,
+                    baseDamage: spawnCard.damage
+                  });
+                }
+
+                // Add spawned units to collection (will be added at end of loop)
+                unitsToSpawn.push(...newSpawns);
+
+                // Update last spawn time and spawned count
+                u.lastSpawn = now;
+                u.spawnedSoFar = spawnedSoFar + spawnCount;
               }
-
-              // Add spawned units to collection (will be added at end of loop)
-              unitsToSpawn.push(...newSpawns);
-
-              // Update last spawn time
-              u.lastSpawn = now;
             }
           }
         }
@@ -4161,6 +4287,50 @@ export default function App() {
                 }
               }
               // Poison will be filtered out after duration
+            } else if (h.isGoblinBarrel) {
+              // Goblin Barrel hits - spawn goblins around impact point
+              const spawnCardId = h.spawns;
+              const spawnCard = CARDS.find(c => c.id === spawnCardId);
+              const spawnCount = h.spawnCount || 3;
+
+              if (spawnCard) {
+                const newGoblins = [];
+                const lane = h.targetX < width / 2 ? 'LEFT' : 'RIGHT';
+
+                for (let i = 0; i < spawnCount; i++) {
+                  // Spawn goblins in a circle around the impact point
+                  const angle = (i / spawnCount) * Math.PI * 2;
+                  const distance = 30 + Math.random() * 20; // 30-50 pixels from center
+                  const offsetX = Math.cos(angle) * distance;
+                  const offsetY = Math.sin(angle) * distance;
+
+                  newGoblins.push({
+                    id: Date.now() + i,
+                    x: h.targetX + offsetX,
+                    y: h.targetY + offsetY,
+                    hp: spawnCard.hp,
+                    maxHp: spawnCard.hp,
+                    isOpponent: false,
+                    speed: spawnCard.speed,
+                    lane: lane,
+                    lastAttack: 0,
+                    spriteId: spawnCard.id,
+                    type: spawnCard.type,
+                    range: spawnCard.range,
+                    damage: spawnCard.damage,
+                    attackSpeed: spawnCard.attackSpeed,
+                    projectile: spawnCard.projectile,
+                    lockedTarget: null,
+                    wasPushed: false,
+                    wasStunned: false,
+                    stunUntil: 0,
+                    baseDamage: spawnCard.damage
+                  });
+                }
+
+                // Add goblins to the game
+                setUnits(prev => [...prev, ...newGoblins]);
+              }
             } else {
               // Other spells (Fireball, Arrows, Zap) - one-time damage
               currentUnits = currentUnits.map(u => {
