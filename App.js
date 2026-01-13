@@ -2476,37 +2476,37 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
                   </View>
                 )}
 
-                {selectedCard.hp && (
+                {Boolean(selectedCard.hp) && (
                   <View style={styles.statRow}>
                     <Text style={styles.statLabel}>❤️ Hitpoints:</Text>
                     <Text style={styles.statValue}>{selectedCard.hp}</Text>
                   </View>
                 )}
-                {selectedCard.damage && (
+                {Boolean(selectedCard.damage) && (
                   <View style={styles.statRow}>
                     <Text style={styles.statLabel}>⚔️ Damage:</Text>
                     <Text style={styles.statValue}>{selectedCard.damage}</Text>
                   </View>
                 )}
-                {selectedCard.speed !== undefined && selectedCard.speed > 0 && (
+                {Boolean(selectedCard.speed !== undefined && selectedCard.speed > 0) && (
                   <View style={styles.statRow}>
                     <Text style={styles.statLabel}>👟 Speed:</Text>
                     <Text style={styles.statValue}>{selectedCard.speed}</Text>
                   </View>
                 )}
-                {selectedCard.range && (
+                {Boolean(selectedCard.range) && (
                   <View style={styles.statRow}>
                     <Text style={styles.statLabel}>🎯 Range:</Text>
                     <Text style={styles.statValue}>{selectedCard.range}</Text>
                   </View>
                 )}
-                {selectedCard.count > 1 && (
+                {Boolean(selectedCard.count > 1) && (
                   <View style={styles.statRow}>
                     <Text style={styles.statLabel}>👥 Count:</Text>
                     <Text style={styles.statValue}>{selectedCard.count}</Text>
                   </View>
                 )}
-                {selectedCard.attackSpeed && (
+                {Boolean(selectedCard.attackSpeed) && (
                   <View style={styles.statRow}>
                     <Text style={styles.statLabel}>⚡ Hit Speed:</Text>
                     <Text style={styles.statValue}>{selectedCard.attackSpeed}ms</Text>
@@ -3379,8 +3379,8 @@ export default function App() {
             id: 'graveyard_' + Date.now(),
             x: x,
             y: y,
-            hp: 1, // Fragile, dies on any hit
-            maxHp: 1,
+            hp: 9999, // Invincible - cannot be destroyed
+            maxHp: 9999,
             isOpponent: false,
             speed: 0, // Stationary
             lane: x < width / 2 ? 'LEFT' : 'RIGHT',
@@ -3391,14 +3391,15 @@ export default function App() {
             damage: 0,
             attackSpeed: 0,
             spawns: spawnCardId,
-            spawnRate: 0.3, // Spawn every 0.3 seconds
+            spawnRate: 0.27, // Spawn every 0.27 seconds (15 skeletons in 4 seconds)
             spawnCount: 1, // Spawn 1 skeleton at a time
             lastSpawn: Date.now(),
             lifetimeDuration: 4, // Lasts 4 seconds
             spawnTime: Date.now(),
             totalToSpawn: spawnCount,
             spawnedSoFar: 0,
-            isOpponent: false
+            isOpponent: false,
+            isZone: true // Mark as a zone (untargetable by units)
           };
           setUnits(prev => [...prev, newUnit]);
         }
@@ -3978,10 +3979,12 @@ export default function App() {
           // For other units: PRIORITIZE towers, only target units if no towers in range
           // Use unitsRef.current instead of currentUnits to avoid circular reference
           // Exclude hidden Teslas from targets (they're underground and untargetable)
+          // Exclude zones (graveyard) from targets (they're untargetable)
           const unitTargets = (unitsRef.current || []).filter(targetUnit =>
             targetUnit.isOpponent !== u.isOpponent &&
             targetUnit.hp > 0 &&
             !(targetUnit.hidden?.active && targetUnit.spriteId === 'tesla') &&
+            !targetUnit.isZone && // Cannot target zones (graveyard, etc.)
             // Ground melee units cannot target flying units, but ranged units can
             // EXCEPTION: X-Bow targets ground ONLY despite having projectile
             (u.type === 'flying' || (u.projectile && u.spriteId !== 'x_bow') || targetUnit.type !== 'flying')
@@ -4461,7 +4464,7 @@ export default function App() {
 
           // Find closest enemy unit to the last chained target
           currentUnits.forEach(unit => {
-            if (unit.isOpponent !== event.isOpponent && unit.hp > 0 && !chainedTargets.find(t => t.id === unit.id)) {
+            if (unit.isOpponent !== event.isOpponent && unit.hp > 0 && !chainedTargets.find(t => t.id === unit.id) && !unit.isZone) {
               const dist = Math.sqrt(Math.pow(unit.x - lastTarget.x, 2) + Math.pow(unit.y - lastTarget.y, 2));
               if (dist < closestDist && dist < 80) { // Max chain distance: 80
                 closestDist = dist;
