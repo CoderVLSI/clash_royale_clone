@@ -25,7 +25,7 @@ const CARDS = [
   { id: 'knight', name: 'Knight', cost: 3, color: '#f1c40f', hp: 1400, speed: 1.5, type: 'ground', range: 40, damage: 150, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common' },
   { id: 'archers', name: 'Archers', cost: 3, color: '#e67e22', hp: 250, speed: 2, type: 'ground', range: 80, damage: 100, attackSpeed: 1000, projectile: 'arrow', count: 2, rarity: 'common' },
   { id: 'giant', name: 'Giant', cost: 5, color: '#e74c3c', hp: 3000, speed: 1, type: 'ground', range: 20, damage: 200, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', rarity: 'rare' },
-  { id: 'pekka', name: 'Mini P', cost: 4, color: '#9b59b6', hp: 1100, speed: 2.5, type: 'ground', range: 25, damage: 350, attackSpeed: 1400, projectile: null, count: 1, rarity: 'rare' },
+  { id: 'mini_pekka', name: 'Mini P', cost: 4, color: '#9b59b6', hp: 1100, speed: 2.5, type: 'ground', range: 25, damage: 350, attackSpeed: 1400, projectile: null, count: 1, rarity: 'rare' },
   { id: 'spear_goblins', name: 'Spear Gobs', cost: 2, color: '#2ecc71', hp: 110, speed: 3, type: 'ground', range: 110, damage: 65, attackSpeed: 1100, projectile: 'spear', count: 3, rarity: 'common' },
   { id: 'musketeer', name: 'Musket', cost: 4, color: '#34495e', hp: 800, speed: 1.5, type: 'ground', range: 100, damage: 180, attackSpeed: 1100, projectile: 'bullet', count: 1, rarity: 'rare' },
   { id: 'baby_dragon', name: 'Baby D', cost: 4, color: '#27ae60', hp: 1200, speed: 2, type: 'flying', range: 80, damage: 130, attackSpeed: 1300, projectile: 'dragon_fire', count: 1, splash: true, rarity: 'epic' },
@@ -72,7 +72,7 @@ const CARDS = [
   { id: 'electro_wizard', name: 'Electro Wiz', cost: 4, color: '#3498db', hp: 590, speed: 1.5, type: 'ground', range: 55, damage: 170, attackSpeed: 1100, projectile: 'electric_bolt', count: 1, splash: true, stun: 0.5, rarity: 'legendary' },
   { id: 'lightning', name: 'Lightning', cost: 6, color: '#f1c40f', type: 'spell', damage: 900, radius: 15, count: 1, rarity: 'epic' },
   { id: 'x_bow', name: 'X-Bow', cost: 6, color: '#95a5a6', hp: 700, speed: 0, type: 'building', range: 180, damage: 40, attackSpeed: 500, projectile: 'arrow', count: 1, lifetime: 35, rarity: 'epic' },
-  { id: 'mirror', name: 'Mirror', cost: 1, color: '#ecf0f1', type: 'spell', isMirror: true, rarity: 'legendary' },
+  { id: 'mirror', name: 'Mirror', cost: 1, color: '#ecf0f1', type: 'spell', isMirror: true, rarity: 'epic' },
 ];
 
 const RARITY_COLORS = {
@@ -224,7 +224,7 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Rect x="45" y="40" width="10" height="40" fill="#95a5a6" />
         </Svg>
       );
-    case 'pekka':
+    case 'mini_pekka':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
           <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
