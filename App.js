@@ -25,7 +25,7 @@ const CARDS = [
   { id: 'knight', name: 'Knight', cost: 3, color: '#f1c40f', hp: 1400, speed: 1.5, type: 'ground', range: 40, damage: 150, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common' },
   { id: 'archers', name: 'Archers', cost: 3, color: '#e67e22', hp: 250, speed: 2, type: 'ground', range: 80, damage: 100, attackSpeed: 1000, projectile: 'arrow', count: 2, rarity: 'common' },
   { id: 'giant', name: 'Giant', cost: 5, color: '#e74c3c', hp: 3000, speed: 1, type: 'ground', range: 20, damage: 200, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', rarity: 'rare' },
-  { id: 'pekka', name: 'Mini P', cost: 4, color: '#9b59b6', hp: 1100, speed: 2.5, type: 'ground', range: 25, damage: 350, attackSpeed: 1400, projectile: null, count: 1, rarity: 'rare' },
+  { id: 'mini_pekka', name: 'Mini P', cost: 4, color: '#9b59b6', hp: 1100, speed: 2.5, type: 'ground', range: 25, damage: 350, attackSpeed: 1400, projectile: null, count: 1, rarity: 'rare' },
   { id: 'spear_goblins', name: 'Spear Gobs', cost: 2, color: '#2ecc71', hp: 110, speed: 3, type: 'ground', range: 110, damage: 65, attackSpeed: 1100, projectile: 'spear', count: 3, rarity: 'common' },
   { id: 'musketeer', name: 'Musket', cost: 4, color: '#34495e', hp: 800, speed: 1.5, type: 'ground', range: 100, damage: 180, attackSpeed: 1100, projectile: 'bullet', count: 1, rarity: 'rare' },
   { id: 'baby_dragon', name: 'Baby D', cost: 4, color: '#27ae60', hp: 1200, speed: 2, type: 'flying', range: 80, damage: 130, attackSpeed: 1300, projectile: 'dragon_fire', count: 1, splash: true, rarity: 'epic' },
@@ -69,9 +69,9 @@ const CARDS = [
   // Next set of additions
   { id: 'pekka', name: 'P.E.K.K.A', cost: 7, color: '#8e44ad', hp: 2900, speed: 1, type: 'ground', range: 25, damage: 650, attackSpeed: 1800, projectile: null, count: 1, rarity: 'epic' },
   { id: 'mega_knight', name: 'Mega Knight', cost: 7, color: '#e67e22', hp: 3300, speed: 1.5, type: 'ground', range: 25, damage: 240, attackSpeed: 1600, projectile: null, count: 1, splash: true, spawnDamage: 180, jumps: true, rarity: 'legendary' },
-  { id: 'electro_wizard', name: 'Electro Wiz', cost: 4, color: '#3498db', hp: 590, speed: 1.5, type: 'ground', range: 55, damage: 170, attackSpeed: 1100, projectile: 'electric_bolt', count: 1, splash: true, stun: 0.5, rarity: 'legendary' },
+  { id: 'electro_wizard', name: 'Electro Wiz', cost: 4, color: '#3498db', hp: 590, speed: 1.5, type: 'ground', range: 55, damage: 170, attackSpeed: 1100, projectile: 'electric_bolt', count: 1, splash: false, stun: 0.5, rarity: 'legendary', spawnDamage: 170 },
   { id: 'lightning', name: 'Lightning', cost: 6, color: '#f1c40f', type: 'spell', damage: 900, radius: 15, count: 1, rarity: 'epic' },
-  { id: 'x_bow', name: 'X-Bow', cost: 6, color: '#95a5a6', hp: 700, speed: 0, type: 'building', range: 180, damage: 40, attackSpeed: 500, projectile: 'arrow', count: 1, lifetime: 35, rarity: 'epic' },
+  { id: 'x_bow', name: 'X-Bow', cost: 6, color: '#95a5a6', hp: 700, speed: 0, type: 'building', range: 350, damage: 40, attackSpeed: 500, projectile: 'arrow', count: 1, lifetime: 30, rarity: 'epic', spawnDelay: 3500 },
   { id: 'mirror', name: 'Mirror', cost: 1, color: '#ecf0f1', type: 'spell', isMirror: true, rarity: 'epic' },
 ];
 
@@ -224,7 +224,7 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Rect x="45" y="40" width="10" height="40" fill="#95a5a6" />
         </Svg>
       );
-    case 'pekka':
+    case 'mini_pekka':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
           <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
@@ -666,7 +666,7 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Circle cx="60" cy="50" r="5" fill="#e74c3c" />
           <Circle cx="40" cy="50" r="2" fill="#f1c40f" opacity="0.8" />
           <Circle cx="60" cy="50" r="2" fill="#f1c40f" opacity="0.8" />
-          <!-- Huge scythe -->
+          {/* Huge scythe */}
           <Path d="M75 40 L95 60" stroke="#bdc3c7" strokeWidth="4" strokeLinecap="round" />
           <Path d="M85 30 L90 40 L95 60 L85 50 Z" fill="#95a5a6" />
           {/* Spikes on armor */}
@@ -779,6 +779,10 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
     ? lastPlayedCard.cost + 1
     : card.cost;
 
+  // For Mirror card, get the card to mirror
+  const cardToDisplay = card.id === 'mirror' && lastPlayedCard ? lastPlayedCard : card;
+  const isMirror = card.id === 'mirror';
+
   const callbacksRef = useRef({ onDragStart, onDragMove, onDragEnd });
   const canAffordRef = useRef(canAfford);
   const isNextRef = useRef(isNext);
@@ -828,13 +832,13 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
   // Always attach panHandlers - we check canAfford inside the callbacks
   // This prevents the responder from being lost when elixir changes
   const handlers = !isNext ? panResponder.panHandlers : {};
-  const isLegendary = card.rarity === 'legendary';
+  const isLegendary = cardToDisplay.rarity === 'legendary';
 
   return (
     <View
       style={[
         styles.card,
-        !isLegendary && { borderColor: RARITY_COLORS[card.rarity] || '#000' },
+        !isLegendary && { borderColor: RARITY_COLORS[cardToDisplay.rarity] || '#000' },
         isLegendary && { backgroundColor: 'transparent', borderWidth: 0 },
         isNext && styles.nextCard,
         (!canAfford && !isNext) && styles.disabledCard,
@@ -863,8 +867,13 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
         </Svg>
       )}
       <View style={styles.cardContent}>
-        <UnitSprite id={card.id} isOpponent={false} size={40} />
-        <Text style={styles.cardName}>{card.name}</Text>
+        <UnitSprite id={cardToDisplay.id} isOpponent={false} size={40} />
+        <Text style={styles.cardName}>{cardToDisplay.name}</Text>
+        {isMirror && (
+          <Text style={{ position: 'absolute', bottom: -2, right: -2, fontSize: 14, fontWeight: 'bold', color: '#FFD700', textShadowColor: '#000', textShadowRadius: 2 }}>
+            +1
+          </Text>
+        )}
       </View>
 
       <View style={{ position: 'absolute', top: -8, left: -8, zIndex: 10 }}>
@@ -1115,6 +1124,82 @@ const Projectile = ({ type, position }) => {
       </View>
     );
   }
+  if (type === 'electric_bolt') {
+    // Electric Wizard's lightning beam - multiple branching bolts
+    const boltWidth = Math.abs(position.targetX - position.x) + 10;
+    const boltHeight = Math.abs(position.targetY - position.y) + 10;
+    const startX = position.x > position.targetX ? 0 : boltWidth;
+    const startY = 0;
+    const endX = position.x > position.targetX ? boltWidth : 0;
+    const endY = boltHeight;
+
+    // Generate jagged lightning path
+    const segments = 5;
+    let pathD = `M${startX} ${startY}`;
+    for (let i = 1; i < segments; i++) {
+      const x = startX + (endX - startX) * (i / segments) + (Math.random() - 0.5) * 10;
+      const y = startY + (endY - startY) * (i / segments);
+      pathD += ` L${x} ${y}`;
+    }
+    pathD += ` L${endX} ${endY}`;
+
+    return (
+      <View style={{
+        position: 'absolute',
+        left: Math.min(position.x, position.targetX) - 5,
+        top: Math.min(position.y, position.targetY) - 5,
+        width: boltWidth,
+        height: boltHeight,
+      }}>
+        <Svg width="100%" height="100%" viewBox={`0 0 ${boltWidth} ${boltHeight}`}>
+          {/* Main bolt - bright yellow/white */}
+          <Path
+            d={pathD}
+            stroke="#FFFFFF"
+            strokeWidth="4"
+            fill="none"
+            opacity="1"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          {/* Outer glow - blue */}
+          <Path
+            d={pathD}
+            stroke="#00BFFF"
+            strokeWidth="8"
+            fill="none"
+            opacity="0.5"
+            strokeLinecap="round"
+          />
+          {/* Electric sparks branching off */}
+          <Path
+            d={`M${boltWidth / 2} ${boltHeight / 2} L${boltWidth / 2 + 15} ${boltHeight / 2 - 10}`}
+            stroke="#FFFF00"
+            strokeWidth="2"
+            fill="none"
+            opacity="0.8"
+          />
+          <Path
+            d={`M${boltWidth / 2 + 15} ${boltHeight / 2 - 10} L${boltWidth / 2 + 20} ${boltHeight / 2 - 15}`}
+            stroke="#FFFF00"
+            strokeWidth="2"
+            fill="none"
+            opacity="0.6"
+          />
+          <Path
+            d={`M${boltWidth / 2 + 15} ${boltHeight / 2 - 10} L${boltWidth / 2 + 18} ${boltHeight / 2 - 5}`}
+            stroke="#FFFF00"
+            strokeWidth="2"
+            fill="none"
+            opacity="0.6"
+          />
+          {/* Hit effect at target */}
+          <Circle cx={endX} cy={endY} r="12" fill="#FFFF00" opacity="0.6" />
+          <Circle cx={endX} cy={endY} r="8" fill="#FFFFFF" opacity="0.8" />
+        </Svg>
+      </View>
+    );
+  }
   return <View style={[styles.cannonball, { left: position.x, top: position.y }]} />;
 };
 
@@ -1125,7 +1210,7 @@ const Unit = ({ unit }) => {
   const isSlowed = unit.slowUntil > Date.now();
 
   // Check if unit is in spawn delay (Golem, Golemite)
-  const isSpawning = unit.spawnDelay && unit.spawnTime && (Date.now() - unit.spawnTime < unit.spawnDelay);
+  const isSpawning = (unit.spawnDelay > 0) && unit.spawnTime && (Date.now() - unit.spawnTime < unit.spawnDelay);
   const rotationAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -1179,6 +1264,26 @@ const Unit = ({ unit }) => {
           zIndex: 5
         }}>
           <Text style={{ position: 'absolute', top: -10, right: -10, fontSize: 10 }}>❄️</Text>
+        </View>
+      )}
+      {/* Stun Effect Overlay - Electric Zap */}
+      {unit.stunUntil > Date.now() && (
+        <View style={{
+          position: 'absolute',
+          top: -4, left: -4, right: -4, bottom: -4,
+          backgroundColor: 'rgba(255, 255, 0, 0.3)',
+          borderRadius: unitSize / 2,
+          borderWidth: 2,
+          borderColor: '#FFFF00',
+          zIndex: 6
+        }}>
+          {/* Lightning icon */}
+          <Text style={{ position: 'absolute', top: -12, right: -12, fontSize: 12 }}>⚡</Text>
+          {/* Electric crackles */}
+          <Svg width={unitSize + 8} height={unitSize + 8} viewBox="0 0 40 40" style={{ position: 'absolute' }}>
+            <Path d="M10 5 L15 20 L5 20 L20 35" stroke="#FFFF00" strokeWidth="2" fill="none" opacity="0.8" />
+            <Path d="M30 10 L25 25 L35 25 L20 40" stroke="#FFFF00" strokeWidth="2" fill="none" opacity="0.8" />
+          </Svg>
         </View>
       )}
       {/* Health bar for enemy units */}
@@ -2209,6 +2314,7 @@ const GameBoard = ({
           };
 
           const isSlowed = tower.slowUntil > Date.now();
+          const isStunned = tower.stunUntil > Date.now();
 
           return (
             <View key={tower.id} style={[styles.towerContainer, styleObj]}>
@@ -2226,6 +2332,21 @@ const GameBoard = ({
                   justifyContent: 'center'
                 }}>
                   <Text style={{ fontSize: 16 }}>❄️</Text>
+                </View>
+              )}
+              {isStunned && (
+                <View style={{
+                  position: 'absolute',
+                  top: -5, left: -5, right: -5, bottom: -5,
+                  backgroundColor: 'rgba(255, 255, 0, 0.3)',
+                  borderRadius: 10,
+                  borderWidth: 2,
+                  borderColor: '#FFFF00',
+                  zIndex: 16,
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <Text style={{ fontSize: 16 }}>⚡</Text>
                 </View>
               )}
               <HealthBar current={tower.hp} max={tower.maxHp} isOpponent={tower.isOpponent} />
@@ -2307,6 +2428,21 @@ const GameBoard = ({
 
       {draggingCard && (
         <View style={{ position: 'absolute', left: dragPosition.x, top: dragPosition.y, zIndex: 9999, elevation: 100 }} pointerEvents="none">
+          {/* Range/Radius Indicator */}
+          {(draggingCard.radius || draggingCard.range) && (
+            <View style={{
+              position: 'absolute',
+              left: -(draggingCard.radius || draggingCard.range),
+              top: -(draggingCard.radius || draggingCard.range),
+              width: (draggingCard.radius || draggingCard.range) * 2,
+              height: (draggingCard.radius || draggingCard.range) * 2,
+              borderRadius: (draggingCard.radius || draggingCard.range),
+              backgroundColor: draggingCard.type === 'spell' ? 'rgba(255, 255, 0, 0.2)' : 'rgba(255, 255, 255, 0.1)',
+              borderColor: draggingCard.type === 'spell' ? '#FFFF00' : 'white',
+              borderWidth: 2,
+              borderStyle: draggingCard.type === 'spell' ? 'solid' : 'dashed'
+            }} />
+          )}
           {draggingCard.spawnDamage && (
             <View style={{
               position: 'absolute',
@@ -2566,18 +2702,25 @@ export default function App() {
   const spawnCard = (card, x, y) => {
     console.log('[spawnCard] Starting - Card:', card.name, 'cost:', card.cost, 'current elixir:', elixir);
 
-    // Handle Mirror card - copy the last played card
+    // Handle Mirror card - copy the last played card with +1 level
     let actualCard = card;
+    let levelBoost = 0;
     if (card.id === 'mirror') {
       const lastCard = lastPlayedCardRef.current;
       if (!lastCard) {
         console.log('[spawnCard] No card to mirror!');
         return;
       }
+      levelBoost = (lastCard.level || 9) + 1; // Default to level 9 (common) + 1
       actualCard = { ...lastCard };
       // Mirror costs (copied card cost + 1)
       actualCard.cost = lastCard.cost + 1;
-      console.log('[spawnCard] Mirroring:', actualCard.name, 'new cost:', actualCard.cost);
+      actualCard.level = levelBoost;
+      // Apply level boost to stats (+10% per level above level 9)
+      const levelBonus = 1 + (levelBoost - 9) * 0.1; // Level 9 = 100%, Level 10 = 110%, etc.
+      actualCard.hp = Math.floor(lastCard.hp * levelBonus);
+      actualCard.damage = Math.floor(lastCard.damage * levelBonus);
+      console.log('[spawnCard] Mirroring:', actualCard.name, 'new cost:', actualCard.cost, 'level:', levelBoost, 'hp:', actualCard.hp, 'damage:', actualCard.damage);
     }
 
     setElixir(currentElixir => {
@@ -2596,7 +2739,75 @@ export default function App() {
         let startX = width / 2;
         let startY = height;
 
-        if (actualCard.id === 'zap') {
+        if (actualCard.id === 'lightning') {
+          // Lightning - Hits 3 highest HP units/towers
+          spellType = 'lightning_bolt';
+          spellSpeed = 100; // Instant
+
+          // Find targets
+          const allTargets = [
+            ...(unitsRef.current || []).filter(u => u.isOpponent !== (card.isOpponent || false)),
+            ...(towersRef.current || []).filter(t => t.isOpponent !== (card.isOpponent || false) && t.hp > 0)
+          ];
+
+          const targetsInRange = allTargets.filter(t => {
+            const dist = Math.sqrt(Math.pow(t.x - x, 2) + Math.pow(t.y - y, 2));
+            return dist <= actualCard.radius;
+          });
+
+          // Sort by HP descending and take top 3
+          const topTargets = targetsInRange.sort((a, b) => b.hp - a.hp).slice(0, 3);
+
+          if (topTargets.length > 0) {
+            const newProjectiles = topTargets.map((t, index) => ({
+              id: Date.now() + index,
+              x: t.x, // Lightning strikes directly
+              y: t.y - 50, // Start slightly above
+              targetX: t.x,
+              targetY: t.y,
+              speed: 100,
+              damage: actualCard.damage,
+              type: 'electric_bolt', // Reuse electric bolt visual
+              isSpell: true,
+              stun: 0.5,
+              hit: true,
+              spawnTime: Date.now()
+            }));
+
+            // Apply damage and stun directly for instant feedback (since we mark hit: true)
+            // But the main loop handles hit: true projectiles too?
+            // Actually, hit: true projectiles are filtered out unless we handle them.
+            // Let's use the standard spell logic but push multiple projectiles.
+            // We need to verify if the projectile loop applies damage for all 'hit: true' spells.
+            // Yes, it does (lines 3510+). However, standard logic expects ONE projectile per spell cast.
+            // If we push multiple, it should work fine.
+            setProjectiles(prev => [...prev, ...newProjectiles]);
+
+            // Manually apply damage/stun here to ensure it hits exactly these targets
+            // The loop might re-find targets in radius which isn't what we want for Lightning (specific targets).
+            // So: Apply state changes immediately.
+
+            setUnits(prev => prev.map(u => {
+              if (topTargets.some(t => t.id === u.id)) {
+                return {
+                  ...u,
+                  hp: u.hp - actualCard.damage,
+                  stunUntil: Date.now() + 500,
+                  wasStunned: true
+                };
+              }
+              return u;
+            }));
+
+            setTowers(prev => prev.map(t => {
+              if (topTargets.some(target => target.id === t.id)) {
+                return { ...t, hp: t.hp - actualCard.damage };
+              }
+              return t;
+            }));
+          }
+
+        } else if (actualCard.id === 'zap') {
           // Zap is instant with lightning
           spellType = 'zap_spell';
           spellSpeed = 100; // Very fast (instant)
@@ -2620,25 +2831,27 @@ export default function App() {
 
         // For poison, mark it as already hit since it's instant
         const isPoison = actualCard.id === 'poison';
-        const currentTime = Date.now();
-
-        setProjectiles(prev => [...prev, {
-          id: Date.now(),
-          x: startX,
-          y: startY,
-          targetX: x,
-          targetY: y,
-          speed: spellSpeed,
-          damage: actualCard.damage,
-          radius: actualCard.radius,
-          type: spellType,
-          isSpell: true,
-          stun: actualCard.stun || 0,
-          duration: actualCard.duration || 0,
-          hit: isPoison, // Poison is instant
-          spawnTime: currentTime, // Track when poison was spawned
-          isPoison: isPoison // Mark as poison for special handling
-        }]);
+        // Skip default projectile creation for Lightning as we handled it
+        if (actualCard.id !== 'lightning') {
+          const currentTime = Date.now();
+          setProjectiles(prev => [...prev, {
+            id: Date.now(),
+            x: startX,
+            y: startY,
+            targetX: x,
+            targetY: y,
+            speed: spellSpeed,
+            damage: actualCard.damage,
+            radius: actualCard.radius,
+            type: spellType,
+            isSpell: true,
+            stun: actualCard.stun || 0,
+            duration: actualCard.duration || 0,
+            hit: isPoison, // Poison is instant
+            spawnTime: currentTime, // Track when poison was spawned
+            isPoison: isPoison // Mark as poison for special handling
+          }]);
+        }
       } else {
         const lane = x < width / 2 ? 'LEFT' : 'RIGHT';
         const count = actualCard.count || 1;
@@ -2722,6 +2935,68 @@ export default function App() {
           }
         }
         setUnits(prev => [...(prev || []), ...newUnits]);
+
+        // Electro Wizard spawn zap & Mega Knight Spawn Knockback
+        if (actualCard.id === 'electro_wizard' || actualCard.id === 'mega_knight') {
+          setUnits(prevUnits => {
+            const spawnZapRange = actualCard.id === 'mega_knight' ? 80 : 60;
+            const spawnZapDamage = actualCard.spawnDamage || actualCard.damage;
+            const stunDuration = actualCard.stun || (actualCard.id === 'mega_knight' ? 0 : 0.5);
+            const knockbackForce = actualCard.id === 'mega_knight' ? 40 : 0; // Mega Knight knocks back
+
+            return prevUnits.map(u => {
+              // Only affect enemy units within range
+              if (!u.isOpponent) return u; // Skip friendly units
+
+              const dist = Math.sqrt(Math.pow(u.x - x, 2) + Math.pow(u.y - y, 2));
+              if (dist <= spawnZapRange) {
+                // Visual effect handled by adding a projectile or just implied?
+                // For E-Wiz we added a projectile. For MK we might want one too or just a splash event.
+
+                if (actualCard.id === 'electro_wizard') {
+                  setProjectiles(prevProjs => [...prevProjs, {
+                    id: Date.now() + Math.random(),
+                    x: x,
+                    y: y,
+                    targetX: u.x,
+                    targetY: u.y,
+                    speed: 50,
+                    damage: 0, // Damage applied below manually
+                    type: 'electric_bolt',
+                    stun: stunDuration,
+                    isSpell: true,
+                    hit: true,
+                    spawnZap: true
+                  }]);
+                }
+
+                // Apply damage, stun, and KNOCKBACK
+                let newX = u.x;
+                let newY = u.y;
+
+                if (knockbackForce > 0) {
+                  const angle = Math.atan2(u.y - y, u.x - x);
+                  newX += Math.cos(angle) * knockbackForce;
+                  newY += Math.sin(angle) * knockbackForce;
+                  // Boundary checks
+                  newX = Math.max(10, Math.min(width - 10, newX));
+                  newY = Math.max(10, Math.min(height - 10, newY));
+                }
+
+                return {
+                  ...u,
+                  x: newX,
+                  y: newY,
+                  hp: u.hp - spawnZapDamage,
+                  stunUntil: stunDuration > 0 ? Date.now() + (stunDuration * 1000) : u.stunUntil,
+                  wasStunned: stunDuration > 0,
+                  wasPushed: knockbackForce > 0
+                };
+              }
+              return u;
+            });
+          });
+        }
       }
 
       // Track the last played card (but NOT when playing Mirror itself)
@@ -3104,7 +3379,8 @@ export default function App() {
             targetUnit.hp > 0 &&
             !(targetUnit.hidden?.active && targetUnit.spriteId === 'tesla') &&
             // Ground melee units cannot target flying units, but ranged units can
-            (u.type === 'flying' || u.projectile || targetUnit.type !== 'flying')
+            // EXCEPTION: X-Bow targets ground ONLY despite having projectile
+            (u.type === 'flying' || (u.projectile && u.spriteId !== 'x_bow') || targetUnit.type !== 'flying')
           );
 
           // Check if any tower is in range
@@ -3146,6 +3422,21 @@ export default function App() {
           }
         });
 
+        // Electro Wizard split attack - find 2 closest targets
+        let closestTarget2 = null;
+        let minDist2 = Infinity;
+        if (u.spriteId === 'electro_wizard') {
+          targets.forEach(t => {
+            if (t.id !== closestTarget?.id) {
+              const dist = Math.sqrt(Math.pow(t.x - u.x, 2) + Math.pow(t.y - u.y, 2));
+              if (dist < minDist2) {
+                minDist2 = dist;
+                closestTarget2 = t;
+              }
+            }
+          });
+        }
+
         if (closestTarget && minDist <= actualRange + 25) {
           // LOCK the target when starting to attack
           if (!u.lockedTarget) {
@@ -3165,25 +3456,35 @@ export default function App() {
 
             // Note: Witch spawns skeletons via periodic spawn (spawnRate: 7), not attack spawn
 
+            // Electro Wizard split attack - fire at 2 targets
+            const targetsToAttack = [closestTarget];
+            if (u.spriteId === 'electro_wizard' && closestTarget2 && minDist2 <= actualRange + 25) {
+              targetsToAttack.push(closestTarget2);
+            }
+
             if (u.projectile) {
               // Tesla uses lightning - special instant effect
               const projectileType = (u.spriteId === 'tesla') ? 'tesla_lightning' : u.projectile;
               const projectileSpeed = (u.spriteId === 'tesla') ? 100 : 12; // Instant for Tesla
 
-              nextProjectiles.push({
-                id: now + Math.random(),
-                x: u.x,
-                y: u.y,
-                targetId: closestTarget.id,
-                targetX: closestTarget.x,
-                targetY: closestTarget.y,
-                speed: projectileSpeed,
-                damage: damageToDeal,
-                type: projectileType,
-                splash: u.splash,
-                slow: u.slow,
-                attackerId: u.id,
-                isOpponent: u.isOpponent
+              // Fire projectiles at all targets
+              targetsToAttack.forEach(target => {
+                nextProjectiles.push({
+                  id: now + Math.random() + target.id,
+                  x: u.x,
+                  y: u.y,
+                  targetId: target.id,
+                  targetX: target.x,
+                  targetY: target.y,
+                  speed: projectileSpeed,
+                  damage: damageToDeal,
+                  type: projectileType,
+                  splash: u.splash,
+                  slow: u.slow,
+                  stun: u.stun,
+                  attackerId: u.id,
+                  isOpponent: u.isOpponent
+                });
               });
             } else {
               // Melee attack - apply damage directly
@@ -3224,111 +3525,148 @@ export default function App() {
             return { ...u, lastAttack: now, hidden: u.hidden, charge: updatedCharge, lockedTarget: u.lockedTarget, wasPushed: false, wasStunned: u.wasStunned };
           }
           return { ...u, hidden: u.hidden, lockedTarget: u.lockedTarget, wasPushed: false, wasStunned: u.wasStunned };
+        } else if (u.spriteId === 'mega_knight' && closestTarget && !u.isJumping && minDist > 50 && minDist < 150) {
+          // MEGA KNIGHT JUMP START
+          // If target is out of melee range but in jump range (50-150)
+          return { ...u, isJumping: true, jumpTargetId: closestTarget.id, hidden: u.hidden, charge: u.charge, lockedTarget: u.lockedTarget, wasPushed: false, wasStunned: u.wasStunned };
         } else {
           // Movement logic
           let nextY = u.y;
           let nextX = u.x;
+          let isJumpingNow = u.isJumping;
 
           // Apply speed boost for charging Prince
           const speedMultiplier = (u.charge && u.charge.active) ? 2 : 1;
           let effectiveSpeed = u.speed * speedMultiplier;
 
-          // Apply slow effect
-          if (u.slowUntil > now) {
-            effectiveSpeed *= (1 - (u.slowAmount || 0.35));
-          }
+          // Mega Knight Jump Movement
+          if (isJumpingNow) {
+            const jumpTarget = targets.find(t => t.id === u.jumpTargetId);
+            if (jumpTarget) {
+              effectiveSpeed = 10; // High speed for jump
+              const angle = Math.atan2(jumpTarget.y - u.y, jumpTarget.x - u.x);
+              nextX += Math.cos(angle) * effectiveSpeed;
+              nextY += Math.sin(angle) * effectiveSpeed;
 
-          // Movement Calculation
-          if ((u.jumps || u.type === 'flying') && closestTarget) {
-            // Direct pathfinding for units that ignore terrain
-            const angle = Math.atan2(closestTarget.y - u.y, closestTarget.x - u.x);
-            nextX += Math.cos(angle) * effectiveSpeed;
-            nextY += Math.sin(angle) * effectiveSpeed;
-          } else {
-            // Standard vertical movement for ground units (bridges will handle steering)
-            if (u.isOpponent) {
-              nextY += effectiveSpeed;
-            } else {
-              nextY -= effectiveSpeed;
-            }
-          }
+              const distRemaining = Math.sqrt(Math.pow(jumpTarget.x - nextX, 2) + Math.pow(jumpTarget.y - nextY, 2));
 
-          // Track distance for charge
-          if (u.charge && !u.charge.active) {
-            const moveDist = Math.sqrt(Math.pow(nextX - u.x, 2) + Math.pow(nextY - u.y, 2));
-            u.charge.distance = (u.charge.distance || 0) + moveDist;
-          }
-
-          // Defensive check: ensure nextTowers is an array
-          const allTowers = (nextTowers || []).filter(t => t.hp > 0);
-
-          // Find the enemy King tower to redirect to after destroying princess tower
-          const enemyKing = (nextTowers || []).find(t => t.type === 'king' && t.isOpponent !== u.isOpponent && t.hp > 0);
-          const kingCenterX = enemyKing ? enemyKing.x : width / 2;
-
-          // Check if unit's lane princess tower is destroyed
-          const lanePrincess = (nextTowers || []).find(t =>
-            t.type === 'princess' &&
-            t.isOpponent !== u.isOpponent &&
-            ((u.lane === 'LEFT' && t.x < width / 2) || (u.lane === 'RIGHT' && t.x > width / 2))
-          );
-          const princessDestroyed = !lanePrincess || lanePrincess.hp <= 0;
-
-          // If princess tower is destroyed and unit is past the princess tower zone, steer toward King
-          const princessY = u.isOpponent ? (height - 230) : 150;
-          const pastPrincess = u.isOpponent ? (nextY > princessY + 30) : (nextY < princessY - 30);
-
-          if (princessDestroyed && pastPrincess && enemyKing) {
-            // Steer toward King tower center
-            const diffX = kingCenterX - nextX;
-            if (Math.abs(diffX) > 5) {
-              const steerSpeed = Math.min(2, Math.abs(diffX) * 0.1);
-              nextX += Math.sign(diffX) * steerSpeed;
-            }
-          }
-
-          let collision = false;
-          let avoidX = 0;
-
-          for (let t of allTowers) {
-            const distToTower = Math.sqrt(Math.pow(t.x - nextX, 2) + Math.pow(t.y - nextY, 2));
-            const minDistance = (t.type === 'king' ? 45 : 35);
-
-            if (distToTower < minDistance) {
-              collision = true;
-              if (nextX < t.x) {
-                avoidX = -2;
-              } else {
-                avoidX = 2;
+              // Landing logic
+              if (distRemaining < 20) {
+                // LANDED
+                isJumpingNow = false;
+                // Deal big splash damage + Knockback
+                const jumpDamage = u.baseDamage * 2; // Jump does 2x damage
+                splashEvents.push({
+                  attacker: u,
+                  targetX: nextX,
+                  targetY: nextY,
+                  damage: jumpDamage,
+                  knockback: 40 // Push units back
+                });
               }
-              break;
+            } else {
+              // Target died/gone while jumping - cancel jump
+              isJumpingNow = false;
             }
-          }
+          } else {
 
-          if (collision && effectiveSpeed > 0) {
-            nextX += avoidX;
-            nextY = u.y + (u.isOpponent ? effectiveSpeed * 0.5 : -effectiveSpeed * 0.5);
-          } else if (!collision && effectiveSpeed > 0) {
-            const riverY = height / 2;
-            const distToRiver = Math.abs(nextY - riverY);
+            // Apply slow effect
+            if (u.slowUntil > now) {
+              effectiveSpeed *= (1 - (u.slowAmount || 0.35));
+            }
 
-            // Hog Rider can jump over river - skip bridge logic
-            // Flying units fly over river - skip bridge logic
-            if (u.jumps || u.type === 'flying') {
-              // Jump/fly over river - just continue straight across
-              // No bridge steering needed
-            } else if (distToRiver < 100) {
-              // Other ground units must use bridges
-              const bridgeCenterX = u.lane === 'LEFT' ? 95 : width - 95;
-              const diffX = bridgeCenterX - nextX;
-              if (Math.abs(diffX) > 2) {
-                const steerSpeed = 1.5;
+            // Movement Calculation
+            if ((u.jumps || u.type === 'flying') && closestTarget) {
+              // Direct pathfinding for units that ignore terrain
+              const angle = Math.atan2(closestTarget.y - u.y, closestTarget.x - u.x);
+              nextX += Math.cos(angle) * effectiveSpeed;
+              nextY += Math.sin(angle) * effectiveSpeed;
+            } else {
+              // Standard vertical movement for ground units (bridges will handle steering)
+              if (u.isOpponent) {
+                nextY += effectiveSpeed;
+              } else {
+                nextY -= effectiveSpeed;
+              }
+            }
+
+            // Track distance for charge
+            if (u.charge && !u.charge.active) {
+              const moveDist = Math.sqrt(Math.pow(nextX - u.x, 2) + Math.pow(nextY - u.y, 2));
+              u.charge.distance = (u.charge.distance || 0) + moveDist;
+            }
+
+            // Defensive check: ensure nextTowers is an array
+            const allTowers = (nextTowers || []).filter(t => t.hp > 0);
+
+            // Find the enemy King tower to redirect to after destroying princess tower
+            const enemyKing = (nextTowers || []).find(t => t.type === 'king' && t.isOpponent !== u.isOpponent && t.hp > 0);
+            const kingCenterX = enemyKing ? enemyKing.x : width / 2;
+
+            // Check if unit's lane princess tower is destroyed
+            const lanePrincess = (nextTowers || []).find(t =>
+              t.type === 'princess' &&
+              t.isOpponent !== u.isOpponent &&
+              ((u.lane === 'LEFT' && t.x < width / 2) || (u.lane === 'RIGHT' && t.x > width / 2))
+            );
+            const princessDestroyed = !lanePrincess || lanePrincess.hp <= 0;
+
+            // If princess tower is destroyed and unit is past the princess tower zone, steer toward King
+            const princessY = u.isOpponent ? (height - 230) : 150;
+            const pastPrincess = u.isOpponent ? (nextY > princessY + 30) : (nextY < princessY - 30);
+
+            if (princessDestroyed && pastPrincess && enemyKing) {
+              // Steer toward King tower center
+              const diffX = kingCenterX - nextX;
+              if (Math.abs(diffX) > 5) {
+                const steerSpeed = Math.min(2, Math.abs(diffX) * 0.1);
                 nextX += Math.sign(diffX) * steerSpeed;
               }
             }
+
+            let collision = false;
+            let avoidX = 0;
+
+            for (let t of allTowers) {
+              const distToTower = Math.sqrt(Math.pow(t.x - nextX, 2) + Math.pow(t.y - nextY, 2));
+              const minDistance = (t.type === 'king' ? 45 : 35);
+
+              if (distToTower < minDistance) {
+                collision = true;
+                if (nextX < t.x) {
+                  avoidX = -2;
+                } else {
+                  avoidX = 2;
+                }
+                break;
+              }
+            }
+
+            if (collision && effectiveSpeed > 0) {
+              nextX += avoidX;
+              nextY = u.y + (u.isOpponent ? effectiveSpeed * 0.5 : -effectiveSpeed * 0.5);
+            } else if (!collision && effectiveSpeed > 0) {
+              const riverY = height / 2;
+              const distToRiver = Math.abs(nextY - riverY);
+
+              // Hog Rider can jump over river - skip bridge logic
+              // Flying units fly over river - skip bridge logic
+              if (u.jumps || u.type === 'flying') {
+                // Jump/fly over river - just continue straight across
+                // No bridge steering needed
+              } else if (distToRiver < 100) {
+                // Other ground units must use bridges
+                const bridgeCenterX = u.lane === 'LEFT' ? 95 : width - 95;
+                const diffX = bridgeCenterX - nextX;
+                if (Math.abs(diffX) > 2) {
+                  const steerSpeed = 1.5;
+                  nextX += Math.sign(diffX) * steerSpeed;
+                }
+              }
+            }
           }
 
-          return { ...u, x: nextX, y: nextY, hidden: u.hidden, charge: u.charge, lockedTarget: u.lockedTarget, wasPushed: u.wasPushed, wasStunned: u.wasStunned };
+          return { ...u, x: nextX, y: nextY, hidden: u.hidden, charge: u.charge, lockedTarget: u.lockedTarget, wasPushed: u.wasPushed, wasStunned: u.wasStunned, isJumping: isJumpingNow, jumpTargetId: u.jumpTargetId };
         }
       });
 
@@ -3366,6 +3704,16 @@ export default function App() {
               if (event.slow) {
                 updatedUnit.slowUntil = Date.now() + 2000;
                 updatedUnit.slowAmount = event.slow;
+              }
+              // Handle Knockback
+              if (event.knockback) {
+                const angle = Math.atan2(unit.y - event.targetY, unit.x - event.targetX);
+                updatedUnit.x += Math.cos(angle) * event.knockback;
+                updatedUnit.y += Math.sin(angle) * event.knockback;
+                // Keep bounds
+                updatedUnit.x = Math.max(10, Math.min(width - 10, updatedUnit.x));
+                updatedUnit.y = Math.max(10, Math.min(height - 10, updatedUnit.y));
+                updatedUnit.wasPushed = true;
               }
               return updatedUnit;
             }
@@ -3520,6 +3868,17 @@ export default function App() {
             currentUnits = currentUnits.map(u => {
               if (u.id === h.targetId) {
                 let updatedUnit = { ...u, hp: u.hp - h.damage };
+
+                // Apply stun effect (Electro Wizard)
+                if (h.stun && h.stun > 0) {
+                  updatedUnit.stunUntil = now + (h.stun * 1000);
+                  // Reset charge if Prince gets stunned
+                  if (u.charge) {
+                    updatedUnit.charge = { ...u.charge, distance: 0, active: false };
+                  }
+                }
+
+                // Apply slow effect (Ice Wizard)
                 if (h.slow && h.slow > 0) {
                   updatedUnit.slowUntil = now + 2000;
                   updatedUnit.slowAmount = h.slow;
@@ -3539,6 +3898,17 @@ export default function App() {
                     const dist = Math.sqrt(Math.pow(u.x - hitX, 2) + Math.pow(u.y - hitY, 2));
                     if (dist <= splashRadius) {
                       let updatedUnit = { ...u, hp: u.hp - Math.floor(h.damage * 0.5) };
+
+                      // Apply stun effect (Electro Wizard)
+                      if (h.stun && h.stun > 0) {
+                        updatedUnit.stunUntil = now + (h.stun * 1000);
+                        // Reset charge if Prince gets stunned
+                        if (u.charge) {
+                          updatedUnit.charge = { ...u.charge, distance: 0, active: false };
+                        }
+                      }
+
+                      // Apply slow effect (Ice Wizard)
                       if (h.slow && h.slow > 0) {
                         updatedUnit.slowUntil = now + 2000;
                         updatedUnit.slowAmount = h.slow;
@@ -3555,10 +3925,21 @@ export default function App() {
             if (h.targetId < 100) {
               const tIndex = nextTowers.findIndex(t => t.id === h.targetId);
               if (tIndex !== -1) {
-                nextTowers[tIndex] = {
-                  ...nextTowers[tIndex],
-                  hp: nextTowers[tIndex].hp - h.damage
-                };
+                const tower = nextTowers[tIndex];
+                let updatedTower = { ...tower, hp: tower.hp - h.damage };
+
+                // Apply stun effect (Electro Wizard) to towers
+                if (h.stun && h.stun > 0) {
+                  updatedTower.stunUntil = now + (h.stun * 1000);
+                }
+
+                // Apply slow effect (Ice Wizard) to towers
+                if (h.slow && h.slow > 0) {
+                  updatedTower.slowUntil = now + 2000;
+                  updatedTower.slowAmount = h.slow;
+                }
+
+                nextTowers[tIndex] = updatedTower;
               }
             }
           }
@@ -3593,6 +3974,10 @@ export default function App() {
           }
         }
         if (!isActive) return tower;
+
+        // Check if tower is stunned - can't attack while stunned
+        const isStunned = tower.stunUntil && now < tower.stunUntil;
+        if (isStunned) return tower;
 
         if (now - tower.lastShot < (tower.type === 'king' ? FIRE_RATE_KING : FIRE_RATE_PRINCESS)) return tower;
 
