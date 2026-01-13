@@ -3561,8 +3561,14 @@ export default function App() {
 
             if (u.projectile) {
               // Tesla uses lightning - special instant effect
+              // X-Bow has very fast arrows
               const projectileType = (u.spriteId === 'tesla') ? 'tesla_lightning' : u.projectile;
-              const projectileSpeed = (u.spriteId === 'tesla') ? 100 : 12; // Instant for Tesla
+              let projectileSpeed = 12; // Default speed
+              if (u.spriteId === 'tesla') {
+                projectileSpeed = 100; // Instant for Tesla
+              } else if (u.spriteId === 'x_bow') {
+                projectileSpeed = 50; // Very fast arrows for X-Bow
+              }
 
               // Fire projectiles at all targets
               targetsToAttack.forEach(target => {
