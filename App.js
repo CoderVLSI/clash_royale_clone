@@ -2780,8 +2780,8 @@ export default function App() {
             targetUnit.isOpponent !== u.isOpponent &&
             targetUnit.hp > 0 &&
             !(targetUnit.hidden?.active && targetUnit.spriteId === 'tesla') &&
-            // Ground units cannot target flying units
-            (u.type === 'flying' || targetUnit.type !== 'flying')
+            // Ground melee units cannot target flying units, but ranged units can
+            (u.type === 'flying' || u.projectile || targetUnit.type !== 'flying')
           );
 
           // Check if any tower is in range
