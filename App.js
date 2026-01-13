@@ -102,8 +102,21 @@ const RARITY_COLORS = {
 const MainMenu = ({ onStart }) => {
   const [progress, setProgress] = useState(0);
   const [loaded, setLoaded] = useState(false);
+  const [tipIndex, setTipIndex] = useState(0);
+
+  const TIPS = [
+    "Tip: Destroying enemy towers grants Crowns!",
+    "Tip: Join a Clan to request cards and friendly battle!",
+    "Tip: Don't spend all your Elixir at once!",
+    "Tip: Lure enemy troops to the center to activate your King Tower.",
+    "Tip: Use spells to damage multiple units at once.",
+    "Tip: Balance your deck with ground and air units."
+  ];
 
   useEffect(() => {
+    // Pick a random tip on mount
+    setTipIndex(Math.floor(Math.random() * TIPS.length));
+
     const interval = setInterval(() => {
       setProgress(prev => {
         if (prev >= 100) {
@@ -111,35 +124,43 @@ const MainMenu = ({ onStart }) => {
           setLoaded(true);
           return 100;
         }
-        return prev + 2;
+        return prev + 2; // Slower load for effect
       });
-    }, 50);
+    }, 30);
     return () => clearInterval(interval);
   }, []);
+
+  // Auto-start when loaded
+  useEffect(() => {
+    if (loaded) {
+      // Small delay before transition
+      const timer = setTimeout(onStart, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [loaded, onStart]);
 
   return (
     <ImageBackground source={require('./background.jpg')} style={styles.menuContainer}>
       <View style={styles.menuOverlay}>
-        <View style={styles.headerContainer}>
-          <Text style={styles.title}>CLASH ROYALE</Text>
-          <Text style={styles.subtitle}>CLONE</Text>
+        <View style={styles.logoContainer}>
+          <Text style={styles.logoTextClash}>CLASH</Text>
+          <Text style={styles.logoTextRoyale}>ROYALE</Text>
         </View>
 
-        <View style={styles.bottomContainer}>
-          {!loaded ? (
-            <View style={styles.loadingContainer}>
-              <Text style={styles.loadingText}>Loading Arena... {progress}%</Text>
-              <View style={styles.progressBarBg}>
-                <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
-              </View>
+        <View style={styles.loadingBottomContainer}>
+          <Text style={styles.tipText}>{TIPS[tipIndex]}</Text>
+          
+          <View style={styles.loadingBarRow}>
+            <Text style={styles.loadingPercentage}>{progress}%</Text>
+            <View style={styles.loadingBarTrack}>
+              <View style={[styles.loadingBarFill, { width: `${progress}%` }]} />
             </View>
-          ) : (
-            <TouchableOpacity style={styles.battleButton} onPress={onStart}>
-              <Text style={styles.battleButtonText}>BATTLE</Text>
-            </TouchableOpacity>
-          )}
-          <Text style={styles.footerText}>Made with React Native Expo</Text>
+          </View>
+          
+          <Text style={styles.loadingStateText}>Updating Arena...</Text>
         </View>
+        
+        <Text style={styles.copyrightText}>SUPERCELL</Text>
       </View>
     </ImageBackground>
   );
@@ -1665,6 +1686,128 @@ const Projectile = ({ type, position }) => {
           {/* Hit effect at target */}
           <Circle cx={endX} cy={endY} r="12" fill="#FFFF00" opacity="0.6" />
           <Circle cx={endX} cy={endY} r="8" fill="#FFFFFF" opacity="0.8" />
+        </Svg>
+      </View>
+    );
+  }
+  if (type === 'bomb') {
+    // Black round bomb for Bomber
+    return (
+      <View style={{
+        position: 'absolute',
+        width: 14,
+        height: 14,
+        borderRadius: 7,
+        backgroundColor: '#2c3e50',
+        borderWidth: 2,
+        borderColor: '#1a1a1a',
+        left: position.x - 7,
+        top: position.y - 7,
+        shadowColor: '#000',
+        shadowOpacity: 0.5,
+        shadowRadius: 3,
+        elevation: 3
+      }}>
+        {/* Fuse/spark */}
+        <View style={{
+          position: 'absolute',
+          top: -2,
+          left: 5,
+          width: 4,
+          height: 4,
+          backgroundColor: '#e74c3c',
+          borderRadius: 2
+        }} />
+      </View>
+    );
+  }
+  if (type === 'goblin_barrel_spell') {
+    // Wooden barrel falling from sky
+    return (
+      <View style={{
+        position: 'absolute',
+        left: position.x - 15,
+        top: position.y - 15,
+        width: 30,
+        height: 30
+      }}>
+        <Svg width="30" height="30" viewBox="0 0 30 30">
+          {/* Wooden barrel body */}
+          <Circle cx="15" cy="15" r="12" fill="#8B4513" stroke="#654321" strokeWidth="2" />
+          {/* Barrel metal bands */}
+          <Rect x="3" y="10" width="24" height="4" fill="#2c3e50" />
+          <Rect x="3" y="16" width="24" height="4" fill="#2c3e50" />
+          {/* Wood grain */}
+          <Path d="M8 5 L8 25 M15 3 L15 27 M22 5 L22 25" stroke="#654321" strokeWidth="1" opacity="0.5" />
+          {/* Goblin face peeking out */}
+          <Circle cx="12" cy="12" r="2" fill="#2ecc71" />
+          <Circle cx="18" cy="12" r="2" fill="#2ecc71" />
+        </Svg>
+      </View>
+    );
+  }
+  if (type === 'earthquake_spell') {
+    // Cracking ground effect for Earthquake
+    return (
+      <View style={{
+        position: 'absolute',
+        left: position.x - 40,
+        top: position.y - 40,
+        width: 80,
+        height: 80
+      }}>
+        <Svg width="80" height="80" viewBox="0 0 80 80">
+          {/* Cracked ground */}
+          <Rect x="5" y="5" width="70" height="70" fill="#7f8c8d" stroke="#5d6d7e" strokeWidth="2" rx="5" opacity="0.8" />
+          {/* Cracks radiating from center */}
+          <Path d="M40 5 L35 30 L40 40" stroke="#2c3e50" strokeWidth="2" fill="none" />
+          <Path d="M40 5 L45 30 L40 40" stroke="#2c3e50" strokeWidth="2" fill="none" />
+          <Path d="M5 40 L30 35 L40 40" stroke="#2c3e50" strokeWidth="2" fill="none" />
+          <Path d="M75 40 L50 45 L40 40" stroke="#2c3e50" strokeWidth="2" fill="none" />
+          <Path d="M40 75 L35 50 L40 40" stroke="#2c3e50" strokeWidth="2" fill="none" />
+          <Path d="M40 75 L45 50 L40 40" stroke="#2c3e50" strokeWidth="2" fill="none" />
+          {/* Dust/debris particles */}
+          <Circle cx="20" cy="20" r="3" fill="#95a5a6" opacity="0.7" />
+          <Circle cx="60" cy="25" r="2" fill="#95a5a6" opacity="0.7" />
+          <Circle cx="25" cy="60" r="2.5" fill="#95a5a6" opacity="0.7" />
+          <Circle cx="55" cy="55" r="2" fill="#95a5a6" opacity="0.7" />
+        </Svg>
+      </View>
+    );
+  }
+  if (type === 'lightning_bolt') {
+    // Lightning spell effect - bolt striking from sky
+    return (
+      <View style={{
+        position: 'absolute',
+        left: position.x - 30,
+        top: position.y - 30,
+        width: 60,
+        height: 60
+      }}>
+        <Svg width="60" height="60" viewBox="0 0 60 60">
+          {/* Main lightning bolt from top */}
+          <Path
+            d="M30 0 L25 25 L35 25 L20 40 L30 40 L30 60"
+            stroke="#f1c40f"
+            strokeWidth="3"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          {/* Glow */}
+          <Path
+            d="M30 0 L25 25 L35 25 L20 40 L30 40 L30 60"
+            stroke="#fff"
+            strokeWidth="6"
+            fill="none"
+            opacity="0.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          {/* Impact flash */}
+          <Circle cx="30" cy="60" r="8" fill="#f1c40f" opacity="0.8" />
+          <Circle cx="30" cy="60" r="4" fill="#fff" opacity="0.9" />
         </Svg>
       </View>
     );
@@ -5438,11 +5581,93 @@ const styles = StyleSheet.create({
   },
   menuOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Lighter overlay for better bg visibility
     width: '100%',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between', // Space between logo and bottom
+    paddingVertical: 50,
   },
+  logoContainer: {
+    alignItems: 'center',
+    marginTop: 50,
+  },
+  logoTextClash: {
+    fontSize: 50,
+    fontWeight: '900',
+    color: '#fff',
+    textShadowColor: '#000',
+    textShadowOffset: { width: 3, height: 3 },
+    textShadowRadius: 0,
+    fontFamily: 'sans-serif-condensed', // Attempt to match font
+    marginBottom: -10, // Stack them
+  },
+  logoTextRoyale: {
+    fontSize: 50,
+    fontWeight: '900',
+    color: '#FFD700', // Gold
+    textShadowColor: '#000',
+    textShadowOffset: { width: 3, height: 3 },
+    textShadowRadius: 0,
+    fontFamily: 'sans-serif-condensed',
+  },
+  loadingBottomContainer: {
+    width: '90%',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  tipText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 10,
+    textShadowColor: '#000',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+  },
+  loadingBarRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 5,
+  },
+  loadingPercentage: {
+    color: '#D442F5', // Pink/Purple text
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginRight: 10,
+    width: 50,
+    textAlign: 'right',
+    textShadowColor: '#000',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 1,
+  },
+  loadingBarTrack: {
+    flex: 1,
+    height: 16,
+    backgroundColor: '#333',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#000',
+    overflow: 'hidden',
+  },
+  loadingBarFill: {
+    height: '100%',
+    backgroundColor: '#D442F5', // Purple loading bar
+  },
+  loadingStateText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginTop: 2,
+  },
+  copyrightText: {
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 10,
+    fontWeight: 'bold',
+    marginTop: 10,
+  },
+  // Legacy styles (kept if needed by other components, though mostly replaced)
   headerContainer: {
     alignItems: 'center',
     marginBottom: 80,
@@ -5515,29 +5740,38 @@ const styles = StyleSheet.create({
     borderRightColor: '#F1C40F', // Highlight edge
   },
   battleButton: {
-    backgroundColor: '#f1c40f',
-    paddingVertical: 18,
-    paddingHorizontal: 50,
-    borderRadius: 12,
-    borderWidth: 0,
+    backgroundColor: '#F1C40F', // Main Gold Color
+    paddingVertical: 15,
+    paddingHorizontal: 60,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#F39C12', // Darker Gold Border
     borderBottomWidth: 6,
-    borderBottomColor: '#c29d0b', // darker shade for 3D effect
+    borderBottomColor: '#C27C0E', // Shadow/3D effect
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
     elevation: 8,
     marginTop: 10,
     alignItems: 'center',
+    marginBottom: 20, // Add space at bottom
   },
   battleButtonText: {
-    color: '#3e2723', // Dark brown text
-    fontSize: 24,
+    color: '#5D4037', // Dark Brown Text
+    fontSize: 28,
     fontWeight: '900',
     letterSpacing: 1,
     textShadowColor: 'rgba(255,255,255,0.4)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 0,
+    fontFamily: 'sans-serif-condensed', // Match CR font style
+  },
+  battleButtonSubtext: {
+    color: '#5D4037',
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginTop: -2,
   },
   footerText: {
     color: 'rgba(255,255,255,0.7)',
