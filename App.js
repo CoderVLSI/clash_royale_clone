@@ -1171,6 +1171,197 @@ const HealthBar = ({ current, max, isOpponent }) => {
   );
 };
 
+const VisualEffects = ({ effects, setEffects }) => {
+  // Clean up expired effects
+  const now = Date.now();
+  const activeEffects = effects.filter(e => now - e.startTime < e.duration);
+
+  // Update state to remove expired effects
+  if (activeEffects.length !== effects.length) {
+    setEffects(activeEffects);
+  }
+
+  return (
+    <>
+      {activeEffects.map(effect => {
+        const progress = (now - effect.startTime) / effect.duration; // 0 to 1
+        const opacity = 1 - progress; // Fade out
+
+        if (effect.type === 'fire_explosion') {
+          // Fire explosion - expanding orange/red circle
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * (0.3 + progress * 0.7)}
+                  fill="#e74c3c"
+                  opacity={0.6}
+                />
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * (0.5 + progress * 0.5)}
+                  fill="#f39c12"
+                  opacity={0.4}
+                />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'ice_freeze') {
+          // Ice freeze - blue expanding circle
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * (0.3 + progress * 0.7)}
+                  fill="#3498db"
+                  opacity={0.5}
+                />
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * 0.5}
+                  fill="white"
+                  opacity={0.3}
+                />
+                {/* Snowflake symbol */}
+                <Text style={{
+                  position: 'absolute',
+                  fontSize: 24,
+                  color: 'white',
+                  opacity: opacity
+                }}>❄️</Text>
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'heal_glow') {
+          // Heal glow - green expanding circle with + symbols
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * (0.2 + progress * 0.8)}
+                  fill="#2ecc71"
+                  opacity={0.4}
+                />
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * 0.6}
+                  fill="#27ae60"
+                  opacity={0.2}
+                />
+              </Svg>
+              <Text style={{
+                position: 'absolute',
+                fontSize: 28,
+                color: '#2ecc71',
+                fontWeight: 'bold',
+                textShadowColor: 'white',
+                textShadowRadius: 5,
+                opacity: opacity
+              }}>+</Text>
+            </View>
+          );
+        }
+
+        if (effect.type === 'chain_lightning' && effect.targets && effect.targets.length > 1) {
+          // Chain lightning - draw lines connecting all targets
+          const lines = [];
+          for (let i = 0; i < effect.targets.length - 1; i++) {
+            const start = effect.targets[i];
+            const end = effect.targets[i + 1];
+            const dx = end.x - start.x;
+            const dy = end.y - start.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            // Generate jagged lightning path
+            const segments = Math.max(3, Math.floor(dist / 30));
+            let pathD = `M${start.x} ${start.y}`;
+            for (let j = 1; j < segments; j++) {
+              const t = j / segments;
+              const baseX = start.x + dx * t;
+              const baseY = start.y + dy * t;
+              const offset = (Math.random() - 0.5) * 15;
+              const perpX = -dy / dist * offset;
+              const perpY = dx / dist * offset;
+              pathD += ` L${baseX + perpX} ${baseY + perpY}`;
+            }
+            pathD += ` L${end.x} ${end.y}`;
+
+            lines.push(
+              <Svg key={`${effect.id}-${i}`} style={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                width: '100%',
+                height: '100%',
+                opacity: opacity
+              }} viewBox={`0 0 ${width} ${height}`}>
+                <Path
+                  d={pathD}
+                  stroke="#f1c40f"
+                  strokeWidth="3"
+                  fill="none"
+                  strokeLinecap="round"
+                />
+                <Path
+                  d={pathD}
+                  stroke="#3498db"
+                  strokeWidth="6"
+                  fill="none"
+                  opacity={0.5}
+                  strokeLinecap="round"
+                />
+              </Svg>
+            );
+          }
+          return <View key={effect.id}>{lines}</View>;
+        }
+
+        return null;
+      })}
+    </>
+  );
+};
+
 const Projectile = ({ type, position }) => {
   const angleDeg = (Math.atan2(position.targetY - position.y, position.targetX - position.x) * 180 / Math.PI);
 
@@ -1301,23 +1492,39 @@ const Projectile = ({ type, position }) => {
       </View>
     );
   }
-  if (type === 'poison_spell') {
-    // Orange Graveyard-style spell
+  if (type === 'poison_spell' || type === 'rage_spell') {
+    // Orange Graveyard-style spell for Poison, Purple for Rage
+    const isRage = type === 'rage_spell';
+    const mainColor = isRage ? "rgba(155, 89, 182, 0.4)" : "rgba(255, 140, 0, 0.4)";
+    const strokeColor = isRage ? "#8e44ad" : "#FF8C00";
+    
     return (
       <View style={{ position: 'absolute', left: position.x - 50, top: position.y - 50, width: 100, height: 100 }}>
         <Svg width="100" height="100" viewBox="0 0 100 100">
-          <Circle cx="50" cy="50" r="45" fill="rgba(255, 140, 0, 0.3)" stroke="#FF8C00" strokeWidth="2" />
-          <Circle cx="35" cy="40" r="6" fill="white" opacity="0.8" />
-          <Circle cx="33" cy="40" r="1.5" fill="black" />
-          <Circle cx="37" cy="40" r="1.5" fill="black" />
+          <Circle cx="50" cy="50" r="45" fill={mainColor} stroke={strokeColor} strokeWidth="2" />
+          
+          {isRage ? (
+             // Rage Spell Visuals - Anger symbol / Energy
+             <>
+                <Circle cx="50" cy="50" r="35" fill="none" stroke="#9b59b6" strokeWidth="2" strokeDasharray="5 5" opacity="0.6" />
+                <Text x="50" y="55" fontSize="30" textAnchor="middle" fill="#8e44ad" opacity="0.8">😡</Text>
+             </>
+          ) : (
+             // Poison Spell Visuals - Skulls/Bubbles
+             <>
+                <Circle cx="35" cy="40" r="6" fill="white" opacity="0.8" />
+                <Circle cx="33" cy="40" r="1.5" fill="black" />
+                <Circle cx="37" cy="40" r="1.5" fill="black" />
 
-          <Circle cx="65" cy="60" r="6" fill="white" opacity="0.8" />
-          <Circle cx="63" cy="60" r="1.5" fill="black" />
-          <Circle cx="67" cy="60" r="1.5" fill="black" />
+                <Circle cx="65" cy="60" r="6" fill="white" opacity="0.8" />
+                <Circle cx="63" cy="60" r="1.5" fill="black" />
+                <Circle cx="67" cy="60" r="1.5" fill="black" />
 
-          <Circle cx="50" cy="30" r="5" fill="white" opacity="0.8" />
-          <Circle cx="48" cy="30" r="1.5" fill="black" />
-          <Circle cx="52" cy="30" r="1.5" fill="black" />
+                <Circle cx="50" cy="30" r="5" fill="white" opacity="0.8" />
+                <Circle cx="48" cy="30" r="1.5" fill="black" />
+                <Circle cx="52" cy="30" r="1.5" fill="black" />
+             </>
+          )}
         </Svg>
       </View>
     );
@@ -1466,6 +1673,7 @@ const Unit = ({ unit }) => {
   const isEnemy = unit.isOpponent;
   const unitSize = 30; // Same size for both teams
   const isSlowed = unit.slowUntil > Date.now();
+  const isRaged = unit.rageUntil > Date.now();
 
   // Check if unit is in spawn delay (Golem, Golemite)
   const isSpawning = (unit.spawnDelay > 0) && unit.spawnTime && (Date.now() - unit.spawnTime < unit.spawnDelay);
@@ -1492,7 +1700,24 @@ const Unit = ({ unit }) => {
 
   return (
     <View style={[styles.unit, { left: unit.x - unitSize / 2, top: unit.y - unitSize / 2, width: unitSize, height: unitSize }]}>
+      {/* Range Indicator Circle */}
+      {unit.range && unit.range > 0 && (
+        <View style={{
+          position: 'absolute',
+          left: unitSize / 2 - unit.range,
+          top: unitSize / 2 - unit.range,
+          width: unit.range * 2,
+          height: unit.range * 2,
+          borderRadius: unit.range,
+          borderWidth: 1,
+          borderColor: isEnemy ? 'rgba(231, 76, 60, 0.3)' : 'rgba(52, 152, 219, 0.3)',
+          backgroundColor: isEnemy ? 'rgba(231, 76, 60, 0.05)' : 'rgba(52, 152, 219, 0.05)',
+          zIndex: -1
+        }} />
+      )}
+
       <UnitSprite id={spriteId} isOpponent={isEnemy} size={unitSize} unit={unit} />
+      
       {/* Spawn Delay Indicator (rotating swirl) */}
       {isSpawning && (
         <Animated.View style={{
@@ -1510,6 +1735,22 @@ const Unit = ({ unit }) => {
           </Svg>
         </Animated.View>
       )}
+
+      {/* Rage Effect Overlay */}
+      {isRaged && (
+        <View style={{
+          position: 'absolute',
+          top: -2, left: -2, right: -2, bottom: -2,
+          backgroundColor: 'rgba(155, 89, 182, 0.3)',
+          borderRadius: unitSize / 2,
+          borderWidth: 2,
+          borderColor: '#8e44ad',
+          zIndex: 4
+        }}>
+          <Text style={{ position: 'absolute', top: -10, left: -10, fontSize: 10 }}>😡</Text>
+        </View>
+      )}
+
       {/* Ice/Slow Effect Overlay */}
       {isSlowed && (
         <View style={{
@@ -2474,7 +2715,7 @@ const MainLobby = ({
 
 // --- Game Board Component (Extracted) ---
 const GameBoard = ({
-  towers, units, projectiles, timeLeft, gameOver,
+  towers, units, projectiles, visualEffects, setVisualEffects, timeLeft, gameOver,
   elixir, hand, nextCard, draggingCard, dragPosition,
   handleDragStart, handleDragMove, handleDragEnd,
   spawnTestEnemy, formatTime, onRestart, score,
@@ -2619,6 +2860,7 @@ const GameBoard = ({
 
         {(units || []).map(u => <Unit key={u.id} unit={u} />)}
         {(projectiles || []).map(p => <Projectile key={p.id} type={p.type} position={p} />)}
+        <VisualEffects effects={visualEffects} setEffects={setVisualEffects} />
 
         {/* Emote Button */}
         <TouchableOpacity style={styles.emoteButton}>
@@ -2744,12 +2986,14 @@ export default function App() {
   const doubleElixirTriggeredRef = useRef(false);
 
   // Multiple deck slots - 5 decks of 8 cards each
+  // Filter out token cards (golemite, lava_pups, etc.) from deck initialization
+  const playableCards = CARDS.filter(card => !card.isToken);
   const [allDecks, setAllDecks] = useState([
-    CARDS.slice(0, 8),  // Deck 1
-    CARDS.slice(8, 16), // Deck 2
-    CARDS.slice(16, 24), // Deck 3
-    CARDS.slice(24, 32), // Deck 4
-    CARDS.slice(32, 40)  // Deck 5
+    playableCards.slice(0, 8),  // Deck 1
+    playableCards.slice(8, 16), // Deck 2
+    playableCards.slice(16, 24), // Deck 3
+    playableCards.slice(24, 32), // Deck 4
+    playableCards.slice(32, 40)  // Deck 5
   ]);
   const [selectedDeckIndex, setSelectedDeckIndex] = useState(0);
 
@@ -2824,6 +3068,7 @@ export default function App() {
 
   const [units, setUnits] = useState([]);
   const [projectiles, setProjectiles] = useState([]);
+  const [visualEffects, setVisualEffects] = useState([]); // Temporary visual effects (explosions, heals, etc.)
   const [lastPlayedCard, setLastPlayedCard] = useState(null);
 
   const towersRef = useRef(towers);
@@ -3804,6 +4049,9 @@ export default function App() {
           if (u.slowUntil > now) {
             currentAttackSpeed = u.attackSpeed / (1 - (u.slowAmount || 0.35));
           }
+          if (u.rageUntil > now) {
+            currentAttackSpeed = u.attackSpeed / 1.35; // 35% faster attack speed
+          }
 
           if (now - u.lastAttack > currentAttackSpeed && !isWakingUp) {
             // Calculate damage to deal
@@ -3883,7 +4131,39 @@ export default function App() {
 
               // Spirit Cards special effects
               if (u.kamikaze) {
-                // Heal Spirit - heal nearby friendly units on attack
+                // Fire Spirit - explosion visual (has splash: true)
+                if (u.splash) {
+                  setVisualEffects(prev => [...prev, {
+                    id: Date.now() + Math.random(),
+                    type: 'fire_explosion',
+                    x: closestTarget.x,
+                    y: closestTarget.y,
+                    radius: 50,
+                    startTime: Date.now(),
+                    duration: 500
+                  }]);
+                }
+
+                // Ice Spirit - freeze visual
+                if (u.stun && u.stun > 0) {
+                  damageEvents.push({
+                    targetId: closestTarget.id,
+                    damage: damageToDeal,
+                    attackerId: u.id,
+                    stun: u.stun
+                  });
+                  setVisualEffects(prev => [...prev, {
+                    id: Date.now() + Math.random(),
+                    type: 'ice_freeze',
+                    x: closestTarget.x,
+                    y: closestTarget.y,
+                    radius: 40,
+                    startTime: Date.now(),
+                    duration: 800
+                  }]);
+                }
+
+                // Heal Spirit - heal visual
                 if (u.healsOnAttack > 0) {
                   healEvents.push({
                     x: closestTarget.x,
@@ -3892,17 +4172,28 @@ export default function App() {
                     amount: u.healsOnAttack,
                     isOpponent: u.isOpponent
                   });
+                  setVisualEffects(prev => [...prev, {
+                    id: Date.now() + Math.random(),
+                    type: 'heal_glow',
+                    x: closestTarget.x,
+                    y: closestTarget.y,
+                    radius: u.healRadius,
+                    startTime: Date.now(),
+                    duration: 600
+                  }]);
                 }
 
-                // Electro Spirit - chain damage to multiple targets
+                // Electro Spirit - chain visual
                 if (u.chain > 0) {
                   chainEvents.push({
                     attackerId: u.id,
                     primaryTarget: closestTarget,
-                    chainCount: u.chain - 1, // -1 because first target is already hit
+                    chainCount: Math.min(u.chain - 1, 3), // Max 3 additional targets (4 total)
                     damage: damageToDeal,
                     stun: u.stun || 0,
-                    isOpponent: u.isOpponent
+                    isOpponent: u.isOpponent,
+                    startX: u.x,
+                    startY: u.y
                   });
                 }
 
@@ -3928,6 +4219,10 @@ export default function App() {
           // Apply speed boost for charging Prince
           const speedMultiplier = (u.charge && u.charge.active) ? 2 : 1;
           let effectiveSpeed = u.speed * speedMultiplier;
+
+          if (u.rageUntil > now) {
+            effectiveSpeed *= 1.35; // 35% faster movement speed
+          }
 
           // Mega Knight Jump Movement
           if (isJumpingNow) {
@@ -4195,6 +4490,17 @@ export default function App() {
             }
           }
         });
+
+        // Create visual effect for chain lightning
+        if (chainedTargets.length > 1) {
+          setVisualEffects(prev => [...prev, {
+            id: Date.now() + Math.random(),
+            type: 'chain_lightning',
+            targets: chainedTargets.map(t => ({ x: t.x, y: t.y })),
+            startTime: Date.now(),
+            duration: 400
+          }]);
+        }
       });
 
       let activeProjectiles = nextProjectiles.map(p => {
@@ -4287,6 +4593,30 @@ export default function App() {
                 }
               }
               // Poison will be filtered out after duration
+            } else if (h.isRage) {
+              // Rage Spell Logic
+              const rageAge = (now - h.spawnTime) / 1000;
+              if (rageAge < h.duration) {
+                 // Refresh rage effect on units in radius
+                 // Rage updates constantly (every tick)
+                 currentUnits = currentUnits.map(u => {
+                    const isFriendly = u.isOpponent === (h.isOpponent || false);
+                    const dist = Math.sqrt(Math.pow(u.x - h.x, 2) + Math.pow(u.y - h.y, 2));
+                    if (isFriendly && dist < h.radius) {
+                      return { ...u, rageUntil: now + 200 }; // Buffer of 200ms
+                    }
+                    return u;
+                 });
+                 // Rage towers
+                 nextTowers = nextTowers.map(t => {
+                    const isFriendly = t.isOpponent === (h.isOpponent || false);
+                    const dist = Math.sqrt(Math.pow(t.x - h.x, 2) + Math.pow(t.y - h.y, 2));
+                    if (isFriendly && dist < h.radius + 30) {
+                       return { ...t, rageUntil: now + 200 };
+                    }
+                    return t;
+                 });
+              }
             } else if (h.isGoblinBarrel) {
               // Goblin Barrel hits - spawn goblins around impact point
               const spawnCardId = h.spawns;
@@ -4459,7 +4789,7 @@ export default function App() {
           if (p.keepVisual && p.type === 'tesla_lightning') {
             return (now - Math.floor(p.id)) < 150;
           }
-          if (p.isPoison) {
+          if (p.isPoison || p.isRage) {
             return ((now - p.spawnTime) / 1000 < p.duration);
           }
           return !p.hit;
@@ -4540,7 +4870,29 @@ export default function App() {
       const deathSpawns = [];
       currentUnits.forEach(u => {
         // Generic death spawn check - works for Tombstone, Lava Hound, etc.
-        if (u.hp <= 0 && (u.spriteId === 'tombstone' || u.deathSpawns)) {
+        if (u.hp <= 0 && (u.spriteId === 'tombstone' || u.deathSpawns || u.deathRage)) {
+          
+          if (u.deathRage) {
+             // Spawn Rage Spell
+             activeProjectiles.push({
+                id: Date.now() + Math.random(),
+                x: u.x,
+                y: u.y,
+                targetX: u.x,
+                targetY: u.y,
+                speed: 100, // Instant
+                damage: 0,
+                radius: 65, // Rage radius
+                type: 'rage_spell',
+                isSpell: true,
+                isRage: true,
+                spawnTime: Date.now(),
+                duration: 6, // Rage lasts 6 seconds (reduced for balance/implementation simplicty, usually 6-8s)
+                isOpponent: u.isOpponent,
+                hit: true // It's already "hit" the ground
+             });
+          }
+
           // Determine what to spawn
           let spawnId = 'skeletons'; // Default for Tombstone
           if (u.deathSpawns) {
@@ -4913,6 +5265,8 @@ export default function App() {
         towers={towers}
         units={units}
         projectiles={projectiles}
+        visualEffects={visualEffects}
+        setVisualEffects={setVisualEffects}
         timeLeft={timeLeft}
         gameOver={gameOver}
         elixir={elixir}
