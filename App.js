@@ -73,6 +73,12 @@ const CARDS = [
   { id: 'lightning', name: 'Lightning', cost: 6, color: '#f1c40f', type: 'spell', damage: 900, radius: 15, count: 1, rarity: 'epic' },
   { id: 'x_bow', name: 'X-Bow', cost: 6, color: '#95a5a6', hp: 700, speed: 0, type: 'building', range: 350, damage: 40, attackSpeed: 500, projectile: 'arrow', count: 1, lifetime: 30, rarity: 'epic', spawnDelay: 3500 },
   { id: 'mirror', name: 'Mirror', cost: 1, color: '#ecf0f1', type: 'spell', isMirror: true, rarity: 'epic' },
+
+  // Spirit cards - jump to target, deal effect, die
+  { id: 'fire_spirit', name: 'Fire Spirit', cost: 1, color: '#e74c3c', hp: 90, speed: 4, type: 'ground', range: 50, damage: 180, attackSpeed: 500, projectile: null, count: 1, rarity: 'common', isSpirit: true, splash: true },
+  { id: 'ice_spirit', name: 'Ice Spirit', cost: 1, color: '#87CEEB', hp: 90, speed: 4, type: 'ground', range: 50, damage: 90, attackSpeed: 500, projectile: null, count: 1, rarity: 'common', isSpirit: true, freeze: 1.5, effectRadius: 60 },
+  { id: 'electro_spirit', name: 'E-Spirit', cost: 1, color: '#1a252f', hp: 90, speed: 4, type: 'ground', range: 50, damage: 90, attackSpeed: 500, projectile: 'chain_lightning', count: 1, rarity: 'common', isSpirit: true, stun: 0.5, chainCount: 4 },
+  { id: 'heal_spirit', name: 'Heal Spirit', cost: 1, color: '#f1c40f', hp: 90, speed: 4, type: 'ground', range: 50, damage: 0, attackSpeed: 500, projectile: null, count: 1, rarity: 'rare', isSpirit: true, healAmount: 90, effectRadius: 60 },
 ];
 
 const RARITY_COLORS = {
@@ -757,6 +763,70 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Rect x="47" y="90" width="6" height="8" fill="#95a5a6" rx="2" />
         </Svg>
       );
+    case 'fire_spirit':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="40" fill="#e74c3c" stroke="#c0392b" strokeWidth="2" />
+          <Path d="M50 20 Q60 40 50 50 Q40 40 50 20" fill="#f39c12" />
+          <Circle cx="45" cy="45" r="4" fill="white" />
+          <Circle cx="55" cy="45" r="4" fill="white" />
+          <Circle cx="45" cy="45" r="2" fill="black" />
+          <Circle cx="55" cy="45" r="2" fill="black" />
+          <Path d="M45 55 Q50 60 55 55" stroke="black" strokeWidth="2" fill="none" />
+        </Svg>
+      );
+    case 'ice_spirit':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="40" fill="#3498db" stroke="#2980b9" strokeWidth="2" />
+          <Path d="M50 15 L50 30 M35 25 L50 30 L65 25" stroke="#ecf0f1" strokeWidth="2" />
+          <Circle cx="45" cy="45" r="4" fill="white" />
+          <Circle cx="55" cy="45" r="4" fill="white" />
+          <Circle cx="45" cy="45" r="2" fill="black" />
+          <Circle cx="55" cy="45" r="2" fill="black" />
+          <Path d="M45 55 Q50 60 55 55" stroke="black" strokeWidth="2" fill="none" />
+        </Svg>
+      );
+    case 'electro_spirit':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Dark blue body */}
+          <Circle cx="50" cy="50" r="40" fill="#1a252f" stroke="#0d1318" strokeWidth="2" />
+          {/* Electric aura */}
+          <Circle cx="50" cy="50" r="43" fill="none" stroke="#00BFFF" strokeWidth="2" strokeDasharray="4 2" opacity="0.6" />
+          {/* Lightning bolts on head */}
+          <Path d="M35 20 L40 30 L35 30 L40 40" stroke="#00BFFF" strokeWidth="3" fill="none" />
+          <Path d="M60 20 L65 30 L60 30 L65 40" stroke="#00BFFF" strokeWidth="3" fill="none" />
+          {/* Electric eyes */}
+          <Circle cx="42" cy="48" r="6" fill="#00BFFF" />
+          <Circle cx="58" cy="48" r="6" fill="#00BFFF" />
+          <Circle cx="42" cy="48" r="3" fill="#ffffff" />
+          <Circle cx="58" cy="48" r="3" fill="#ffffff" />
+          {/* Lightning shaped moustache - zigzag pattern */}
+          <Path d="M32 60 L38 55 L44 62 L50 55 L56 62 L62 55 L68 60" stroke="#00BFFF" strokeWidth="3" fill="none" strokeLinejoin="round" />
+          {/* Electric smile */}
+          <Path d="M42 72 Q50 78 58 72" stroke="#f1c40f" strokeWidth="2" fill="none" />
+        </Svg>
+      );
+    case 'heal_spirit':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Yellow body */}
+          <Circle cx="50" cy="50" r="40" fill="#f1c40f" stroke="#f39c12" strokeWidth="2" />
+          {/* Healing aura */}
+          <Circle cx="50" cy="50" r="43" fill="none" stroke="#2ecc71" strokeWidth="2" strokeDasharray="4 2" opacity="0.6" />
+          {/* Cross symbol on head */}
+          <Rect x="45" y="18" width="10" height="14" fill="#2ecc71" rx="1" />
+          <Rect x="41" y="22" width="18" height="6" fill="#2ecc71" rx="1" />
+          {/* Healing eyes */}
+          <Circle cx="42" cy="55" r="5" fill="white" />
+          <Circle cx="58" cy="55" r="5" fill="white" />
+          <Circle cx="42" cy="55" r="2.5" fill="#2ecc71" />
+          <Circle cx="58" cy="55" r="2.5" fill="#2ecc71" />
+          {/* Happy smile */}
+          <Path d="M43 68 Q50 75 57 68" stroke="#27ae60" strokeWidth="3" fill="none" />
+        </Svg>
+      );
     default:
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
@@ -768,19 +838,24 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
   }
 };
 
-const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd, isDragging, lastPlayedCard }) => {
+const Card = (props) => {
+  const { card, isNext, canAfford, onDragStart, onDragMove, onDragEnd, isDragging, lastPlayedCard } = props;
+
   // Guard against undefined card
   if (!card) {
     return null;
   }
 
+  // Safely get lastPlayedCard
+  const safeLastPlayed = lastPlayedCard || null;
+
   // Calculate display cost for Mirror card
-  const displayCost = card.id === 'mirror' && lastPlayedCard
-    ? lastPlayedCard.cost + 1
+  const displayCost = card.id === 'mirror' && safeLastPlayed
+    ? safeLastPlayed.cost + 1
     : card.cost;
 
   // For Mirror card, get the card to mirror
-  const cardToDisplay = card.id === 'mirror' && lastPlayedCard ? lastPlayedCard : card;
+  const cardToDisplay = card.id === 'mirror' && safeLastPlayed ? safeLastPlayed : card;
   const isMirror = card.id === 'mirror';
 
   const callbacksRef = useRef({ onDragStart, onDragMove, onDragEnd });
@@ -883,14 +958,7 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
       {isNext && <Text style={styles.nextLabel}>Next</Text>}
     </View>
   );
-}, (prevProps, nextProps) => {
-  // Custom comparison: return true (skip re-render) ONLY when canAfford is the same
-  // If canAfford changed, return false to trigger re-render
-  // Use optional chaining to handle undefined cards
-  return prevProps.canAfford === nextProps.canAfford &&
-    prevProps.isDragging === nextProps.isDragging &&
-    prevProps.card?.id === nextProps.card?.id;
-});
+};
 
 const HealthBar = ({ current, max, isOpponent }) => {
   if (current <= 0) return null;
@@ -1196,6 +1264,111 @@ const Projectile = ({ type, position }) => {
           {/* Hit effect at target */}
           <Circle cx={endX} cy={endY} r="12" fill="#FFFF00" opacity="0.6" />
           <Circle cx={endX} cy={endY} r="8" fill="#FFFFFF" opacity="0.8" />
+        </Svg>
+      </View>
+    );
+  }
+  if (type === 'freeze_ring') {
+    // Ice Spirit freeze radius visual
+    return (
+      <View style={{
+        position: 'absolute',
+        left: position.x - 60,
+        top: position.y - 60,
+        width: 120,
+        height: 120,
+      }}>
+        <Svg width="120" height="120" viewBox="0 0 120 120">
+          {/* Expanding ring effect */}
+          <Circle cx="60" cy="60" r="55" fill="none" stroke="#00BFFF" strokeWidth="4" opacity="0.8" />
+          <Circle cx="60" cy="60" r="45" fill="none" stroke="#87CEEB" strokeWidth="3" opacity="0.6" />
+          <Circle cx="60" cy="60" r="35" fill="none" stroke="#00BFFF" strokeWidth="2" opacity="0.4" />
+          {/* Ice crystals */}
+          <Path d="M60 10 L62 20 M60 110 L58 100 M10 60 L20 62 M110 60 L100 58" stroke="#E0FFFF" strokeWidth="3" opacity="0.8" />
+          {/* Snowflake symbol in center */}
+          <Circle cx="60" cy="60" r="15" fill="rgba(135, 206, 250, 0.5)" stroke="#00BFFF" strokeWidth="2" />
+          <Text style={{ position: 'absolute', left: 52, top: 50, fontSize: 14 }}>❄️</Text>
+        </Svg>
+      </View>
+    );
+  }
+  if (type === 'heal_ring') {
+    // Heal Spirit heal radius visual
+    return (
+      <View style={{
+        position: 'absolute',
+        left: position.x - 60,
+        top: position.y - 60,
+        width: 120,
+        height: 120,
+      }}>
+        <Svg width="120" height="120" viewBox="0 0 120 120">
+          {/* Expanding ring effect */}
+          <Circle cx="60" cy="60" r="55" fill="none" stroke="#2ecc71" strokeWidth="4" opacity="0.8" />
+          <Circle cx="60" cy="60" r="45" fill="none" stroke="#27ae60" strokeWidth="3" opacity="0.6" />
+          <Circle cx="60" cy="60" r="35" fill="none" stroke="#2ecc71" strokeWidth="2" opacity="0.4" />
+          {/* Healing particles */}
+          <Circle cx="60" cy="20" r="4" fill="#2ecc71" opacity="0.8" />
+          <Circle cx="60" cy="100" r="4" fill="#2ecc71" opacity="0.8" />
+          <Circle cx="20" cy="60" r="4" fill="#2ecc71" opacity="0.8" />
+          <Circle cx="100" cy="60" r="4" fill="#2ecc71" opacity="0.8" />
+          {/* Cross symbol in center */}
+          <Rect x="56" y="48" width="8" height="14" fill="#2ecc71" rx="1" />
+          <Rect x="52" y="52" width="16" height="6" fill="#2ecc71" rx="1" />
+        </Svg>
+      </View>
+    );
+  }
+  if (type === 'chain_lightning') {
+    // Electro Spirit's chain lightning bolts - thinner and faster
+    const boltWidth = Math.abs(position.targetX - position.x) + 10;
+    const boltHeight = Math.abs(position.targetY - position.y) + 10;
+    const startX = position.x > position.targetX ? 0 : boltWidth;
+    const startY = 0;
+    const endX = position.x > position.targetX ? boltWidth : 0;
+    const endY = boltHeight;
+
+    // Generate jagged lightning path for chain
+    const segments = 4;
+    let pathD = `M${startX} ${startY}`;
+    for (let i = 1; i < segments; i++) {
+      const x = startX + (endX - startX) * (i / segments) + (Math.random() - 0.5) * 8;
+      const y = startY + (endY - startY) * (i / segments);
+      pathD += ` L${x} ${y}`;
+    }
+    pathD += ` L${endX} ${endY}`;
+
+    return (
+      <View style={{
+        position: 'absolute',
+        left: Math.min(position.x, position.targetX) - 5,
+        top: Math.min(position.y, position.targetY) - 5,
+        width: boltWidth,
+        height: boltHeight,
+      }}>
+        <Svg width="100%" height="100%" viewBox={`0 0 ${boltWidth} ${boltHeight}`}>
+          {/* Main bolt - bright blue */}
+          <Path
+            d={pathD}
+            stroke="#00BFFF"
+            strokeWidth="3"
+            fill="none"
+            opacity="1"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          {/* Outer glow */}
+          <Path
+            d={pathD}
+            stroke="#E0FFFF"
+            strokeWidth="6"
+            fill="none"
+            opacity="0.4"
+            strokeLinecap="round"
+          />
+          {/* Hit effect at target */}
+          <Circle cx={endX} cy={endY} r="8" fill="#00BFFF" opacity="0.6" />
+          <Circle cx={endX} cy={endY} r="5" fill="#FFFFFF" opacity="0.8" />
         </Svg>
       </View>
     );
@@ -2383,22 +2556,29 @@ const GameBoard = ({
         <View style={styles.deckContainer}>
           <View style={styles.nextCardContainer}>
             <Text style={styles.nextLabel}>NEXT</Text>
-            {nextCard && <Card card={nextCard} isNext={true} />}
+            {nextCard && <Card card={nextCard} isNext={true} lastPlayedCard={lastPlayedCard} />}
           </View>
 
           <View style={styles.handContainer}>
-            {(hand || []).map((card, index) => (
-              <Card
-                key={`${card.id}-${index}`}
-                card={card}
-                isNext={false}
-                canAfford={elixir >= card.cost}
-                onDragStart={handleDragStart}
-                onDragMove={handleDragMove}
-                onDragEnd={handleDragEnd}
-                isDragging={draggingCard && draggingCard.id === card.id}
-              />
-            ))}
+            {(hand || []).map((card, index) => {
+              // Calculate actual cost for Mirror card
+              const actualCost = card.id === 'mirror' && lastPlayedCard
+                ? lastPlayedCard.cost + 1
+                : card.cost;
+              return (
+                <Card
+                  key={`${card.id}-${index}`}
+                  card={card}
+                  isNext={false}
+                  canAfford={elixir >= actualCost}
+                  onDragStart={handleDragStart}
+                  onDragMove={handleDragMove}
+                  onDragEnd={handleDragEnd}
+                  isDragging={draggingCard && draggingCard.id === card.id}
+                  lastPlayedCard={lastPlayedCard}
+                />
+              );
+            })}
           </View>
         </View>
 
@@ -2924,7 +3104,11 @@ export default function App() {
             baseDamage: actualCard.damage,
             lockedTarget: null,  // Once locked, unit won't switch targets
             wasPushed: false,    // Track if unit was pushed back (unlocks target)
-            wasStunned: false    // Track if unit was stunned (unlocks target when stun ends)
+            wasStunned: false,   // Track if unit was stunned (unlocks target when stun ends)
+            isSpirit: actualCard.isSpirit || false,  // Spirit cards die after attacking
+            freeze: actualCard.freeze || 0,  // Ice Spirit freeze duration
+            healAmount: actualCard.healAmount || 0,  // Heal Spirit heal amount
+            stun: actualCard.stun || 0  // Electro Spirit stun
           });
           // Log spawn properties for debugging
           if (actualCard.spawns) {
@@ -3162,6 +3346,11 @@ export default function App() {
       let damageEvents = [];
 
       let currentUnits = (unitsRef.current || []).map(u => {
+        // X-BOW EARLY DEBUG
+        if (u.spriteId === 'x_bow') {
+          const timeSinceSpawn = Date.now() - (u.spawnTime || 0);
+          console.log('[X-BOW] EXISTS - hp:', u.hp, 'spawnDelay:', u.spawnDelay, 'timeSinceSpawn:', timeSinceSpawn, 'range:', u.range);
+        }
         // Check if stunned
         const isCurrentlyStunned = u.stunUntil && now < u.stunUntil;
         const wasPreviouslyStunned = u.wasStunned || false;
@@ -3437,6 +3626,11 @@ export default function App() {
           });
         }
 
+        // Debug X-Bow targeting
+        if (u.spriteId === 'x_bow') {
+          console.log('[X-BOW DEBUG] targets:', targets.length, 'closestTarget:', closestTarget?.id, 'minDist:', minDist, 'actualRange:', actualRange, 'inRange:', minDist <= actualRange + 25);
+        }
+
         if (closestTarget && minDist <= actualRange + 25) {
           // LOCK the target when starting to attack
           if (!u.lockedTarget) {
@@ -3457,9 +3651,40 @@ export default function App() {
             // Note: Witch spawns skeletons via periodic spawn (spawnRate: 7), not attack spawn
 
             // Electro Wizard split attack - fire at 2 targets
+            // Electro Spirit chain lightning - fire at up to 4 targets
             const targetsToAttack = [closestTarget];
             if (u.spriteId === 'electro_wizard' && closestTarget2 && minDist2 <= actualRange + 25) {
               targetsToAttack.push(closestTarget2);
+            }
+            if (u.spriteId === 'electro_spirit' && u.chainCount) {
+              // Find up to chainCount additional targets for chain lightning
+              const chainTargets = [];
+              const usedTargetIds = new Set([closestTarget.id]);
+              const maxChains = Math.min(u.chainCount, 4); // Up to 4 targets
+
+              for (let chain = 0; chain < maxChains; chain++) {
+                let closestChainTarget = null;
+                let minChainDist = Infinity;
+                const lastTarget = chain === 0 ? closestTarget : chainTargets[chain - 1];
+
+                targets.forEach(t => {
+                  if (!usedTargetIds.has(t.id)) {
+                    // For chain lightning, we measure distance from the last hit target
+                    const dist = Math.sqrt(Math.pow(t.x - lastTarget.x, 2) + Math.pow(t.y - lastTarget.y, 2));
+                    const maxChainRange = 80; // Max range for chain to jump
+                    if (dist <= maxChainRange && dist < minChainDist) {
+                      minChainDist = dist;
+                      closestChainTarget = t;
+                    }
+                  }
+                });
+
+                if (closestChainTarget) {
+                  chainTargets.push(closestChainTarget);
+                  usedTargetIds.add(closestChainTarget.id);
+                }
+              }
+              targetsToAttack.push(...chainTargets);
             }
 
             if (u.projectile) {
@@ -3504,7 +3729,10 @@ export default function App() {
                 damageEvents.push({
                   targetId: closestTarget.id,
                   damage: damageToDeal,
-                  attackerId: u.id
+                  attackerId: u.id,
+                  freeze: u.freeze, // Ice Spirit freeze
+                  stun: u.stun,     // Electro Spirit stun
+                  healAmount: u.healAmount // Heal Spirit
                 });
 
                 // Reset charge if Prince gets attacked - handled in damage application
@@ -3518,6 +3746,104 @@ export default function App() {
                   targetY: closestTarget.y,
                   damage: damageToDeal
                 });
+              }
+
+              // SPIRIT SUICIDE - Spirits die after attacking
+              if (u.isSpirit) {
+                // Apply freeze effect (Ice Spirit) with visual
+                if (u.freeze) {
+                  const freezeRadius = u.effectRadius || 60;
+                  damageEvents.push({
+                    areaFreeze: true,
+                    x: closestTarget.x,
+                    y: closestTarget.y,
+                    radius: freezeRadius,
+                    duration: u.freeze * 1000,
+                    attackerId: u.id,
+                    isOpponent: u.isOpponent
+                  });
+                  // Visual freeze radius effect
+                  nextProjectiles.push({
+                    id: now + Math.random(),
+                    x: closestTarget.x,
+                    y: closestTarget.y,
+                    targetX: closestTarget.x,
+                    targetY: closestTarget.y,
+                    speed: 0,
+                    damage: 0,
+                    type: 'freeze_ring',
+                    radius: freezeRadius,
+                    isSpell: true,
+                    hit: true,
+                    spawnTime: now,
+                    duration: 500 // Visual lasts 0.5s
+                  });
+                }
+                // Heal Spirit heals nearby allies with visual
+                if (u.healAmount) {
+                  const healRadius = u.effectRadius || 60;
+                  damageEvents.push({
+                    areaHeal: true,
+                    x: closestTarget.x,
+                    y: closestTarget.y,
+                    radius: healRadius,
+                    healAmount: u.healAmount,
+                    attackerId: u.id,
+                    isOpponent: u.isOpponent
+                  });
+                  // Visual heal radius effect
+                  nextProjectiles.push({
+                    id: now + Math.random(),
+                    x: closestTarget.x,
+                    y: closestTarget.y,
+                    targetX: closestTarget.x,
+                    targetY: closestTarget.y,
+                    speed: 0,
+                    damage: 0,
+                    type: 'heal_ring',
+                    radius: healRadius,
+                    isSpell: true,
+                    hit: true,
+                    spawnTime: now,
+                    duration: 500 // Visual lasts 0.5s
+                  });
+                }
+                // Electro Spirit chain lightning
+                if (u.chainCount && u.stun) {
+                  // Find up to chainCount enemies to chain to
+                  const chainTargets = targets
+                    .filter(t => t.id !== closestTarget.id && t.isOpponent !== u.isOpponent)
+                    .slice(0, u.chainCount - 1); // -1 because first target already hit
+
+                  let prevTarget = closestTarget;
+                  chainTargets.forEach((chainTarget, idx) => {
+                    // Add chain lightning visual
+                    nextProjectiles.push({
+                      id: now + Math.random() + idx,
+                      x: prevTarget.x,
+                      y: prevTarget.y,
+                      targetX: chainTarget.x,
+                      targetY: chainTarget.y,
+                      speed: 100,
+                      damage: u.damage,
+                      type: 'electric_bolt',
+                      stun: u.stun,
+                      isSpell: true,
+                      hit: true,
+                      spawnTime: now,
+                      chainDelay: idx * 100 // Stagger chain visuals
+                    });
+                    // Apply stun to chain target
+                    damageEvents.push({
+                      targetId: chainTarget.id,
+                      damage: u.damage,
+                      stun: u.stun,
+                      attackerId: u.id
+                    });
+                    prevTarget = chainTarget;
+                  });
+                }
+                return { ...u, hp: 0 }; // Spirit dies after attack
               }
             }
             // Reset charge when Prince attacks (consumes charge)
@@ -3942,6 +4268,52 @@ export default function App() {
                 nextTowers[tIndex] = updatedTower;
               }
             }
+
+            // Handle death effects (freeze_ring, heal_ring)
+            if (h.isDeathEffect) {
+              const effectX = h.x;
+              const effectY = h.y;
+              const effectRadius = h.effectRadius || 60;
+
+              // Apply freeze effect
+              if (h.type === 'freeze_ring' && h.freeze) {
+                currentUnits = currentUnits.map(u => {
+                  const isEnemy = u.isOpponent !== (h.isOpponent || false);
+                  const dist = Math.sqrt(Math.pow(u.x - effectX, 2) + Math.pow(u.y - effectY, 2));
+                  if (isEnemy && dist <= effectRadius) {
+                    let updatedUnit = { ...u };
+                    updatedUnit.stunUntil = now + (h.freeze * 1000);
+                    updatedUnit.wasStunned = true;
+                    if (u.charge) {
+                      updatedUnit.charge = { ...u.charge, distance: 0, active: false };
+                    }
+                    return updatedUnit;
+                  }
+                  return u;
+                });
+              }
+
+              // Apply heal effect
+              if (h.type === 'heal_ring' && h.healAmount) {
+                currentUnits = currentUnits.map(u => {
+                  const isFriendly = u.isOpponent === (h.isOpponent || false);
+                  const dist = Math.sqrt(Math.pow(u.x - effectX, 2) + Math.pow(u.y - effectY, 2));
+                  if (isFriendly && dist <= effectRadius) {
+                    return { ...u, hp: Math.min(u.hp + h.healAmount, u.maxHp) };
+                  }
+                  return u;
+                });
+                // Also heal towers
+                nextTowers = nextTowers.map(t => {
+                  const isFriendly = t.isOpponent === (h.isOpponent || false);
+                  const dist = Math.sqrt(Math.pow(t.x - effectX, 2) + Math.pow(t.y - effectY, 2));
+                  if (isFriendly && dist <= effectRadius + 30) {
+                    return { ...t, hp: Math.min(t.hp + h.healAmount, t.maxHp) };
+                  }
+                  return t;
+                });
+              }
+            }
           }
         });
 
@@ -3952,6 +4324,10 @@ export default function App() {
           }
           if (p.isPoison) {
             return ((now - p.spawnTime) / 1000 < p.duration);
+          }
+          // Keep death effect visuals for a short duration
+          if (p.isDeathEffect && (p.type === 'freeze_ring' || p.type === 'heal_ring')) {
+            return (now - Math.floor(p.id)) < 800; // Show for 800ms
           }
           return !p.hit;
         });
@@ -4014,13 +4390,57 @@ export default function App() {
 
       // Apply unit-vs-unit damage events
       if (damageEvents.length > 0) {
+        // First handle area effects (freeze, heal)
+        damageEvents.forEach(e => {
+          if (e.areaFreeze) {
+            // Freeze all enemies in radius
+            currentUnits = currentUnits.map(u => {
+              if (u.isOpponent !== e.isOpponent) {
+                const dist = Math.sqrt(Math.pow(u.x - e.x, 2) + Math.pow(u.y - e.y, 2));
+                if (dist <= e.radius) {
+                  return { ...u, stunUntil: now + e.duration, wasStunned: true };
+                }
+              }
+              return u;
+            });
+          }
+          if (e.areaHeal) {
+            // Heal all allies in radius
+            currentUnits = currentUnits.map(u => {
+              if (u.isOpponent === e.isOpponent && u.id !== e.attackerId) {
+                const dist = Math.sqrt(Math.pow(u.x - e.x, 2) + Math.pow(u.y - e.y, 2));
+                if (dist <= e.radius) {
+                  return { ...u, hp: Math.min(u.maxHp, u.hp + e.healAmount) };
+                }
+              }
+              return u;
+            });
+          }
+        });
+
+        // Then handle direct damage
         currentUnits = currentUnits.map(u => {
           const events = damageEvents.filter(e => e.targetId === u.id);
           if (events.length > 0) {
-            const totalDamage = events.reduce((sum, e) => sum + e.damage, 0);
+            let updatedUnit = { ...u };
+            const totalDamage = events.reduce((sum, e) => sum + (e.damage || 0), 0);
+            updatedUnit.hp = u.hp - totalDamage;
             // Also reset charge if taking damage
-            const updatedCharge = u.charge ? { ...u.charge, distance: 0, active: false } : u.charge;
-            return { ...u, hp: u.hp - totalDamage, charge: updatedCharge };
+            if (u.charge) {
+              updatedUnit.charge = { ...u.charge, distance: 0, active: false };
+            }
+            // Apply freeze from Ice Spirit
+            events.forEach(e => {
+              if (e.freeze) {
+                updatedUnit.stunUntil = now + (e.freeze * 1000);
+                updatedUnit.wasStunned = true;
+              }
+              if (e.stun) {
+                updatedUnit.stunUntil = now + (e.stun * 1000);
+                updatedUnit.wasStunned = true;
+              }
+            });
+            return updatedUnit;
           }
           return u;
         });
@@ -4029,7 +4449,42 @@ export default function App() {
       // Check for death spawns (Tombstone -> skeletons, Lava Hound -> lava pups)
       // This MUST run after damage is applied but before dead units are filtered
       const deathSpawns = [];
+      const deathEffects = []; // Store death effect projectiles (freeze_ring, heal_ring, chain_lightning)
       currentUnits.forEach(u => {
+        // Spirit death effects (Ice Spirit freeze, Heal Spirit heal)
+        if (u.hp <= 0 && u.isSpirit) {
+          if (u.spriteId === 'ice_spirit' && u.freeze) {
+            // Create freeze ring effect
+            deathEffects.push({
+              id: now + Math.random() * 1000,
+              x: u.x,
+              y: u.y,
+              speed: 0, // Stationary effect
+              type: 'freeze_ring',
+              freeze: u.freeze,
+              effectRadius: u.effectRadius || 60,
+              isOpponent: u.isOpponent,
+              hit: true,
+              isDeathEffect: true
+            });
+          }
+          if (u.spriteId === 'heal_spirit' && u.healAmount) {
+            // Create heal ring effect
+            deathEffects.push({
+              id: now + Math.random() * 1000,
+              x: u.x,
+              y: u.y,
+              speed: 0, // Stationary effect
+              type: 'heal_ring',
+              healAmount: u.healAmount,
+              effectRadius: u.effectRadius || 60,
+              isOpponent: u.isOpponent,
+              hit: true,
+              isDeathEffect: true
+            });
+          }
+        }
+
         // Generic death spawn check - works for Tombstone, Lava Hound, etc.
         if (u.hp <= 0 && (u.spriteId === 'tombstone' || u.deathSpawns)) {
           // Determine what to spawn
@@ -4079,6 +4534,11 @@ export default function App() {
       // Add death spawns to collection
       if (deathSpawns.length > 0) {
         unitsToSpawn.push(...deathSpawns);
+      }
+
+      // Add death effect projectiles (freeze_ring, heal_ring)
+      if (deathEffects.length > 0) {
+        activeProjectiles.push(...deathEffects);
       }
 
       // Filter dead units
