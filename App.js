@@ -838,25 +838,14 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
   }
 };
 
-const Card = (props) => {
-  const { card, isNext, canAfford, onDragStart, onDragMove, onDragEnd, isDragging, lastPlayedCard } = props;
-
+const Card = ({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd, isDragging }) => {
   // Guard against undefined card
   if (!card) {
     return null;
   }
 
-  // Safely get lastPlayedCard
-  const safeLastPlayed = lastPlayedCard || null;
-
-  // Calculate display cost for Mirror card
-  const displayCost = card.id === 'mirror' && safeLastPlayed
-    ? safeLastPlayed.cost + 1
-    : card.cost;
-
-  // For Mirror card, get the card to mirror
-  const cardToDisplay = card.id === 'mirror' && safeLastPlayed ? safeLastPlayed : card;
-  const isMirror = card.id === 'mirror';
+  const cardToDisplay = card;
+  const displayCost = card.cost;
 
   const callbacksRef = useRef({ onDragStart, onDragMove, onDragEnd });
   const canAffordRef = useRef(canAfford);
@@ -944,11 +933,6 @@ const Card = (props) => {
       <View style={styles.cardContent}>
         <UnitSprite id={cardToDisplay.id} isOpponent={false} size={40} />
         <Text style={styles.cardName}>{cardToDisplay.name}</Text>
-        {isMirror && (
-          <Text style={{ position: 'absolute', bottom: -2, right: -2, fontSize: 14, fontWeight: 'bold', color: '#FFD700', textShadowColor: '#000', textShadowRadius: 2 }}>
-            +1
-          </Text>
-        )}
       </View>
 
       <View style={{ position: 'absolute', top: -8, left: -8, zIndex: 10 }}>
@@ -2393,10 +2377,11 @@ const GameBoard = ({
   elixir, hand, nextCard, draggingCard, dragPosition,
   handleDragStart, handleDragMove, handleDragEnd,
   spawnTestEnemy, formatTime, onRestart, score,
-  isDoubleElixir, showDoubleElixirAlert,
-  audioEnabled, setAudioEnabled, onConcede
+  setShowSettings, showSettings, audioEnabled, setAudioEnabled,
+  onConcede, lastPlayedCard,
+  isDoubleElixir, showDoubleElixirAlert
 }) => {
-  const [showSettings, setShowSettings] = useState(false);
+  const [showSettingsLocal, setShowSettingsLocal] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -2427,15 +2412,15 @@ const GameBoard = ({
         </View>
 
         {/* Settings Button */}
-        <TouchableOpacity style={styles.settingsButton} onPress={() => setShowSettings(true)}>
+        <TouchableOpacity style={styles.settingsButton} onPress={() => setShowSettingsLocal(true)}>
           <Text style={{ fontSize: 20 }}>⚙️</Text>
         </TouchableOpacity>
 
         <Modal
           transparent={true}
-          visible={showSettings}
+          visible={showSettingsLocal}
           animationType="fade"
-          onRequestClose={() => setShowSettings(false)}
+          onRequestClose={() => setShowSettingsLocal(false)}
         >
           <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
             <View style={{ width: 300, backgroundColor: 'white', padding: 20, borderRadius: 10, alignItems: 'center', elevation: 5 }}>
@@ -2450,21 +2435,21 @@ const GameBoard = ({
 
               <TouchableOpacity
                 style={{ padding: 15, backgroundColor: '#3498db', width: '100%', alignItems: 'center', borderRadius: 5, marginBottom: 10 }}
-                onPress={() => { setShowSettings(false); onRestart('game'); }}
+                onPress={() => { setShowSettingsLocal(false); onRestart('game'); }}
               >
                 <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>Restart Game</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={{ padding: 15, backgroundColor: '#e74c3c', width: '100%', alignItems: 'center', borderRadius: 5, marginBottom: 10 }}
-                onPress={() => { setShowSettings(false); onConcede(); }}
+                onPress={() => { setShowSettingsLocal(false); onConcede(); }}
               >
                 <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>Concede</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={{ padding: 10, marginTop: 5 }}
-                onPress={() => setShowSettings(false)}
+                onPress={() => setShowSettingsLocal(false)}
               >
                 <Text style={{ color: '#7f8c8d', fontSize: 16 }}>Close</Text>
               </TouchableOpacity>
@@ -2556,26 +2541,21 @@ const GameBoard = ({
         <View style={styles.deckContainer}>
           <View style={styles.nextCardContainer}>
             <Text style={styles.nextLabel}>NEXT</Text>
-            {nextCard && <Card card={nextCard} isNext={true} lastPlayedCard={lastPlayedCard} />}
+            {nextCard && <Card card={nextCard} isNext={true} />}
           </View>
 
           <View style={styles.handContainer}>
             {(hand || []).map((card, index) => {
-              // Calculate actual cost for Mirror card
-              const actualCost = card.id === 'mirror' && lastPlayedCard
-                ? lastPlayedCard.cost + 1
-                : card.cost;
               return (
                 <Card
                   key={`${card.id}-${index}`}
                   card={card}
                   isNext={false}
-                  canAfford={elixir >= actualCost}
+                  canAfford={elixir >= card.cost}
                   onDragStart={handleDragStart}
                   onDragMove={handleDragMove}
                   onDragEnd={handleDragEnd}
                   isDragging={draggingCard && draggingCard.id === card.id}
-                  lastPlayedCard={lastPlayedCard}
                 />
               );
             })}
