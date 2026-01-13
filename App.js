@@ -79,6 +79,16 @@ const CARDS = [
   { id: 'ice_spirit', name: 'Ice Spirit', cost: 1, color: '#3498db', hp: 90, speed: 4, type: 'ground', range: 25, damage: 91, attackSpeed: 1000, projectile: null, count: 1, splash: true, stun: 1.0, rarity: 'common', kamikaze: true },
   { id: 'electro_spirit', name: 'Electro Spirit', cost: 1, color: '#9b59b6', hp: 90, speed: 4, type: 'ground', range: 25, damage: 100, attackSpeed: 1000, projectile: null, count: 1, chain: 9, stun: 0.5, rarity: 'common', kamikaze: true },
   { id: 'heal_spirit', name: 'Heal Spirit', cost: 1, color: '#2ecc71', hp: 110, speed: 4, type: 'ground', range: 25, damage: 230, attackSpeed: 1000, projectile: null, count: 1, splash: true, rarity: 'rare', kamikaze: true, healsOnAttack: 400, healRadius: 50 },
+
+  // Additional cards for new decks
+  { id: 'bomber', name: 'Bomber', cost: 2, color: '#e67e22', hp: 160, speed: 2, type: 'ground', range: 55, damage: 145, attackSpeed: 1200, projectile: 'bomb', count: 1, splash: true, rarity: 'common' },
+  { id: 'goblin_barrel', name: 'Goblin B', cost: 3, color: '#2ecc71', type: 'spell', damage: 0, radius: 20, count: 3, spawns: 'sword_goblins', spawnCount: 3, rarity: 'epic' },
+  { id: 'elixir_collector', name: 'Elixir G', cost: 6, color: '#9b59b6', hp: 700, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 70, rarity: 'rare', generatesElixir: true },
+  { id: 'goblin_hut', name: 'Goblin Hut', cost: 5, color: '#2ecc71', hp: 500, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 30, spawns: 'sword_goblins', spawnRate: 4.5, spawnCount: 1, rarity: 'rare' },
+  { id: 'furnace', name: 'Furnace', cost: 4, color: '#e74c3c', hp: 600, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 35, spawns: 'fire_spirit', spawnRate: 10, spawnCount: 2, rarity: 'rare' },
+  { id: 'earthquake', name: 'Earthquake', cost: 3, color: '#7f8c8d', type: 'spell', damage: 160, radius: 100, count: 1, slow: 0.35, rarity: 'rare' },
+  { id: 'graveyard', name: 'Graveyard', cost: 5, color: '#2c3e50', type: 'spell', damage: 0, radius: 20, count: 15, spawns: 'skeletons', spawnCount: 15, rarity: 'legendary' },
+  { id: 'lumberjack', name: 'Lumberjack', cost: 4, color: '#e67e22', hp: 1000, speed: 2.5, type: 'ground', range: 25, damage: 200, attackSpeed: 1100, projectile: null, count: 1, splash: true, deathRage: true, rarity: 'legendary' },
 ];
 
 const RARITY_COLORS = {
@@ -845,6 +855,123 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Rect x="43" y="39" width="14" height="6" fill="white" rx="1" />
           {/* Healing aura */}
           <Circle cx="50" cy="50" r="45" fill="none" stroke="#2ecc71" strokeWidth="1" strokeDasharray="3 3" opacity="0.5" />
+        </Svg>
+      );
+    case 'bomber':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          {/* Bomb in hand */}
+          <Circle cx="50" cy="60" r="12" fill="#2c3e50" stroke="#34495e" strokeWidth="2" />
+          <Path d="M50 48 L50 72" stroke="#e74c3c" strokeWidth="4" />
+          <Circle cx="50" cy="60" r="4" fill="#e74c3c" />
+          {/* Fuse */}
+          <Path d="M55 50 Q65 45 70 35" stroke="#f39c12" strokeWidth="2" />
+          {/* Spark */}
+          <Circle cx="70" cy="35" r="2" fill="#f1c40f" />
+        </Svg>
+      );
+    case 'goblin_barrel':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Barrel */}
+          <Rect x="30" y="40" width="40" height="40" fill="#8B4513" stroke="#654321" strokeWidth="2" rx="5" />
+          <Rect x="35" y="35" width="30" height="10" fill="#654321" />
+          <Rect x="40" y="30" width="20" height="10" fill="#8B4513" />
+          {/* Metal bands */}
+          <Rect x="28" y="50" width="44" height="5" fill="#95a5a6" />
+          <Rect x="28" y="65" width="44" height="5" fill="#95a5a6" />
+          {/* Goblin face peeking out */}
+          <Circle cx="50" cy="55" r="8" fill="#2ecc71" />
+          <Circle cx="47" cy="53" r="2" fill="black" />
+          <Circle cx="53" cy="53" r="2" fill="black" />
+        </Svg>
+      );
+    case 'elixir_collector':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Base */}
+          <Rect x="20" y="50" width="60" height="30" fill="#f39c12" stroke="#e67e22" strokeWidth="2" rx="3" />
+          {/* Elixir vial */}
+          <Rect x="40" y="30" width="20" height="40" fill="#3498db" stroke="#2980b9" strokeWidth="2" rx="3" />
+          <Rect x="45" y="20" width="10" height="15" fill="#3498db" stroke="#2980b9" strokeWidth="2" />
+          {/* Elixir liquid */}
+          <Rect x="42" y="35" width="16" height="30" fill="#9b59b6" opacity="0.7" />
+          {/* Collector wheels */}
+          <Circle cx="25" cy="80" r="5" fill="#7f8c8d" />
+          <Circle cx="75" cy="80" r="5" fill="#7f8c8d" />
+        </Svg>
+      );
+    case 'goblin_hut':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Hut structure */}
+          <Rect x="20" y="50" width="60" height="40" fill="#8B4513" stroke="#654321" strokeWidth="2" />
+          {/* Roof */}
+          <Path d="M15 50 L50 25 L85 50 Z" fill="#A0522D" stroke="#654321" strokeWidth="2" />
+          {/* Door */}
+          <Rect x="42" y="65" width="16" height="25" fill="#654321" />
+          {/* Window */}
+          <Circle cx="35" cy="60" r="5" fill="#f1c40f" opacity="0.8" />
+          <Circle cx="65" cy="60" r="5" fill="#f1c40f" opacity="0.8" />
+        </Svg>
+      );
+    case 'furnace':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Furnace body */}
+          <Rect x="25" y="40" width="50" height="45" fill="#e74c3c" stroke="#c0392b" strokeWidth="2" rx="3" />
+          {/* Top opening */}
+          <Rect x="35" y="35" width="30" height="10" fill="#2c3e50" />
+          {/* Fire inside */}
+          <Circle cx="50" cy="60" r="15" fill="#f39c12" opacity="0.8" />
+          <Circle cx="50" cy="60" r="8" fill="#e74c3c" />
+          {/* Smoke vents */}
+          <Rect x="30" y="30" width="8" height="8" fill="#7f8c8d" />
+          <Rect x="62" y="30" width="8" height="8" fill="#7f8c8d" />
+        </Svg>
+      );
+    case 'earthquake':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#7f8c8d" stroke="#95a5a6" strokeWidth="3" />
+          {/* Cracked ground */}
+          <Path d="M20 50 L35 40 L45 55 L60 35 L80 50" stroke="#2c3e50" strokeWidth="4" fill="none" />
+          <Path d="M25 60 L40 50 L50 65 L70 45" stroke="#2c3e50" strokeWidth="3" fill="none" />
+          {/* Tremor waves */}
+          <Circle cx="50" cy="50" r="30" fill="none" stroke="#7f8c8d" strokeWidth="2" strokeDasharray="5 3" />
+          <Circle cx="50" cy="50" r="20" fill="none" stroke="#7f8c8d" strokeWidth="2" strokeDasharray="5 3" />
+        </Svg>
+      );
+    case 'graveyard':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#2c3e50" stroke="#34495e" strokeWidth="3" />
+          {/* Tombstone */}
+          <Rect x="35" y="40" width="30" height="35" fill="#95a5a6" stroke="#7f8c8d" strokeWidth="2" rx="5" />
+          {/* RIP text */}
+          <Text x="50" y="60" fill="#2c3e50" fontSize="12" fontWeight="bold" textAnchor="middle">RIP</Text>
+          {/* Skeleton hands */}
+          <Circle cx="30" cy="70" r="4" fill="#ecf0f1" />
+          <Circle cx="70" cy="70" r="4" fill="#ecf0f1" />
+          {/* Eerie glow */}
+          <Circle cx="50" cy="50" r="40" fill="none" stroke="#2ecc71" strokeWidth="1" strokeDasharray="3 3" opacity="0.5" />
+        </Svg>
+      );
+    case 'lumberjack':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          {/* Hard hat */}
+          <Rect x="30" y="20" width="40" height="15" fill="#f1c40f" stroke="#e67e22" strokeWidth="2" rx="3" />
+          {/* Axe */}
+          <Rect x="70" y="35" width="8" height="40" fill="#8B4513" transform="rotate(20 74 55)" />
+          <Path d="M70 35 L78 30 L82 40 Z" fill="#95a5a6" transform="rotate(20 74 55)" />
+          {/* Face */}
+          <Circle cx="45" cy="45" r="3" fill="black" />
+          <Circle cx="55" cy="45" r="3" fill="black" />
+          {/* Beard */}
+          <Path d="M35 55 Q50 75 65 55" fill="#e67e22" />
         </Svg>
       );
     default:
@@ -2575,11 +2702,13 @@ export default function App() {
   const [audioEnabled, setAudioEnabled] = useState(true);
   const doubleElixirTriggeredRef = useRef(false);
 
-  // Multiple deck slots - 3 decks of 8 cards each
+  // Multiple deck slots - 5 decks of 8 cards each
   const [allDecks, setAllDecks] = useState([
     CARDS.slice(0, 8),  // Deck 1
     CARDS.slice(8, 16), // Deck 2
-    CARDS.slice(16, 24) // Deck 3
+    CARDS.slice(16, 24), // Deck 3
+    CARDS.slice(24, 32), // Deck 4
+    CARDS.slice(32, 40)  // Deck 5
   ]);
   const [selectedDeckIndex, setSelectedDeckIndex] = useState(0);
 
@@ -3018,7 +3147,10 @@ export default function App() {
             kamikaze: actualCard.kamikaze || false,  // Spirit cards die when they attack
             chain: actualCard.chain || 0,  // Electro Spirit chain count
             healsOnAttack: actualCard.healsOnAttack || 0,  // Heal Spirit healing amount
-            healRadius: actualCard.healRadius || 0  // Heal Spirit healing radius
+            healRadius: actualCard.healRadius || 0,  // Heal Spirit healing radius
+            deathRage: actualCard.deathRage || false,  // Lumberjack rage on death
+            generatesElixir: actualCard.generatesElixir || false,  // Elixir Collector generates elixir
+            elixirGenerationTime: 0  // Track last elixir generation time
           });
           // Log spawn properties for debugging
           if (actualCard.spawns) {
