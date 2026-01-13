@@ -54,6 +54,11 @@ const CARDS = [
   // Lava Hound & Lava Pups
   { id: 'lava_hound', name: 'Lava Hound', cost: 7, color: '#c0392b', hp: 3150, speed: 1, type: 'flying', range: 25, damage: 35, attackSpeed: 1300, projectile: null, count: 1, targetType: 'buildings', rarity: 'legendary', deathSpawns: 'lava_pups', deathSpawnCount: 6 },
   { id: 'lava_pups', name: 'Lava Pups', cost: 0, color: '#e74c3c', hp: 180, speed: 2, type: 'flying', range: 50, damage: 45, attackSpeed: 1000, projectile: 'lava_shot', count: 1, rarity: 'common', isToken: true },
+
+  // Super easy additions
+  { id: 'three_musketeers', name: '3 Musketeers', cost: 9, color: '#34495e', hp: 800, speed: 1.5, type: 'ground', range: 100, damage: 180, attackSpeed: 1100, projectile: 'bullet', count: 3, rarity: 'rare' },
+  { id: 'royal_giant', name: 'Royal Giant', cost: 6, color: '#e67e22', hp: 1800, speed: 1.2, type: 'ground', range: 90, damage: 140, attackSpeed: 1300, projectile: 'cannonball', count: 1, targetType: 'buildings', rarity: 'rare' },
+  { id: 'rocket', name: 'Rocket', cost: 6, color: '#ff4500', type: 'spell', damage: 600, radius: 30, count: 1, rarity: 'rare' },
 ];
 
 const RARITY_COLORS = {
@@ -437,6 +442,82 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Path d="M75 40 Q85 30 75 25" stroke="#c0392b" strokeWidth="2" fill="none" />
         </Svg>
       );
+    case 'three_musketeers':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Background circle */}
+          <Circle cx="50" cy="50" r="45" fill="#34495e" stroke="white" strokeWidth="2" />
+          {/* Three musketeer figures */}
+          {/* Left musketeer */}
+          <G transform="translate(15, 20) scale(0.7)">
+            <Circle cx="20" cy="50" r="15" fill="#ecf0f1" />
+            <Rect x="15" y="65" width="10" height="25" fill="#34495e" />
+            <Rect x="10" y="40" width="20" height="8" fill="#2c3e50" rx="2" />
+          </G>
+          {/* Center musketeer (larger, in front) */}
+          <G transform="translate(25, 15) scale(0.85)">
+            <Circle cx="20" cy="50" r="15" fill="#ecf0f1" />
+            <Rect x="15" y="65" width="10" height="25" fill="#34495e" />
+            <Rect x="10" y="40" width="20" height="8" fill="#2c3e50" rx="2" />
+            {/* Musketeer hat with feather */}
+            <Path d="M10 35 L20 25 L30 35" fill="#e74c3c" />
+            <Path d="M20 25 L20 15 L25 18" stroke="#f1c40f" strokeWidth="2" fill="none" />
+          </G>
+          {/* Right musketeer */}
+          <G transform="translate(35, 20) scale(0.7)">
+            <Circle cx="20" cy="50" r="15" fill="#ecf0f1" />
+            <Rect x="15" y="65" width="10" height="25" fill="#34495e" />
+            <Rect x="10" y="40" width="20" height="8" fill="#2c3e50" rx="2" />
+          </G>
+        </Svg>
+      );
+    case 'royal_giant':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Royal crown */}
+          <Circle cx="50" cy="50" r="45" fill="#e67e22" stroke="#f39c12" strokeWidth="3" />
+          {/* Crown points */}
+          <Path d="M25 40 L35 25 L50 35 L65 25 L75 40" fill="#f1c40f" stroke="#e74c3c" strokeWidth="2" />
+          {/* Crown base */}
+          <Rect x="25" y="40" width="50" height="10" fill="#f1c40f" stroke="#e74c3c" strokeWidth="2" />
+          {/* Jewels */}
+          <Circle cx="50" cy="30" r="4" fill="#e74c3c" />
+          <Circle cx="35" cy="32" r="3" fill="#3498db" />
+          <Circle cx="65" cy="32" r="3" fill="#3498db" />
+          {/* Giant face */}
+          <Circle cx="50" cy="65" r="20" fill="#ecf0f1" stroke="#bdc3c7" strokeWidth="2" />
+          {/* Eyes */}
+          <Circle cx="43" cy="62" r="4" fill="#2c3e50" />
+          <Circle cx="57" cy="62" r="4" fill="#2c3e50" />
+          <Circle cx="44" cy="61" r="1.5" fill="white" />
+          <Circle cx="58" cy="61" r="1.5" fill="white" />
+          {/* Mustache */}
+          <Path d="M38 70 Q50 75 62 70" stroke="#5d4e37" strokeWidth="3" fill="none" strokeLinecap="round" />
+        </Svg>
+      );
+    case 'rocket':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Explosion background */}
+          <Circle cx="50" cy="50" r="45" fill="#ff4500" stroke="#e74c3c" strokeWidth="2" />
+          {/* Explosion rays */}
+          <Path d="M50 5 L50 20 M50 80 L50 95 M5 50 L20 50 M80 50 L95 50" stroke="#f39c12" strokeWidth="4" />
+          <Path d="M15 15 L25 25 M75 75 L85 85 M85 15 L75 25 M15 85 L25 75" stroke="#f39c12" strokeWidth="4" />
+          {/* Rocket body */}
+          <Rect x="42" y="30" width="16" height="45" fill="#7f8c8d" stroke="#2c3e50" strokeWidth="2" rx="3" />
+          {/* Red nose cone */}
+          <Path d="M42 30 L50 15 L58 30" fill="#e74c3c" stroke="#c0392b" strokeWidth="2" />
+          {/* Fins */}
+          <Path d="M42 60 L35 75 L42 70" fill="#c0392b" />
+          <Path d="M58 60 L65 75 L58 70" fill="#c0392b" />
+          {/* Window */}
+          <Circle cx="50" cy="45" r="5" fill="#3498db" stroke="#2980b9" strokeWidth="2" />
+          <Circle cx="50" cy="45" r="2" fill="#ecf0f1" />
+          {/* Flame */}
+          <Path d="M45 75 Q50 90 55 75 Q50 82 45 75" fill="#f39c12" />
+          <Path d="M47 75 Q50 85 53 75 Q50 80 47 75" fill="#e74c3c" />
+        </Svg>
+      );
     default:
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
@@ -629,6 +710,68 @@ const Projectile = ({ type, position }) => {
   if (type === 'fireball_spell') {
     return (
       <View style={[styles.fireballSpell, { left: position.x, top: position.y }]} />
+    );
+  }
+  if (type === 'rocket_spell') {
+    // Rocket projectile - larger cylinder shape with flame trail
+    return (
+      <View style={{ position: 'absolute', left: position.x - 8, top: position.y - 15 }}>
+        {/* Rocket body */}
+        <View style={{
+          width: 16,
+          height: 30,
+          backgroundColor: '#7f8c8d',
+          borderRadius: 3,
+          borderWidth: 2,
+          borderColor: '#2c3e50',
+          position: 'relative'
+        }}>
+          {/* Red nose cone */}
+          <View style={{
+            position: 'absolute',
+            top: -8,
+            left: 3,
+            width: 0,
+            height: 0,
+            borderLeftWidth: 5,
+            borderRightWidth: 5,
+            borderBottomWidth: 10,
+            borderLeftColor: 'transparent',
+            borderRightColor: 'transparent',
+            borderBottomColor: '#e74c3c'
+          }} />
+          {/* Fins */}
+          <View style={{
+            position: 'absolute',
+            bottom: -5,
+            left: -4,
+            width: 6,
+            height: 12,
+            backgroundColor: '#c0392b',
+            transform: [{ rotate: '-20deg' }]
+          }} />
+          <View style={{
+            position: 'absolute',
+            bottom: -5,
+            right: -4,
+            width: 6,
+            height: 12,
+            backgroundColor: '#c0392b',
+            transform: [{ rotate: '20deg' }]
+          }} />
+          {/* Flame trail */}
+          <View style={{
+            position: 'absolute',
+            bottom: -15,
+            left: 4,
+            width: 8,
+            height: 15,
+            backgroundColor: '#f39c12',
+            borderRadius: 4,
+            opacity: 0.8
+          }} />
+        </View>
+      </View>
     );
   }
   if (type === 'zap_spell') {
@@ -2165,6 +2308,11 @@ export default function App() {
           spellSpeed = 100; // Instant - no travel time
           startX = x; // Start at target location
           startY = y;  // Start at target location
+        } else if (card.id === 'rocket') {
+          // Rocket shoots straight up then down on target
+          spellType = 'rocket_spell';
+          startY = height;
+          spellSpeed = 12; // Slower than fireball
         }
 
         // For poison, mark it as already hit since it's instant
@@ -2197,15 +2345,35 @@ export default function App() {
           const offsetX = count > 1 ? (Math.random() * 40 - 20) : 0;
           const offsetY = count > 1 ? (Math.random() * 40 - 20) : 0;
 
+          // Three Musketeers special split: 2 to one lane, 1 to the other
+          let unitLane = lane;
+          let spawnX = x + offsetX;
+          let spawnY = y + offsetY;
+
+          if (card.id === 'three_musketeers' && count === 3) {
+            if (i < 2) {
+              // First 2 go to the dropped lane
+              unitLane = lane;
+              spawnX = x + offsetX;
+              spawnY = y + offsetY;
+            } else {
+              // Third one goes to opposite lane
+              unitLane = lane === 'LEFT' ? 'RIGHT' : 'LEFT';
+              // Spawn on opposite side of the river
+              spawnX = unitLane === 'LEFT' ? 70 + offsetX : width - 70 + offsetX;
+              spawnY = y + offsetY;
+            }
+          }
+
           newUnits.push({
             id: Date.now() + i,
-            x: x + offsetX,
-            y: y + offsetY,
+            x: spawnX,
+            y: spawnY,
             hp: card.hp,
             maxHp: card.hp,
             isOpponent: false,
             speed: card.speed,
-            lane: lane,
+            lane: unitLane,
             lastAttack: 0,
             spriteId: card.id,
             type: card.type,
@@ -2611,7 +2779,9 @@ export default function App() {
           const unitTargets = (unitsRef.current || []).filter(targetUnit =>
             targetUnit.isOpponent !== u.isOpponent &&
             targetUnit.hp > 0 &&
-            !(targetUnit.hidden?.active && targetUnit.spriteId === 'tesla')
+            !(targetUnit.hidden?.active && targetUnit.spriteId === 'tesla') &&
+            // Ground units cannot target flying units
+            (u.type === 'flying' || targetUnit.type !== 'flying')
           );
 
           // Check if any tower is in range
