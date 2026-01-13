@@ -666,7 +666,7 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Circle cx="60" cy="50" r="5" fill="#e74c3c" />
           <Circle cx="40" cy="50" r="2" fill="#f1c40f" opacity="0.8" />
           <Circle cx="60" cy="50" r="2" fill="#f1c40f" opacity="0.8" />
-          <!-- Huge scythe -->
+          {/* Huge scythe */}
           <Path d="M75 40 L95 60" stroke="#bdc3c7" strokeWidth="4" strokeLinecap="round" />
           <Path d="M85 30 L90 40 L95 60 L85 50 Z" fill="#95a5a6" />
           {/* Spikes on armor */}
@@ -1125,7 +1125,7 @@ const Unit = ({ unit }) => {
   const isSlowed = unit.slowUntil > Date.now();
 
   // Check if unit is in spawn delay (Golem, Golemite)
-  const isSpawning = unit.spawnDelay && unit.spawnTime && (Date.now() - unit.spawnTime < unit.spawnDelay);
+  const isSpawning = (unit.spawnDelay > 0) && unit.spawnTime && (Date.now() - unit.spawnTime < unit.spawnDelay);
   const rotationAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
