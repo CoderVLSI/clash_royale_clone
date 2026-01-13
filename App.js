@@ -2245,6 +2245,9 @@ export default function App() {
           if (card.spawns) {
             console.log('[SPAWN CARD]', card.id, 'spawns:', card.spawns, 'spawnRate:', card.spawnRate);
           }
+          if (card.deathSpawns) {
+            console.log('[SPAWN CARD]', card.id, 'deathSpawns:', card.deathSpawns, 'deathSpawnCount:', card.deathSpawnCount);
+          }
         }
         setUnits(prev => [...(prev || []), ...newUnits]);
       }
@@ -2430,18 +2433,15 @@ export default function App() {
         // Handle periodic spawning (Tombstone spawns skeletons every spawnRate seconds)
         if (u.spawns && u.spawnRate && u.lastSpawn !== undefined) {
           const timeSinceLastSpawn = (now - u.lastSpawn) / 1000; // Convert to seconds
-          console.log('[SPAWN CHECK]', u.spriteId, 'timeSinceLastSpawn:', timeSinceLastSpawn, 'spawnRate:', u.spawnRate);
           if (timeSinceLastSpawn >= u.spawnRate) {
             // Spawn the units
             const spawnCardId = u.spawns;
             const spawnCard = CARDS.find(c => c.id === spawnCardId);
-            console.log('[SPAWN]', u.spriteId, 'spawning', spawnCardId, 'found:', !!spawnCard);
 
             if (spawnCard) {
               const newSpawns = [];
               // Use unit's spawnCount if defined, otherwise fall back to spawn card's count
               const spawnCount = u.spawnCount || spawnCard.count || 1;
-              console.log('[SPAWN]', 'count:', spawnCount, 'hp:', spawnCard.hp);
 
               for (let i = 0; i < spawnCount; i++) {
                 // Calculate spawn position - ensure skeletons spawn AWAY from parent, not inside
@@ -2491,14 +2491,9 @@ export default function App() {
                   stunUntil: 0,
                   baseDamage: spawnCard.damage
                 });
-                console.log('[SPAWN]', 'skeleton at', spawnX.toFixed(1), spawnY.toFixed(1), 'hp:', spawnCard.hp);
               }
 
               // Add spawned units to collection (will be added at end of loop)
-              console.log('[SPAWN]', 'adding', newSpawns.length, 'units to game');
-              newSpawns.forEach(spawn => {
-                console.log('[SPAWN]', 'NEW UNIT id:', spawn.id, 'spriteId:', spawn.spriteId, 'x:', spawn.x.toFixed(1), 'y:', spawn.y.toFixed(1), 'hp:', spawn.hp);
-              });
               unitsToSpawn.push(...newSpawns);
 
               // Update last spawn time
@@ -2844,59 +2839,6 @@ export default function App() {
         }
       });
 
-      // Check for death spawns (Tombstone -> skeletons, Lava Hound -> lava pups)
-      const deathSpawns = [];
-      currentUnits.forEach(u => {
-        // Generic death spawn check - works for Tombstone, Lava Hound, etc.
-        if (u.hp <= 0 && (u.spriteId === 'tombstone' || u.deathSpawns)) {
-          // Determine what to spawn
-          let spawnId = 'skeletons'; // Default for Tombstone
-          if (u.deathSpawns) {
-            spawnId = u.deathSpawns; // Use custom spawn type (e.g., 'lava_pups')
-          }
-
-          const spawnCard = CARDS.find(c => c.id === spawnId);
-          if (spawnCard) {
-            const deathSpawnCount = u.deathSpawnCount || 4;
-            for (let i = 0; i < deathSpawnCount; i++) {
-              // Spawn units in a spread pattern around the destroyed unit
-              const angle = (i / deathSpawnCount) * Math.PI * 2 + Math.random() * 0.5;
-              const distance = 50 + Math.random() * 30;  // 50-80 pixels away
-              const offsetX = Math.cos(angle) * distance;
-              const offsetY = Math.sin(angle) * distance;
-              deathSpawns.push({
-                id: Date.now() + Math.random() * 1000 + i,
-                x: u.x + offsetX,
-                y: u.y + offsetY,
-                hp: spawnCard.hp,
-                maxHp: spawnCard.hp,
-                isOpponent: u.isOpponent,
-                speed: spawnCard.speed,
-                lane: u.lane,
-                lastAttack: 0,
-                spriteId: spawnCard.id,
-                type: spawnCard.type,
-                range: spawnCard.range,
-                damage: spawnCard.damage,
-                attackSpeed: spawnCard.attackSpeed,
-                projectile: spawnCard.projectile,
-                lockedTarget: null,
-                wasPushed: false,
-                wasStunned: false,
-                stunUntil: 0,
-                baseDamage: spawnCard.damage
-              });
-            }
-          }
-        }
-      });
-
-      // Add death spawns to collection
-      if (deathSpawns.length > 0) {
-        unitsToSpawn.push(...deathSpawns);
-        console.log('[DEATH SPAWN]', 'adding', deathSpawns.length, 'units from death spawn');
-      }
-
       // Filter out dead units
       const beforeFilter = currentUnits.length;
       currentUnits = currentUnits.filter(u => {
@@ -3206,40 +3148,67 @@ export default function App() {
         });
       }
 
-      // Filter dead units
-      // Filter dead units
-      let deadCount = 0;
-      currentUnits = currentUnits.filter(u => {
-        if (u.hp <= 0) {
-          deadCount++;
-          return false;
+      // Check for death spawns (Tombstone -> skeletons, Lava Hound -> lava pups)
+      // This MUST run after damage is applied but before dead units are filtered
+      const deathSpawns = [];
+      currentUnits.forEach(u => {
+        // Generic death spawn check - works for Tombstone, Lava Hound, etc.
+        if (u.hp <= 0 && (u.spriteId === 'tombstone' || u.deathSpawns)) {
+          // Determine what to spawn
+          let spawnId = 'skeletons'; // Default for Tombstone
+          if (u.deathSpawns) {
+            spawnId = u.deathSpawns; // Use custom spawn type (e.g., 'lava_pups')
+          }
+
+          const spawnCard = CARDS.find(c => c.id === spawnId);
+          if (spawnCard) {
+            const deathSpawnCount = u.deathSpawnCount || 4;
+            for (let i = 0; i < deathSpawnCount; i++) {
+              // Spawn units in a spread pattern around the destroyed unit
+              const angle = (i / deathSpawnCount) * Math.PI * 2 + Math.random() * 0.5;
+              const distance = 50 + Math.random() * 30;  // 50-80 pixels away
+              const offsetX = Math.cos(angle) * distance;
+              const offsetY = Math.sin(angle) * distance;
+              deathSpawns.push({
+                id: Date.now() + Math.random() * 1000 + i,
+                x: u.x + offsetX,
+                y: u.y + offsetY,
+                hp: spawnCard.hp,
+                maxHp: spawnCard.hp,
+                isOpponent: u.isOpponent,
+                speed: spawnCard.speed,
+                lane: u.lane,
+                lastAttack: 0,
+                spriteId: spawnCard.id,
+                type: spawnCard.type,
+                range: spawnCard.range,
+                damage: spawnCard.damage,
+                attackSpeed: spawnCard.attackSpeed,
+                projectile: spawnCard.projectile,
+                lockedTarget: null,
+                wasPushed: false,
+                wasStunned: false,
+                stunUntil: 0,
+                baseDamage: spawnCard.damage
+              });
+            }
+          }
         }
-        return true;
       });
 
-      if (deadCount > 0) {
-        console.log('[FILTER]', 'Removed', deadCount, 'units');
+      // Add death spawns to collection
+      if (deathSpawns.length > 0) {
+        unitsToSpawn.push(...deathSpawns);
       }
+
+      // Filter dead units
+      currentUnits = currentUnits.filter(u => u.hp > 0);
 
       // Update state
       const allUnits = [...currentUnits, ...unitsToSpawn];
       setUnits(allUnits);
       setProjectiles(activeProjectiles);
       setTowers(nextTowers);
-
-      // Debug: Log total units in game
-      if (allUnits.length > 0) {
-        // console.log('[GAME STATE]', 'Total units:', allUnits.length);
-      }
-
-      // Debug: Check if spawned units have valid positions
-      if (unitsToSpawn.length > 0) {
-        console.log('[SPAWN CHECK]', 'Spawned', unitsToSpawn.length, 'units - checking next frame...');
-        setTimeout(() => {
-          const currentCount = (unitsRef.current || []).filter(u => u.spriteId === 'skeletons').length;
-          console.log('[SPAWN CHECK]', 'Next frame skeleton count:', currentCount);
-        }, 60);
-      }
 
     }, 50);
 
