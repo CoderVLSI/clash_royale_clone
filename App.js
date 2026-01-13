@@ -768,11 +768,16 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
   }
 };
 
-const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd, isDragging }) => {
+const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd, isDragging, lastPlayedCard }) => {
   // Guard against undefined card
   if (!card) {
     return null;
   }
+
+  // Calculate display cost for Mirror card
+  const displayCost = card.id === 'mirror' && lastPlayedCard
+    ? lastPlayedCard.cost + 1
+    : card.cost;
 
   const callbacksRef = useRef({ onDragStart, onDragMove, onDragEnd });
   const canAffordRef = useRef(canAfford);
@@ -863,7 +868,7 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
       </View>
 
       <View style={{ position: 'absolute', top: -8, left: -8, zIndex: 10 }}>
-        <ElixirDroplet size={24} value={card.cost} />
+        <ElixirDroplet size={24} value={displayCost} />
       </View>
 
       {isNext && <Text style={styles.nextLabel}>Next</Text>}
@@ -2423,6 +2428,7 @@ export default function App() {
 
   const [units, setUnits] = useState([]);
   const [projectiles, setProjectiles] = useState([]);
+  const [lastPlayedCard, setLastPlayedCard] = useState(null);
 
   const towersRef = useRef(towers);
   const unitsRef = useRef(units);
@@ -2431,6 +2437,7 @@ export default function App() {
   const enemyHandRef = useRef(enemyHand);
   const enemyNextCardRef = useRef(enemyNextCard);
   const enemyDeckQueueRef = useRef(enemyDeckQueue);
+  const lastPlayedCardRef = useRef(lastPlayedCard);
 
   useEffect(() => { towersRef.current = towers; }, [towers]);
   useEffect(() => { unitsRef.current = units; }, [units]);
@@ -2439,6 +2446,7 @@ export default function App() {
   useEffect(() => { enemyHandRef.current = enemyHand; }, [enemyHand]);
   useEffect(() => { enemyNextCardRef.current = enemyNextCard; }, [enemyNextCard]);
   useEffect(() => { enemyDeckQueueRef.current = enemyDeckQueue; }, [enemyDeckQueue]);
+  useEffect(() => { lastPlayedCardRef.current = lastPlayedCard; }, [lastPlayedCard]);
 
   const concedeGame = () => {
     setGameOver('LOSE');
@@ -2557,37 +2565,53 @@ export default function App() {
 
   const spawnCard = (card, x, y) => {
     console.log('[spawnCard] Starting - Card:', card.name, 'cost:', card.cost, 'current elixir:', elixir);
+
+    // Handle Mirror card - copy the last played card
+    let actualCard = card;
+    if (card.id === 'mirror') {
+      const lastCard = lastPlayedCardRef.current;
+      if (!lastCard) {
+        console.log('[spawnCard] No card to mirror!');
+        return;
+      }
+      actualCard = { ...lastCard };
+      // Mirror costs (copied card cost + 1)
+      actualCard.cost = lastCard.cost + 1;
+      console.log('[spawnCard] Mirroring:', actualCard.name, 'new cost:', actualCard.cost);
+    }
+
     setElixir(currentElixir => {
-      console.log('[spawnCard] Inside setElixir - currentElixir:', currentElixir, 'card.cost:', card.cost);
-      if (currentElixir < card.cost) {
+      const costToUse = actualCard.cost;
+      console.log('[spawnCard] Inside setElixir - currentElixir:', currentElixir, 'card.cost:', costToUse);
+      if (currentElixir < costToUse) {
         console.log('[spawnCard] BLOCKED - Not enough elixir!');
         return currentElixir;
       }
-      const newElixir = currentElixir - card.cost;
+      const newElixir = currentElixir - costToUse;
 
-      if (card.type === 'spell') {
+      if (actualCard.type === 'spell') {
         // Different spell types have different visuals and timing
         let spellType = 'fireball_spell';
         let spellSpeed = 15;
         let startX = width / 2;
         let startY = height;
 
-        if (card.id === 'zap') {
+        if (actualCard.id === 'zap') {
           // Zap is instant with lightning
           spellType = 'zap_spell';
           spellSpeed = 100; // Very fast (instant)
-        } else if (card.id === 'arrows') {
+        } else if (actualCard.id === 'arrows') {
           // Arrows fall from sky with volley visual
           spellType = 'arrows_spell';
           startY = 0; // Start from top of screen
           spellSpeed = 20;
-        } else if (card.id === 'poison') {
+        } else if (actualCard.id === 'poison') {
           // Poison is instant area that stays and ticks damage
           spellType = 'poison_spell';
           spellSpeed = 100; // Instant - no travel time
           startX = x; // Start at target location
           startY = y;  // Start at target location
-        } else if (card.id === 'rocket') {
+        } else if (actualCard.id === 'rocket') {
           // Rocket shoots straight up then down on target
           spellType = 'rocket_spell';
           startY = height;
@@ -2595,7 +2619,7 @@ export default function App() {
         }
 
         // For poison, mark it as already hit since it's instant
-        const isPoison = card.id === 'poison';
+        const isPoison = actualCard.id === 'poison';
         const currentTime = Date.now();
 
         setProjectiles(prev => [...prev, {
@@ -2605,19 +2629,19 @@ export default function App() {
           targetX: x,
           targetY: y,
           speed: spellSpeed,
-          damage: card.damage,
-          radius: card.radius,
+          damage: actualCard.damage,
+          radius: actualCard.radius,
           type: spellType,
           isSpell: true,
-          stun: card.stun || 0,
-          duration: card.duration || 0,
+          stun: actualCard.stun || 0,
+          duration: actualCard.duration || 0,
           hit: isPoison, // Poison is instant
           spawnTime: currentTime, // Track when poison was spawned
           isPoison: isPoison // Mark as poison for special handling
         }]);
       } else {
         const lane = x < width / 2 ? 'LEFT' : 'RIGHT';
-        const count = card.count || 1;
+        const count = actualCard.count || 1;
         const newUnits = [];
 
         for (let i = 0; i < count; i++) {
@@ -2629,7 +2653,7 @@ export default function App() {
           let spawnX = x + offsetX;
           let spawnY = y + offsetY;
 
-          if (card.id === 'three_musketeers' && count === 3) {
+          if (actualCard.id === 'three_musketeers' && count === 3) {
             if (i < 2) {
               // First 2 go to the dropped lane
               unitLane = lane;
@@ -2648,80 +2672,90 @@ export default function App() {
             id: Date.now() + i,
             x: spawnX,
             y: spawnY,
-            hp: card.hp,
-            maxHp: card.hp,
+            hp: actualCard.hp,
+            maxHp: actualCard.hp,
             isOpponent: false,
-            speed: card.speed,
+            speed: actualCard.speed,
             lane: unitLane,
             lastAttack: 0,
-            spriteId: card.id,
-            type: card.type,
-            range: card.range,
-            damage: card.damage,
-            attackSpeed: card.attackSpeed,
-            projectile: card.projectile,
-            targetType: card.targetType,
+            spriteId: actualCard.id,
+            type: actualCard.type,
+            range: actualCard.range,
+            damage: actualCard.damage,
+            attackSpeed: actualCard.attackSpeed,
+            projectile: actualCard.projectile,
+            targetType: actualCard.targetType,
             // Special properties
-            charge: card.charge ? {
+            charge: actualCard.charge ? {
               active: false,
               distance: 0,      // Distance traveled so far
               threshold: 2      // Charge activates after 2 tiles
             } : undefined,
-            hidden: card.hidden ? { active: true, visibleHp: card.hp } : undefined,
-            splash: card.splash || false,
-            spawnDamage: card.spawnDamage,
-            spawns: card.spawns,
-            spawnRate: card.spawnRate,
-            spawnCount: card.spawnCount,  // Custom spawn count (e.g., Tombstone: 2, Witch: 3)
-            deathSpawnCount: card.deathSpawnCount,  // Units to spawn on death (Tombstone: 4, Lava Hound: 6)
-            deathSpawns: card.deathSpawns,  // What unit type to spawn on death (e.g., 'lava_pups')
-            lastSpawn: card.spawnRate ? Date.now() : 0,  // Initialize to now for buildings with spawnRate
-            lifetimeDuration: card.lifetime,  // Store lifetime duration in seconds
+            hidden: actualCard.hidden ? { active: true, visibleHp: actualCard.hp } : undefined,
+            splash: actualCard.splash || false,
+            spawnDamage: actualCard.spawnDamage,
+            spawns: actualCard.spawns,
+            spawnRate: actualCard.spawnRate,
+            spawnCount: actualCard.spawnCount,  // Custom spawn count (e.g., Tombstone: 2, Witch: 3)
+            deathSpawnCount: actualCard.deathSpawnCount,  // Units to spawn on death (Tombstone: 4, Lava Hound: 6)
+            deathSpawns: actualCard.deathSpawns,  // What unit type to spawn on death (e.g., 'lava_pups')
+            lastSpawn: actualCard.spawnRate ? Date.now() : 0,  // Initialize to now for buildings with spawnRate
+            lifetimeDuration: actualCard.lifetime,  // Store lifetime duration in seconds
             spawnTime: Date.now(),  // Track when building was spawned for HP depreciation
-            spawnDelay: card.spawnDelay || 0,  // Spawn delay before unit can move/attack (Golem: 1000ms, Golemite: 500ms)
-            maxHp: card.hp,  // Store initial max HP for depreciation calculation
-            jumps: card.jumps || false,  // Hog Rider can jump over river
-            slow: card.slow || 0,
+            spawnDelay: actualCard.spawnDelay || 0,  // Spawn delay before unit can move/attack (Golem: 1000ms, Golemite: 500ms)
+            maxHp: actualCard.hp,  // Store initial max HP for depreciation calculation
+            jumps: actualCard.jumps || false,  // Hog Rider can jump over river
+            slow: actualCard.slow || 0,
             slowUntil: 0,
             stunUntil: 0,
-            baseDamage: card.damage,
+            baseDamage: actualCard.damage,
             lockedTarget: null,  // Once locked, unit won't switch targets
             wasPushed: false,    // Track if unit was pushed back (unlocks target)
             wasStunned: false    // Track if unit was stunned (unlocks target when stun ends)
           });
           // Log spawn properties for debugging
-          if (card.spawns) {
-            console.log('[SPAWN CARD]', card.id, 'spawns:', card.spawns, 'spawnRate:', card.spawnRate);
+          if (actualCard.spawns) {
+            console.log('[SPAWN CARD]', actualCard.id, 'spawns:', actualCard.spawns, 'spawnRate:', actualCard.spawnRate);
           }
-          if (card.deathSpawns) {
-            console.log('[SPAWN CARD]', card.id, 'deathSpawns:', card.deathSpawns, 'deathSpawnCount:', card.deathSpawnCount);
+          if (actualCard.deathSpawns) {
+            console.log('[SPAWN CARD]', actualCard.id, 'deathSpawns:', actualCard.deathSpawns, 'deathSpawnCount:', actualCard.deathSpawnCount);
           }
         }
         setUnits(prev => [...(prev || []), ...newUnits]);
       }
 
+      // Track the last played card (but NOT when playing Mirror itself)
+      if (card.id !== 'mirror') {
+        setLastPlayedCard(card);
+      }
+
       // Cycle cards - use findIndex + splice to remove only first occurrence
+      // For Mirror, we remove Mirror from hand, not the copied card
+      const cardToCycle = card;
       setHand(currentHand => {
         const newHand = [...currentHand];
-        const cardIndex = newHand.findIndex(c => c.id === card.id);
+        const cardIndex = newHand.findIndex(c => c.id === cardToCycle.id);
         if (cardIndex !== -1) {
           newHand.splice(cardIndex, 1);
         }
         newHand.push(nextCard);
-        console.log('[spawnCard] Card cycled successfully - removed', card.name, 'from hand, added', nextCard.name);
+        console.log('[spawnCard] Card cycled successfully - removed', cardToCycle.name, 'from hand, added', nextCard.name);
         return newHand;
       });
 
       setDeckQueue(currentQueue => {
         const newQueue = [...currentQueue];
         const newNext = newQueue.shift();
-        newQueue.push(card);
+        // Don't add Mirror to deck queue - Mirror copies cards, it doesn't get recycled
+        if (cardToCycle.id !== 'mirror') {
+          newQueue.push(cardToCycle);
+        }
         setNextCard(newNext);
         console.log('[spawnCard] Deck updated - new next card:', newNext?.name);
         return newQueue;
       });
 
-      console.log('[spawnCard] SUCCESS -', card.name, 'spawned, elixir:', newElixir);
+      console.log('[spawnCard] SUCCESS -', actualCard.name, 'spawned, elixir:', newElixir);
       return newElixir;
     });
   };
