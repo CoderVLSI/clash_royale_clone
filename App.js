@@ -1009,7 +1009,7 @@ const Unit = ({ unit }) => {
 
   // Check if unit is in spawn delay (Golem, Golemite)
   const isSpawning = unit.spawnDelay && unit.spawnTime && (Date.now() - unit.spawnTime < unit.spawnDelay);
-  const [rotationAnim] = useState(new Animated.Value(0));
+  const rotationAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (isSpawning) {
