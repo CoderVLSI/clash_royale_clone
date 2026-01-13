@@ -3772,6 +3772,22 @@ export default function App() {
           }
         }
 
+        // Handle Elixir generation (Elixir Collector)
+        if (u.generatesElixir && u.elixirGenerationTime !== undefined) {
+          const timeSinceLastGen = (now - u.elixirGenerationTime) / 1000;
+          const elixirGenRate = 10.5; // Generate 1 elixir every 10.5 seconds (93s lifetime / 8 elixir)
+
+          if (timeSinceLastGen >= elixirGenRate) {
+            // Generate elixir for the owner
+            if (u.isOpponent) {
+              setEnemyElixir(prev => Math.min(10, prev + 1));
+            } else {
+              setElixir(prev => Math.min(10, prev + 1));
+            }
+            return { ...u, elixirGenerationTime: now };
+          }
+        }
+
         // Handle periodic spawning (Tombstone spawns skeletons every spawnRate seconds)
         if (u.spawns && u.spawnRate && u.lastSpawn !== undefined) {
           // Check if we've reached the spawn limit (for graveyard)
@@ -3849,7 +3865,14 @@ export default function App() {
                     wasPushed: false,
                     wasStunned: false,
                     stunUntil: 0,
-                    baseDamage: spawnCard.damage
+                    baseDamage: spawnCard.damage,
+                    // Copy special properties from spawnCard
+                    kamikaze: spawnCard.kamikaze || false,
+                    splash: spawnCard.splash || false,
+                    healsOnAttack: spawnCard.healsOnAttack || 0,
+                    healRadius: spawnCard.healRadius || 0,
+                    chain: spawnCard.chain || 0,
+                    stun: spawnCard.stun || 0
                   });
                 }
 
@@ -4362,10 +4385,15 @@ export default function App() {
         }
       });
 
-      // Filter out dead units
+      // Filter out dead units - but handle death spawns first
       const beforeFilter = currentUnits.length;
+      const unitsThatDied = [];
+
       currentUnits = currentUnits.filter(u => {
         if (u.hp <= 0) {
+          // Track units that died this frame for death spawn handling
+          unitsThatDied.push(u);
+
           if (u.spriteId === 'skeletons') {
             console.log('[FILTER]', 'skeleton died - hp:', u.hp);
           }
@@ -4379,6 +4407,72 @@ export default function App() {
         }
         return true;
       });
+
+      // Handle death spawns (Goblin Hut spawns 3 goblins when destroyed)
+      if (unitsThatDied.length > 0) {
+        unitsThatDied.forEach(deadUnit => {
+          // Goblin Hut death spawn - 3 Spear Goblins
+          if (deadUnit.spriteId === 'goblin_hut' && deadUnit.isOpponent === false) {
+            const spawnCard = CARDS.find(c => c.id === 'sword_goblins');
+            if (spawnCard) {
+              const newGoblins = [];
+              for (let i = 0; i < 3; i++) {
+                const angle = (i / 3) * Math.PI * 2;
+                const distance = 30 + Math.random() * 20;
+                const offsetX = Math.cos(angle) * distance;
+                const offsetY = Math.sin(angle) * distance;
+
+                newGoblins.push({
+                  id: Date.now() + Math.random() * 1000 + i,
+                  x: deadUnit.x + offsetX,
+                  y: deadUnit.y + offsetY,
+                  hp: spawnCard.hp,
+                  maxHp: spawnCard.hp,
+                  isOpponent: deadUnit.isOpponent,
+                  speed: spawnCard.speed,
+                  lane: deadUnit.lane,
+                  lastAttack: now,
+                  spriteId: spawnCard.id,
+                  type: spawnCard.type,
+                  range: spawnCard.range,
+                  damage: spawnCard.damage,
+                  attackSpeed: spawnCard.attackSpeed,
+                  projectile: spawnCard.projectile,
+                  lockedTarget: null,
+                  wasPushed: false,
+                  wasStunned: false,
+                  stunUntil: 0,
+                  baseDamage: spawnCard.damage
+                });
+              }
+              unitsToSpawn.push(...newGoblins);
+            }
+          }
+
+          // Lumberjack death - drops Rage spell
+          if (deadUnit.deathRage && deadUnit.spriteId === 'lumberjack') {
+            // Create Rage effect at Lumberjack's death location
+            setProjectiles(prev => [...prev, {
+              id: Date.now() + Math.random(),
+              x: deadUnit.x,
+              y: deadUnit.y,
+              targetX: deadUnit.x,
+              targetY: deadUnit.y,
+              speed: 0,
+              damage: 0,
+              radius: 50, // Rage spell radius (2.5 tiles = 50 pixels)
+              type: 'rage_spell',
+              isSpell: true,
+              isRage: true,
+              hit: true,
+              spawnTime: now,
+              duration: 6, // Rage lasts 6 seconds
+              isOpponent: deadUnit.isOpponent
+            }]);
+          }
+        });
+      }
+
       const afterFilter = currentUnits.length;
       if (beforeFilter !== afterFilter) {
         console.log('[FILTER]', 'Removed', beforeFilter - afterFilter, 'units');
@@ -4669,12 +4763,19 @@ export default function App() {
                 setUnits(prev => [...prev, ...newGoblins]);
               }
             } else {
-              // Other spells (Fireball, Arrows, Zap) - one-time damage
+              // Other spells (Fireball, Arrows, Zap, Earthquake) - one-time damage
               currentUnits = currentUnits.map(u => {
                 const isEnemy = u.isOpponent !== (h.isOpponent || false);
                 const dist = Math.sqrt(Math.pow(u.x - h.targetX, 2) + Math.pow(u.y - h.targetY, 2));
                 if (isEnemy && dist < h.radius) {
-                  let updatedUnit = { ...u, hp: u.hp - h.damage };
+                  let damageToDeal = h.damage;
+
+                  // Earthquake: 3.5x damage to buildings (speed === 0 means building)
+                  if (h.type === 'earthquake_spell' && u.speed === 0) {
+                    damageToDeal = Math.floor(h.damage * 3.5);
+                  }
+
+                  let updatedUnit = { ...u, hp: u.hp - damageToDeal };
 
                   // Zap stun effect - resets charge ONLY when stunned
                   if (h.stun && h.stun > 0) {
@@ -4685,7 +4786,7 @@ export default function App() {
                     }
                   }
 
-                  // Apply slow effect (Ice Wizard)
+                  // Apply slow effect (Earthquake, Ice Wizard)
                   if (h.slow && h.slow > 0) {
                     updatedUnit.slowUntil = now + 2000; // Slow lasts 2s
                     updatedUnit.slowAmount = h.slow;
@@ -4699,7 +4800,14 @@ export default function App() {
                 const isEnemy = t.isOpponent !== (h.isOpponent || false);
                 const dist = Math.sqrt(Math.pow(t.x - h.targetX, 2) + Math.pow(t.y - h.targetY, 2));
                 if (isEnemy && dist < h.radius + 30) {
-                  return { ...t, hp: t.hp - h.damage };
+                  let damageToDeal = h.damage;
+
+                  // Earthquake: 3.5x damage to buildings (towers are buildings)
+                  if (h.type === 'earthquake_spell') {
+                    damageToDeal = Math.floor(h.damage * 3.5);
+                  }
+
+                  return { ...t, hp: t.hp - damageToDeal };
                 }
                 return t;
               });
