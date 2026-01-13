@@ -72,7 +72,7 @@ const CARDS = [
   { id: 'electro_wizard', name: 'Electro Wiz', cost: 4, color: '#3498db', hp: 590, speed: 1.5, type: 'ground', range: 55, damage: 170, attackSpeed: 1100, projectile: 'electric_bolt', count: 1, splash: true, stun: 0.5, rarity: 'legendary' },
   { id: 'lightning', name: 'Lightning', cost: 6, color: '#f1c40f', type: 'spell', damage: 900, radius: 15, count: 1, rarity: 'epic' },
   { id: 'x_bow', name: 'X-Bow', cost: 6, color: '#95a5a6', hp: 700, speed: 0, type: 'building', range: 180, damage: 40, attackSpeed: 500, projectile: 'arrow', count: 1, lifetime: 35, rarity: 'epic' },
-  { id: 'mirror', name: 'Mirror', cost: 1, color: '#ecf0f1', type: 'spell', isMirror: true, rarity: 'legendary' },
+  { id: 'mirror', name: 'Mirror', cost: 1, color: '#ecf0f1', type: 'spell', isMirror: true, rarity: 'epic' },
 ];
 
 const RARITY_COLORS = {
