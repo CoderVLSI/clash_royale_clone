@@ -23,7 +23,7 @@ const FIRE_RATE_KING = 1000;
 // Card Definitions & Unit Stats
 const CARDS = [
   // Original 8 cards
-  { id: 'knight', name: 'Knight', cost: 3, color: '#f1c40f', hp: 1400, speed: 1.5, type: 'ground', range: 40, damage: 150, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common' },
+  { id: 'knight', name: 'Knight', cost: 3, color: '#f1c40f', hp: 1400, speed: 1.5, type: 'ground', range: 25, damage: 150, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common' },
   { id: 'archers', name: 'Archers', cost: 3, color: '#e67e22', hp: 250, speed: 2, type: 'ground', range: 80, damage: 100, attackSpeed: 1000, projectile: 'arrow', count: 2, rarity: 'common' },
   { id: 'giant', name: 'Giant', cost: 5, color: '#e74c3c', hp: 3000, speed: 1, type: 'ground', range: 20, damage: 200, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', rarity: 'rare' },
   { id: 'mini_pekka', name: 'Mini P', cost: 4, color: '#9b59b6', hp: 1100, speed: 2.5, type: 'ground', range: 25, damage: 350, attackSpeed: 1400, projectile: null, count: 1, rarity: 'rare' },
@@ -214,6 +214,10 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
   const color = isOpponent ? '#E74C3C' : '#3498DB';
   const isHidden = unit?.hidden?.active;
 
+  // Check if unit is flying to add shadow
+  const card = CARDS.find(c => c.id === id);
+  const isFlying = card?.type === 'flying';
+
   switch (id) {
     case 'knight':
       return (
@@ -249,12 +253,26 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
         </Svg>
       );
     case 'baby_dragon':
-      return (
+      const babyDragonSprite = (
         <Svg width={size} height={size} viewBox="0 0 100 100">
           <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
           <Path d="M20 40 Q50 10 80 40" stroke="#27ae60" strokeWidth="5" fill="none" />
           <Circle cx="50" cy="50" r="20" fill="#27ae60" />
         </Svg>
+      );
+      return (
+        <View style={{ position: 'relative' }}>
+          <View style={{
+            position: 'absolute',
+            left: size * 0.1,
+            top: size * 0.7,
+            width: size * 0.8,
+            height: size * 0.2,
+            backgroundColor: 'rgba(0, 0, 0, 0.25)',
+            borderRadius: size * 0.15
+          }} />
+          {babyDragonSprite}
+        </View>
       );
     case 'musketeer':
       return (
@@ -310,13 +328,27 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
       );
     case 'minions':
     case 'minion_horde':
-      return (
+      const minionSprite = (
         <Svg width={size} height={size} viewBox="0 0 100 100">
           <Circle cx="50" cy="50" r="30" fill={color} />
           <Path d="M25 40 Q10 20 25 10 M75 40 Q90 20 75 10" stroke="#95a5a6" strokeWidth="3" fill="none" />
           <Circle cx="42" cy="45" r="4" fill="white" />
           <Circle cx="58" cy="45" r="4" fill="white" />
         </Svg>
+      );
+      return (
+        <View style={{ position: 'relative' }}>
+          <View style={{
+            position: 'absolute',
+            left: size * 0.2,
+            top: size * 0.65,
+            width: size * 0.6,
+            height: size * 0.15,
+            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+            borderRadius: size * 0.08
+          }} />
+          {minionSprite}
+        </View>
       );
     case 'skeletons':
       return (
@@ -473,7 +505,7 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
         </Svg>
       );
     case 'lava_hound':
-      return (
+      const lavaHoundSprite = (
         <Svg width={size} height={size} viewBox="0 0 100 100">
           {/* Outer glow */}
           <Circle cx="50" cy="50" r="48" fill="rgba(231, 76, 60, 0.3)" />
@@ -495,8 +527,22 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Path d="M65 25 L70 10 L60 20" fill="#7f8c8d" />
         </Svg>
       );
-    case 'lava_pups':
       return (
+        <View style={{ position: 'relative' }}>
+          <View style={{
+            position: 'absolute',
+            left: size * 0.05,
+            top: size * 0.65,
+            width: size * 0.9,
+            height: size * 0.25,
+            backgroundColor: 'rgba(0, 0, 0, 0.35)',
+            borderRadius: size * 0.2
+          }} />
+          {lavaHoundSprite}
+        </View>
+      );
+    case 'lava_pups':
+      const lavaPupSprite = (
         <Svg width={size} height={size} viewBox="0 0 100 100">
           {/* Glow */}
           <Circle cx="50" cy="50" r="42" fill="rgba(231, 76, 60, 0.2)" />
@@ -513,6 +559,20 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Path d="M25 40 Q15 30 25 25" stroke="#c0392b" strokeWidth="2" fill="none" />
           <Path d="M75 40 Q85 30 75 25" stroke="#c0392b" strokeWidth="2" fill="none" />
         </Svg>
+      );
+      return (
+        <View style={{ position: 'relative' }}>
+          <View style={{
+            position: 'absolute',
+            left: size * 0.2,
+            top: size * 0.65,
+            width: size * 0.6,
+            height: size * 0.15,
+            backgroundColor: 'rgba(0, 0, 0, 0.25)',
+            borderRadius: size * 0.08
+          }} />
+          {lavaPupSprite}
+        </View>
       );
     case 'three_musketeers':
       return (
@@ -1040,13 +1100,32 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
         </Svg>
       );
     default:
-      return (
+      const sprite = (
         <Svg width={size} height={size} viewBox="0 0 100 100">
           <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
           <Rect x="42" y="40" width="16" height="20" fill="white" rx="3" />
           <Circle cx="50" cy="35" r="5" fill="white" />
         </Svg>
       );
+
+      // Add shadow for flying units
+      if (isFlying) {
+        return (
+          <View style={{ position: 'relative' }}>
+            <View style={{
+              position: 'absolute',
+              left: size * 0.15,
+              top: size * 0.75,
+              width: size * 0.7,
+              height: size * 0.15,
+              backgroundColor: 'rgba(0, 0, 0, 0.3)',
+              borderRadius: size * 0.1
+            }} />
+            {sprite}
+          </View>
+        );
+      }
+      return sprite;
   }
 };
 
@@ -2227,8 +2306,8 @@ const Unit = ({ unit }) => {
 
   return (
     <View style={[styles.unit, { left: unit.x - unitSize / 2, top: unit.y - unitSize / 2, width: unitSize, height: unitSize }]}>
-      {/* Range Indicator Circle */}
-      {Boolean(unit.range && unit.range > 0) && (
+      {/* Range Indicator Circle - Only for Buildings and Units with Spawn Damage (e.g. Mega Knight) */}
+      {Boolean(unit.range && unit.range > 0 && (unit.type === 'building' || unit.spawnDamage)) && (
         <View style={{
           position: 'absolute',
           left: unitSize / 2 - unit.range,
@@ -2515,6 +2594,89 @@ const DeckStats = ({ cards = [] }) => {
   );
 };
 
+// Optimized Collection Card Component
+const CollectionCard = memo(({ card, isInDeck, isDragging, onTap, onDragStart, onDragMove, onDragEnd, globalDragHandlers }) => {
+  if (!card) return null;
+
+  const isLegendary = card.rarity === 'legendary';
+  const componentRef = useRef(null);
+  
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: (evt, gestureState) => {
+        onDragStart(card, gestureState, componentRef.current);
+      },
+      onPanResponderMove: (evt, gestureState) => {
+        onDragMove(gestureState);
+      },
+      onPanResponderRelease: (evt, gestureState) => {
+        onDragEnd(gestureState);
+      },
+      onPanResponderTerminate: () => {
+        if (globalDragHandlers && globalDragHandlers.end) globalDragHandlers.end();
+        onDragEnd({ moveX: 0, moveY: 0 }); // Reset state
+      }
+    })
+  ).current;
+
+  return (
+    <View 
+      ref={componentRef} 
+      style={{ opacity: isDragging ? 0.3 : 1 }}
+      {...panResponder.panHandlers}
+    >
+      <TouchableOpacity
+        style={[
+          styles.deckCard,
+          !isLegendary && { borderColor: RARITY_COLORS[card.rarity] || '#000' },
+          isLegendary && { backgroundColor: 'transparent', borderWidth: 0 },
+          { opacity: isInDeck ? 0.5 : 1 }
+        ]}
+        onPress={() => onTap(card)}
+        delayLongPress={200}
+        activeOpacity={0.7}
+      >
+        {isLegendary && (
+          <Svg width="70" height="85" viewBox="0 0 60 75" style={{ position: 'absolute', top: 0, left: 0 }}>
+            <Defs>
+              <LinearGradient id="rainbow_collection" x1="0" y1="0" x2="1" y2="1">
+                <Stop offset="0%" stopColor="#ff0000" />
+                <Stop offset="20%" stopColor="#ffff00" />
+                <Stop offset="40%" stopColor="#00ff00" />
+                <Stop offset="60%" stopColor="#00ffff" />
+                <Stop offset="80%" stopColor="#0000ff" />
+                <Stop offset="100%" stopColor="#ff00ff" />
+              </LinearGradient>
+            </Defs>
+            <Polygon
+              points="30,2 58,18 58,57 30,73 2,57 2,18"
+              fill="rgba(255, 255, 255, 0.95)"
+              stroke="url(#rainbow_collection)"
+              strokeWidth="2"
+            />
+          </Svg>
+        )}
+        <UnitSprite id={card.id} isOpponent={false} size={40} />
+        <Text style={styles.deckCardName}>{card.name || 'Card'}</Text>
+        <View style={styles.deckCardCost}>
+          <Text style={styles.deckCardCostText}>{card.cost || 0}</Text>
+        </View>
+        {isInDeck && (
+          <View style={styles.deckCardBadge}>
+            <Text style={styles.deckCardBadgeText}>✓</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    </View>
+  );
+}, (prev, next) => {
+  return prev.card.id === next.card.id && 
+         prev.isInDeck === next.isInDeck && 
+         prev.isDragging === next.isDragging;
+});
+
 const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeckIndex, setSelectedDeckIndex }) => {
   const [selectedCard, setSelectedCard] = useState(null); // For detail modal
   const [cardMenuCard, setCardMenuCard] = useState(null); // For popup menu
@@ -2522,6 +2684,10 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [filterRarity, setFilterRarity] = useState('all');
   const [sortByElixir, setSortByElixir] = useState(false);
+
+  // Drag & drop refs
+  const dropZones = useRef([]);
+  const deckSlotRefs = useRef([]);
 
   // Drag state
   const [localDraggingCard, setLocalDraggingCard] = useState(null);
@@ -2817,86 +2983,6 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
     setScrollEnabled(true);
   };
 
-  // Simple card component for collection with Drag capability - Memoized for performance
-  const CollectionCard = memo(({ card }) => {
-    if (!card) return null;
-
-    const isInDeck = cards.some(c => c && c.id === card.id);
-    const isLegendary = card.rarity === 'legendary';
-
-    const componentRef = useRef(null);
-    const panResponder = useRef(
-      PanResponder.create({
-        onStartShouldSetPanResponder: () => true,
-        onMoveShouldSetPanResponder: () => true,
-        onPanResponderGrant: (evt, gestureState) => {
-          handleDragStart(card, gestureState, componentRef.current);
-        },
-        onPanResponderMove: (evt, gestureState) => {
-          handleDragMove(gestureState);
-        },
-        onPanResponderRelease: (evt, gestureState) => {
-          handleDragEnd(gestureState);
-        },
-        onPanResponderTerminate: () => {
-          if (dragHandlers && dragHandlers.end) dragHandlers.end();
-          setLocalDraggingCard(null);
-          setScrollEnabled(true);
-        }
-      })
-    ).current;
-
-    return (
-      <View ref={componentRef} style={{ opacity: localDraggingCard?.id === card.id ? 0.3 : 1 }}>
-        <TouchableOpacity
-          style={[
-            styles.deckCard,
-            !isLegendary && { borderColor: RARITY_COLORS[card.rarity] || '#000' },
-            isLegendary && { backgroundColor: 'transparent', borderWidth: 0 },
-            { opacity: isInDeck ? 0.5 : 1 }
-          ]}
-          onPress={() => {
-            if (!localDraggingCard) handleCollectionCardTap(card);
-          }}
-          delayLongPress={200}
-          activeOpacity={0.7}
-          {...panResponder.panHandlers}
-        >
-          {isLegendary && (
-            <Svg width="70" height="85" viewBox="0 0 60 75" style={{ position: 'absolute', top: 0, left: 0 }}>
-              <Defs>
-                <LinearGradient id="rainbow_collection" x1="0" y1="0" x2="1" y2="1">
-                  <Stop offset="0%" stopColor="#ff0000" />
-                  <Stop offset="20%" stopColor="#ffff00" />
-                  <Stop offset="40%" stopColor="#00ff00" />
-                  <Stop offset="60%" stopColor="#00ffff" />
-                  <Stop offset="80%" stopColor="#0000ff" />
-                  <Stop offset="100%" stopColor="#ff00ff" />
-                </LinearGradient>
-              </Defs>
-              <Polygon
-                points="30,2 58,18 58,57 30,73 2,57 2,18"
-                fill="rgba(255, 255, 255, 0.95)"
-                stroke="url(#rainbow_collection)"
-                strokeWidth="2"
-              />
-            </Svg>
-          )}
-          <UnitSprite id={card.id} isOpponent={false} size={40} />
-          <Text style={styles.deckCardName}>{card.name || 'Card'}</Text>
-          <View style={styles.deckCardCost}>
-            <Text style={styles.deckCardCostText}>{card.cost || 0}</Text>
-          </View>
-          {isInDeck && (
-            <View style={styles.deckCardBadge}>
-              <Text style={styles.deckCardBadgeText}>✓</Text>
-            </View>
-          )}
-        </TouchableOpacity>
-      </View>
-    );
-  });
-
   return (
     <View style={styles.deckTabContainer}>
       <View style={styles.deckHeaderRow}>
@@ -3044,21 +3130,37 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
       {/* Filter Modal */}
       <FilterModal />
 
-      <View style={[styles.deckBox, { flex: 1, paddingVertical: 8, paddingHorizontal: 4, overflow: 'hidden' }]}>
-        <ScrollView
-          style={[styles.allCardsScroll, { marginBottom: 0 }]}
+      <View style={[styles.deckBox, { flex: 1, paddingVertical: 8, paddingHorizontal: 4 }]}>
+        <FlatList
+          data={filteredCards}
+          keyExtractor={item => item.id}
+          numColumns={4}
+          renderItem={({ item }) => {
+            const isInDeck = cards.some(c => c && c.id === item.id);
+            const isDragging = localDraggingCard?.id === item.id;
+            
+            return (
+              <View style={{ margin: 5 }}>
+                <CollectionCard 
+                  card={item} 
+                  isInDeck={isInDeck} 
+                  isDragging={isDragging}
+                  onTap={handleCollectionCardTap}
+                  onDragStart={handleDragStart}
+                  onDragMove={handleDragMove}
+                  onDragEnd={handleDragEnd}
+                  globalDragHandlers={dragHandlers}
+                />
+              </View>
+            );
+          }}
+          initialNumToRender={12}
+          maxToRenderPerBatch={8}
+          windowSize={5}
           showsVerticalScrollIndicator={true}
           contentContainerStyle={{ paddingBottom: 20 }}
-          nestedScrollEnabled={true}
-        >
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-evenly' }}>
-            {filteredCards.map(card => (
-              <View key={card.id} style={{ marginBottom: 10 }}>
-                <CollectionCard card={card} />
-              </View>
-            ))}
-          </View>
-        </ScrollView>
+          columnWrapperStyle={{ justifyContent: 'space-around' }}
+        />
       </View>
 
       {/* Card Menu Modal */}
@@ -3606,8 +3708,8 @@ const GameBoard = ({
 
       {draggingCard && (
         <View style={{ position: 'absolute', left: dragPosition.x, top: dragPosition.y, zIndex: 9999, elevation: 100 }} pointerEvents="none">
-          {/* Range/Radius Indicator */}
-          {Boolean(draggingCard.radius || draggingCard.range) && (
+          {/* Range/Radius Indicator - Only for Spells (radius), Buildings, or Units with Spawn Damage */}
+          {Boolean(draggingCard.radius || (draggingCard.range && (draggingCard.type === 'building' || draggingCard.spawnDamage))) && (
             <View style={{
               position: 'absolute',
               left: -(draggingCard.radius || draggingCard.range),
