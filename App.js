@@ -23,7 +23,7 @@ const FIRE_RATE_KING = 1000;
 // Card Definitions & Unit Stats
 const CARDS = [
   // Original 8 cards
-  { id: 'knight', name: 'Knight', cost: 3, color: '#f1c40f', hp: 1400, speed: 1.5, type: 'ground', range: 25, damage: 150, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common' },
+  { id: 'knight', name: 'Knight', cost: 3, color: '#f1c40f', hp: 1400, speed: 1.5, type: 'ground', range: 20, damage: 150, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common' },
   { id: 'archers', name: 'Archers', cost: 3, color: '#e67e22', hp: 250, speed: 2, type: 'ground', range: 80, damage: 100, attackSpeed: 1000, projectile: 'arrow', count: 2, rarity: 'common' },
   { id: 'giant', name: 'Giant', cost: 5, color: '#e74c3c', hp: 3000, speed: 1, type: 'ground', range: 20, damage: 200, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', rarity: 'rare' },
   { id: 'mini_pekka', name: 'Mini P', cost: 4, color: '#9b59b6', hp: 1100, speed: 2.5, type: 'ground', range: 25, damage: 350, attackSpeed: 1400, projectile: null, count: 1, rarity: 'rare' },
@@ -88,7 +88,7 @@ const CARDS = [
   { id: 'goblin_hut', name: 'Goblin Hut', cost: 5, color: '#2ecc71', hp: 1293, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 60, spawns: 'sword_goblins', spawnRate: 4.7, spawnCount: 1, rarity: 'rare' },
   { id: 'furnace', name: 'Furnace', cost: 4, color: '#e74c3c', hp: 727, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 60, spawns: 'fire_spirit', spawnRate: 7, spawnCount: 1, rarity: 'rare' },
   { id: 'earthquake', name: 'Earthquake', cost: 3, color: '#7f8c8d', type: 'spell', damage: 243, radius: 70, count: 1, slow: 0.35, rarity: 'rare' },
-  { id: 'graveyard', name: 'Graveyard', cost: 5, color: '#2c3e50', type: 'spell', damage: 0, radius: 80, count: 15, spawns: 'skeletons', spawnCount: 15, rarity: 'legendary' },
+  { id: 'graveyard', name: 'Graveyard', cost: 5, color: '#2c3e50', type: 'spell', damage: 0, radius: 80, count: 20, spawns: 'skeletons', spawnCount: 20, rarity: 'legendary' },
   { id: 'lumberjack', name: 'Lumberjack', cost: 4, color: '#e67e22', hp: 820, speed: 2.5, type: 'ground', range: 25, damage: 200, attackSpeed: 700, projectile: null, count: 1, splash: true, deathRage: true, rarity: 'legendary' },
 ];
 
@@ -1078,25 +1078,24 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
     case 'graveyard_zone':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
-          {/* Green mystical zone */}
-          <Circle cx="50" cy="50" r="45" fill="#2c3e50" stroke="#2ecc71" strokeWidth="3" opacity="0.8" />
-          {/* Inner green glow */}
-          <Circle cx="50" cy="50" r="35" fill="#27ae60" opacity="0.4" />
+          {/* Authentic CR Graveyard: Purple/Teal mystical zone */}
+          <Circle cx="50" cy="50" r="50" fill="rgba(106, 13, 173, 0.3)" stroke="#9b59b6" strokeWidth="2" />
+          {/* Inner mystical glow */}
+          <Circle cx="50" cy="50" r="40" fill="none" stroke="#2ecc71" strokeWidth="1" strokeDasharray="4 4" opacity="0.6" />
           {/* Skull symbol in center */}
-          <Circle cx="50" cy="48" r="18" fill="#ecf0f1" stroke="#bdc3c7" strokeWidth="2" />
-          {/* Skull eye sockets */}
-          <Circle cx="43" cy="45" r="4" fill="#2c3e50" />
-          <Circle cx="57" cy="45" r="4" fill="#2c3e50" />
-          {/* Skull nose */}
-          <Path d="M50 50 L47 55 L53 55 Z" fill="#2c3e50" />
-          {/* Crossed bones below skull */}
-          <Rect x="35" y="58" width="30" height="4" fill="#ecf0f1" transform="rotate(-30, 50, 60)" rx="2" />
-          <Rect x="35" y="58" width="30" height="4" fill="#ecf0f1" transform="rotate(30, 50, 60)" rx="2" />
-          {/* Mystical green particles */}
-          <Circle cx="25" cy="30" r="2" fill="#2ecc71" opacity="0.8" />
-          <Circle cx="75" cy="35" r="2" fill="#2ecc71" opacity="0.8" />
-          <Circle cx="30" cy="70" r="2" fill="#2ecc71" opacity="0.8" />
-          <Circle cx="70" cy="65" r="2" fill="#2ecc71" opacity="0.8" />
+          <G opacity="0.8">
+            <Circle cx="50" cy="48" r="18" fill="#ecf0f1" stroke="#bdc3c7" strokeWidth="2" />
+            <Circle cx="43" cy="45" r="4" fill="#2c3e50" />
+            <Circle cx="57" cy="45" r="4" fill="#2c3e50" />
+            <Path d="M50 50 L47 55 L53 55 Z" fill="#2c3e50" />
+            <Rect x="35" y="58" width="30" height="4" fill="#ecf0f1" transform="rotate(-30, 50, 60)" rx="2" />
+            <Rect x="35" y="58" width="30" height="4" fill="#ecf0f1" transform="rotate(30, 50, 60)" rx="2" />
+          </G>
+          {/* Mystical particles */}
+          <Circle cx="25" cy="30" r="2" fill="#fff" opacity="0.8" />
+          <Circle cx="75" cy="35" r="2" fill="#fff" opacity="0.8" />
+          <Circle cx="30" cy="70" r="2" fill="#9b59b6" opacity="0.8" />
+          <Circle cx="70" cy="65" r="2" fill="#9b59b6" opacity="0.8" />
         </Svg>
       );
     default:
@@ -1982,31 +1981,35 @@ const Projectile = ({ type, position }) => {
     const mainColor = isRage ? "rgba(155, 89, 182, 0.4)" : "rgba(255, 140, 0, 0.4)";
     const strokeColor = isRage ? "#8e44ad" : "#FF8C00";
     
+    // Use dynamic radius from spell data (default to 50 if undefined)
+    const spellRadius = position.radius || 50;
+    const diameter = spellRadius * 2;
+
     return (
-      <View style={{ position: 'absolute', left: position.x - 50, top: position.y - 50, width: 100, height: 100 }}>
-        <Svg width="100" height="100" viewBox="0 0 100 100">
-          <Circle cx="50" cy="50" r="45" fill={mainColor} stroke={strokeColor} strokeWidth="2" />
+      <View style={{ position: 'absolute', left: position.x - spellRadius, top: position.y - spellRadius, width: diameter, height: diameter }}>
+        <Svg width={diameter} height={diameter} viewBox={`0 0 ${diameter} ${diameter}`}>
+          <Circle cx={spellRadius} cy={spellRadius} r={spellRadius - 2} fill={mainColor} stroke={strokeColor} strokeWidth="2" />
           
           {isRage ? (
              // Rage Spell Visuals - Anger symbol / Energy
              <>
-                <Circle cx="50" cy="50" r="35" fill="none" stroke="#9b59b6" strokeWidth="2" strokeDasharray="5 5" opacity="0.6" />
-                <SvgText x="50" y="55" fontSize="30" textAnchor="middle" fill="#8e44ad" opacity="0.8">😡</SvgText>
+                <Circle cx={spellRadius} cy={spellRadius} r={spellRadius * 0.7} fill="none" stroke="#9b59b6" strokeWidth="2" strokeDasharray="5 5" opacity="0.6" />
+                <SvgText x={spellRadius} y={spellRadius + 10} fontSize={spellRadius * 0.6} textAnchor="middle" fill="#8e44ad" opacity="0.8">😡</SvgText>
              </>
           ) : (
-             // Poison Spell Visuals - Skulls/Bubbles
+             // Poison Spell Visuals - Skulls/Bubbles (scaled positions)
              <>
-                <Circle cx="35" cy="40" r="6" fill="white" opacity="0.8" />
-                <Circle cx="33" cy="40" r="1.5" fill="black" />
-                <Circle cx="37" cy="40" r="1.5" fill="black" />
+                <Circle cx={spellRadius * 0.7} cy={spellRadius * 0.8} r={spellRadius * 0.12} fill="white" opacity="0.8" />
+                <Circle cx={spellRadius * 0.66} cy={spellRadius * 0.8} r={spellRadius * 0.03} fill="black" />
+                <Circle cx={spellRadius * 0.74} cy={spellRadius * 0.8} r={spellRadius * 0.03} fill="black" />
 
-                <Circle cx="65" cy="60" r="6" fill="white" opacity="0.8" />
-                <Circle cx="63" cy="60" r="1.5" fill="black" />
-                <Circle cx="67" cy="60" r="1.5" fill="black" />
+                <Circle cx={spellRadius * 1.3} cy={spellRadius * 1.2} r={spellRadius * 0.12} fill="white" opacity="0.8" />
+                <Circle cx={spellRadius * 1.26} cy={spellRadius * 1.2} r={spellRadius * 0.03} fill="black" />
+                <Circle cx={spellRadius * 1.34} cy={spellRadius * 1.2} r={spellRadius * 0.03} fill="black" />
 
-                <Circle cx="50" cy="30" r="5" fill="white" opacity="0.8" />
-                <Circle cx="48" cy="30" r="1.5" fill="black" />
-                <Circle cx="52" cy="30" r="1.5" fill="black" />
+                <Circle cx={spellRadius} cy={spellRadius * 0.6} r={spellRadius * 0.1} fill="white" opacity="0.8" />
+                <Circle cx={spellRadius * 0.96} cy={spellRadius * 0.6} r={spellRadius * 0.03} fill="black" />
+                <Circle cx={spellRadius * 1.04} cy={spellRadius * 0.6} r={spellRadius * 0.03} fill="black" />
              </>
           )}
         </Svg>
@@ -2277,9 +2280,11 @@ const Projectile = ({ type, position }) => {
 const Unit = ({ unit }) => {
   const spriteId = unit.spriteId || 'knight';
   const isEnemy = unit.isOpponent;
-  const unitSize = 30; // Same size for both teams
   const isSlowed = unit.slowUntil > Date.now();
   const isRaged = unit.rageUntil > Date.now();
+
+  // Use dynamic size for zones (radius * 2) or default to 30 for troops
+  const unitSize = unit.radius ? (unit.radius * 2) : 30;
 
   // Check if unit is in spawn delay (Golem, Golemite)
   const isSpawning = Boolean((unit.spawnDelay > 0) && unit.spawnTime && (Date.now() - unit.spawnTime < unit.spawnDelay));
@@ -2603,8 +2608,10 @@ const CollectionCard = memo(({ card, isInDeck, isDragging, onTap, onDragStart, o
   
   const panResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (evt, gestureState) => {
+        return Math.abs(gestureState.dx) > 5 || Math.abs(gestureState.dy) > 5;
+      },
       onPanResponderGrant: (evt, gestureState) => {
         onDragStart(card, gestureState, componentRef.current);
       },
@@ -2988,7 +2995,7 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
     const isDragging = localDraggingCard?.id === item.id;
     
     return (
-      <View style={{ margin: 5 }}>
+      <View style={{ margin: 3 }}>
         <CollectionCard 
           card={item} 
           isInDeck={isInDeck} 
@@ -3158,13 +3165,14 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
           keyExtractor={item => item.id}
           numColumns={4}
           renderItem={renderCollectionCard}
+          scrollEnabled={scrollEnabled}
           initialNumToRender={12}
           maxToRenderPerBatch={8}
           windowSize={5}
           removeClippedSubviews={true}
           showsVerticalScrollIndicator={true}
           contentContainerStyle={{ paddingBottom: 20 }}
-          columnWrapperStyle={{ justifyContent: 'space-around' }}
+          columnWrapperStyle={{ justifyContent: 'flex-start' }}
         />
       </View>
 
@@ -3500,7 +3508,7 @@ const MainLobby = ({
 
 // --- Game Board Component (Extracted) ---
 const GameBoard = ({
-  towers, units, projectiles, visualEffects, setVisualEffects, timeLeft, gameOver,
+  towers, units, projectiles, visualEffects, setVisualEffects, screenShake, setScreenShake, timeLeft, gameOver,
   elixir, hand, nextCard, draggingCard, dragPosition,
   handleDragStart, handleDragMove, handleDragEnd,
   spawnTestEnemy, formatTime, onRestart, score,
@@ -3509,9 +3517,47 @@ const GameBoard = ({
 }) => {
   const [showSettings, setShowSettings] = useState(false);
 
+  // Screen shake animation
+  const shakeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (screenShake) {
+      const { intensity, duration } = screenShake;
+      const shakes = 10;
+      const shakeDuration = duration / shakes;
+
+      const animations = [];
+      for (let i = 0; i < shakes; i++) {
+        animations.push(
+          Animated.sequence([
+            Animated.timing(shakeAnim, {
+              toValue: intensity * 5 * (i % 2 === 0 ? 1 : -1),
+              duration: shakeDuration / 2,
+              useNativeDriver: true,
+            }),
+            Animated.timing(shakeAnim, {
+              toValue: 0,
+              duration: shakeDuration / 2,
+              useNativeDriver: true,
+            }),
+          ])
+        );
+      }
+
+      Animated.sequence(animations).start(() => {
+        setScreenShake(null);
+      });
+    }
+  }, [screenShake, shakeAnim, setScreenShake]);
+
   return (
     <View style={styles.container}>
-      <View style={styles.gameBoard}>
+      <Animated.View style={[
+        styles.gameBoard,
+        screenShake && {
+          transform: [{ translateX: shakeAnim }]
+        }
+      ]}>
         {/* Top Info Bar (Opponent) */}
         <View style={styles.topInfoBar}>
           <View style={styles.playerInfoContainer}>
@@ -3709,7 +3755,7 @@ const GameBoard = ({
             <Text style={{ color: '#fff', fontSize: 10 }}>Enemy</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </Animated.View>
 
       {draggingCard && (
         <View style={{ position: 'absolute', left: dragPosition.x, top: dragPosition.y, zIndex: 9999, elevation: 100 }} pointerEvents="none">
@@ -4062,6 +4108,7 @@ export default function App() {
   const [deckQueue, setDeckQueue] = useState([CARDS[5], CARDS[6], CARDS[7]]);
   const [draggingCard, setDraggingCard] = useState(null);
   const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
+  const [screenShake, setScreenShake] = useState(null);
 
   const handleSwapCards = (source, toIndex) => {
     // source can be index (deck swap) or card object (collection swap)
@@ -4413,6 +4460,31 @@ export default function App() {
             spawns: spawnCardId,
             spawnCount: spawnCount
           }]);
+        } else if (actualCard.id === 'earthquake') {
+          // Earthquake - instant damage with screen shake
+          spellType = 'earthquake_spell';
+          spellSpeed = 100; // Instant
+
+          setProjectiles(prev => [...prev, {
+            id: Date.now(),
+            x: x, // Start at target (instant)
+            y: y,
+            targetX: x,
+            targetY: y,
+            speed: spellSpeed,
+            damage: actualCard.damage,
+            radius: actualCard.radius,
+            type: spellType,
+            isSpell: true,
+            stun: actualCard.stun || 0,
+            duration: actualCard.duration || 0,
+            hit: true, // Instant - already hit the ground
+            spawnTime: Date.now(),
+            slow: actualCard.slow
+          }]);
+
+          // Trigger screen shake
+          setScreenShake({ intensity: 1.0, duration: 500 });
         } else if (actualCard.id === 'graveyard') {
           // Graveyard - spawns skeletons gradually over time
           spellType = 'graveyard_spell';
@@ -4439,23 +4511,24 @@ export default function App() {
             damage: 0,
             attackSpeed: 0,
             spawns: spawnCardId,
-            spawnRate: 0.27, // Spawn every 0.27 seconds (15 skeletons in 4 seconds)
+            spawnRate: 0.5, // Spawn every 0.5 seconds (20 skeletons in 10 seconds)
             spawnCount: 1, // Spawn 1 skeleton at a time
             lastSpawn: Date.now(),
-            lifetimeDuration: 4, // Lasts 4 seconds
+            lifetimeDuration: 10, // Lasts 10 seconds
             spawnTime: Date.now(),
-            totalToSpawn: spawnCount,
+            totalToSpawn: 20, // 10s / 0.5s = 20 skeletons
             spawnedSoFar: 0,
             isOpponent: false,
-            isZone: true // Mark as a zone (untargetable by units)
+            isZone: true, // Mark as a zone (untargetable by units)
+            radius: actualCard.radius // Set the radius for visual scaling
           };
           setUnits(prev => [...prev, newUnit]);
         }
 
         // For poison, mark it as already hit since it's instant
         const isPoison = actualCard.id === 'poison';
-        // Skip default projectile creation for Lightning, Goblin Barrel, and Graveyard as we handled them
-        if (actualCard.id !== 'lightning' && actualCard.id !== 'goblin_barrel' && actualCard.id !== 'graveyard') {
+        // Skip default projectile creation for Lightning, Goblin Barrel, Graveyard, and Earthquake as we handled them
+        if (actualCard.id !== 'lightning' && actualCard.id !== 'goblin_barrel' && actualCard.id !== 'graveyard' && actualCard.id !== 'earthquake') {
           const currentTime = Date.now();
           setProjectiles(prev => [...prev, {
             id: Date.now(),
@@ -6733,6 +6806,8 @@ export default function App() {
         projectiles={projectiles}
         visualEffects={visualEffects}
         setVisualEffects={setVisualEffects}
+        screenShake={screenShake}
+        setScreenShake={setScreenShake}
         timeLeft={timeLeft}
         gameOver={gameOver}
         elixir={elixir}
@@ -7484,9 +7559,8 @@ const styles = StyleSheet.create({
   },
   tabContentArea: {
     flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 0,
   },
   bottomNavigation: {
     height: 70,
@@ -7593,9 +7667,8 @@ const styles = StyleSheet.create({
   // --- Deck Tab Styles ---
   deckTabContainer: {
     flex: 1,
-    padding: 10,
+    paddingHorizontal: 15,
     paddingTop: 15,
-    width: width,
   },
   deckHeaderRow: {
     flexDirection: 'row',
