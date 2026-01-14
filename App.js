@@ -1128,7 +1128,7 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
       {...handlers}
     >
       {isLegendary && (
-        <Svg width="60" height="75" viewBox="0 0 60 75" style={{ position: 'absolute', top: 0, left: 0 }}>
+        <Svg width={isNext ? "40" : "60"} height={isNext ? "50" : "75"} viewBox="0 0 60 75" style={{ position: 'absolute', top: 0, left: 0 }}>
           <Defs>
             <LinearGradient id="rainbow" x1="0" y1="0" x2="1" y2="1">
               <Stop offset="0%" stopColor="#ff0000" />
@@ -1148,7 +1148,7 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
         </Svg>
       )}
       <View style={styles.cardContent}>
-        <UnitSprite id={cardToDisplay.id} isOpponent={false} size={40} />
+        <UnitSprite id={cardToDisplay.id} isOpponent={false} size={isNext ? 30 : 40} />
         <Text style={styles.cardName}>{cardToDisplay.name}</Text>
         {isMirror && (
           <Text style={{ position: 'absolute', bottom: -2, right: -2, fontSize: 14, fontWeight: 'bold', color: '#FFD700', textShadowColor: '#000', textShadowRadius: 2 }}>
@@ -1197,13 +1197,15 @@ const HealthBar = ({ current, max, isOpponent }) => {
 const VisualEffects = ({ effects, setEffects }) => {
   const now = Date.now();
 
-  // Clean up expired effects using useEffect (not during render)
+  // Clean up expired effects using useEffect with a timer (not every render)
   useEffect(() => {
-    const activeEffects = effects.filter(e => now - e.startTime < e.duration);
-    if (activeEffects.length !== effects.length) {
-      setEffects(activeEffects);
-    }
-  }, [now, effects, setEffects]);
+    const cleanupTimer = setInterval(() => {
+      const cleanupTime = Date.now();
+      setEffects(prev => prev.filter(e => cleanupTime - e.startTime < e.duration));
+    }, 500); // Clean up every 500ms instead of every render
+
+    return () => clearInterval(cleanupTimer);
+  }, [setEffects]);
 
   const activeEffects = effects.filter(e => now - e.startTime < e.duration);
 
@@ -1732,6 +1734,27 @@ const VisualEffects = ({ effects, setEffects }) => {
                 <Path d={`M${effect.radius * 1.2} ${effect.radius * 0.5} L${effect.radius * 1.8} ${effect.radius * 0.5}`} stroke="#f1c40f" strokeWidth="2" opacity={0.8} />
                 {/* Center glow */}
                 <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.2} fill="#f1c40f" opacity={1 - progress * 0.5} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'tower_hit') {
+          // Tower hit - simple flash effect
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - 40,
+              top: effect.y - 40,
+              width: 80,
+              height: 80,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width="80" height="80" viewBox="0 0 80 80">
+                <Circle cx="40" cy="40" r="35" fill="#fff" opacity={0.3 * opacity} />
+                <Circle cx="40" cy="40" r="25" fill="#fff" opacity={0.5 * opacity} />
               </Svg>
             </View>
           );
@@ -5858,6 +5881,19 @@ export default function App() {
               if (tIndex !== -1) {
                 const tower = nextTowers[tIndex];
                 let updatedTower = { ...tower, hp: tower.hp - h.damage };
+
+                // Tower hit visual effect for significant damage
+                if (h.damage > 50) {
+                  setVisualEffects(prev => [...prev, {
+                    id: Date.now() + Math.random(),
+                    type: 'tower_hit',
+                    x: tower.x,
+                    y: tower.y,
+                    radius: 40,
+                    startTime: Date.now(),
+                    duration: 200
+                  }]);
+                }
 
                 // Apply stun effect (Electro Wizard) to towers
                 if (h.stun && h.stun > 0) {
