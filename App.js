@@ -1569,6 +1569,113 @@ const VisualEffects = ({ effects, setEffects }) => {
           );
         }
 
+        if (effect.type === 'golem_death') {
+          // Golem death - stone explosion
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Main stone burst */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * (0.3 + progress * 0.7)} fill="#7f8c8d" opacity={0.8} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * (0.5 + progress * 0.5)} fill="#95a5a6" opacity={0.6} />
+                {/* Flying stone fragments */}
+                <Circle cx={effect.radius * 0.3} cy={effect.radius * 0.3} r={effect.radius * 0.15 * (1 + progress)} fill="#7f8c8d" />
+                <Circle cx={effect.radius * 1.7} cy={effect.radius * 0.4} r={effect.radius * 0.12 * (1 + progress)} fill="#95a5a6" />
+                <Circle cx={effect.radius * 0.5} cy={effect.radius * 1.6} r={effect.radius * 0.18 * (1 + progress)} fill="#7f8c8d" />
+                <Circle cx={effect.radius * 1.5} cy={effect.radius * 1.5} r={effect.radius * 0.1 * (1 + progress)} fill="#95a5a6" />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'lava_hound_death') {
+          // Lava Hound death - fiery explosion
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Fiery explosion */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * (0.4 + progress * 0.6)} fill="#c0392b" opacity={0.9} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * (0.6 + progress * 0.4)} fill="#e74c3c" opacity={0.7} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.3} fill="#f39c12" opacity={1 - progress} />
+                {/* Lava droplets */}
+                <Circle cx={effect.radius * 0.2} cy={effect.radius * 0.3} r={effect.radius * 0.1} fill="#e74c3c" />
+                <Circle cx={effect.radius * 1.8} cy={effect.radius * 0.5} r={effect.radius * 0.08} fill="#f39c12" />
+                <Circle cx={effect.radius * 0.6} cy={effect.radius * 1.7} r={effect.radius * 0.12} fill="#e74c3c" />
+                <Circle cx={effect.radius * 1.4} cy={effect.radius * 1.6} r={effect.radius * 0.09} fill="#f39c12" />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'building_destruction') {
+          // Building destruction - debris and collapse
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Debris cloud */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.8} fill="#8B4513" opacity={0.6} />
+                {/* Building fragments */}
+                <Rect x={effect.radius * 0.2} y={effect.radius * 0.2} width={effect.radius * 0.2} height={effect.radius * 0.2} fill="#A0522D" transform={`rotate(${45}, ${effect.radius * 0.3}, ${effect.radius * 0.3})`} />
+                <Rect x={effect.radius * 1.6} y={effect.radius * 0.4} width={effect.radius * 0.15} height={effect.radius * 0.15} fill="#8B4513" transform={`rotate(${-30}, ${effect.radius * 1.7}, ${effect.radius * 0.5})`} />
+                <Rect x={effect.radius * 0.5} y={effect.radius * 1.6} width={effect.radius * 0.18} height={effect.radius * 0.18} fill="#A0522D" transform={`rotate(${60}, ${effect.radius * 0.6}, ${effect.radius * 1.7})`} />
+                <Rect x={effect.radius * 1.3} y={effect.radius * 1.5} width={effect.radius * 0.12} height={effect.radius * 0.12} fill="#8B4513" transform={`rotate(${-45}, ${effect.radius * 1.4}, ${effect.radius * 1.6})`} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'lumberjack_rage') {
+          // Lumberjack rage drop - energy burst
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Purple energy burst */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * (0.5 + progress * 0.5)} fill="#9b59b6" opacity={0.8} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * (0.3 + progress * 0.4)} fill="#8e44ad" opacity={0.9} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.2} fill="#fff" opacity={1 - progress} />
+                {/* Energy waves */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.6} fill="none" stroke="#9b59b6" strokeWidth="2" opacity={1 - progress} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.8} fill="none" stroke="#8e44ad" strokeWidth="1.5" opacity={0.8 - progress * 0.8} />
+              </Svg>
+            </View>
+          );
+        }
+
         return null;
       })}
     </>
@@ -3411,10 +3518,129 @@ const GameBoard = ({
   );
 };
 
+// --- Chest Opening Modal Component ---
+const ChestOpeningModal = ({ chest, onClose }) => {
+  console.log('Rendering ChestOpeningModal for:', chest.id);
+  const [step, setStep] = useState('CLOSED'); // CLOSED -> OPENING -> REWARDS
+  const [rewards, setRewards] = useState([]);
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const shakeAnim = useRef(new Animated.Value(0)).current;
+
+  const generateRewards = () => {
+    // Determine rewards based on chest type
+    let gold = 0;
+    let gems = 0;
+    let cardCount = 0;
+    
+    switch (chest.type) {
+      case 'SILVER': gold = 50; cardCount = 5; break;
+      case 'GOLD': gold = 200; gems = 2; cardCount = 15; break;
+      case 'GIANT': gold = 1000; cardCount = 50; break;
+      case 'MAGICAL': gold = 500; gems = 10; cardCount = 20; break;
+      case 'TEST': gold = 9999; gems = 999; cardCount = 1; break;
+      default: gold = 100; cardCount = 10;
+    }
+
+    const newRewards = [];
+    if (gold > 0) newRewards.push({ type: 'GOLD', value: gold, icon: '💰', label: 'Gold' });
+    if (gems > 0) newRewards.push({ type: 'GEM', value: gems, icon: '💎', label: 'Gems' });
+    
+    // Pick a random card
+    const randomCard = CARDS[Math.floor(Math.random() * CARDS.length)];
+    if (cardCount > 0) newRewards.push({ type: 'CARD', value: cardCount, icon: '🃏', label: randomCard.name, card: randomCard });
+
+    setRewards(newRewards);
+  };
+
+  const handleTap = () => {
+    if (step === 'CLOSED') {
+      // Shake animation
+      Animated.sequence([
+        Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
+        Animated.timing(shakeAnim, { toValue: -10, duration: 50, useNativeDriver: true }),
+        Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
+        Animated.timing(shakeAnim, { toValue: 0, duration: 50, useNativeDriver: true }),
+      ]).start(() => {
+        setStep('REWARDS');
+        generateRewards();
+        // Scale up effect for rewards
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          friction: 5,
+          useNativeDriver: true
+        }).start();
+      });
+    }
+  };
+
+  const getChestColor = (type) => {
+    switch (type) {
+      case 'SILVER': return '#bdc3c7';
+      case 'GOLD': return '#f1c40f';
+      case 'GIANT': return '#e67e22';
+      case 'MAGICAL': return '#9b59b6';
+      default: return '#bdc3c7';
+    }
+  };
+
+  return (
+    <View style={styles.chestModalOverlay}>
+      <View style={styles.chestModalContent}>
+        <Text style={styles.chestModalTitle}>{chest.type} CHEST</Text>
+        
+        {step === 'CLOSED' && (
+          <TouchableOpacity onPress={handleTap} activeOpacity={0.8}>
+            <Animated.View style={[
+              styles.chestVisual, 
+              { 
+                borderColor: getChestColor(chest.type),
+                transform: [{ translateX: shakeAnim }] 
+              }
+            ]}>
+              <Text style={{fontSize: 50}}>🔒</Text>
+            </Animated.View>
+            <Text style={styles.chestTapText}>Tap to Open!</Text>
+          </TouchableOpacity>
+        )}
+
+        {step === 'REWARDS' && (
+          <View style={{alignItems: 'center'}}>
+            <Animated.View style={[styles.chestVisual, { borderColor: getChestColor(chest.type), marginBottom: 20 }]}>
+               <Text style={{fontSize: 50}}>🔓</Text>
+            </Animated.View>
+            
+            <View style={styles.rewardsContainer}>
+              {rewards.map((r, i) => (
+                <View key={i} style={styles.rewardItem}>
+                  {r.type === 'CARD' ? (
+                    <View>
+                      <UnitSprite id={r.card.id} isOpponent={false} size={60} />
+                      <Text style={{position: 'absolute', bottom: 0, right: 0, fontWeight: 'bold', color: '#fff', backgroundColor: 'rgba(0,0,0,0.5)'}}>x{r.value}</Text>
+                    </View>
+                  ) : (
+                    <Text style={styles.rewardIcon}>{r.icon}</Text>
+                  )}
+                  <Text style={styles.rewardValue}>{r.type !== 'CARD' ? r.value : r.label}</Text>
+                  {r.type !== 'CARD' && <Text style={styles.rewardLabel}>{r.label}</Text>}
+                </View>
+              ))}
+            </View>
+
+            <TouchableOpacity style={styles.closeChestButton} onPress={onClose}>
+              <Text style={styles.closeChestButtonText}>COLLECT</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+    </View>
+  );
+};
+
 export default function App() {
   // Main App Entry Point
   const [inGame, setInGame] = useState(false);
   const [inLobby, setInLobby] = useState(false);
+  const [openingChest, setOpeningChest] = useState(null); // Track chest being opened
   const [activeTab, setActiveTab] = useState(2); // Default to Battle tab
   const [gameOver, setGameOver] = useState(null);
   const [timeLeft, setTimeLeft] = useState(180);
@@ -4109,8 +4335,9 @@ export default function App() {
 
   // Chest State
   const [chests, setChests] = useState([
-    { id: 'chest_1', slotIndex: 0, type: 'SILVER', state: 'LOCKED', unlockTime: 3 * 60 * 60, timeLeft: 3 * 60 * 60 },
-    { id: 'chest_2', slotIndex: 1, type: 'GOLD', state: 'LOCKED', unlockTime: 8 * 60 * 60, timeLeft: 8 * 60 * 60 },
+    { id: 'test_chest', slotIndex: 0, type: 'TEST', state: 'UNLOCKED', unlockTime: 0, timeLeft: 0 },
+    { id: 'chest_1', slotIndex: 1, type: 'SILVER', state: 'LOCKED', unlockTime: 3 * 60 * 60, timeLeft: 3 * 60 * 60 },
+    { id: 'chest_2', slotIndex: 2, type: 'GOLD', state: 'LOCKED', unlockTime: 8 * 60 * 60, timeLeft: 8 * 60 * 60 },
   ]);
 
   // Chest Timer Logic
@@ -4150,11 +4377,16 @@ export default function App() {
   };
 
   const handleOpenChest = (chestToOpen) => {
-    // Reward player (Gold, Gems, Cards) - simplified for now
-    console.log('Opening chest:', chestToOpen.type);
-    
-    // Remove chest from slot
-    setChests(prev => prev.filter(c => c.id !== chestToOpen.id));
+    console.log('handleOpenChest called with:', chestToOpen);
+    setOpeningChest(chestToOpen);
+  };
+
+  const handleCollectRewards = () => {
+    if (openingChest) {
+      // Remove chest from slot
+      setChests(prev => prev.filter(c => c.id !== openingChest.id));
+      setOpeningChest(null);
+    }
   };
 
   const checkWinner = () => {
@@ -4967,6 +5199,17 @@ export default function App() {
                 });
               }
               unitsToSpawn.push(...newGoblins);
+
+              // Goblin Hut destruction visual effect
+              setVisualEffects(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: 'building_destruction',
+                x: deadUnit.x,
+                y: deadUnit.y,
+                radius: 60,
+                startTime: Date.now(),
+                duration: 800
+              }]);
             }
           }
 
@@ -5614,6 +5857,17 @@ export default function App() {
                 isOpponent: u.isOpponent,
                 hit: true // It's already "hit" the ground
              });
+
+             // Lumberjack rage drop visual effect
+             setVisualEffects(prev => [...prev, {
+               id: Date.now() + Math.random(),
+               type: 'lumberjack_rage',
+               x: u.x,
+               y: u.y,
+               radius: 50,
+               startTime: Date.now(),
+               duration: 1000
+             }]);
           }
 
           // Determine what to spawn
@@ -5655,6 +5909,42 @@ export default function App() {
                 spawnTime: Date.now(),  // Track spawn time for spawn delay
                 spawnDelay: spawnCard.spawnDelay || 0  // Inherit spawn delay from card
               });
+            }
+
+            // Add death visual effects based on unit type
+            if (u.spriteId === 'golem' || u.spriteId === 'golemite') {
+              // Golem death - stone explosion
+              setVisualEffects(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: 'golem_death',
+                x: u.x,
+                y: u.y,
+                radius: 80,
+                startTime: Date.now(),
+                duration: 1000
+              }]);
+            } else if (u.spriteId === 'lava_hound') {
+              // Lava Hound death - fiery explosion
+              setVisualEffects(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: 'lava_hound_death',
+                x: u.x,
+                y: u.y,
+                radius: 100,
+                startTime: Date.now(),
+                duration: 1500
+              }]);
+            } else if (u.spriteId === 'tombstone') {
+              // Tombstone destruction
+              setVisualEffects(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: 'building_destruction',
+                x: u.x,
+                y: u.y,
+                radius: 50,
+                startTime: Date.now(),
+                duration: 800
+              }]);
             }
           }
         }
@@ -5968,20 +6258,28 @@ export default function App() {
 
   if (!inGame && inLobby) {
     return (
-      <MainLobby
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        onStartGame={handleStartBattle}
-        currentDeck={userCards}
-        onSwapCards={handleSwapCards}
-        dragHandlers={{ start: onGlobalDragStart, move: onGlobalDragMove, end: onGlobalDragEnd }}
-        selectedDeckIndex={selectedDeckIndex}
-        setSelectedDeckIndex={setSelectedDeckIndex}
-        allDecks={allDecks}
-        chests={chests}
-        onUnlockChest={handleUnlockChest}
-        onOpenChest={handleOpenChest}
-      />
+      <>
+        <MainLobby
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          onStartGame={handleStartBattle}
+          currentDeck={userCards}
+          onSwapCards={handleSwapCards}
+          dragHandlers={{ start: onGlobalDragStart, move: onGlobalDragMove, end: onGlobalDragEnd }}
+          selectedDeckIndex={selectedDeckIndex}
+          setSelectedDeckIndex={setSelectedDeckIndex}
+          allDecks={allDecks}
+          chests={chests}
+          onUnlockChest={handleUnlockChest}
+          onOpenChest={handleOpenChest}
+        />
+        {openingChest && (
+          <ChestOpeningModal 
+            chest={openingChest} 
+            onClose={handleCollectRewards} 
+          />
+        )}
+      </>
     );
   }
 
@@ -8108,5 +8406,108 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  // Chest Opening Modal Styles
+  chestModalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0,0,0,0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 9999,
+    elevation: 50,
+  },
+  chestModalContent: {
+    alignItems: 'center',
+    width: '100%',
+  },
+  chestModalTitle: {
+    fontSize: 32,
+    fontWeight: '900',
+    color: '#FFD700',
+    marginBottom: 40,
+    textShadowColor: '#000',
+    textShadowOffset: {width: 2, height: 2},
+    textShadowRadius: 5,
+    letterSpacing: 2,
+  },
+  chestVisual: {
+    width: 200,
+    height: 160,
+    backgroundColor: '#5D4037', // Brown
+    borderRadius: 20,
+    borderWidth: 4,
+    borderColor: '#8D6E63',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 50,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.8,
+    shadowRadius: 15,
+    elevation: 20,
+  },
+  chestTapText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    opacity: 0.8,
+    marginTop: 20,
+  },
+  rewardsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  rewardItem: {
+    alignItems: 'center',
+    margin: 15,
+    transform: [{scale: 1.2}],
+  },
+  rewardIcon: {
+    fontSize: 40,
+    marginBottom: 5,
+  },
+  rewardValue: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: 'bold',
+    textShadowColor: '#000',
+    textShadowRadius: 2,
+  },
+  rewardLabel: {
+    color: '#ccc',
+    fontSize: 14,
+    marginTop: 2,
+  },
+  closeChestButton: {
+    marginTop: 40,
+    backgroundColor: '#F1C40F',
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 30,
+    borderBottomWidth: 5,
+    borderBottomColor: '#c29d0b',
+  },
+  closeChestButtonText: {
+    color: '#3e2723',
+    fontSize: 20,
+    fontWeight: '900',
+  },
+  chestOpenText: {
+    color: '#2ecc71',
+    fontWeight: '900',
+    fontSize: 10,
+    textShadowColor: 'black',
+    textShadowRadius: 1,
+  },
+  chestLockedText: {
+    color: '#7f8c8d',
+    fontWeight: 'bold',
+    fontSize: 10,
   },
 });
