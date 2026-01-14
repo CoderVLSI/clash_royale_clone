@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Text, Dimensions, TouchableOpacity, PanResponder, Animated, Image, ImageBackground, ScrollView, Modal, TextInput, KeyboardAvoidingView, FlatList, ActivityIndicator } from 'react-native';
-import { useState, useEffect, useRef, memo, useMemo } from 'react';
+import { useState, useEffect, useRef, memo, useMemo, useCallback } from 'react';
 import Svg, { Circle, Rect, Path, G, Defs, LinearGradient, Stop, Polygon, Text as SvgText } from 'react-native-svg';
 import { io } from "socket.io-client";
 
@@ -2766,18 +2766,18 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
   );
 
   // Show card menu for collection cards
-  const handleCollectionCardTap = (card) => {
+  const handleCollectionCardTap = useCallback((card) => {
     setCardMenuCard(card);
-  };
+  }, []);
 
   // Handle tap on deck slot card
-  const handleDeckCardTap = (card, index) => {
+  const handleDeckCardTap = useCallback((card, index) => {
     // Just show details for deck cards
     setSelectedCard(card);
-  };
+  }, []);
 
   // Handle swap from menu
-  const handleSwapFromMenu = (deckIndex) => {
+  const handleSwapFromMenu = useCallback((deckIndex) => {
     // Use showSlotSelector as the source card (it's set when Swap is clicked)
     const sourceCard = showSlotSelector || cardMenuCard;
     if (sourceCard) {
@@ -2795,7 +2795,7 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
       setCardMenuCard(null);
       setShowSlotSelector(null);
     }
-  };
+  }, [showSlotSelector, cardMenuCard, cards, onSwapCards]);
 
   // Card menu component (popup)
   const CardMenu = ({ card }) => {
@@ -2926,7 +2926,7 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
     );
   };
 
-  const measureDropZones = () => {
+  const measureDropZones = useCallback(() => {
     dropZones.current = [];
     deckSlotRefs.current.forEach((ref, index) => {
       if (ref) {
@@ -2935,9 +2935,9 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
         });
       }
     });
-  };
+  }, []);
 
-  const handleDragStart = (card, gesture, componentRef) => {
+  const handleDragStart = useCallback((card, gesture, componentRef) => {
     setScrollEnabled(false);
     setLocalDraggingCard(card);
 
@@ -2949,15 +2949,15 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
       // Also measure drop zones now
       measureDropZones();
     });
-  };
+  }, [dragHandlers, measureDropZones]);
 
-  const handleDragMove = (gesture) => {
+  const handleDragMove = useCallback((gesture) => {
     if (dragHandlers && dragHandlers.move) {
       dragHandlers.move(gesture.moveX, gesture.moveY);
     }
-  };
+  }, [dragHandlers]);
 
-  const handleDragEnd = (gesture) => {
+  const handleDragEnd = useCallback((gesture) => {
     const dropX = gesture.moveX;
     const dropY = gesture.moveY;
 
@@ -2981,7 +2981,27 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
     }
     setLocalDraggingCard(null);
     setScrollEnabled(true);
-  };
+  }, [cards, localDraggingCard, onSwapCards, dragHandlers]);
+
+  const renderCollectionCard = useCallback(({ item }) => {
+    const isInDeck = cards.some(c => c && c.id === item.id);
+    const isDragging = localDraggingCard?.id === item.id;
+    
+    return (
+      <View style={{ margin: 5 }}>
+        <CollectionCard 
+          card={item} 
+          isInDeck={isInDeck} 
+          isDragging={isDragging}
+          onTap={handleCollectionCardTap}
+          onDragStart={handleDragStart}
+          onDragMove={handleDragMove}
+          onDragEnd={handleDragEnd}
+          globalDragHandlers={dragHandlers}
+        />
+      </View>
+    );
+  }, [cards, localDraggingCard, handleCollectionCardTap, handleDragStart, handleDragMove, handleDragEnd, dragHandlers]);
 
   return (
     <View style={styles.deckTabContainer}>
@@ -3026,6 +3046,7 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
               return (
                 <TouchableOpacity
                   key={card.id}
+                  ref={el => deckSlotRefs.current[index] = el}
                   style={[
                     styles.deckCard,
                     !isLegendary && { borderColor: RARITY_COLORS[card.rarity] || '#000' },
@@ -3073,6 +3094,7 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
               return (
                 <TouchableOpacity
                   key={card.id}
+                  ref={el => deckSlotRefs.current[index + 4] = el}
                   style={[
                     styles.deckCard,
                     !isLegendary && { borderColor: RARITY_COLORS[card.rarity] || '#000' },
@@ -3135,28 +3157,11 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
           data={filteredCards}
           keyExtractor={item => item.id}
           numColumns={4}
-          renderItem={({ item }) => {
-            const isInDeck = cards.some(c => c && c.id === item.id);
-            const isDragging = localDraggingCard?.id === item.id;
-            
-            return (
-              <View style={{ margin: 5 }}>
-                <CollectionCard 
-                  card={item} 
-                  isInDeck={isInDeck} 
-                  isDragging={isDragging}
-                  onTap={handleCollectionCardTap}
-                  onDragStart={handleDragStart}
-                  onDragMove={handleDragMove}
-                  onDragEnd={handleDragEnd}
-                  globalDragHandlers={dragHandlers}
-                />
-              </View>
-            );
-          }}
+          renderItem={renderCollectionCard}
           initialNumToRender={12}
           maxToRenderPerBatch={8}
           windowSize={5}
+          removeClippedSubviews={true}
           showsVerticalScrollIndicator={true}
           contentContainerStyle={{ paddingBottom: 20 }}
           columnWrapperStyle={{ justifyContent: 'space-around' }}
