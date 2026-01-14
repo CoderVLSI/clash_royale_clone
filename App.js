@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Text, Dimensions, TouchableOpacity, PanResponder, Animated, Image, ImageBackground, ScrollView, Modal, TextInput, KeyboardAvoidingView, FlatList } from 'react-native';
 import { useState, useEffect, useRef, memo } from 'react';
-import Svg, { Circle, Rect, Path, G, Defs, LinearGradient, Stop, Polygon } from 'react-native-svg';
+import Svg, { Circle, Rect, Path, G, Defs, LinearGradient, Stop, Polygon, Text as SvgText } from 'react-native-svg';
 
 const { width, height } = Dimensions.get('window');
 
@@ -48,7 +48,7 @@ const CARDS = [
   { id: 'tesla', name: 'Tesla', cost: 4, color: '#f1c40f', hp: 600, speed: 0, type: 'building', range: 55, damage: 100, attackSpeed: 800, projectile: 'tesla_lightning', count: 1, lifetime: 35, hidden: true, rarity: 'common' },
   { id: 'wizard', name: 'Wizard', cost: 5, color: '#9b59b6', hp: 600, speed: 1.5, type: 'ground', range: 60, damage: 170, attackSpeed: 1400, projectile: 'fireball_small', count: 1, splash: true, rarity: 'rare' },
   { id: 'tombstone', name: 'Tombstone', cost: 3, color: '#95a5a6', hp: 450, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 40, spawns: 'skeletons', spawnRate: 3.1, spawnCount: 2, deathSpawnCount: 4, rarity: 'rare' },
-  { id: 'sword_goblins', name: 'Sword Gobs', cost: 3, color: '#2ecc71', hp: 160, speed: 3, type: 'ground', range: 25, damage: 100, attackSpeed: 900, projectile: null, count: 3, rarity: 'common' },
+  { id: 'sword_goblins', name: 'Sword Gobs', cost: 3, color: '#2ecc71', hp: 162, speed: 3, type: 'ground', range: 25, damage: 100, attackSpeed: 900, projectile: null, count: 3, rarity: 'common' },
   { id: 'ice_wizard', name: 'Ice Wiz', cost: 3, color: '#3498db', hp: 590, speed: 1.5, type: 'ground', range: 55, damage: 75, attackSpeed: 1700, projectile: 'ice_shard', count: 1, splash: true, rarity: 'legendary', slow: 0.35, spawnDamage: 75 },
 
   // Lava Hound & Lava Pups
@@ -71,8 +71,24 @@ const CARDS = [
   { id: 'mega_knight', name: 'Mega Knight', cost: 7, color: '#e67e22', hp: 3300, speed: 1.5, type: 'ground', range: 25, damage: 240, attackSpeed: 1600, projectile: null, count: 1, splash: true, spawnDamage: 180, jumps: true, rarity: 'legendary' },
   { id: 'electro_wizard', name: 'Electro Wiz', cost: 4, color: '#3498db', hp: 590, speed: 1.5, type: 'ground', range: 55, damage: 170, attackSpeed: 1100, projectile: 'electric_bolt', count: 1, splash: false, stun: 0.5, rarity: 'legendary', spawnDamage: 170 },
   { id: 'lightning', name: 'Lightning', cost: 6, color: '#f1c40f', type: 'spell', damage: 900, radius: 15, count: 1, rarity: 'epic' },
-  { id: 'x_bow', name: 'X-Bow', cost: 6, color: '#95a5a6', hp: 700, speed: 0, type: 'building', range: 350, damage: 40, attackSpeed: 500, projectile: 'arrow', count: 1, lifetime: 30, rarity: 'epic', spawnDelay: 3500 },
+  { id: 'x_bow', name: 'X-Bow', cost: 6, color: '#95a5a6', hp: 700, speed: 0, type: 'building', range: 280, damage: 40, attackSpeed: 100, projectile: 'arrow', count: 1, lifetime: 30, rarity: 'epic', spawnDelay: 3500 },
   { id: 'mirror', name: 'Mirror', cost: 1, color: '#ecf0f1', type: 'spell', isMirror: true, rarity: 'epic' },
+
+  // Spirit Cards - All cost 1 Elixir and die when they attack
+  { id: 'fire_spirit', name: 'Fire Spirit', cost: 1, color: '#e74c3c', hp: 90, speed: 4, type: 'ground', range: 25, damage: 81, attackSpeed: 1000, projectile: null, count: 1, splash: true, rarity: 'common', kamikaze: true },
+  { id: 'ice_spirit', name: 'Ice Spirit', cost: 1, color: '#3498db', hp: 90, speed: 4, type: 'ground', range: 25, damage: 91, attackSpeed: 1000, projectile: null, count: 1, splash: true, stun: 1.0, rarity: 'common', kamikaze: true },
+  { id: 'electro_spirit', name: 'Electro Spirit', cost: 1, color: '#9b59b6', hp: 90, speed: 4, type: 'ground', range: 25, damage: 100, attackSpeed: 1000, projectile: null, count: 1, chain: 9, stun: 0.5, rarity: 'common', kamikaze: true },
+  { id: 'heal_spirit', name: 'Heal Spirit', cost: 1, color: '#2ecc71', hp: 110, speed: 4, type: 'ground', range: 25, damage: 230, attackSpeed: 1000, projectile: null, count: 1, splash: true, rarity: 'rare', kamikaze: true, healsOnAttack: 400, healRadius: 50 },
+
+  // Additional cards for new decks
+  { id: 'bomber', name: 'Bomber', cost: 2, color: '#e67e22', hp: 340, speed: 2, type: 'ground', range: 55, damage: 145, attackSpeed: 1600, projectile: 'bomb', count: 1, splash: true, rarity: 'common' },
+  { id: 'goblin_barrel', name: 'Goblin B', cost: 3, color: '#2ecc71', type: 'spell', damage: 0, radius: 20, count: 3, spawns: 'sword_goblins', spawnCount: 3, rarity: 'epic' },
+  { id: 'elixir_collector', name: 'Elixir G', cost: 6, color: '#9b59b6', hp: 1070, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 93, rarity: 'rare', generatesElixir: true },
+  { id: 'goblin_hut', name: 'Goblin Hut', cost: 5, color: '#2ecc71', hp: 1293, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 60, spawns: 'sword_goblins', spawnRate: 4.7, spawnCount: 1, rarity: 'rare' },
+  { id: 'furnace', name: 'Furnace', cost: 4, color: '#e74c3c', hp: 727, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 60, spawns: 'fire_spirit', spawnRate: 7, spawnCount: 1, rarity: 'rare' },
+  { id: 'earthquake', name: 'Earthquake', cost: 3, color: '#7f8c8d', type: 'spell', damage: 243, radius: 70, count: 1, slow: 0.35, rarity: 'rare' },
+  { id: 'graveyard', name: 'Graveyard', cost: 5, color: '#2c3e50', type: 'spell', damage: 0, radius: 80, count: 15, spawns: 'skeletons', spawnCount: 15, rarity: 'legendary' },
+  { id: 'lumberjack', name: 'Lumberjack', cost: 4, color: '#e67e22', hp: 820, speed: 2.5, type: 'ground', range: 25, damage: 200, attackSpeed: 700, projectile: null, count: 1, splash: true, deathRage: true, rarity: 'legendary' },
 ];
 
 const RARITY_COLORS = {
@@ -86,8 +102,21 @@ const RARITY_COLORS = {
 const MainMenu = ({ onStart }) => {
   const [progress, setProgress] = useState(0);
   const [loaded, setLoaded] = useState(false);
+  const [tipIndex, setTipIndex] = useState(0);
+
+  const TIPS = [
+    "Tip: Destroying enemy towers grants Crowns!",
+    "Tip: Join a Clan to request cards and friendly battle!",
+    "Tip: Don't spend all your Elixir at once!",
+    "Tip: Lure enemy troops to the center to activate your King Tower.",
+    "Tip: Use spells to damage multiple units at once.",
+    "Tip: Balance your deck with ground and air units."
+  ];
 
   useEffect(() => {
+    // Pick a random tip on mount
+    setTipIndex(Math.floor(Math.random() * TIPS.length));
+
     const interval = setInterval(() => {
       setProgress(prev => {
         if (prev >= 100) {
@@ -95,35 +124,45 @@ const MainMenu = ({ onStart }) => {
           setLoaded(true);
           return 100;
         }
-        return prev + 2;
+        return prev + 2; // Slower load for effect
       });
-    }, 50);
+    }, 30);
     return () => clearInterval(interval);
   }, []);
+
+  // Auto-start when loaded
+  useEffect(() => {
+    if (loaded) {
+      // Small delay before transition
+      const timer = setTimeout(onStart, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [loaded, onStart]);
 
   return (
     <ImageBackground source={require('./background.jpg')} style={styles.menuContainer}>
       <View style={styles.menuOverlay}>
-        <View style={styles.headerContainer}>
-          <Text style={styles.title}>CLASH ROYALE</Text>
-          <Text style={styles.subtitle}>CLONE</Text>
+        <View style={styles.logoContainer}>
+          <Text style={styles.logoTextClash}>CLASH</Text>
+          <Text style={styles.logoTextRoyale}>ROYALE</Text>
         </View>
 
-        <View style={styles.bottomContainer}>
-          {!loaded ? (
-            <View style={styles.loadingContainer}>
-              <Text style={styles.loadingText}>Loading Arena... {progress}%</Text>
-              <View style={styles.progressBarBg}>
-                <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
-              </View>
+        <View style={{ flex: 1 }} />
+
+        <View style={styles.loadingBottomContainer}>
+          <Text style={styles.tipText}>{TIPS[tipIndex]}</Text>
+          
+          <View style={styles.loadingBarRow}>
+            <Text style={styles.loadingPercentage}>{progress}%</Text>
+            <View style={styles.loadingBarTrack}>
+              <View style={[styles.loadingBarFill, { width: `${progress}%` }]} />
             </View>
-          ) : (
-            <TouchableOpacity style={styles.battleButton} onPress={onStart}>
-              <Text style={styles.battleButtonText}>BATTLE</Text>
-            </TouchableOpacity>
-          )}
-          <Text style={styles.footerText}>Made with React Native Expo</Text>
+          </View>
+          
+          <Text style={styles.loadingStateText}>Updating Arena...</Text>
         </View>
+        
+        <Text style={styles.copyrightText}>SUPERCELL</Text>
       </View>
     </ImageBackground>
   );
@@ -757,6 +796,248 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Rect x="47" y="90" width="6" height="8" fill="#95a5a6" rx="2" />
         </Svg>
       );
+    case 'fire_spirit':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Flaming body - coal with fire */}
+          <Circle cx="50" cy="50" r="30" fill="#e74c3c" stroke="#c0392b" strokeWidth="2" />
+          <Circle cx="50" cy="50" r="25" fill="#f39c12" stroke="#e67e22" strokeWidth="2" />
+          {/* Glowing eyes */}
+          <Circle cx="42" cy="45" r="4" fill="#f1c40f" />
+          <Circle cx="58" cy="45" r="4" fill="#f1c40f" />
+          <Circle cx="42" cy="45" r="2" fill="#e74c3c" />
+          <Circle cx="58" cy="45" r="2" fill="#e74c3c" />
+          {/* Small hands and feet */}
+          <Circle cx="30" cy="50" r="5" fill="#e74c3c" />
+          <Circle cx="70" cy="50" r="5" fill="#e74c3c" />
+          <Circle cx="40" cy="75" r="5" fill="#e74c3c" />
+          <Circle cx="60" cy="75" r="5" fill="#e74c3c" />
+          {/* Flame aura */}
+          <Path d="M25 25 Q30 15 35 25 Q40 10 45 25 Q50 5 55 25 Q60 10 65 25 Q70 15 75 25" stroke="#f1c40f" strokeWidth="3" fill="none" opacity="0.8" />
+        </Svg>
+      );
+    case 'ice_spirit':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Ice cube/snowball body */}
+          <Rect x="30" y="30" width="40" height="40" rx="8" fill="#3498db" stroke="#2980b9" strokeWidth="2" />
+          {/* Ice crystal facets */}
+          <Path d="M30 30 L70 70 M50 30 L50 70 M30 50 L70 50" stroke="#85c1e9" strokeWidth="1" opacity="0.5" />
+          {/* Glowing eyes */}
+          <Circle cx="42" cy="45" r="4" fill="white" />
+          <Circle cx="58" cy="45" r="4" fill="white" />
+          <Circle cx="42" cy="45" r="2" fill="#3498db" />
+          <Circle cx="58" cy="45" r="2" fill="#3498db" />
+          {/* Small hands and feet */}
+          <Circle cx="25" cy="50" r="5" fill="#3498db" stroke="#2980b9" strokeWidth="1" />
+          <Circle cx="75" cy="50" r="5" fill="#3498db" stroke="#2980b9" strokeWidth="1" />
+          <Circle cx="40" cy="75" r="5" fill="#3498db" stroke="#2980b9" strokeWidth="1" />
+          <Circle cx="60" cy="75" r="5" fill="#3498db" stroke="#2980b9" strokeWidth="1" />
+          {/* Frost aura */}
+          <Circle cx="50" cy="50" r="45" fill="none" stroke="#85c1e9" strokeWidth="1" strokeDasharray="3 3" opacity="0.5" />
+        </Svg>
+      );
+    case 'electro_spirit':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Electric body */}
+          <Circle cx="50" cy="50" r="30" fill="#9b59b6" stroke="#8e44ad" strokeWidth="2" />
+          {/* Lightning bolt mustache */}
+          <Path d="M30 55 L45 50 L40 60 L50 45 L55 55 L70 50" stroke="#f1c40f" strokeWidth="3" fill="none" strokeLinecap="round" />
+          {/* Glowing eyes */}
+          <Circle cx="42" cy="40" r="4" fill="#3498db" />
+          <Circle cx="58" cy="40" r="4" fill="#3498db" />
+          <Circle cx="42" cy="40" r="2" fill="white" />
+          <Circle cx="58" cy="40" r="2" fill="white" />
+          {/* Small hands and feet */}
+          <Circle cx="25" cy="50" r="5" fill="#9b59b6" stroke="#8e44ad" strokeWidth="1" />
+          <Circle cx="75" cy="50" r="5" fill="#9b59b6" stroke="#8e44ad" strokeWidth="1" />
+          <Circle cx="40" cy="75" r="5" fill="#9b59b6" stroke="#8e44ad" strokeWidth="1" />
+          <Circle cx="60" cy="75" r="5" fill="#9b59b6" stroke="#8e44ad" strokeWidth="1" />
+          {/* Electric sparks */}
+          <Path d="M20 20 L25 30 M80 20 L75 30 M20 80 L25 70 M80 80 L75 70" stroke="#f1c40f" strokeWidth="2" opacity="0.8" />
+        </Svg>
+      );
+    case 'heal_spirit':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Lemon/lime body */}
+          <Rect x="32" y="32" width="36" height="36" rx="6" fill="#2ecc71" stroke="#27ae60" strokeWidth="2" />
+          {/* Glowing eyes */}
+          <Circle cx="43" cy="45" r="4" fill="white" />
+          <Circle cx="57" cy="45" r="4" fill="white" />
+          <Circle cx="43" cy="45" r="2" fill="#27ae60" />
+          <Circle cx="57" cy="45" r="2" fill="#27ae60" />
+          {/* Small hands and feet */}
+          <Circle cx="25" cy="50" r="5" fill="#2ecc71" stroke="#27ae60" strokeWidth="1" />
+          <Circle cx="75" cy="50" r="5" fill="#2ecc71" stroke="#27ae60" strokeWidth="1" />
+          <Circle cx="40" cy="75" r="5" fill="#2ecc71" stroke="#27ae60" strokeWidth="1" />
+          <Circle cx="60" cy="75" r="5" fill="#2ecc71" stroke="#27ae60" strokeWidth="1" />
+          {/* Healing cross symbol */}
+          <Rect x="47" y="35" width="6" height="14" fill="white" rx="1" />
+          <Rect x="43" y="39" width="14" height="6" fill="white" rx="1" />
+          {/* Healing aura */}
+          <Circle cx="50" cy="50" r="45" fill="none" stroke="#2ecc71" strokeWidth="1" strokeDasharray="3 3" opacity="0.5" />
+        </Svg>
+      );
+    case 'bomber':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          {/* Bomb in hand */}
+          <Circle cx="50" cy="60" r="12" fill="#2c3e50" stroke="#34495e" strokeWidth="2" />
+          <Path d="M50 48 L50 72" stroke="#e74c3c" strokeWidth="4" />
+          <Circle cx="50" cy="60" r="4" fill="#e74c3c" />
+          {/* Fuse */}
+          <Path d="M55 50 Q65 45 70 35" stroke="#f39c12" strokeWidth="2" />
+          {/* Spark */}
+          <Circle cx="70" cy="35" r="2" fill="#f1c40f" />
+        </Svg>
+      );
+    case 'goblin_barrel':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Barrel */}
+          <Rect x="30" y="40" width="40" height="40" fill="#8B4513" stroke="#654321" strokeWidth="2" rx="5" />
+          <Rect x="35" y="35" width="30" height="10" fill="#654321" />
+          <Rect x="40" y="30" width="20" height="10" fill="#8B4513" />
+          {/* Metal bands */}
+          <Rect x="28" y="50" width="44" height="5" fill="#95a5a6" />
+          <Rect x="28" y="65" width="44" height="5" fill="#95a5a6" />
+          {/* Goblin face peeking out */}
+          <Circle cx="50" cy="55" r="8" fill="#2ecc71" />
+          <Circle cx="47" cy="53" r="2" fill="black" />
+          <Circle cx="53" cy="53" r="2" fill="black" />
+        </Svg>
+      );
+    case 'elixir_collector':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Base */}
+          <Rect x="20" y="50" width="60" height="30" fill="#f39c12" stroke="#e67e22" strokeWidth="2" rx="3" />
+          {/* Elixir vial */}
+          <Rect x="40" y="30" width="20" height="40" fill="#3498db" stroke="#2980b9" strokeWidth="2" rx="3" />
+          <Rect x="45" y="20" width="10" height="15" fill="#3498db" stroke="#2980b9" strokeWidth="2" />
+          {/* Elixir liquid */}
+          <Rect x="42" y="35" width="16" height="30" fill="#9b59b6" opacity="0.7" />
+          {/* Collector wheels */}
+          <Circle cx="25" cy="80" r="5" fill="#7f8c8d" />
+          <Circle cx="75" cy="80" r="5" fill="#7f8c8d" />
+        </Svg>
+      );
+    case 'goblin_hut':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Hut structure */}
+          <Rect x="20" y="50" width="60" height="40" fill="#8B4513" stroke="#654321" strokeWidth="2" />
+          {/* Roof */}
+          <Path d="M15 50 L50 25 L85 50 Z" fill="#A0522D" stroke="#654321" strokeWidth="2" />
+          {/* Door */}
+          <Rect x="42" y="65" width="16" height="25" fill="#654321" />
+          {/* Window */}
+          <Circle cx="35" cy="60" r="5" fill="#f1c40f" opacity="0.8" />
+          <Circle cx="65" cy="60" r="5" fill="#f1c40f" opacity="0.8" />
+        </Svg>
+      );
+    case 'furnace':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Furnace body */}
+          <Rect x="25" y="40" width="50" height="45" fill="#e74c3c" stroke="#c0392b" strokeWidth="2" rx="3" />
+          {/* Top opening */}
+          <Rect x="35" y="35" width="30" height="10" fill="#2c3e50" />
+          {/* Fire inside */}
+          <Circle cx="50" cy="60" r="15" fill="#f39c12" opacity="0.8" />
+          <Circle cx="50" cy="60" r="8" fill="#e74c3c" />
+          {/* Smoke vents */}
+          <Rect x="30" y="30" width="8" height="8" fill="#7f8c8d" />
+          <Rect x="62" y="30" width="8" height="8" fill="#7f8c8d" />
+        </Svg>
+      );
+    case 'earthquake':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#7f8c8d" stroke="#95a5a6" strokeWidth="3" />
+          {/* Cracked ground */}
+          <Path d="M20 50 L35 40 L45 55 L60 35 L80 50" stroke="#2c3e50" strokeWidth="4" fill="none" />
+          <Path d="M25 60 L40 50 L50 65 L70 45" stroke="#2c3e50" strokeWidth="3" fill="none" />
+          {/* Tremor waves */}
+          <Circle cx="50" cy="50" r="30" fill="none" stroke="#7f8c8d" strokeWidth="2" strokeDasharray="5 3" />
+          <Circle cx="50" cy="50" r="20" fill="none" stroke="#7f8c8d" strokeWidth="2" strokeDasharray="5 3" />
+        </Svg>
+      );
+    case 'graveyard':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#2c3e50" stroke="#34495e" strokeWidth="3" />
+          {/* Tombstone */}
+          <Rect x="35" y="40" width="30" height="35" fill="#95a5a6" stroke="#7f8c8d" strokeWidth="2" rx="5" />
+          {/* RIP text */}
+          <Text x="50" y="60" fill="#2c3e50" fontSize="12" fontWeight="bold" textAnchor="middle">RIP</Text>
+          {/* Skeleton hands */}
+          <Circle cx="30" cy="70" r="4" fill="#ecf0f1" />
+          <Circle cx="70" cy="70" r="4" fill="#ecf0f1" />
+          {/* Eerie glow */}
+          <Circle cx="50" cy="50" r="40" fill="none" stroke="#2ecc71" strokeWidth="1" strokeDasharray="3 3" opacity="0.5" />
+        </Svg>
+      );
+    case 'lumberjack':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          {/* Hard hat */}
+          <Rect x="30" y="20" width="40" height="15" fill="#f1c40f" stroke="#e67e22" strokeWidth="2" rx="3" />
+          {/* Axe */}
+          <Rect x="70" y="35" width="8" height="40" fill="#8B4513" transform="rotate(20 74 55)" />
+          <Path d="M70 35 L78 30 L82 40 Z" fill="#95a5a6" transform="rotate(20 74 55)" />
+          {/* Face */}
+          <Circle cx="45" cy="45" r="3" fill="black" />
+          <Circle cx="55" cy="45" r="3" fill="black" />
+          {/* Beard */}
+          <Path d="M35 55 Q50 75 65 55" fill="#e67e22" />
+        </Svg>
+      );
+    case 'goblin_barrel_spell':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Wooden barrel falling from sky */}
+          <Circle cx="50" cy="50" r="40" fill="#8B4513" stroke="#654321" strokeWidth="3" />
+          {/* Barrel metal bands */}
+          <Rect x="10" y="35" width="80" height="8" fill="#2c3e50" />
+          <Rect x="10" y="55" width="80" height="8" fill="#2c3e50" />
+          {/* Barrel wood grain */}
+          <Path d="M20 30 L20 70 M35 25 L35 75 M50 20 L50 80 M65 25 L65 75 M80 30 L80 70" stroke="#654321" strokeWidth="2" opacity="0.5" />
+          {/* Goblin face peeking out */}
+          <Circle cx="35" cy="45" r="3" fill="#2ecc71" />
+          <Circle cx="65" cy="45" r="3" fill="#2ecc71" />
+          {/* Motion lines (falling effect) */}
+          <Path d="M30 10 L25 5 M50 5 L50 0 M70 10 L75 5" stroke="#bdc3c7" strokeWidth="2" opacity="0.6" />
+        </Svg>
+      );
+    case 'graveyard_zone':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Green mystical zone */}
+          <Circle cx="50" cy="50" r="45" fill="#2c3e50" stroke="#2ecc71" strokeWidth="3" opacity="0.8" />
+          {/* Inner green glow */}
+          <Circle cx="50" cy="50" r="35" fill="#27ae60" opacity="0.4" />
+          {/* Skull symbol in center */}
+          <Circle cx="50" cy="48" r="18" fill="#ecf0f1" stroke="#bdc3c7" strokeWidth="2" />
+          {/* Skull eye sockets */}
+          <Circle cx="43" cy="45" r="4" fill="#2c3e50" />
+          <Circle cx="57" cy="45" r="4" fill="#2c3e50" />
+          {/* Skull nose */}
+          <Path d="M50 50 L47 55 L53 55 Z" fill="#2c3e50" />
+          {/* Crossed bones below skull */}
+          <Rect x="35" y="58" width="30" height="4" fill="#ecf0f1" transform="rotate(-30, 50, 60)" rx="2" />
+          <Rect x="35" y="58" width="30" height="4" fill="#ecf0f1" transform="rotate(30, 50, 60)" rx="2" />
+          {/* Mystical green particles */}
+          <Circle cx="25" cy="30" r="2" fill="#2ecc71" opacity="0.8" />
+          <Circle cx="75" cy="35" r="2" fill="#2ecc71" opacity="0.8" />
+          <Circle cx="30" cy="70" r="2" fill="#2ecc71" opacity="0.8" />
+          <Circle cx="70" cy="65" r="2" fill="#2ecc71" opacity="0.8" />
+        </Svg>
+      );
     default:
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
@@ -847,7 +1128,7 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
       {...handlers}
     >
       {isLegendary && (
-        <Svg width="60" height="75" viewBox="0 0 60 75" style={{ position: 'absolute', top: 0, left: 0 }}>
+        <Svg width={isNext ? "40" : "60"} height={isNext ? "50" : "75"} viewBox="0 0 60 75" style={{ position: 'absolute', top: 0, left: 0 }}>
           <Defs>
             <LinearGradient id="rainbow" x1="0" y1="0" x2="1" y2="1">
               <Stop offset="0%" stopColor="#ff0000" />
@@ -867,7 +1148,7 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
         </Svg>
       )}
       <View style={styles.cardContent}>
-        <UnitSprite id={cardToDisplay.id} isOpponent={false} size={40} />
+        <UnitSprite id={cardToDisplay.id} isOpponent={false} size={isNext ? 30 : 40} />
         <Text style={styles.cardName}>{cardToDisplay.name}</Text>
         {isMirror && (
           <Text style={{ position: 'absolute', bottom: -2, right: -2, fontSize: 14, fontWeight: 'bold', color: '#FFD700', textShadowColor: '#000', textShadowRadius: 2 }}>
@@ -910,6 +1191,578 @@ const HealthBar = ({ current, max, isOpponent }) => {
         />
       </View>
     </View>
+  );
+};
+
+const VisualEffects = ({ effects, setEffects }) => {
+  const now = Date.now();
+
+  // Clean up expired effects using useEffect with a timer (not every render)
+  useEffect(() => {
+    const cleanupTimer = setInterval(() => {
+      const cleanupTime = Date.now();
+      setEffects(prev => prev.filter(e => cleanupTime - e.startTime < e.duration));
+    }, 500); // Clean up every 500ms instead of every render
+
+    return () => clearInterval(cleanupTimer);
+  }, [setEffects]);
+
+  const activeEffects = effects.filter(e => now - e.startTime < e.duration);
+
+  return (
+    <>
+      {activeEffects.map(effect => {
+        const progress = (now - effect.startTime) / effect.duration; // 0 to 1
+        const opacity = 1 - progress; // Fade out
+
+        if (effect.type === 'fire_explosion') {
+          // Fire explosion - expanding orange/red circle
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * (0.3 + progress * 0.7)}
+                  fill="#e74c3c"
+                  opacity={0.6}
+                />
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * (0.5 + progress * 0.5)}
+                  fill="#f39c12"
+                  opacity={0.4}
+                />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'ice_freeze') {
+          // Ice freeze - blue expanding circle
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * (0.3 + progress * 0.7)}
+                  fill="#3498db"
+                  opacity={0.5}
+                />
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * 0.5}
+                  fill="white"
+                  opacity={0.3}
+                />
+              </Svg>
+              {/* Snowflake symbol - outside SVG */}
+              <View style={{
+                position: 'absolute',
+                opacity: opacity
+              }}>
+                <Text style={{ fontSize: 24 }}>❄️</Text>
+              </View>
+            </View>
+          );
+        }
+
+        if (effect.type === 'heal_glow') {
+          // Heal glow - green expanding circle with + symbols
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * (0.2 + progress * 0.8)}
+                  fill="#2ecc71"
+                  opacity={0.4}
+                />
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * 0.6}
+                  fill="#27ae60"
+                  opacity={0.2}
+                />
+              </Svg>
+              {/* Plus symbol - outside SVG */}
+              <View style={{
+                position: 'absolute',
+                opacity: opacity
+              }}>
+                <Text style={{
+                  fontSize: 28,
+                  color: '#2ecc71',
+                  fontWeight: 'bold',
+                  textShadowColor: 'white',
+                  textShadowRadius: 5
+                }}>+</Text>
+              </View>
+            </View>
+          );
+        }
+
+        if (effect.type === 'chain_lightning' && effect.targets && effect.targets.length > 1) {
+          // Chain lightning - draw lines connecting all targets
+          const lines = [];
+          for (let i = 0; i < effect.targets.length - 1; i++) {
+            const start = effect.targets[i];
+            const end = effect.targets[i + 1];
+            const dx = end.x - start.x;
+            const dy = end.y - start.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            // Generate jagged lightning path
+            const segments = Math.max(3, Math.floor(dist / 30));
+            let pathD = `M${start.x} ${start.y}`;
+            for (let j = 1; j < segments; j++) {
+              const t = j / segments;
+              const baseX = start.x + dx * t;
+              const baseY = start.y + dy * t;
+              const offset = (Math.random() - 0.5) * 15;
+              const perpX = -dy / dist * offset;
+              const perpY = dx / dist * offset;
+              pathD += ` L${baseX + perpX} ${baseY + perpY}`;
+            }
+            pathD += ` L${end.x} ${end.y}`;
+
+            lines.push(
+              <Svg key={`${effect.id}-${i}`} style={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                width: '100%',
+                height: '100%',
+                opacity: opacity
+              }} viewBox={`0 0 ${width} ${height}`}>
+                <Path
+                  d={pathD}
+                  stroke="#f1c40f"
+                  strokeWidth="3"
+                  fill="none"
+                  strokeLinecap="round"
+                />
+                <Path
+                  d={pathD}
+                  stroke="#3498db"
+                  strokeWidth="6"
+                  fill="none"
+                  opacity={0.5}
+                  strokeLinecap="round"
+                />
+              </Svg>
+            );
+          }
+          return <View key={effect.id}>{lines}</View>;
+        }
+
+        if (effect.type === 'fireball_explosion') {
+          // Fireball impact - large explosion
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * (0.5 + progress * 0.5)} fill="#e74c3c" opacity={0.7} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * (0.3 + progress * 0.4)} fill="#f39c12" opacity={0.9} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.2} fill="#fff" opacity={1 - progress} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'zap_impact') {
+          // Zap impact - electric spark
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.8} fill="#3498db" opacity={0.8} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.5} fill="#fff" opacity={0.9} />
+                <Path d={`M${effect.radius * 0.3} ${effect.radius * 0.2} L${effect.radius * 0.5} ${effect.radius * 0.4}`} stroke="#fff" strokeWidth="2" />
+                <Path d={`M${effect.radius * 0.7} ${effect.radius * 0.2} L${effect.radius * 0.5} ${effect.radius * 0.4}`} stroke="#fff" strokeWidth="2" />
+                <Path d={`M${effect.radius * 0.3} ${effect.radius * 0.8} L${effect.radius * 0.5} ${effect.radius * 0.6}`} stroke="#fff" strokeWidth="2" />
+                <Path d={`M${effect.radius * 0.7} ${effect.radius * 0.8} L${effect.radius * 0.5} ${effect.radius * 0.6}`} stroke="#fff" strokeWidth="2" />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'arrows_impact') {
+          // Arrows impact - multiple arrows in ground
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.6} fill="#2ecc71" opacity={0.3} />
+                <Path d="M20 40 L25 50 L30 40" stroke="#8B4513" strokeWidth="2" fill="none" transform={`rotate(${30}, ${effect.radius}, ${effect.radius})`} />
+                <Path d="M40 20 L45 30 L50 20" stroke="#8B4513" strokeWidth="2" fill="none" transform={`rotate(${-15}, ${effect.radius}, ${effect.radius})`} />
+                <Path d="M50 50 L55 60 L60 50" stroke="#8B4513" strokeWidth="2" fill="none" transform={`rotate(${60}, ${effect.radius}, ${effect.radius})`} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'poison_cloud') {
+          // Poison spell - green cloud
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity * 0.7,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius} fill="#27ae60" opacity={0.4} />
+                <Circle cx={effect.radius * 0.7} cy={effect.radius * 0.6} r={effect.radius * 0.25} fill="#2ecc71" opacity={0.6} />
+                <Circle cx={effect.radius * 1.3} cy={effect.radius * 0.7} r={effect.radius * 0.2} fill="#2ecc71" opacity={0.6} />
+                <Circle cx={effect.radius * 0.8} cy={effect.radius * 1.3} r={effect.radius * 0.22} fill="#2ecc71" opacity={0.6} />
+                <Circle cx={effect.radius * 0.5} cy={effect.radius * 1.5} r={effect.radius * 0.1} fill="#a9dfbf" opacity={progress} />
+                <Circle cx={effect.radius * 1.2} cy={effect.radius * 1.4} r={effect.radius * 0.12} fill="#a9dfbf" opacity={progress} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'rocket_explosion') {
+          // Rocket impact - massive explosion
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius} fill="#7f8c8d" opacity={0.8} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.7} fill="#e74c3c" opacity={0.9} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.4} fill="#f39c12" opacity={1} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.15} fill="#fff" opacity={1 - progress} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'rage_aura') {
+          // Rage spell - purple energy aura
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity * 0.6,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius} fill="none" stroke="#9b59b6" strokeWidth="3" strokeDasharray="10 5" />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.7} fill="none" stroke="#8e44ad" strokeWidth="2" opacity={0.7} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.4} fill="none" stroke="#9b59b6" strokeWidth="2" opacity={0.5} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'earthquake_crack') {
+          // Earthquake - cracking ground effect
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Rect x="5" y="5" width={effect.radius * 2 - 10} height={effect.radius * 2 - 10} fill="#7f8c8d" stroke="#5d6d7e" strokeWidth="2" rx="5" opacity={0.9} />
+                <Path d={`M${effect.radius} 5 L${effect.radius * 0.7} ${effect.radius * 0.5} L${effect.radius} ${effect.radius}`} stroke="#2c3e50" strokeWidth="3" fill="none" />
+                <Path d={`M${effect.radius} 5 L${effect.radius * 1.3} ${effect.radius * 0.5} L${effect.radius} ${effect.radius}`} stroke="#2c3e50" strokeWidth="3" fill="none" />
+                <Path d={`M5 ${effect.radius} L${effect.radius * 0.5} ${effect.radius * 0.7} L${effect.radius} ${effect.radius}`} stroke="#2c3e50" strokeWidth="2" fill="none" />
+                <Path d={`M${effect.radius * 2} ${effect.radius} L${effect.radius * 1.5} ${effect.radius * 1.3} L${effect.radius} ${effect.radius}`} stroke="#2c3e50" strokeWidth="2" fill="none" />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'lightning_strike') {
+          // Lightning spell - bolt from sky
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Path d={`M${effect.radius} 0 L${effect.radius * 0.7} ${effect.radius * 0.5} L${effect.radius * 1.2} ${effect.radius * 0.5} L${effect.radius * 0.5} ${effect.radius} L${effect.radius * 0.8} ${effect.radius} L${effect.radius} ${effect.radius * 2}`} stroke="#f1c40f" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                <Path d={`M${effect.radius} 0 L${effect.radius * 0.7} ${effect.radius * 0.5} L${effect.radius * 1.2} ${effect.radius * 0.5} L${effect.radius * 0.5} ${effect.radius} L${effect.radius * 0.8} ${effect.radius} L${effect.radius} ${effect.radius * 2}`} stroke="#fff" strokeWidth="8" fill="none" opacity={0.5} strokeLinecap="round" strokeLinejoin="round" />
+                <Circle cx={effect.radius} cy={effect.radius * 1.8} r={effect.radius * 0.3} fill="#f1c40f" opacity={1 - progress} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'golem_death') {
+          // Golem death - stone explosion
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Main stone burst */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * (0.3 + progress * 0.7)} fill="#7f8c8d" opacity={0.8} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * (0.5 + progress * 0.5)} fill="#95a5a6" opacity={0.6} />
+                {/* Flying stone fragments */}
+                <Circle cx={effect.radius * 0.3} cy={effect.radius * 0.3} r={effect.radius * 0.15 * (1 + progress)} fill="#7f8c8d" />
+                <Circle cx={effect.radius * 1.7} cy={effect.radius * 0.4} r={effect.radius * 0.12 * (1 + progress)} fill="#95a5a6" />
+                <Circle cx={effect.radius * 0.5} cy={effect.radius * 1.6} r={effect.radius * 0.18 * (1 + progress)} fill="#7f8c8d" />
+                <Circle cx={effect.radius * 1.5} cy={effect.radius * 1.5} r={effect.radius * 0.1 * (1 + progress)} fill="#95a5a6" />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'lava_hound_death') {
+          // Lava Hound death - fiery explosion
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Fiery explosion */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * (0.4 + progress * 0.6)} fill="#c0392b" opacity={0.9} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * (0.6 + progress * 0.4)} fill="#e74c3c" opacity={0.7} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.3} fill="#f39c12" opacity={1 - progress} />
+                {/* Lava droplets */}
+                <Circle cx={effect.radius * 0.2} cy={effect.radius * 0.3} r={effect.radius * 0.1} fill="#e74c3c" />
+                <Circle cx={effect.radius * 1.8} cy={effect.radius * 0.5} r={effect.radius * 0.08} fill="#f39c12" />
+                <Circle cx={effect.radius * 0.6} cy={effect.radius * 1.7} r={effect.radius * 0.12} fill="#e74c3c" />
+                <Circle cx={effect.radius * 1.4} cy={effect.radius * 1.6} r={effect.radius * 0.09} fill="#f39c12" />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'building_destruction') {
+          // Building destruction - debris and collapse
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Debris cloud */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.8} fill="#8B4513" opacity={0.6} />
+                {/* Building fragments */}
+                <Rect x={effect.radius * 0.2} y={effect.radius * 0.2} width={effect.radius * 0.2} height={effect.radius * 0.2} fill="#A0522D" transform={`rotate(${45}, ${effect.radius * 0.3}, ${effect.radius * 0.3})`} />
+                <Rect x={effect.radius * 1.6} y={effect.radius * 0.4} width={effect.radius * 0.15} height={effect.radius * 0.15} fill="#8B4513" transform={`rotate(${-30}, ${effect.radius * 1.7}, ${effect.radius * 0.5})`} />
+                <Rect x={effect.radius * 0.5} y={effect.radius * 1.6} width={effect.radius * 0.18} height={effect.radius * 0.18} fill="#A0522D" transform={`rotate(${60}, ${effect.radius * 0.6}, ${effect.radius * 1.7})`} />
+                <Rect x={effect.radius * 1.3} y={effect.radius * 1.5} width={effect.radius * 0.12} height={effect.radius * 0.12} fill="#8B4513" transform={`rotate(${-45}, ${effect.radius * 1.4}, ${effect.radius * 1.6})`} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'lumberjack_rage') {
+          // Lumberjack rage drop - energy burst
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Purple energy burst */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * (0.5 + progress * 0.5)} fill="#9b59b6" opacity={0.8} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * (0.3 + progress * 0.4)} fill="#8e44ad" opacity={0.9} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.2} fill="#fff" opacity={1 - progress} />
+                {/* Energy waves */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.6} fill="none" stroke="#9b59b6" strokeWidth="2" opacity={1 - progress} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.8} fill="none" stroke="#8e44ad" strokeWidth="1.5" opacity={0.8 - progress * 0.8} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'mega_knight_slam') {
+          // Mega Knight spawn slam - ground pound effect
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Expanding shockwave */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * progress * 0.9} fill="none" stroke="#e67e22" strokeWidth="4" opacity={0.9} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * progress * 0.6} fill="none" stroke="#d35400" strokeWidth="3" opacity={0.8} />
+                {/* Ground impact */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.3} fill="#e67e22" opacity={1 - progress} />
+                {/* Dust particles */}
+                <Circle cx={effect.radius * 0.5} cy={effect.radius * 0.4} r={effect.radius * 0.1} fill="#a04000" opacity={1 - progress * 0.5} />
+                <Circle cx={effect.radius * 1.5} cy={effect.radius * 0.6} r={effect.radius * 0.08} fill="#a04000" opacity={1 - progress * 0.5} />
+                <Circle cx={effect.radius * 0.6} cy={effect.radius * 1.5} r={effect.radius * 0.12} fill="#a04000" opacity={1 - progress * 0.5} />
+                <Circle cx={effect.radius * 1.4} cy={effect.radius * 1.4} r={effect.radius * 0.09} fill="#a04000" opacity={1 - progress * 0.5} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'tesla_reveal') {
+          // Tesla reveal - electric emergence effect
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Electric burst */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * (0.3 + progress * 0.7)} fill="none" stroke="#f1c40f" strokeWidth="3" opacity={0.9} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * (0.5 + progress * 0.5)} fill="none" stroke="#3498db" strokeWidth="2" opacity={0.7} />
+                {/* Lightning bolts */}
+                <Path d={`M${effect.radius * 0.5} ${effect.radius * 0.2} L${effect.radius * 0.5} ${effect.radius * 0.8}`} stroke="#f1c40f" strokeWidth="2" opacity={0.8} />
+                <Path d={`M${effect.radius * 1.5} ${effect.radius * 0.2} L${effect.radius * 1.5} ${effect.radius * 0.8}`} stroke="#f1c40f" strokeWidth="2" opacity={0.8} />
+                <Path d={`M${effect.radius * 0.2} ${effect.radius * 0.5} L${effect.radius * 0.8} ${effect.radius * 0.5}`} stroke="#f1c40f" strokeWidth="2" opacity={0.8} />
+                <Path d={`M${effect.radius * 1.2} ${effect.radius * 0.5} L${effect.radius * 1.8} ${effect.radius * 0.5}`} stroke="#f1c40f" strokeWidth="2" opacity={0.8} />
+                {/* Center glow */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.2} fill="#f1c40f" opacity={1 - progress * 0.5} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'tower_hit') {
+          // Tower hit - simple flash effect
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - 40,
+              top: effect.y - 40,
+              width: 80,
+              height: 80,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width="80" height="80" viewBox="0 0 80 80">
+                <Circle cx="40" cy="40" r="35" fill="#fff" opacity={0.3 * opacity} />
+                <Circle cx="40" cy="40" r="25" fill="#fff" opacity={0.5 * opacity} />
+              </Svg>
+            </View>
+          );
+        }
+
+        return null;
+      })}
+    </>
   );
 };
 
@@ -1043,23 +1896,39 @@ const Projectile = ({ type, position }) => {
       </View>
     );
   }
-  if (type === 'poison_spell') {
-    // Orange Graveyard-style spell
+  if (type === 'poison_spell' || type === 'rage_spell') {
+    // Orange Graveyard-style spell for Poison, Purple for Rage
+    const isRage = type === 'rage_spell';
+    const mainColor = isRage ? "rgba(155, 89, 182, 0.4)" : "rgba(255, 140, 0, 0.4)";
+    const strokeColor = isRage ? "#8e44ad" : "#FF8C00";
+    
     return (
       <View style={{ position: 'absolute', left: position.x - 50, top: position.y - 50, width: 100, height: 100 }}>
         <Svg width="100" height="100" viewBox="0 0 100 100">
-          <Circle cx="50" cy="50" r="45" fill="rgba(255, 140, 0, 0.3)" stroke="#FF8C00" strokeWidth="2" />
-          <Circle cx="35" cy="40" r="6" fill="white" opacity="0.8" />
-          <Circle cx="33" cy="40" r="1.5" fill="black" />
-          <Circle cx="37" cy="40" r="1.5" fill="black" />
+          <Circle cx="50" cy="50" r="45" fill={mainColor} stroke={strokeColor} strokeWidth="2" />
+          
+          {isRage ? (
+             // Rage Spell Visuals - Anger symbol / Energy
+             <>
+                <Circle cx="50" cy="50" r="35" fill="none" stroke="#9b59b6" strokeWidth="2" strokeDasharray="5 5" opacity="0.6" />
+                <SvgText x="50" y="55" fontSize="30" textAnchor="middle" fill="#8e44ad" opacity="0.8">😡</SvgText>
+             </>
+          ) : (
+             // Poison Spell Visuals - Skulls/Bubbles
+             <>
+                <Circle cx="35" cy="40" r="6" fill="white" opacity="0.8" />
+                <Circle cx="33" cy="40" r="1.5" fill="black" />
+                <Circle cx="37" cy="40" r="1.5" fill="black" />
 
-          <Circle cx="65" cy="60" r="6" fill="white" opacity="0.8" />
-          <Circle cx="63" cy="60" r="1.5" fill="black" />
-          <Circle cx="67" cy="60" r="1.5" fill="black" />
+                <Circle cx="65" cy="60" r="6" fill="white" opacity="0.8" />
+                <Circle cx="63" cy="60" r="1.5" fill="black" />
+                <Circle cx="67" cy="60" r="1.5" fill="black" />
 
-          <Circle cx="50" cy="30" r="5" fill="white" opacity="0.8" />
-          <Circle cx="48" cy="30" r="1.5" fill="black" />
-          <Circle cx="52" cy="30" r="1.5" fill="black" />
+                <Circle cx="50" cy="30" r="5" fill="white" opacity="0.8" />
+                <Circle cx="48" cy="30" r="1.5" fill="black" />
+                <Circle cx="52" cy="30" r="1.5" fill="black" />
+             </>
+          )}
         </Svg>
       </View>
     );
@@ -1200,6 +2069,128 @@ const Projectile = ({ type, position }) => {
       </View>
     );
   }
+  if (type === 'bomb') {
+    // Black round bomb for Bomber
+    return (
+      <View style={{
+        position: 'absolute',
+        width: 14,
+        height: 14,
+        borderRadius: 7,
+        backgroundColor: '#2c3e50',
+        borderWidth: 2,
+        borderColor: '#1a1a1a',
+        left: position.x - 7,
+        top: position.y - 7,
+        shadowColor: '#000',
+        shadowOpacity: 0.5,
+        shadowRadius: 3,
+        elevation: 3
+      }}>
+        {/* Fuse/spark */}
+        <View style={{
+          position: 'absolute',
+          top: -2,
+          left: 5,
+          width: 4,
+          height: 4,
+          backgroundColor: '#e74c3c',
+          borderRadius: 2
+        }} />
+      </View>
+    );
+  }
+  if (type === 'goblin_barrel_spell') {
+    // Wooden barrel falling from sky
+    return (
+      <View style={{
+        position: 'absolute',
+        left: position.x - 15,
+        top: position.y - 15,
+        width: 30,
+        height: 30
+      }}>
+        <Svg width="30" height="30" viewBox="0 0 30 30">
+          {/* Wooden barrel body */}
+          <Circle cx="15" cy="15" r="12" fill="#8B4513" stroke="#654321" strokeWidth="2" />
+          {/* Barrel metal bands */}
+          <Rect x="3" y="10" width="24" height="4" fill="#2c3e50" />
+          <Rect x="3" y="16" width="24" height="4" fill="#2c3e50" />
+          {/* Wood grain */}
+          <Path d="M8 5 L8 25 M15 3 L15 27 M22 5 L22 25" stroke="#654321" strokeWidth="1" opacity="0.5" />
+          {/* Goblin face peeking out */}
+          <Circle cx="12" cy="12" r="2" fill="#2ecc71" />
+          <Circle cx="18" cy="12" r="2" fill="#2ecc71" />
+        </Svg>
+      </View>
+    );
+  }
+  if (type === 'earthquake_spell') {
+    // Cracking ground effect for Earthquake
+    return (
+      <View style={{
+        position: 'absolute',
+        left: position.x - 40,
+        top: position.y - 40,
+        width: 80,
+        height: 80
+      }}>
+        <Svg width="80" height="80" viewBox="0 0 80 80">
+          {/* Cracked ground */}
+          <Rect x="5" y="5" width="70" height="70" fill="#7f8c8d" stroke="#5d6d7e" strokeWidth="2" rx="5" opacity="0.8" />
+          {/* Cracks radiating from center */}
+          <Path d="M40 5 L35 30 L40 40" stroke="#2c3e50" strokeWidth="2" fill="none" />
+          <Path d="M40 5 L45 30 L40 40" stroke="#2c3e50" strokeWidth="2" fill="none" />
+          <Path d="M5 40 L30 35 L40 40" stroke="#2c3e50" strokeWidth="2" fill="none" />
+          <Path d="M75 40 L50 45 L40 40" stroke="#2c3e50" strokeWidth="2" fill="none" />
+          <Path d="M40 75 L35 50 L40 40" stroke="#2c3e50" strokeWidth="2" fill="none" />
+          <Path d="M40 75 L45 50 L40 40" stroke="#2c3e50" strokeWidth="2" fill="none" />
+          {/* Dust/debris particles */}
+          <Circle cx="20" cy="20" r="3" fill="#95a5a6" opacity="0.7" />
+          <Circle cx="60" cy="25" r="2" fill="#95a5a6" opacity="0.7" />
+          <Circle cx="25" cy="60" r="2.5" fill="#95a5a6" opacity="0.7" />
+          <Circle cx="55" cy="55" r="2" fill="#95a5a6" opacity="0.7" />
+        </Svg>
+      </View>
+    );
+  }
+  if (type === 'lightning_bolt') {
+    // Lightning spell effect - bolt striking from sky
+    return (
+      <View style={{
+        position: 'absolute',
+        left: position.x - 30,
+        top: position.y - 30,
+        width: 60,
+        height: 60
+      }}>
+        <Svg width="60" height="60" viewBox="0 0 60 60">
+          {/* Main lightning bolt from top */}
+          <Path
+            d="M30 0 L25 25 L35 25 L20 40 L30 40 L30 60"
+            stroke="#f1c40f"
+            strokeWidth="3"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          {/* Glow */}
+          <Path
+            d="M30 0 L25 25 L35 25 L20 40 L30 40 L30 60"
+            stroke="#fff"
+            strokeWidth="6"
+            fill="none"
+            opacity="0.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          {/* Impact flash */}
+          <Circle cx="30" cy="60" r="8" fill="#f1c40f" opacity="0.8" />
+          <Circle cx="30" cy="60" r="4" fill="#fff" opacity="0.9" />
+        </Svg>
+      </View>
+    );
+  }
   return <View style={[styles.cannonball, { left: position.x, top: position.y }]} />;
 };
 
@@ -1208,9 +2199,10 @@ const Unit = ({ unit }) => {
   const isEnemy = unit.isOpponent;
   const unitSize = 30; // Same size for both teams
   const isSlowed = unit.slowUntil > Date.now();
+  const isRaged = unit.rageUntil > Date.now();
 
   // Check if unit is in spawn delay (Golem, Golemite)
-  const isSpawning = (unit.spawnDelay > 0) && unit.spawnTime && (Date.now() - unit.spawnTime < unit.spawnDelay);
+  const isSpawning = Boolean((unit.spawnDelay > 0) && unit.spawnTime && (Date.now() - unit.spawnTime < unit.spawnDelay));
   const rotationAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -1234,7 +2226,24 @@ const Unit = ({ unit }) => {
 
   return (
     <View style={[styles.unit, { left: unit.x - unitSize / 2, top: unit.y - unitSize / 2, width: unitSize, height: unitSize }]}>
+      {/* Range Indicator Circle */}
+      {Boolean(unit.range && unit.range > 0) && (
+        <View style={{
+          position: 'absolute',
+          left: unitSize / 2 - unit.range,
+          top: unitSize / 2 - unit.range,
+          width: unit.range * 2,
+          height: unit.range * 2,
+          borderRadius: unit.range,
+          borderWidth: 1,
+          borderColor: isEnemy ? 'rgba(231, 76, 60, 0.3)' : 'rgba(52, 152, 219, 0.3)',
+          backgroundColor: isEnemy ? 'rgba(231, 76, 60, 0.05)' : 'rgba(52, 152, 219, 0.05)',
+          zIndex: -1
+        }} />
+      )}
+
       <UnitSprite id={spriteId} isOpponent={isEnemy} size={unitSize} unit={unit} />
+      
       {/* Spawn Delay Indicator (rotating swirl) */}
       {isSpawning && (
         <Animated.View style={{
@@ -1252,6 +2261,22 @@ const Unit = ({ unit }) => {
           </Svg>
         </Animated.View>
       )}
+
+      {/* Rage Effect Overlay */}
+      {isRaged && (
+        <View style={{
+          position: 'absolute',
+          top: -2, left: -2, right: -2, bottom: -2,
+          backgroundColor: 'rgba(155, 89, 182, 0.3)',
+          borderRadius: unitSize / 2,
+          borderWidth: 2,
+          borderColor: '#8e44ad',
+          zIndex: 4
+        }}>
+          <Text style={{ position: 'absolute', top: -10, left: -10, fontSize: 10 }}>😡</Text>
+        </View>
+      )}
+
       {/* Ice/Slow Effect Overlay */}
       {isSlowed && (
         <View style={{
@@ -1322,17 +2347,64 @@ const LobbyHeader = () => (
   </View>
 );
 
-const ChestSlots = () => (
-  <View style={styles.chestSlotsContainer}>
-    <Text style={styles.chestSlotsTitle}>CHESTS</Text>
-    <View style={styles.chestRow}>
-      <View style={styles.chestSlot}><Text style={styles.chestText}>SILVER</Text><Text style={styles.chestTimer}>3h</Text></View>
-      <View style={styles.chestSlot}><Text style={styles.chestText}>GOLD</Text><Text style={styles.chestTimer}>8h</Text></View>
-      <View style={styles.chestSlotEmpty}><Text style={styles.chestTextEmpty}>Empty Slot</Text></View>
-      <View style={styles.chestSlotEmpty}><Text style={styles.chestTextEmpty}>Empty Slot</Text></View>
+const ChestSlots = ({ chests, onUnlock, onOpen }) => {
+  const getChestColor = (type) => {
+    switch (type) {
+      case 'SILVER': return '#bdc3c7';
+      case 'GOLD': return '#f1c40f';
+      case 'GIANT': return '#e67e22';
+      case 'MAGICAL': return '#9b59b6';
+      default: return '#bdc3c7';
+    }
+  };
+
+  const formatChestTime = (seconds) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    if (h > 0) return `${h}h ${m}m`;
+    return `${m}m`;
+  };
+
+  return (
+    <View style={styles.chestSlotsContainer}>
+      <Text style={styles.chestSlotsTitle}>CHESTS</Text>
+      <View style={styles.chestRow}>
+        {[0, 1, 2, 3].map(index => {
+          const chest = chests.find(c => c.slotIndex === index);
+          if (!chest) {
+            return (
+              <View key={index} style={styles.chestSlotEmpty}>
+                <Text style={styles.chestTextEmpty}>Empty Slot</Text>
+              </View>
+            );
+          }
+
+          const isUnlocking = chest.state === 'UNLOCKING';
+          const isUnlocked = chest.state === 'UNLOCKED';
+          
+          return (
+            <TouchableOpacity 
+              key={index} 
+              style={[styles.chestSlot, { borderColor: getChestColor(chest.type), borderWidth: 2 }]}
+              onPress={() => isUnlocked ? onOpen(chest) : onUnlock(chest)}
+              disabled={isUnlocking}
+            >
+              <Text style={[styles.chestText, { color: getChestColor(chest.type) }]}>{chest.type}</Text>
+              {isUnlocked ? (
+                <Text style={styles.chestOpenText}>OPEN!</Text>
+              ) : isUnlocking ? (
+                <Text style={styles.chestTimer}>{formatChestTime(chest.timeLeft)}</Text>
+              ) : (
+                <Text style={styles.chestLockedText}>{formatChestTime(chest.unlockTime)}</Text>
+              )}
+              {isUnlocking && <Text style={{fontSize: 10, color: '#f1c40f'}}>Unlocking...</Text>}
+            </TouchableOpacity>
+          );
+        })}
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 const MiniCard = ({ card }) => (
   <View style={[styles.miniCard, { borderColor: RARITY_COLORS[card.rarity] || '#000' }]}>
@@ -1446,10 +2518,83 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
   const [selectedCard, setSelectedCard] = useState(null); // For detail modal
   const [cardMenuCard, setCardMenuCard] = useState(null); // For popup menu
   const [showSlotSelector, setShowSlotSelector] = useState(null); // For slot selector
+  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [filterRarity, setFilterRarity] = useState('all');
+  const [sortByElixir, setSortByElixir] = useState(false);
 
   // Drag state
   const [localDraggingCard, setLocalDraggingCard] = useState(null);
   const [scrollEnabled, setScrollEnabled] = useState(true);
+
+  // Filter Logic
+  const filteredCards = CARDS.filter(card => !card.isToken).filter(card => {
+    if (filterRarity === 'all') return true;
+    return card.rarity === filterRarity;
+  }).sort((a, b) => {
+    if (sortByElixir) {
+      return a.cost - b.cost;
+    }
+    // Default sort by id/name stability or rarity if needed
+    return 0;
+  });
+
+  // Filter Modal Component
+  const FilterModal = () => (
+    <Modal
+      animationType="fade"
+      transparent={true}
+      visible={showFilterModal}
+      onRequestClose={() => setShowFilterModal(false)}
+    >
+      <TouchableOpacity 
+        style={styles.cardMenuOverlay} 
+        activeOpacity={1} 
+        onPress={() => setShowFilterModal(false)}
+      >
+        <View style={styles.cardMenuContent}>
+          <Text style={styles.slotSelectorTitle}>Filter Collection</Text>
+          
+          <Text style={styles.deckSelectorLabel}>RARITY</Text>
+          <View style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8, marginBottom: 20}}>
+            <TouchableOpacity 
+              style={[styles.filterButton, filterRarity === 'all' && styles.filterButtonActive]} 
+              onPress={() => setFilterRarity('all')}
+            >
+              <Text style={[styles.filterButtonText, filterRarity === 'all' && styles.filterButtonTextActive]}>All</Text>
+            </TouchableOpacity>
+            {['common', 'rare', 'epic', 'legendary'].map(rarity => (
+              <TouchableOpacity 
+                key={rarity}
+                style={[styles.filterButton, filterRarity === rarity && styles.filterButtonActive, { borderColor: RARITY_COLORS[rarity] }]} 
+                onPress={() => setFilterRarity(rarity)}
+              >
+                <Text style={[styles.filterButtonText, filterRarity === rarity && styles.filterButtonTextActive, { color: filterRarity === rarity ? '#fff' : RARITY_COLORS[rarity] }]}>
+                  {rarity.charAt(0).toUpperCase() + rarity.slice(1)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <Text style={styles.deckSelectorLabel}>SORT BY</Text>
+          <View style={{flexDirection: 'row', justifyContent: 'center', marginBottom: 20}}>
+            <TouchableOpacity 
+              style={[styles.filterButton, sortByElixir && styles.filterButtonActive]} 
+              onPress={() => setSortByElixir(!sortByElixir)}
+            >
+              <Text style={[styles.filterButtonText, sortByElixir && styles.filterButtonTextActive]}>Elixir Cost {sortByElixir ? '▲' : ''}</Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            style={styles.cardMenuCancel}
+            onPress={() => setShowFilterModal(false)}
+          >
+            <Text style={styles.cardMenuCancelText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    </Modal>
+  );
 
   // Show card menu for collection cards
   const handleCollectionCardTap = (card) => {
@@ -1510,9 +2655,9 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
 
             {/* Stats Preview */}
             <View style={styles.cardMenuStats}>
-              {card.hp && <Text style={styles.cardMenuStat}>HP: {card.hp}</Text>}
-              {card.damage && <Text style={styles.cardMenuStat}>DMG: {card.damage}</Text>}
-              {card.speed > 0 && <Text style={styles.cardMenuStat}>SPD: {card.speed}</Text>}
+              {Boolean(card.hp) && <Text style={styles.cardMenuStat}>HP: {card.hp}</Text>}
+              {Boolean(card.damage) && <Text style={styles.cardMenuStat}>DMG: {card.damage}</Text>}
+              {Boolean(card.speed !== undefined && card.speed > 0) && <Text style={styles.cardMenuStat}>SPD: {card.speed}</Text>}
             </View>
 
             {/* Action Buttons */}
@@ -1752,17 +2897,17 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
   return (
     <View style={styles.deckTabContainer}>
       <View style={styles.deckHeaderRow}>
-        <Text style={styles.deckTabTitle}>Battle Deck 1</Text>
+        <Text style={styles.deckTabTitle}>Battle Deck {selectedDeckIndex + 1}</Text>
         <MagicItems />
       </View>
 
       <DeckStats cards={cards} />
 
-      {/* Deck Selector - 3 Deck Slots */}
+      {/* Deck Selector - 5 Deck Slots */}
       <View style={styles.deckSelectorContainer}>
         <Text style={styles.deckSelectorLabel}>SELECT DECK:</Text>
         <View style={styles.deckSelectorButtons}>
-          {[0, 1, 2].map(deckIndex => (
+          {allDecks.map((_, deckIndex) => (
             <TouchableOpacity
               key={deckIndex}
               style={[
@@ -1883,7 +3028,19 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
       </View>
 
       {/* All Cards Section */}
-      <Text style={styles.deckBoxTitle}>Collection</Text>
+      <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5}}>
+        <Text style={[styles.deckBoxTitle, {marginBottom: 0}]}>Collection</Text>
+        <TouchableOpacity 
+          style={styles.filterButton} 
+          onPress={() => setShowFilterModal(true)}
+        >
+          <Text style={styles.filterButtonText}>Filters {filterRarity !== 'all' || sortByElixir ? '•' : ''} ▾</Text>
+        </TouchableOpacity>
+      </View>
+      
+      {/* Filter Modal */}
+      <FilterModal />
+
       <View style={[styles.deckBox, { flex: 1, paddingVertical: 8, paddingHorizontal: 4, overflow: 'hidden' }]}>
         <ScrollView
           style={[styles.allCardsScroll, { marginBottom: 0 }]}
@@ -1892,7 +3049,7 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
           nestedScrollEnabled={true}
         >
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-evenly' }}>
-            {CARDS.filter(card => !card.isToken).map(card => (
+            {filteredCards.map(card => (
               <View key={card.id} style={{ marginBottom: 10 }}>
                 <CollectionCard card={card} />
               </View>
@@ -1973,37 +3130,37 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
                   </View>
                 )}
 
-                {selectedCard.hp && (
+                {Boolean(selectedCard.hp) && (
                   <View style={styles.statRow}>
                     <Text style={styles.statLabel}>❤️ Hitpoints:</Text>
                     <Text style={styles.statValue}>{selectedCard.hp}</Text>
                   </View>
                 )}
-                {selectedCard.damage && (
+                {Boolean(selectedCard.damage) && (
                   <View style={styles.statRow}>
                     <Text style={styles.statLabel}>⚔️ Damage:</Text>
                     <Text style={styles.statValue}>{selectedCard.damage}</Text>
                   </View>
                 )}
-                {selectedCard.speed !== undefined && selectedCard.speed > 0 && (
+                {Boolean(selectedCard.speed !== undefined && selectedCard.speed > 0) && (
                   <View style={styles.statRow}>
                     <Text style={styles.statLabel}>👟 Speed:</Text>
                     <Text style={styles.statValue}>{selectedCard.speed}</Text>
                   </View>
                 )}
-                {selectedCard.range && (
+                {Boolean(selectedCard.range) && (
                   <View style={styles.statRow}>
                     <Text style={styles.statLabel}>🎯 Range:</Text>
                     <Text style={styles.statValue}>{selectedCard.range}</Text>
                   </View>
                 )}
-                {selectedCard.count > 1 && (
+                {Boolean(selectedCard.count > 1) && (
                   <View style={styles.statRow}>
                     <Text style={styles.statLabel}>👥 Count:</Text>
                     <Text style={styles.statValue}>{selectedCard.count}</Text>
                   </View>
                 )}
-                {selectedCard.attackSpeed && (
+                {Boolean(selectedCard.attackSpeed) && (
                   <View style={styles.statRow}>
                     <Text style={styles.statLabel}>⚡ Hit Speed:</Text>
                     <Text style={styles.statValue}>{selectedCard.attackSpeed}ms</Text>
@@ -2022,7 +3179,7 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
   );
 };
 
-const BattleTab = ({ currentDeck, onStartBattle }) => (
+const BattleTab = ({ currentDeck, onStartBattle, chests, onUnlockChest, onOpenChest }) => (
   <View style={styles.battleTabContainer}>
     <View style={styles.arenaTitleContainer}>
       <Text style={styles.arenaTitle}>ARENA 1</Text>
@@ -2068,7 +3225,7 @@ const BattleTab = ({ currentDeck, onStartBattle }) => (
       <Text style={styles.battleButtonSubtext}>Ranked 1v1</Text>
     </TouchableOpacity>
 
-    <ChestSlots />
+    <ChestSlots chests={chests} onUnlock={onUnlockChest} onOpen={onOpenChest} />
   </View>
 );
 
@@ -2182,7 +3339,8 @@ const BottomNavigation = ({ activeTab, onTabChange }) => {
 
 const MainLobby = ({
   activeTab, onTabChange, onStartGame, currentDeck, onSwapCards,
-  dragHandlers, selectedDeckIndex, setSelectedDeckIndex, allDecks
+  dragHandlers, selectedDeckIndex, setSelectedDeckIndex, allDecks,
+  chests, onUnlockChest, onOpenChest
 }) => {
   const renderTabContent = () => {
     switch (activeTab) {
@@ -2195,9 +3353,21 @@ const MainLobby = ({
         setSelectedDeckIndex={setSelectedDeckIndex}
         allDecks={allDecks}
       />;
-      case 2: return <BattleTab currentDeck={currentDeck} onStartBattle={onStartGame} />;
+      case 2: return <BattleTab 
+        currentDeck={currentDeck} 
+        onStartBattle={onStartGame} 
+        chests={chests}
+        onUnlockChest={onUnlockChest}
+        onOpenChest={onOpenChest}
+      />;
       case 3: return <ClanTab />;
-      default: return <BattleTab currentDeck={currentDeck} onStartBattle={onStartGame} />;
+      default: return <BattleTab 
+        currentDeck={currentDeck} 
+        onStartBattle={onStartGame}
+        chests={chests}
+        onUnlockChest={onUnlockChest}
+        onOpenChest={onOpenChest} 
+      />;
     }
   };
 
@@ -2216,7 +3386,7 @@ const MainLobby = ({
 
 // --- Game Board Component (Extracted) ---
 const GameBoard = ({
-  towers, units, projectiles, timeLeft, gameOver,
+  towers, units, projectiles, visualEffects, setVisualEffects, timeLeft, gameOver,
   elixir, hand, nextCard, draggingCard, dragPosition,
   handleDragStart, handleDragMove, handleDragEnd,
   spawnTestEnemy, formatTime, onRestart, score,
@@ -2361,6 +3531,7 @@ const GameBoard = ({
 
         {(units || []).map(u => <Unit key={u.id} unit={u} />)}
         {(projectiles || []).map(p => <Projectile key={p.id} type={p.type} position={p} />)}
+        <VisualEffects effects={visualEffects} setEffects={setVisualEffects} />
 
         {/* Emote Button */}
         <TouchableOpacity style={styles.emoteButton}>
@@ -2429,7 +3600,7 @@ const GameBoard = ({
       {draggingCard && (
         <View style={{ position: 'absolute', left: dragPosition.x, top: dragPosition.y, zIndex: 9999, elevation: 100 }} pointerEvents="none">
           {/* Range/Radius Indicator */}
-          {(draggingCard.radius || draggingCard.range) && (
+          {Boolean(draggingCard.radius || draggingCard.range) && (
             <View style={{
               position: 'absolute',
               left: -(draggingCard.radius || draggingCard.range),
@@ -2443,7 +3614,7 @@ const GameBoard = ({
               borderStyle: draggingCard.type === 'spell' ? 'solid' : 'dashed'
             }} />
           )}
-          {draggingCard.spawnDamage && (
+          {Boolean(draggingCard.spawnDamage) && (
             <View style={{
               position: 'absolute',
               left: -50,
@@ -2472,10 +3643,129 @@ const GameBoard = ({
   );
 };
 
+// --- Chest Opening Modal Component ---
+const ChestOpeningModal = ({ chest, onClose }) => {
+  console.log('Rendering ChestOpeningModal for:', chest.id);
+  const [step, setStep] = useState('CLOSED'); // CLOSED -> OPENING -> REWARDS
+  const [rewards, setRewards] = useState([]);
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const shakeAnim = useRef(new Animated.Value(0)).current;
+
+  const generateRewards = () => {
+    // Determine rewards based on chest type
+    let gold = 0;
+    let gems = 0;
+    let cardCount = 0;
+    
+    switch (chest.type) {
+      case 'SILVER': gold = 50; cardCount = 5; break;
+      case 'GOLD': gold = 200; gems = 2; cardCount = 15; break;
+      case 'GIANT': gold = 1000; cardCount = 50; break;
+      case 'MAGICAL': gold = 500; gems = 10; cardCount = 20; break;
+      case 'TEST': gold = 9999; gems = 999; cardCount = 1; break;
+      default: gold = 100; cardCount = 10;
+    }
+
+    const newRewards = [];
+    if (gold > 0) newRewards.push({ type: 'GOLD', value: gold, icon: '💰', label: 'Gold' });
+    if (gems > 0) newRewards.push({ type: 'GEM', value: gems, icon: '💎', label: 'Gems' });
+    
+    // Pick a random card
+    const randomCard = CARDS[Math.floor(Math.random() * CARDS.length)];
+    if (cardCount > 0) newRewards.push({ type: 'CARD', value: cardCount, icon: '🃏', label: randomCard.name, card: randomCard });
+
+    setRewards(newRewards);
+  };
+
+  const handleTap = () => {
+    if (step === 'CLOSED') {
+      // Shake animation
+      Animated.sequence([
+        Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
+        Animated.timing(shakeAnim, { toValue: -10, duration: 50, useNativeDriver: true }),
+        Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
+        Animated.timing(shakeAnim, { toValue: 0, duration: 50, useNativeDriver: true }),
+      ]).start(() => {
+        setStep('REWARDS');
+        generateRewards();
+        // Scale up effect for rewards
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          friction: 5,
+          useNativeDriver: true
+        }).start();
+      });
+    }
+  };
+
+  const getChestColor = (type) => {
+    switch (type) {
+      case 'SILVER': return '#bdc3c7';
+      case 'GOLD': return '#f1c40f';
+      case 'GIANT': return '#e67e22';
+      case 'MAGICAL': return '#9b59b6';
+      default: return '#bdc3c7';
+    }
+  };
+
+  return (
+    <View style={styles.chestModalOverlay}>
+      <View style={styles.chestModalContent}>
+        <Text style={styles.chestModalTitle}>{chest.type} CHEST</Text>
+        
+        {step === 'CLOSED' && (
+          <TouchableOpacity onPress={handleTap} activeOpacity={0.8}>
+            <Animated.View style={[
+              styles.chestVisual, 
+              { 
+                borderColor: getChestColor(chest.type),
+                transform: [{ translateX: shakeAnim }] 
+              }
+            ]}>
+              <Text style={{fontSize: 50}}>🔒</Text>
+            </Animated.View>
+            <Text style={styles.chestTapText}>Tap to Open!</Text>
+          </TouchableOpacity>
+        )}
+
+        {step === 'REWARDS' && (
+          <View style={{alignItems: 'center'}}>
+            <Animated.View style={[styles.chestVisual, { borderColor: getChestColor(chest.type), marginBottom: 20 }]}>
+               <Text style={{fontSize: 50}}>🔓</Text>
+            </Animated.View>
+            
+            <View style={styles.rewardsContainer}>
+              {rewards.map((r, i) => (
+                <View key={i} style={styles.rewardItem}>
+                  {r.type === 'CARD' ? (
+                    <View>
+                      <UnitSprite id={r.card.id} isOpponent={false} size={60} />
+                      <Text style={{position: 'absolute', bottom: 0, right: 0, fontWeight: 'bold', color: '#fff', backgroundColor: 'rgba(0,0,0,0.5)'}}>x{r.value}</Text>
+                    </View>
+                  ) : (
+                    <Text style={styles.rewardIcon}>{r.icon}</Text>
+                  )}
+                  <Text style={styles.rewardValue}>{r.type !== 'CARD' ? r.value : r.label}</Text>
+                  {r.type !== 'CARD' && <Text style={styles.rewardLabel}>{r.label}</Text>}
+                </View>
+              ))}
+            </View>
+
+            <TouchableOpacity style={styles.closeChestButton} onPress={onClose}>
+              <Text style={styles.closeChestButtonText}>COLLECT</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+    </View>
+  );
+};
+
 export default function App() {
   // Main App Entry Point
   const [inGame, setInGame] = useState(false);
   const [inLobby, setInLobby] = useState(false);
+  const [openingChest, setOpeningChest] = useState(null); // Track chest being opened
   const [activeTab, setActiveTab] = useState(2); // Default to Battle tab
   const [gameOver, setGameOver] = useState(null);
   const [timeLeft, setTimeLeft] = useState(180);
@@ -2485,11 +3775,15 @@ export default function App() {
   const [audioEnabled, setAudioEnabled] = useState(true);
   const doubleElixirTriggeredRef = useRef(false);
 
-  // Multiple deck slots - 3 decks of 8 cards each
+  // Multiple deck slots - 5 decks of 8 cards each
+  // Filter out token cards (golemite, lava_pups, etc.) from deck initialization
+  const playableCards = CARDS.filter(card => !card.isToken);
   const [allDecks, setAllDecks] = useState([
-    CARDS.slice(0, 8),  // Deck 1
-    CARDS.slice(8, 16), // Deck 2
-    CARDS.slice(16, 24) // Deck 3
+    playableCards.slice(0, 8),  // Deck 1
+    playableCards.slice(8, 16), // Deck 2
+    playableCards.slice(16, 24), // Deck 3
+    playableCards.slice(24, 32), // Deck 4
+    playableCards.slice(32, 40)  // Deck 5
   ]);
   const [selectedDeckIndex, setSelectedDeckIndex] = useState(0);
 
@@ -2564,6 +3858,7 @@ export default function App() {
 
   const [units, setUnits] = useState([]);
   const [projectiles, setProjectiles] = useState([]);
+  const [visualEffects, setVisualEffects] = useState([]); // Temporary visual effects (explosions, heals, etc.)
   const [lastPlayedCard, setLastPlayedCard] = useState(null);
 
   const towersRef = useRef(towers);
@@ -2827,12 +4122,78 @@ export default function App() {
           spellType = 'rocket_spell';
           startY = height;
           spellSpeed = 12; // Slower than fireball
+        } else if (actualCard.id === 'goblin_barrel') {
+          // Goblin Barrel - spawns 3 goblins around target after delay
+          spellType = 'goblin_barrel_spell';
+          spellSpeed = 25; // Barrel falls from sky
+          startX = x;
+          startY = 0; // Start from top of screen
+
+          // Create barrel projectile that will spawn goblins on impact
+          const spawnCardId = actualCard.spawns;
+          const spawnCard = CARDS.find(c => c.id === spawnCardId);
+          const spawnCount = actualCard.spawnCount || 3;
+
+          setProjectiles(prev => [...prev, {
+            id: Date.now(),
+            x: startX,
+            y: startY,
+            targetX: x,
+            targetY: y,
+            speed: spellSpeed,
+            damage: 0,
+            radius: actualCard.radius,
+            type: spellType,
+            isSpell: true,
+            hit: false,
+            spawnTime: Date.now(),
+            isGoblinBarrel: true,
+            spawns: spawnCardId,
+            spawnCount: spawnCount
+          }]);
+        } else if (actualCard.id === 'graveyard') {
+          // Graveyard - spawns skeletons gradually over time
+          spellType = 'graveyard_spell';
+          spellSpeed = 100; // Instant
+
+          const spawnCardId = actualCard.spawns;
+          const spawnCard = CARDS.find(c => c.id === spawnCardId);
+          const spawnCount = actualCard.spawnCount || 15;
+
+          // Create a graveyard zone that spawns skeletons over 4 seconds
+          const newUnit = {
+            id: 'graveyard_' + Date.now(),
+            x: x,
+            y: y,
+            hp: 9999, // Invincible - cannot be destroyed
+            maxHp: 9999,
+            isOpponent: false,
+            speed: 0, // Stationary
+            lane: x < width / 2 ? 'LEFT' : 'RIGHT',
+            lastAttack: 0,
+            spriteId: 'graveyard_zone',
+            type: 'graveyard_zone', // Special type
+            range: 0,
+            damage: 0,
+            attackSpeed: 0,
+            spawns: spawnCardId,
+            spawnRate: 0.27, // Spawn every 0.27 seconds (15 skeletons in 4 seconds)
+            spawnCount: 1, // Spawn 1 skeleton at a time
+            lastSpawn: Date.now(),
+            lifetimeDuration: 4, // Lasts 4 seconds
+            spawnTime: Date.now(),
+            totalToSpawn: spawnCount,
+            spawnedSoFar: 0,
+            isOpponent: false,
+            isZone: true // Mark as a zone (untargetable by units)
+          };
+          setUnits(prev => [...prev, newUnit]);
         }
 
         // For poison, mark it as already hit since it's instant
         const isPoison = actualCard.id === 'poison';
-        // Skip default projectile creation for Lightning as we handled it
-        if (actualCard.id !== 'lightning') {
+        // Skip default projectile creation for Lightning, Goblin Barrel, and Graveyard as we handled them
+        if (actualCard.id !== 'lightning' && actualCard.id !== 'goblin_barrel' && actualCard.id !== 'graveyard') {
           const currentTime = Date.now();
           setProjectiles(prev => [...prev, {
             id: Date.now(),
@@ -2924,7 +4285,14 @@ export default function App() {
             baseDamage: actualCard.damage,
             lockedTarget: null,  // Once locked, unit won't switch targets
             wasPushed: false,    // Track if unit was pushed back (unlocks target)
-            wasStunned: false    // Track if unit was stunned (unlocks target when stun ends)
+            wasStunned: false,   // Track if unit was stunned (unlocks target when stun ends)
+            kamikaze: actualCard.kamikaze || false,  // Spirit cards die when they attack
+            chain: actualCard.chain || 0,  // Electro Spirit chain count
+            healsOnAttack: actualCard.healsOnAttack || 0,  // Heal Spirit healing amount
+            healRadius: actualCard.healRadius || 0,  // Heal Spirit healing radius
+            deathRage: actualCard.deathRage || false,  // Lumberjack rage on death
+            generatesElixir: actualCard.generatesElixir || false,  // Elixir Collector generates elixir
+            elixirGenerationTime: 0  // Track last elixir generation time
           });
           // Log spawn properties for debugging
           if (actualCard.spawns) {
@@ -3090,13 +4458,105 @@ export default function App() {
     setUnits(prev => [...(prev || []), ...newUnits]);
   };
 
+  // Chest State
+  const [chests, setChests] = useState([
+    { id: 'test_chest', slotIndex: 0, type: 'TEST', state: 'UNLOCKED', unlockTime: 0, timeLeft: 0 },
+    { id: 'chest_1', slotIndex: 1, type: 'SILVER', state: 'LOCKED', unlockTime: 3 * 60 * 60, timeLeft: 3 * 60 * 60 },
+    { id: 'chest_2', slotIndex: 2, type: 'GOLD', state: 'LOCKED', unlockTime: 8 * 60 * 60, timeLeft: 8 * 60 * 60 },
+  ]);
+
+  // Chest Timer Logic
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setChests(prevChests => {
+        return prevChests.map(chest => {
+          if (chest.state === 'UNLOCKING') {
+            const newTimeLeft = Math.max(0, chest.timeLeft - 1);
+            if (newTimeLeft === 0) {
+              return { ...chest, state: 'UNLOCKED', timeLeft: 0 };
+            }
+            return { ...chest, timeLeft: newTimeLeft };
+          }
+          return chest;
+        });
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleUnlockChest = (chestToUnlock) => {
+    // Check if another chest is already unlocking
+    const isAnyUnlocking = chests.some(c => c.state === 'UNLOCKING');
+    if (isAnyUnlocking) {
+      // In real game, you can queue one, but for now simple 1 at a time
+      console.log('Already unlocking a chest!');
+      return;
+    }
+
+    setChests(prev => prev.map(c => {
+      if (c.id === chestToUnlock.id) {
+        return { ...c, state: 'UNLOCKING' };
+      }
+      return c;
+    }));
+  };
+
+  const handleOpenChest = (chestToOpen) => {
+    console.log('handleOpenChest called with:', chestToOpen);
+    setOpeningChest(chestToOpen);
+  };
+
+  const handleCollectRewards = () => {
+    if (openingChest) {
+      // Remove chest from slot
+      setChests(prev => prev.filter(c => c.id !== openingChest.id));
+      setOpeningChest(null);
+    }
+  };
+
   const checkWinner = () => {
     const playerTowers = towersRef.current.filter(t => !t.isOpponent && t.hp > 0).length;
     const opponentTowers = towersRef.current.filter(t => t.isOpponent && t.hp > 0).length;
 
-    if (playerTowers > opponentTowers) setGameOver('VICTORY');
-    else if (opponentTowers > playerTowers) setGameOver('DEFEAT');
-    else setGameOver('DRAW');
+    let result = 'DRAW';
+    if (playerTowers > opponentTowers) result = 'VICTORY';
+    else if (opponentTowers > playerTowers) result = 'DEFEAT';
+    
+    setGameOver(result);
+
+    // Reward Chest on Victory
+    if (result === 'VICTORY') {
+      setChests(prev => {
+        // Find first empty slot (0-3)
+        const occupiedSlots = prev.map(c => c.slotIndex);
+        let emptySlot = -1;
+        for (let i = 0; i < 4; i++) {
+          if (!occupiedSlots.includes(i)) {
+            emptySlot = i;
+            break;
+          }
+        }
+
+        if (emptySlot !== -1) {
+          const chestTypes = ['SILVER', 'SILVER', 'SILVER', 'GOLD', 'GIANT', 'MAGICAL'];
+          const randomType = chestTypes[Math.floor(Math.random() * chestTypes.length)];
+          let unlockTime = 3 * 60 * 60; // Silver default
+          if (randomType === 'GOLD') unlockTime = 8 * 60 * 60;
+          if (randomType === 'GIANT' || randomType === 'MAGICAL') unlockTime = 12 * 60 * 60;
+
+          const newChest = {
+            id: `chest_${Date.now()}`,
+            slotIndex: emptySlot,
+            type: randomType,
+            state: 'LOCKED',
+            unlockTime: unlockTime,
+            timeLeft: unlockTime
+          };
+          return [...prev, newChest];
+        }
+        return prev;
+      });
+    }
   };
 
   useEffect(() => {
@@ -3160,6 +4620,9 @@ export default function App() {
       // Collect units to spawn (will be added at the end)
       let unitsToSpawn = [];
       let damageEvents = [];
+      // Spirit card effects
+      let healEvents = [];
+      let chainEvents = [];
 
       let currentUnits = (unitsRef.current || []).map(u => {
         // Check if stunned
@@ -3187,74 +4650,117 @@ export default function App() {
           }
         }
 
+        // Handle Elixir generation (Elixir Collector)
+        if (u.generatesElixir && u.elixirGenerationTime !== undefined) {
+          const timeSinceLastGen = (now - u.elixirGenerationTime) / 1000;
+          const elixirGenRate = 10.5; // Generate 1 elixir every 10.5 seconds (93s lifetime / 8 elixir)
+
+          if (timeSinceLastGen >= elixirGenRate) {
+            // Generate elixir for the owner
+            if (u.isOpponent) {
+              setEnemyElixir(prev => Math.min(10, prev + 1));
+            } else {
+              setElixir(prev => Math.min(10, prev + 1));
+            }
+            return { ...u, elixirGenerationTime: now };
+          }
+        }
+
         // Handle periodic spawning (Tombstone spawns skeletons every spawnRate seconds)
         if (u.spawns && u.spawnRate && u.lastSpawn !== undefined) {
-          const timeSinceLastSpawn = (now - u.lastSpawn) / 1000; // Convert to seconds
-          if (timeSinceLastSpawn >= u.spawnRate) {
-            // Spawn the units
-            const spawnCardId = u.spawns;
-            const spawnCard = CARDS.find(c => c.id === spawnCardId);
+          // Check if we've reached the spawn limit (for graveyard)
+          const maxSpawned = u.totalToSpawn || Infinity;
+          const spawnedSoFar = u.spawnedSoFar || 0;
 
-            if (spawnCard) {
-              const newSpawns = [];
-              // Use unit's spawnCount if defined, otherwise fall back to spawn card's count
-              const spawnCount = u.spawnCount || spawnCard.count || 1;
+          if (spawnedSoFar < maxSpawned) {
+            const timeSinceLastSpawn = (now - u.lastSpawn) / 1000; // Convert to seconds
+            if (timeSinceLastSpawn >= u.spawnRate) {
+              // Spawn the units
+              const spawnCardId = u.spawns;
+              const spawnCard = CARDS.find(c => c.id === spawnCardId);
 
-              for (let i = 0; i < spawnCount; i++) {
-                // Calculate spawn position - ensure skeletons spawn AWAY from parent, not inside
-                // For buildings (speed === 0), spawn in direction toward enemy
-                // For moving units like Witch, spawn around them with minimum distance
-                let offsetX, offsetY;
-                const minOffset = 50;  // Minimum distance from parent center
-                const maxOffset = 80;  // Maximum distance from parent center
+              if (spawnCard) {
+                const newSpawns = [];
+                // Use unit's spawnCount if defined, otherwise fall back to spawn card's count
+                let spawnCount = u.spawnCount || spawnCard.count || 1;
 
-                if (u.speed === 0) {
-                  // Building (Tombstone) - spawn skeletons toward enemy side
-                  const angle = (Math.random() * Math.PI / 2) - Math.PI / 4; // -45 to +45 degrees from forward
-                  const distance = minOffset + Math.random() * (maxOffset - minOffset);
-                  offsetX = Math.sin(angle) * distance;
-                  // Spawn toward enemy: player buildings spawn up (-Y), opponent buildings spawn down (+Y)
-                  offsetY = u.isOpponent ? distance * Math.cos(angle) : -distance * Math.cos(angle);
-                } else {
-                  // Moving unit (Witch) - spawn around with minimum distance
-                  const angle = (i / spawnCount) * Math.PI * 2 + Math.random() * 0.5; // Spread evenly around
-                  const distance = minOffset + Math.random() * (maxOffset - minOffset);
-                  offsetX = Math.cos(angle) * distance;
-                  offsetY = Math.sin(angle) * distance;
+                // Limit spawn count to not exceed totalToSpawn
+                if (spawnedSoFar + spawnCount > maxSpawned) {
+                  spawnCount = maxSpawned - spawnedSoFar;
                 }
 
-                const spawnX = u.x + offsetX;
-                const spawnY = u.y + offsetY;
+                for (let i = 0; i < spawnCount; i++) {
+                  // Calculate spawn position - ensure skeletons spawn AWAY from parent, not inside
+                  // For buildings (speed === 0), spawn in direction toward enemy
+                  // For moving units like Witch, spawn around them with minimum distance
+                  let offsetX, offsetY;
 
-                newSpawns.push({
-                  id: Date.now() + Math.random() * 1000 + i,
-                  x: spawnX,
-                  y: spawnY,
-                  hp: spawnCard.hp,
-                  maxHp: spawnCard.hp,
-                  isOpponent: u.isOpponent,
-                  speed: spawnCard.speed,
-                  lane: u.lane,
-                  lastAttack: 0,
-                  spriteId: spawnCard.id,
-                  type: spawnCard.type,
-                  range: spawnCard.range,
-                  damage: spawnCard.damage,
-                  attackSpeed: spawnCard.attackSpeed,
-                  projectile: spawnCard.projectile,
-                  lockedTarget: null,
-                  wasPushed: false,
-                  wasStunned: false,
-                  stunUntil: 0,
-                  baseDamage: spawnCard.damage
-                });
+                  if (u.type === 'graveyard_zone') {
+                    // Graveyard: spawn randomly in a 4-tile radius circle (80 pixels)
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = Math.random() * 80; // 0-80 pixels from center (4 tiles)
+                    offsetX = Math.cos(angle) * distance;
+                    offsetY = Math.sin(angle) * distance;
+                  } else if (u.speed === 0) {
+                    // Building (Tombstone) - spawn skeletons toward enemy side
+                    const minOffset = 50;
+                    const maxOffset = 80;
+                    const angle = (Math.random() * Math.PI / 2) - Math.PI / 4; // -45 to +45 degrees from forward
+                    const distance = minOffset + Math.random() * (maxOffset - minOffset);
+                    offsetX = Math.sin(angle) * distance;
+                    // Spawn toward enemy: player buildings spawn up (-Y), opponent buildings spawn down (+Y)
+                    offsetY = u.isOpponent ? distance * Math.cos(angle) : -distance * Math.cos(angle);
+                  } else {
+                    // Moving unit (Witch) - spawn around with minimum distance
+                    const minOffset = 50;
+                    const maxOffset = 80;
+                    const angle = (i / spawnCount) * Math.PI * 2 + Math.random() * 0.5; // Spread evenly around
+                    const distance = minOffset + Math.random() * (maxOffset - minOffset);
+                    offsetX = Math.cos(angle) * distance;
+                    offsetY = Math.sin(angle) * distance;
+                  }
+
+                  const spawnX = u.x + offsetX;
+                  const spawnY = u.y + offsetY;
+
+                  newSpawns.push({
+                    id: Date.now() + Math.random() * 1000 + i,
+                    x: spawnX,
+                    y: spawnY,
+                    hp: spawnCard.hp,
+                    maxHp: spawnCard.hp,
+                    isOpponent: u.isOpponent,
+                    speed: spawnCard.speed,
+                    lane: u.lane,
+                    lastAttack: 0,
+                    spriteId: spawnCard.id,
+                    type: spawnCard.type,
+                    range: spawnCard.range,
+                    damage: spawnCard.damage,
+                    attackSpeed: spawnCard.attackSpeed,
+                    projectile: spawnCard.projectile,
+                    lockedTarget: null,
+                    wasPushed: false,
+                    wasStunned: false,
+                    stunUntil: 0,
+                    baseDamage: spawnCard.damage,
+                    // Copy special properties from spawnCard
+                    kamikaze: spawnCard.kamikaze || false,
+                    splash: spawnCard.splash || false,
+                    healsOnAttack: spawnCard.healsOnAttack || 0,
+                    healRadius: spawnCard.healRadius || 0,
+                    chain: spawnCard.chain || 0,
+                    stun: spawnCard.stun || 0
+                  });
+                }
+
+                // Add spawned units to collection (will be added at end of loop)
+                unitsToSpawn.push(...newSpawns);
+
+                // Update last spawn time and spawned count
+                u.lastSpawn = now;
+                u.spawnedSoFar = spawnedSoFar + spawnCount;
               }
-
-              // Add spawned units to collection (will be added at end of loop)
-              unitsToSpawn.push(...newSpawns);
-
-              // Update last spawn time
-              u.lastSpawn = now;
             }
           }
         }
@@ -3270,6 +4776,19 @@ export default function App() {
             damage: u.spawnDamage,
             slow: u.slow
           });
+
+          // Mega Knight spawn slam visual effect
+          if (u.spriteId === 'mega_knight') {
+            setVisualEffects(prev => [...prev, {
+              id: Date.now() + Math.random(),
+              type: 'mega_knight_slam',
+              x: u.x,
+              y: u.y,
+              radius: 70,
+              startTime: Date.now(),
+              duration: 600
+            }]);
+          }
         }
 
         // Handle Tesla hidden mechanic
@@ -3296,6 +4815,17 @@ export default function App() {
             u.hidden.lastCombatTime = now;
             if (u.hidden.active) {
               u.hidden.wakeTime = now;
+
+              // Tesla reveal visual effect
+              setVisualEffects(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: 'tesla_reveal',
+                x: u.x,
+                y: u.y,
+                radius: 50,
+                startTime: Date.now(),
+                duration: 500
+              }]);
             }
             u.hidden.active = false;
           } else {
@@ -3374,10 +4904,12 @@ export default function App() {
           // For other units: PRIORITIZE towers, only target units if no towers in range
           // Use unitsRef.current instead of currentUnits to avoid circular reference
           // Exclude hidden Teslas from targets (they're underground and untargetable)
+          // Exclude zones (graveyard) from targets (they're untargetable)
           const unitTargets = (unitsRef.current || []).filter(targetUnit =>
             targetUnit.isOpponent !== u.isOpponent &&
             targetUnit.hp > 0 &&
             !(targetUnit.hidden?.active && targetUnit.spriteId === 'tesla') &&
+            !targetUnit.isZone && // Cannot target zones (graveyard, etc.)
             // Ground melee units cannot target flying units, but ranged units can
             // EXCEPTION: X-Bow targets ground ONLY despite having projectile
             (u.type === 'flying' || (u.projectile && u.spriteId !== 'x_bow') || targetUnit.type !== 'flying')
@@ -3449,6 +4981,9 @@ export default function App() {
           if (u.slowUntil > now) {
             currentAttackSpeed = u.attackSpeed / (1 - (u.slowAmount || 0.35));
           }
+          if (u.rageUntil > now) {
+            currentAttackSpeed = u.attackSpeed / 1.35; // 35% faster attack speed
+          }
 
           if (now - u.lastAttack > currentAttackSpeed && !isWakingUp) {
             // Calculate damage to deal
@@ -3464,8 +4999,14 @@ export default function App() {
 
             if (u.projectile) {
               // Tesla uses lightning - special instant effect
+              // X-Bow has very fast arrows
               const projectileType = (u.spriteId === 'tesla') ? 'tesla_lightning' : u.projectile;
-              const projectileSpeed = (u.spriteId === 'tesla') ? 100 : 12; // Instant for Tesla
+              let projectileSpeed = 12; // Default speed
+              if (u.spriteId === 'tesla') {
+                projectileSpeed = 100; // Instant for Tesla
+              } else if (u.spriteId === 'x_bow') {
+                projectileSpeed = 50; // Very fast arrows for X-Bow
+              }
 
               // Fire projectiles at all targets
               targetsToAttack.forEach(target => {
@@ -3519,6 +5060,78 @@ export default function App() {
                   damage: damageToDeal
                 });
               }
+
+              // Spirit Cards special effects
+              if (u.kamikaze) {
+                // Fire Spirit - explosion visual (has splash: true)
+                if (u.splash) {
+                  setVisualEffects(prev => [...prev, {
+                    id: Date.now() + Math.random(),
+                    type: 'fire_explosion',
+                    x: closestTarget.x,
+                    y: closestTarget.y,
+                    radius: 50,
+                    startTime: Date.now(),
+                    duration: 500
+                  }]);
+                }
+
+                // Ice Spirit - freeze visual
+                if (u.stun && u.stun > 0) {
+                  damageEvents.push({
+                    targetId: closestTarget.id,
+                    damage: damageToDeal,
+                    attackerId: u.id,
+                    stun: u.stun
+                  });
+                  setVisualEffects(prev => [...prev, {
+                    id: Date.now() + Math.random(),
+                    type: 'ice_freeze',
+                    x: closestTarget.x,
+                    y: closestTarget.y,
+                    radius: 40,
+                    startTime: Date.now(),
+                    duration: 800
+                  }]);
+                }
+
+                // Heal Spirit - heal visual
+                if (u.healsOnAttack > 0) {
+                  healEvents.push({
+                    x: closestTarget.x,
+                    y: closestTarget.y,
+                    radius: u.healRadius,
+                    amount: u.healsOnAttack,
+                    isOpponent: u.isOpponent
+                  });
+                  setVisualEffects(prev => [...prev, {
+                    id: Date.now() + Math.random(),
+                    type: 'heal_glow',
+                    x: closestTarget.x,
+                    y: closestTarget.y,
+                    radius: u.healRadius,
+                    startTime: Date.now(),
+                    duration: 600
+                  }]);
+                }
+
+                // Electro Spirit - chain visual
+                if (u.chain > 0) {
+                  chainEvents.push({
+                    attackerId: u.id,
+                    primaryTarget: closestTarget,
+                    chainCount: Math.min(u.chain - 1, 3), // Max 3 additional targets (4 total)
+                    damage: damageToDeal,
+                    stun: u.stun || 0,
+                    isOpponent: u.isOpponent,
+                    startX: u.x,
+                    startY: u.y
+                  });
+                }
+
+                // Kamikaze - die after attacking
+                return { ...u, lastAttack: now, hp: 0, hidden: u.hidden, charge: u.charge ? { ...u.charge, distance: 0, active: false } : u.charge, lockedTarget: u.lockedTarget, wasPushed: false, wasStunned: u.wasStunned };
+              }
             }
             // Reset charge when Prince attacks (consumes charge)
             const updatedCharge = u.charge ? { ...u.charge, distance: 0, active: false } : u.charge;
@@ -3538,6 +5151,10 @@ export default function App() {
           // Apply speed boost for charging Prince
           const speedMultiplier = (u.charge && u.charge.active) ? 2 : 1;
           let effectiveSpeed = u.speed * speedMultiplier;
+
+          if (u.rageUntil > now) {
+            effectiveSpeed *= 1.35; // 35% faster movement speed
+          }
 
           // Mega Knight Jump Movement
           if (isJumpingNow) {
@@ -3670,10 +5287,15 @@ export default function App() {
         }
       });
 
-      // Filter out dead units
+      // Filter out dead units - but handle death spawns first
       const beforeFilter = currentUnits.length;
+      const unitsThatDied = [];
+
       currentUnits = currentUnits.filter(u => {
         if (u.hp <= 0) {
+          // Track units that died this frame for death spawn handling
+          unitsThatDied.push(u);
+
           if (u.spriteId === 'skeletons') {
             console.log('[FILTER]', 'skeleton died - hp:', u.hp);
           }
@@ -3687,6 +5309,83 @@ export default function App() {
         }
         return true;
       });
+
+      // Handle death spawns (Goblin Hut spawns 3 goblins when destroyed)
+      if (unitsThatDied.length > 0) {
+        unitsThatDied.forEach(deadUnit => {
+          // Goblin Hut death spawn - 3 Spear Goblins
+          if (deadUnit.spriteId === 'goblin_hut' && deadUnit.isOpponent === false) {
+            const spawnCard = CARDS.find(c => c.id === 'sword_goblins');
+            if (spawnCard) {
+              const newGoblins = [];
+              for (let i = 0; i < 3; i++) {
+                const angle = (i / 3) * Math.PI * 2;
+                const distance = 30 + Math.random() * 20;
+                const offsetX = Math.cos(angle) * distance;
+                const offsetY = Math.sin(angle) * distance;
+
+                newGoblins.push({
+                  id: Date.now() + Math.random() * 1000 + i,
+                  x: deadUnit.x + offsetX,
+                  y: deadUnit.y + offsetY,
+                  hp: spawnCard.hp,
+                  maxHp: spawnCard.hp,
+                  isOpponent: deadUnit.isOpponent,
+                  speed: spawnCard.speed,
+                  lane: deadUnit.lane,
+                  lastAttack: now,
+                  spriteId: spawnCard.id,
+                  type: spawnCard.type,
+                  range: spawnCard.range,
+                  damage: spawnCard.damage,
+                  attackSpeed: spawnCard.attackSpeed,
+                  projectile: spawnCard.projectile,
+                  lockedTarget: null,
+                  wasPushed: false,
+                  wasStunned: false,
+                  stunUntil: 0,
+                  baseDamage: spawnCard.damage
+                });
+              }
+              unitsToSpawn.push(...newGoblins);
+
+              // Goblin Hut destruction visual effect
+              setVisualEffects(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: 'building_destruction',
+                x: deadUnit.x,
+                y: deadUnit.y,
+                radius: 60,
+                startTime: Date.now(),
+                duration: 800
+              }]);
+            }
+          }
+
+          // Lumberjack death - drops Rage spell
+          if (deadUnit.deathRage && deadUnit.spriteId === 'lumberjack') {
+            // Create Rage effect at Lumberjack's death location
+            setProjectiles(prev => [...prev, {
+              id: Date.now() + Math.random(),
+              x: deadUnit.x,
+              y: deadUnit.y,
+              targetX: deadUnit.x,
+              targetY: deadUnit.y,
+              speed: 0,
+              damage: 0,
+              radius: 50, // Rage spell radius (2.5 tiles = 50 pixels)
+              type: 'rage_spell',
+              isSpell: true,
+              isRage: true,
+              hit: true,
+              spawnTime: now,
+              duration: 6, // Rage lasts 6 seconds
+              isOpponent: deadUnit.isOpponent
+            }]);
+          }
+        });
+      }
+
       const afterFilter = currentUnits.length;
       if (beforeFilter !== afterFilter) {
         console.log('[FILTER]', 'Removed', beforeFilter - afterFilter, 'units');
@@ -3730,6 +5429,92 @@ export default function App() {
           }
           return tower;
         });
+      });
+
+      // Apply heal events (Heal Spirit)
+      healEvents.forEach(event => {
+        // Heal all friendly units in radius
+        currentUnits = currentUnits.map(unit => {
+          if (unit.isOpponent === event.isOpponent && unit.hp > 0) {
+            const dist = Math.sqrt(Math.pow(unit.x - event.x, 2) + Math.pow(unit.y - event.y, 2));
+            if (dist <= event.radius) {
+              return { ...unit, hp: Math.min(unit.maxHp || unit.hp + event.amount, unit.hp + event.amount) };
+            }
+          }
+          return unit;
+        });
+        // Also heal friendly towers
+        nextTowers = nextTowers.map(tower => {
+          if (tower.isOpponent === event.isOpponent && tower.hp > 0) {
+            const dist = Math.sqrt(Math.pow(tower.x - event.x, 2) + Math.pow(tower.y - event.y, 2));
+            if (dist <= event.radius) {
+              return { ...tower, hp: Math.min(tower.maxHp || tower.hp + event.amount, tower.hp + event.amount) };
+            }
+          }
+          return tower;
+        });
+      });
+
+      // Apply chain events (Electro Spirit)
+      chainEvents.forEach(event => {
+        const attacker = currentUnits.find(u => u.id === event.attackerId);
+        if (!attacker) return; // Attacker died before chain could complete
+
+        let chainedTargets = [event.primaryTarget];
+        let remainingChains = event.chainCount;
+
+        // Find additional targets to chain to
+        while (remainingChains > 0) {
+          let lastTarget = chainedTargets[chainedTargets.length - 1];
+          let closestDist = Infinity;
+          let closestTarget = null;
+
+          // Find closest enemy unit to the last chained target
+          currentUnits.forEach(unit => {
+            if (unit.isOpponent !== event.isOpponent && unit.hp > 0 && !chainedTargets.find(t => t.id === unit.id) && !unit.isZone) {
+              const dist = Math.sqrt(Math.pow(unit.x - lastTarget.x, 2) + Math.pow(unit.y - lastTarget.y, 2));
+              if (dist < closestDist && dist < 80) { // Max chain distance: 80
+                closestDist = dist;
+                closestTarget = unit;
+              }
+            }
+          });
+
+          if (closestTarget) {
+            chainedTargets.push(closestTarget);
+            remainingChains--;
+          } else {
+            break; // No more targets in range
+          }
+        }
+
+        // Apply damage and stun to all chained targets (except the first one which was already hit)
+        chainedTargets.slice(1).forEach(target => {
+          damageEvents.push({
+            targetId: target.id,
+            damage: event.damage,
+            attackerId: event.attackerId
+          });
+          // Apply stun
+          if (event.stun > 0) {
+            const targetUnit = currentUnits.find(u => u.id === target.id);
+            if (targetUnit) {
+              targetUnit.stunUntil = Date.now() + (event.stun * 1000);
+              targetUnit.wasStunned = true;
+            }
+          }
+        });
+
+        // Create visual effect for chain lightning
+        if (chainedTargets.length > 1) {
+          setVisualEffects(prev => [...prev, {
+            id: Date.now() + Math.random(),
+            type: 'chain_lightning',
+            targets: chainedTargets.map(t => ({ x: t.x, y: t.y })),
+            startTime: Date.now(),
+            duration: 400
+          }]);
+        }
       });
 
       let activeProjectiles = nextProjectiles.map(p => {
@@ -3822,13 +5607,102 @@ export default function App() {
                 }
               }
               // Poison will be filtered out after duration
+            } else if (h.isRage) {
+              // Rage Spell Logic
+              const rageAge = (now - h.spawnTime) / 1000;
+              if (rageAge < h.duration) {
+                 // Refresh rage effect on units in radius
+                 // Rage updates constantly (every tick)
+                 currentUnits = currentUnits.map(u => {
+                    const isFriendly = u.isOpponent === (h.isOpponent || false);
+                    const dist = Math.sqrt(Math.pow(u.x - h.x, 2) + Math.pow(u.y - h.y, 2));
+                    if (isFriendly && dist < h.radius) {
+                      return { ...u, rageUntil: now + 200 }; // Buffer of 200ms
+                    }
+                    return u;
+                 });
+                 // Rage towers
+                 nextTowers = nextTowers.map(t => {
+                    const isFriendly = t.isOpponent === (h.isOpponent || false);
+                    const dist = Math.sqrt(Math.pow(t.x - h.x, 2) + Math.pow(t.y - h.y, 2));
+                    if (isFriendly && dist < h.radius + 30) {
+                       return { ...t, rageUntil: now + 200 };
+                    }
+                    return t;
+                 });
+
+                 // Create persistent rage visual effect (recreated every frame to show continuous effect)
+                 if (!h.rageEffectCreated) {
+                   setVisualEffects(prev => [...prev, {
+                     id: Date.now() + Math.random(),
+                     type: 'rage_aura',
+                     x: h.x,
+                     y: h.y,
+                     radius: h.radius || 50,
+                     startTime: Date.now(),
+                     duration: h.duration * 1000
+                   }]);
+                   h.rageEffectCreated = true;
+                 }
+              }
+            } else if (h.isGoblinBarrel) {
+              // Goblin Barrel hits - spawn goblins around impact point
+              const spawnCardId = h.spawns;
+              const spawnCard = CARDS.find(c => c.id === spawnCardId);
+              const spawnCount = h.spawnCount || 3;
+
+              if (spawnCard) {
+                const newGoblins = [];
+                const lane = h.targetX < width / 2 ? 'LEFT' : 'RIGHT';
+
+                for (let i = 0; i < spawnCount; i++) {
+                  // Spawn goblins in a circle around the impact point
+                  const angle = (i / spawnCount) * Math.PI * 2;
+                  const distance = 30 + Math.random() * 20; // 30-50 pixels from center
+                  const offsetX = Math.cos(angle) * distance;
+                  const offsetY = Math.sin(angle) * distance;
+
+                  newGoblins.push({
+                    id: Date.now() + i,
+                    x: h.targetX + offsetX,
+                    y: h.targetY + offsetY,
+                    hp: spawnCard.hp,
+                    maxHp: spawnCard.hp,
+                    isOpponent: false,
+                    speed: spawnCard.speed,
+                    lane: lane,
+                    lastAttack: 0,
+                    spriteId: spawnCard.id,
+                    type: spawnCard.type,
+                    range: spawnCard.range,
+                    damage: spawnCard.damage,
+                    attackSpeed: spawnCard.attackSpeed,
+                    projectile: spawnCard.projectile,
+                    lockedTarget: null,
+                    wasPushed: false,
+                    wasStunned: false,
+                    stunUntil: 0,
+                    baseDamage: spawnCard.damage
+                  });
+                }
+
+                // Add goblins to the game
+                setUnits(prev => [...prev, ...newGoblins]);
+              }
             } else {
-              // Other spells (Fireball, Arrows, Zap) - one-time damage
+              // Other spells (Fireball, Arrows, Zap, Earthquake) - one-time damage
               currentUnits = currentUnits.map(u => {
                 const isEnemy = u.isOpponent !== (h.isOpponent || false);
                 const dist = Math.sqrt(Math.pow(u.x - h.targetX, 2) + Math.pow(u.y - h.targetY, 2));
                 if (isEnemy && dist < h.radius) {
-                  let updatedUnit = { ...u, hp: u.hp - h.damage };
+                  let damageToDeal = h.damage;
+
+                  // Earthquake: 3.5x damage to buildings (speed === 0 means building)
+                  if (h.type === 'earthquake_spell' && u.speed === 0) {
+                    damageToDeal = Math.floor(h.damage * 3.5);
+                  }
+
+                  let updatedUnit = { ...u, hp: u.hp - damageToDeal };
 
                   // Zap stun effect - resets charge ONLY when stunned
                   if (h.stun && h.stun > 0) {
@@ -3839,7 +5713,7 @@ export default function App() {
                     }
                   }
 
-                  // Apply slow effect (Ice Wizard)
+                  // Apply slow effect (Earthquake, Ice Wizard)
                   if (h.slow && h.slow > 0) {
                     updatedUnit.slowUntil = now + 2000; // Slow lasts 2s
                     updatedUnit.slowAmount = h.slow;
@@ -3853,10 +5727,90 @@ export default function App() {
                 const isEnemy = t.isOpponent !== (h.isOpponent || false);
                 const dist = Math.sqrt(Math.pow(t.x - h.targetX, 2) + Math.pow(t.y - h.targetY, 2));
                 if (isEnemy && dist < h.radius + 30) {
-                  return { ...t, hp: t.hp - h.damage };
+                  let damageToDeal = h.damage;
+
+                  // Earthquake: 3.5x damage to buildings (towers are buildings)
+                  if (h.type === 'earthquake_spell') {
+                    damageToDeal = Math.floor(h.damage * 3.5);
+                  }
+
+                  return { ...t, hp: t.hp - damageToDeal };
                 }
                 return t;
               });
+
+              // Create visual effects for spells
+              if (h.type === 'fireball_spell') {
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'fireball_explosion',
+                  x: h.targetX,
+                  y: h.targetY,
+                  radius: h.radius || 60,
+                  startTime: Date.now(),
+                  duration: 600
+                }]);
+              } else if (h.type === 'zap_spell') {
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'zap_impact',
+                  x: h.targetX,
+                  y: h.targetY,
+                  radius: h.radius || 35,
+                  startTime: Date.now(),
+                  duration: 400
+                }]);
+              } else if (h.type === 'arrows_spell') {
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'arrows_impact',
+                  x: h.targetX,
+                  y: h.targetY,
+                  radius: h.radius || 40,
+                  startTime: Date.now(),
+                  duration: 500
+                }]);
+              } else if (h.type === 'poison_spell') {
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'poison_cloud',
+                  x: h.targetX,
+                  y: h.targetY,
+                  radius: h.radius || 50,
+                  startTime: Date.now(),
+                  duration: 5000
+                }]);
+              } else if (h.type === 'rocket_spell') {
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'rocket_explosion',
+                  x: h.targetX,
+                  y: h.targetY,
+                  radius: h.radius || 30,
+                  startTime: Date.now(),
+                  duration: 800
+                }]);
+              } else if (h.type === 'earthquake_spell') {
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'earthquake_crack',
+                  x: h.targetX,
+                  y: h.targetY,
+                  radius: h.radius || 70,
+                  startTime: Date.now(),
+                  duration: 1000
+                }]);
+              } else if (h.type === 'lightning_bolt') {
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'lightning_strike',
+                  x: h.targetX,
+                  y: h.targetY,
+                  radius: h.radius || 50,
+                  startTime: Date.now(),
+                  duration: 500
+                }]);
+              }
             }
 
           } else {
@@ -3928,6 +5882,19 @@ export default function App() {
                 const tower = nextTowers[tIndex];
                 let updatedTower = { ...tower, hp: tower.hp - h.damage };
 
+                // Tower hit visual effect for significant damage
+                if (h.damage > 50) {
+                  setVisualEffects(prev => [...prev, {
+                    id: Date.now() + Math.random(),
+                    type: 'tower_hit',
+                    x: tower.x,
+                    y: tower.y,
+                    radius: 40,
+                    startTime: Date.now(),
+                    duration: 200
+                  }]);
+                }
+
                 // Apply stun effect (Electro Wizard) to towers
                 if (h.stun && h.stun > 0) {
                   updatedTower.stunUntil = now + (h.stun * 1000);
@@ -3950,7 +5917,7 @@ export default function App() {
           if (p.keepVisual && p.type === 'tesla_lightning') {
             return (now - Math.floor(p.id)) < 150;
           }
-          if (p.isPoison) {
+          if (p.isPoison || p.isRage) {
             return ((now - p.spawnTime) / 1000 < p.duration);
           }
           return !p.hit;
@@ -4031,7 +5998,40 @@ export default function App() {
       const deathSpawns = [];
       currentUnits.forEach(u => {
         // Generic death spawn check - works for Tombstone, Lava Hound, etc.
-        if (u.hp <= 0 && (u.spriteId === 'tombstone' || u.deathSpawns)) {
+        if (u.hp <= 0 && (u.spriteId === 'tombstone' || u.deathSpawns || u.deathRage)) {
+          
+          if (u.deathRage) {
+             // Spawn Rage Spell
+             activeProjectiles.push({
+                id: Date.now() + Math.random(),
+                x: u.x,
+                y: u.y,
+                targetX: u.x,
+                targetY: u.y,
+                speed: 100, // Instant
+                damage: 0,
+                radius: 65, // Rage radius
+                type: 'rage_spell',
+                isSpell: true,
+                isRage: true,
+                spawnTime: Date.now(),
+                duration: 6, // Rage lasts 6 seconds (reduced for balance/implementation simplicty, usually 6-8s)
+                isOpponent: u.isOpponent,
+                hit: true // It's already "hit" the ground
+             });
+
+             // Lumberjack rage drop visual effect
+             setVisualEffects(prev => [...prev, {
+               id: Date.now() + Math.random(),
+               type: 'lumberjack_rage',
+               x: u.x,
+               y: u.y,
+               radius: 50,
+               startTime: Date.now(),
+               duration: 1000
+             }]);
+          }
+
           // Determine what to spawn
           let spawnId = 'skeletons'; // Default for Tombstone
           if (u.deathSpawns) {
@@ -4071,6 +6071,42 @@ export default function App() {
                 spawnTime: Date.now(),  // Track spawn time for spawn delay
                 spawnDelay: spawnCard.spawnDelay || 0  // Inherit spawn delay from card
               });
+            }
+
+            // Add death visual effects based on unit type
+            if (u.spriteId === 'golem' || u.spriteId === 'golemite') {
+              // Golem death - stone explosion
+              setVisualEffects(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: 'golem_death',
+                x: u.x,
+                y: u.y,
+                radius: 80,
+                startTime: Date.now(),
+                duration: 1000
+              }]);
+            } else if (u.spriteId === 'lava_hound') {
+              // Lava Hound death - fiery explosion
+              setVisualEffects(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: 'lava_hound_death',
+                x: u.x,
+                y: u.y,
+                radius: 100,
+                startTime: Date.now(),
+                duration: 1500
+              }]);
+            } else if (u.spriteId === 'tombstone') {
+              // Tombstone destruction
+              setVisualEffects(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: 'building_destruction',
+                x: u.x,
+                y: u.y,
+                radius: 50,
+                startTime: Date.now(),
+                duration: 800
+              }]);
             }
           }
         }
@@ -4384,17 +6420,28 @@ export default function App() {
 
   if (!inGame && inLobby) {
     return (
-      <MainLobby
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        onStartGame={handleStartBattle}
-        currentDeck={userCards}
-        onSwapCards={handleSwapCards}
-        dragHandlers={{ start: onGlobalDragStart, move: onGlobalDragMove, end: onGlobalDragEnd }}
-        selectedDeckIndex={selectedDeckIndex}
-        setSelectedDeckIndex={setSelectedDeckIndex}
-        allDecks={allDecks}
-      />
+      <>
+        <MainLobby
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          onStartGame={handleStartBattle}
+          currentDeck={userCards}
+          onSwapCards={handleSwapCards}
+          dragHandlers={{ start: onGlobalDragStart, move: onGlobalDragMove, end: onGlobalDragEnd }}
+          selectedDeckIndex={selectedDeckIndex}
+          setSelectedDeckIndex={setSelectedDeckIndex}
+          allDecks={allDecks}
+          chests={chests}
+          onUnlockChest={handleUnlockChest}
+          onOpenChest={handleOpenChest}
+        />
+        {openingChest && (
+          <ChestOpeningModal 
+            chest={openingChest} 
+            onClose={handleCollectRewards} 
+          />
+        )}
+      </>
     );
   }
 
@@ -4404,6 +6451,8 @@ export default function App() {
         towers={towers}
         units={units}
         projectiles={projectiles}
+        visualEffects={visualEffects}
+        setVisualEffects={setVisualEffects}
         timeLeft={timeLeft}
         gameOver={gameOver}
         elixir={elixir}
@@ -4460,11 +6509,92 @@ const styles = StyleSheet.create({
   },
   menuOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Lighter overlay for better bg visibility
     width: '100%',
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingVertical: 30,
   },
+  logoContainer: {
+    alignItems: 'center',
+    marginTop: 50,
+  },
+  logoTextClash: {
+    fontSize: 50,
+    fontWeight: '900',
+    color: '#fff',
+    textShadowColor: '#000',
+    textShadowOffset: { width: 3, height: 3 },
+    textShadowRadius: 0,
+    fontFamily: 'sans-serif-condensed', // Attempt to match font
+    marginBottom: -10, // Stack them
+  },
+  logoTextRoyale: {
+    fontSize: 50,
+    fontWeight: '900',
+    color: '#FFD700', // Gold
+    textShadowColor: '#000',
+    textShadowOffset: { width: 3, height: 3 },
+    textShadowRadius: 0,
+    fontFamily: 'sans-serif-condensed',
+  },
+  loadingBottomContainer: {
+    width: '90%',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  tipText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 10,
+    textShadowColor: '#000',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+  },
+  loadingBarRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 5,
+  },
+  loadingPercentage: {
+    color: '#D442F5', // Pink/Purple text
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginRight: 10,
+    width: 50,
+    textAlign: 'right',
+    textShadowColor: '#000',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 1,
+  },
+  loadingBarTrack: {
+    flex: 1,
+    height: 16,
+    backgroundColor: '#333',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#000',
+    overflow: 'hidden',
+  },
+  loadingBarFill: {
+    height: '100%',
+    backgroundColor: '#D442F5', // Purple loading bar
+  },
+  loadingStateText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginTop: 2,
+  },
+  copyrightText: {
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 10,
+    fontWeight: 'bold',
+    marginTop: 10,
+  },
+  // Legacy styles (kept if needed by other components, though mostly replaced)
   headerContainer: {
     alignItems: 'center',
     marginBottom: 80,
@@ -4537,29 +6667,38 @@ const styles = StyleSheet.create({
     borderRightColor: '#F1C40F', // Highlight edge
   },
   battleButton: {
-    backgroundColor: '#f1c40f',
-    paddingVertical: 18,
-    paddingHorizontal: 50,
-    borderRadius: 12,
-    borderWidth: 0,
+    backgroundColor: '#F1C40F', // Main Gold Color
+    paddingVertical: 15,
+    paddingHorizontal: 60,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#F39C12', // Darker Gold Border
     borderBottomWidth: 6,
-    borderBottomColor: '#c29d0b', // darker shade for 3D effect
+    borderBottomColor: '#C27C0E', // Shadow/3D effect
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
     elevation: 8,
     marginTop: 10,
     alignItems: 'center',
+    marginBottom: 20, // Add space at bottom
   },
   battleButtonText: {
-    color: '#3e2723', // Dark brown text
-    fontSize: 24,
+    color: '#5D4037', // Dark Brown Text
+    fontSize: 28,
     fontWeight: '900',
     letterSpacing: 1,
     textShadowColor: 'rgba(255,255,255,0.4)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 0,
+    fontFamily: 'sans-serif-condensed', // Match CR font style
+  },
+  battleButtonSubtext: {
+    color: '#5D4037',
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginTop: -2,
   },
   footerText: {
     color: 'rgba(255,255,255,0.7)',
@@ -5197,6 +7336,31 @@ const styles = StyleSheet.create({
     fontSize: 17,
     textShadowColor: 'rgba(241, 196, 15, 0.5)',
     textShadowRadius: 4,
+  },
+  filterContainer: {
+    paddingHorizontal: 5,
+    marginBottom: 5,
+  },
+  filterButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: '#bdc3c7',
+    marginRight: 8,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+  },
+  filterButtonActive: {
+    backgroundColor: '#34495e',
+    borderColor: '#fff',
+  },
+  filterButtonText: {
+    color: '#bdc3c7',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  filterButtonTextActive: {
+    color: '#fff',
   },
   deckBox: {
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
@@ -6404,5 +8568,108 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  // Chest Opening Modal Styles
+  chestModalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0,0,0,0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 9999,
+    elevation: 50,
+  },
+  chestModalContent: {
+    alignItems: 'center',
+    width: '100%',
+  },
+  chestModalTitle: {
+    fontSize: 32,
+    fontWeight: '900',
+    color: '#FFD700',
+    marginBottom: 40,
+    textShadowColor: '#000',
+    textShadowOffset: {width: 2, height: 2},
+    textShadowRadius: 5,
+    letterSpacing: 2,
+  },
+  chestVisual: {
+    width: 200,
+    height: 160,
+    backgroundColor: '#5D4037', // Brown
+    borderRadius: 20,
+    borderWidth: 4,
+    borderColor: '#8D6E63',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 50,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.8,
+    shadowRadius: 15,
+    elevation: 20,
+  },
+  chestTapText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    opacity: 0.8,
+    marginTop: 20,
+  },
+  rewardsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  rewardItem: {
+    alignItems: 'center',
+    margin: 15,
+    transform: [{scale: 1.2}],
+  },
+  rewardIcon: {
+    fontSize: 40,
+    marginBottom: 5,
+  },
+  rewardValue: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: 'bold',
+    textShadowColor: '#000',
+    textShadowRadius: 2,
+  },
+  rewardLabel: {
+    color: '#ccc',
+    fontSize: 14,
+    marginTop: 2,
+  },
+  closeChestButton: {
+    marginTop: 40,
+    backgroundColor: '#F1C40F',
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 30,
+    borderBottomWidth: 5,
+    borderBottomColor: '#c29d0b',
+  },
+  closeChestButtonText: {
+    color: '#3e2723',
+    fontSize: 20,
+    fontWeight: '900',
+  },
+  chestOpenText: {
+    color: '#2ecc71',
+    fontWeight: '900',
+    fontSize: 10,
+    textShadowColor: 'black',
+    textShadowRadius: 1,
+  },
+  chestLockedText: {
+    color: '#7f8c8d',
+    fontWeight: 'bold',
+    fontSize: 10,
   },
 });
