@@ -1,7 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Text, Dimensions, TouchableOpacity, PanResponder, Animated, Image, ImageBackground, ScrollView, Modal, TextInput, KeyboardAvoidingView, FlatList } from 'react-native';
-import { useState, useEffect, useRef, memo } from 'react';
+import { StyleSheet, View, Text, Dimensions, TouchableOpacity, PanResponder, Animated, Image, ImageBackground, ScrollView, Modal, TextInput, KeyboardAvoidingView, FlatList, ActivityIndicator } from 'react-native';
+import { useState, useEffect, useRef, memo, useMemo } from 'react';
 import Svg, { Circle, Rect, Path, G, Defs, LinearGradient, Stop, Polygon, Text as SvgText } from 'react-native-svg';
+import { io } from "socket.io-client";
 
 const { width, height } = Dimensions.get('window');
 
@@ -2526,17 +2527,19 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
   const [localDraggingCard, setLocalDraggingCard] = useState(null);
   const [scrollEnabled, setScrollEnabled] = useState(true);
 
-  // Filter Logic
-  const filteredCards = CARDS.filter(card => !card.isToken).filter(card => {
-    if (filterRarity === 'all') return true;
-    return card.rarity === filterRarity;
-  }).sort((a, b) => {
-    if (sortByElixir) {
-      return a.cost - b.cost;
-    }
-    // Default sort by id/name stability or rarity if needed
-    return 0;
-  });
+  // Filter Logic - Memoized to prevent re-computation on every render
+  const filteredCards = useMemo(() => {
+    return CARDS.filter(card => !card.isToken).filter(card => {
+      if (filterRarity === 'all') return true;
+      return card.rarity === filterRarity;
+    }).sort((a, b) => {
+      if (sortByElixir) {
+        return a.cost - b.cost;
+      }
+      // Default sort by id/name stability or rarity if needed
+      return 0;
+    });
+  }, [filterRarity, sortByElixir]);
 
   // Filter Modal Component
   const FilterModal = () => (
@@ -2814,8 +2817,8 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
     setScrollEnabled(true);
   };
 
-  // Simple card component for collection with Drag capability
-  const CollectionCard = ({ card }) => {
+  // Simple card component for collection with Drag capability - Memoized for performance
+  const CollectionCard = memo(({ card }) => {
     if (!card) return null;
 
     const isInDeck = cards.some(c => c && c.id === card.id);
@@ -2892,7 +2895,7 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
         </TouchableOpacity>
       </View>
     );
-  };
+  });
 
   return (
     <View style={styles.deckTabContainer}>
@@ -3179,7 +3182,7 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
   );
 };
 
-const BattleTab = ({ currentDeck, onStartBattle, chests, onUnlockChest, onOpenChest }) => (
+const BattleTab = ({ currentDeck, onStartBattle, chests, onUnlockChest, onOpenChest, onFriendlyBattle }) => (
   <View style={styles.battleTabContainer}>
     <View style={styles.arenaTitleContainer}>
       <Text style={styles.arenaTitle}>ARENA 1</Text>
@@ -3223,6 +3226,10 @@ const BattleTab = ({ currentDeck, onStartBattle, chests, onUnlockChest, onOpenCh
     <TouchableOpacity style={styles.battleButton} onPress={onStartBattle}>
       <Text style={styles.battleButtonText}>BATTLE</Text>
       <Text style={styles.battleButtonSubtext}>Ranked 1v1</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity style={styles.friendlyButton} onPress={onFriendlyBattle}>
+      <Text style={styles.friendlyButtonText}>Play with Friend</Text>
     </TouchableOpacity>
 
     <ChestSlots chests={chests} onUnlock={onUnlockChest} onOpen={onOpenChest} />
@@ -3648,11 +3655,10 @@ const ChestOpeningModal = ({ chest, onClose }) => {
   console.log('Rendering ChestOpeningModal for:', chest.id);
   const [step, setStep] = useState('CLOSED'); // CLOSED -> OPENING -> REWARDS
   const [rewards, setRewards] = useState([]);
-  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const [revealedIndex, setRevealedIndex] = useState(-1);
   const shakeAnim = useRef(new Animated.Value(0)).current;
 
   const generateRewards = () => {
-    // Determine rewards based on chest type
     let gold = 0;
     let gems = 0;
     let cardCount = 0;
@@ -3670,7 +3676,7 @@ const ChestOpeningModal = ({ chest, onClose }) => {
     if (gold > 0) newRewards.push({ type: 'GOLD', value: gold, icon: '💰', label: 'Gold' });
     if (gems > 0) newRewards.push({ type: 'GEM', value: gems, icon: '💎', label: 'Gems' });
     
-    // Pick a random card
+    // For bigger chests, add multiple cards or items to make it feel "real"
     const randomCard = CARDS[Math.floor(Math.random() * CARDS.length)];
     if (cardCount > 0) newRewards.push({ type: 'CARD', value: cardCount, icon: '🃏', label: randomCard.name, card: randomCard });
 
@@ -3679,22 +3685,23 @@ const ChestOpeningModal = ({ chest, onClose }) => {
 
   const handleTap = () => {
     if (step === 'CLOSED') {
-      // Shake animation
+      // Shake animation for first open
       Animated.sequence([
         Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
         Animated.timing(shakeAnim, { toValue: -10, duration: 50, useNativeDriver: true }),
         Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
         Animated.timing(shakeAnim, { toValue: 0, duration: 50, useNativeDriver: true }),
       ]).start(() => {
-        setStep('REWARDS');
+        setStep('OPENING');
         generateRewards();
-        // Scale up effect for rewards
-        Animated.spring(scaleAnim, {
-          toValue: 1,
-          friction: 5,
-          useNativeDriver: true
-        }).start();
+        setRevealedIndex(0); // Show first reward
       });
+    } else if (step === 'OPENING') {
+      if (revealedIndex < rewards.length - 1) {
+        setRevealedIndex(prev => prev + 1);
+      } else {
+        setStep('FINISHED');
+      }
     }
   };
 
@@ -3708,13 +3715,20 @@ const ChestOpeningModal = ({ chest, onClose }) => {
     }
   };
 
+  const remainingCount = rewards.length - (revealedIndex + 1);
+  const currentReward = rewards[revealedIndex];
+
   return (
-    <View style={styles.chestModalOverlay}>
+    <TouchableOpacity 
+      style={styles.chestModalOverlay} 
+      activeOpacity={1} 
+      onPress={handleTap}
+    >
       <View style={styles.chestModalContent}>
         <Text style={styles.chestModalTitle}>{chest.type} CHEST</Text>
         
         {step === 'CLOSED' && (
-          <TouchableOpacity onPress={handleTap} activeOpacity={0.8}>
+          <View style={{alignItems: 'center'}}>
             <Animated.View style={[
               styles.chestVisual, 
               { 
@@ -3725,39 +3739,156 @@ const ChestOpeningModal = ({ chest, onClose }) => {
               <Text style={{fontSize: 50}}>🔒</Text>
             </Animated.View>
             <Text style={styles.chestTapText}>Tap to Open!</Text>
-          </TouchableOpacity>
+          </View>
         )}
 
-        {step === 'REWARDS' && (
-          <View style={{alignItems: 'center'}}>
-            <Animated.View style={[styles.chestVisual, { borderColor: getChestColor(chest.type), marginBottom: 20 }]}>
-               <Text style={{fontSize: 50}}>🔓</Text>
-            </Animated.View>
-            
-            <View style={styles.rewardsContainer}>
-              {rewards.map((r, i) => (
-                <View key={i} style={styles.rewardItem}>
-                  {r.type === 'CARD' ? (
-                    <View>
-                      <UnitSprite id={r.card.id} isOpponent={false} size={60} />
-                      <Text style={{position: 'absolute', bottom: 0, right: 0, fontWeight: 'bold', color: '#fff', backgroundColor: 'rgba(0,0,0,0.5)'}}>x{r.value}</Text>
-                    </View>
-                  ) : (
-                    <Text style={styles.rewardIcon}>{r.icon}</Text>
-                  )}
-                  <Text style={styles.rewardValue}>{r.type !== 'CARD' ? r.value : r.label}</Text>
-                  {r.type !== 'CARD' && <Text style={styles.rewardLabel}>{r.label}</Text>}
-                </View>
-              ))}
-            </View>
+        {(step === 'OPENING' || step === 'FINISHED') && currentReward && (
+          <View style={{alignItems: 'center', width: '100%'}}>
+            {/* Authentic CR Item Count Indicator */}
+            {step === 'OPENING' && remainingCount > 0 && (
+              <View style={styles.itemCountBadge}>
+                <Text style={styles.itemCountText}>{remainingCount}</Text>
+              </View>
+            )}
 
-            <TouchableOpacity style={styles.closeChestButton} onPress={onClose}>
-              <Text style={styles.closeChestButtonText}>COLLECT</Text>
-            </TouchableOpacity>
+            {/* Current Reward Visual */}
+            <Animated.View style={styles.rewardRevealContainer}>
+              <View style={styles.rewardItemLarge}>
+                {currentReward.type === 'CARD' ? (
+                  <View style={{alignItems: 'center'}}>
+                    <UnitSprite id={currentReward.card.id} isOpponent={false} size={120} />
+                    <Text style={styles.rewardValueLarge}>{currentReward.label}</Text>
+                    <View style={styles.cardCountBadge}>
+                      <Text style={styles.cardCountText}>x{currentReward.value}</Text>
+                    </View>
+                  </View>
+                ) : (
+                  <View style={{alignItems: 'center'}}>
+                    <Text style={styles.rewardIconLarge}>{currentReward.icon}</Text>
+                    <Text style={styles.rewardValueLarge}>{currentReward.value}</Text>
+                    <Text style={styles.rewardLabelLarge}>{currentReward.label}</Text>
+                  </View>
+                )}
+              </View>
+            </Animated.View>
+
+            {step === 'FINISHED' && (
+              <TouchableOpacity style={styles.closeChestButton} onPress={onClose}>
+                <Text style={styles.closeChestButtonText}>COLLECT</Text>
+              </TouchableOpacity>
+            )}
+            
+            {step === 'OPENING' && (
+              <Text style={styles.chestTapText}>Tap to reveal next!</Text>
+            )}
           </View>
         )}
       </View>
-    </View>
+    </TouchableOpacity>
+  );
+};
+
+// --- Friendly Battle Modal Component ---
+const FriendlyBattleModal = ({ visible, onClose, socket }) => {
+  const [mode, setMode] = useState('MENU'); // MENU, CREATE, JOIN
+  const [roomCode, setRoomCode] = useState('');
+  const [joinCode, setJoinCode] = useState('');
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (visible) {
+      setMode('MENU');
+      setRoomCode('');
+      setJoinCode('');
+      setError('');
+    }
+  }, [visible]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on('room_created', (roomId) => {
+      setRoomCode(roomId);
+    });
+
+    socket.on('error', (msg) => {
+      setError(msg);
+      // Reset after 3s
+      setTimeout(() => setError(''), 3000);
+    });
+
+    return () => {
+      socket.off('room_created');
+      socket.off('error');
+    };
+  }, [socket]);
+
+  const handleCreate = () => {
+    setMode('CREATE');
+    // Generate random 4-digit code and request creation
+    const code = Math.floor(1000 + Math.random() * 9000).toString();
+    // In reality, server should generate ID, but we'll request one for simplicity
+    if (socket) socket.emit('create_room', code);
+  };
+
+  const handleJoin = () => {
+    if (joinCode.length === 4) {
+      if (socket) socket.emit('join_room', joinCode);
+    } else {
+      setError('Please enter a 4-digit room code');
+    }
+  };
+
+  return (
+    <Modal visible={visible} transparent={true} animationType="slide">
+      <TouchableOpacity style={styles.chestModalOverlay} activeOpacity={1} onPress={onClose}>
+        <View style={styles.friendlyModalContent} onStartShouldSetResponder={() => true}>
+          <Text style={styles.friendlyModalTitle}>FRIENDLY BATTLE</Text>
+
+          {mode === 'MENU' && (
+            <View style={styles.roomButtonsRow}>
+              <TouchableOpacity style={styles.createRoomButton} onPress={handleCreate}>
+                <Text style={styles.roomButtonText}>CREATE ROOM</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.joinRoomButton} onPress={() => setMode('JOIN')}>
+                <Text style={styles.roomButtonText}>JOIN ROOM</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {mode === 'CREATE' && (
+            <View style={{alignItems: 'center', width: '100%'}}>
+              <Text style={styles.waitingText}>Share this code with your friend:</Text>
+              <Text style={styles.roomCodeText}>{roomCode || '...'}</Text>
+              <Text style={styles.waitingText}>Waiting for opponent...</Text>
+              <ActivityIndicator size="large" color="#3498db" />
+            </View>
+          )}
+
+          {mode === 'JOIN' && (
+            <View style={{alignItems: 'center', width: '100%'}}>
+              <TextInput
+                style={styles.roomInput}
+                placeholder="Enter Room Code"
+                keyboardType="numeric"
+                maxLength={4}
+                value={joinCode}
+                onChangeText={setJoinCode}
+              />
+              <TouchableOpacity style={styles.joinRoomButton} onPress={handleJoin}>
+                <Text style={styles.roomButtonText}>JOIN BATTLE</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {error ? <Text style={{color: 'red', marginTop: 10, fontWeight: 'bold'}}>{error}</Text> : null}
+
+          <TouchableOpacity style={styles.cardMenuCancel} onPress={onClose}>
+            <Text style={styles.cardMenuCancelText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    </Modal>
   );
 };
 
@@ -3766,6 +3897,7 @@ export default function App() {
   const [inGame, setInGame] = useState(false);
   const [inLobby, setInLobby] = useState(false);
   const [openingChest, setOpeningChest] = useState(null); // Track chest being opened
+  const [friendlyModalVisible, setFriendlyModalVisible] = useState(false); // Friendly battle modal
   const [activeTab, setActiveTab] = useState(2); // Default to Battle tab
   const [gameOver, setGameOver] = useState(null);
   const [timeLeft, setTimeLeft] = useState(180);
@@ -3774,6 +3906,29 @@ export default function App() {
   const [showDoubleElixirAlert, setShowDoubleElixirAlert] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(true);
   const doubleElixirTriggeredRef = useRef(false);
+  const socketRef = useRef(null);
+
+  // Initialize Socket
+  useEffect(() => {
+    socketRef.current = io("http://localhost:3000");
+
+    socketRef.current.on("connect", () => {
+      console.log("Connected to server:", socketRef.current.id);
+    });
+
+    socketRef.current.on("start_game", (data) => {
+      console.log("Game Starting!", data);
+      setFriendlyModalVisible(false);
+      resetGame();
+      setInLobby(false);
+      setInGame(true);
+      // Here you would use data.startingPlayer to determine host/client
+    });
+
+    return () => {
+      if (socketRef.current) socketRef.current.disconnect();
+    };
+  }, []);
 
   // Multiple deck slots - 5 decks of 8 cards each
   // Filter out token cards (golemite, lava_pups, etc.) from deck initialization
@@ -4512,6 +4667,18 @@ export default function App() {
       setChests(prev => prev.filter(c => c.id !== openingChest.id));
       setOpeningChest(null);
     }
+  };
+
+  const handleFriendlyBattle = () => {
+    setFriendlyModalVisible(true);
+  };
+
+  const startFriendlyMatch = () => {
+    setFriendlyModalVisible(false);
+    resetGame();
+    setInLobby(false);
+    setInGame(true);
+    // In a real app, we would set a flag for friendly mode here
   };
 
   const checkWinner = () => {
@@ -6434,6 +6601,7 @@ export default function App() {
           chests={chests}
           onUnlockChest={handleUnlockChest}
           onOpenChest={handleOpenChest}
+          onFriendlyBattle={handleFriendlyBattle}
         />
         {openingChest && (
           <ChestOpeningModal 
@@ -6441,6 +6609,11 @@ export default function App() {
             onClose={handleCollectRewards} 
           />
         )}
+        <FriendlyBattleModal
+          visible={friendlyModalVisible}
+          onClose={() => setFriendlyModalVisible(false)}
+          socket={socketRef.current}
+        />
       </>
     );
   }
@@ -6699,6 +6872,104 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     marginTop: -2,
+  },
+  friendlyButton: {
+    backgroundColor: '#3498db',
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#2980b9',
+    borderBottomWidth: 4,
+    borderBottomColor: '#1f618d',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
+    marginBottom: 20,
+  },
+  friendlyButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 1,
+  },
+  // Friendly Battle Modal
+  friendlyModalContent: {
+    backgroundColor: '#ecf0f1',
+    borderRadius: 20,
+    padding: 25,
+    width: '90%',
+    maxWidth: 350,
+    borderWidth: 4,
+    borderColor: '#3498db',
+    alignItems: 'center',
+  },
+  friendlyModalTitle: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: '#2c3e50',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  roomInput: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    fontSize: 18,
+    textAlign: 'center',
+    borderWidth: 2,
+    borderColor: '#bdc3c7',
+    marginBottom: 20,
+    color: '#2c3e50',
+    fontWeight: 'bold',
+  },
+  roomButtonsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    gap: 10,
+  },
+  createRoomButton: {
+    flex: 1,
+    backgroundColor: '#2ecc71',
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    borderBottomWidth: 4,
+    borderBottomColor: '#27ae60',
+  },
+  joinRoomButton: {
+    flex: 1,
+    backgroundColor: '#3498db',
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    borderBottomWidth: 4,
+    borderBottomColor: '#2980b9',
+  },
+  roomButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  roomCodeText: {
+    fontSize: 32,
+    fontWeight: '900',
+    color: '#3498db',
+    marginVertical: 20,
+    letterSpacing: 5,
+  },
+  waitingText: {
+    fontSize: 16,
+    color: '#7f8c8d',
+    marginBottom: 20,
+    fontStyle: 'italic',
   },
   footerText: {
     color: 'rgba(255,255,255,0.7)',
@@ -8625,26 +8896,66 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
   },
-  rewardItem: {
+  rewardRevealContainer: {
     alignItems: 'center',
-    margin: 15,
-    transform: [{scale: 1.2}],
+    justifyContent: 'center',
+    width: '100%',
+    marginVertical: 30,
   },
-  rewardIcon: {
-    fontSize: 40,
-    marginBottom: 5,
+  rewardItemLarge: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  rewardValue: {
+  rewardIconLarge: {
+    fontSize: 80,
+    marginBottom: 10,
+  },
+  rewardValueLarge: {
+    color: '#fff',
+    fontSize: 32,
+    fontWeight: '900',
+    textShadowColor: '#000',
+    textShadowRadius: 4,
+  },
+  rewardLabelLarge: {
+    color: '#FFD700',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 5,
+  },
+  cardCountBadge: {
+    backgroundColor: '#34495e',
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+    borderRadius: 15,
+    marginTop: 10,
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  cardCountText: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: '900',
+  },
+  itemCountBadge: {
+    position: 'absolute',
+    top: -20,
+    right: 40,
+    backgroundColor: '#e74c3c',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: '#fff',
+    elevation: 10,
+    zIndex: 100,
+  },
+  itemCountText: {
     color: '#fff',
     fontSize: 24,
-    fontWeight: 'bold',
-    textShadowColor: '#000',
-    textShadowRadius: 2,
-  },
-  rewardLabel: {
-    color: '#ccc',
-    fontSize: 14,
-    marginTop: 2,
+    fontWeight: '900',
   },
   closeChestButton: {
     marginTop: 40,
