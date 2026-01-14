@@ -1195,14 +1195,17 @@ const HealthBar = ({ current, max, isOpponent }) => {
 };
 
 const VisualEffects = ({ effects, setEffects }) => {
-  // Clean up expired effects
   const now = Date.now();
-  const activeEffects = effects.filter(e => now - e.startTime < e.duration);
 
-  // Update state to remove expired effects
-  if (activeEffects.length !== effects.length) {
-    setEffects(activeEffects);
-  }
+  // Clean up expired effects using useEffect (not during render)
+  useEffect(() => {
+    const activeEffects = effects.filter(e => now - e.startTime < e.duration);
+    if (activeEffects.length !== effects.length) {
+      setEffects(activeEffects);
+    }
+  }, [now, effects, setEffects]);
+
+  const activeEffects = effects.filter(e => now - e.startTime < e.duration);
 
   return (
     <>
@@ -1671,6 +1674,64 @@ const VisualEffects = ({ effects, setEffects }) => {
                 {/* Energy waves */}
                 <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.6} fill="none" stroke="#9b59b6" strokeWidth="2" opacity={1 - progress} />
                 <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.8} fill="none" stroke="#8e44ad" strokeWidth="1.5" opacity={0.8 - progress * 0.8} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'mega_knight_slam') {
+          // Mega Knight spawn slam - ground pound effect
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Expanding shockwave */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * progress * 0.9} fill="none" stroke="#e67e22" strokeWidth="4" opacity={0.9} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * progress * 0.6} fill="none" stroke="#d35400" strokeWidth="3" opacity={0.8} />
+                {/* Ground impact */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.3} fill="#e67e22" opacity={1 - progress} />
+                {/* Dust particles */}
+                <Circle cx={effect.radius * 0.5} cy={effect.radius * 0.4} r={effect.radius * 0.1} fill="#a04000" opacity={1 - progress * 0.5} />
+                <Circle cx={effect.radius * 1.5} cy={effect.radius * 0.6} r={effect.radius * 0.08} fill="#a04000" opacity={1 - progress * 0.5} />
+                <Circle cx={effect.radius * 0.6} cy={effect.radius * 1.5} r={effect.radius * 0.12} fill="#a04000" opacity={1 - progress * 0.5} />
+                <Circle cx={effect.radius * 1.4} cy={effect.radius * 1.4} r={effect.radius * 0.09} fill="#a04000" opacity={1 - progress * 0.5} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'tesla_reveal') {
+          // Tesla reveal - electric emergence effect
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Electric burst */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * (0.3 + progress * 0.7)} fill="none" stroke="#f1c40f" strokeWidth="3" opacity={0.9} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * (0.5 + progress * 0.5)} fill="none" stroke="#3498db" strokeWidth="2" opacity={0.7} />
+                {/* Lightning bolts */}
+                <Path d={`M${effect.radius * 0.5} ${effect.radius * 0.2} L${effect.radius * 0.5} ${effect.radius * 0.8}`} stroke="#f1c40f" strokeWidth="2" opacity={0.8} />
+                <Path d={`M${effect.radius * 1.5} ${effect.radius * 0.2} L${effect.radius * 1.5} ${effect.radius * 0.8}`} stroke="#f1c40f" strokeWidth="2" opacity={0.8} />
+                <Path d={`M${effect.radius * 0.2} ${effect.radius * 0.5} L${effect.radius * 0.8} ${effect.radius * 0.5}`} stroke="#f1c40f" strokeWidth="2" opacity={0.8} />
+                <Path d={`M${effect.radius * 1.2} ${effect.radius * 0.5} L${effect.radius * 1.8} ${effect.radius * 0.5}`} stroke="#f1c40f" strokeWidth="2" opacity={0.8} />
+                {/* Center glow */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.2} fill="#f1c40f" opacity={1 - progress * 0.5} />
               </Svg>
             </View>
           );
@@ -2434,6 +2495,7 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
   const [selectedCard, setSelectedCard] = useState(null); // For detail modal
   const [cardMenuCard, setCardMenuCard] = useState(null); // For popup menu
   const [showSlotSelector, setShowSlotSelector] = useState(null); // For slot selector
+  const [showFilterModal, setShowFilterModal] = useState(false);
   const [filterRarity, setFilterRarity] = useState('all');
   const [sortByElixir, setSortByElixir] = useState(false);
 
@@ -2452,6 +2514,64 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
     // Default sort by id/name stability or rarity if needed
     return 0;
   });
+
+  // Filter Modal Component
+  const FilterModal = () => (
+    <Modal
+      animationType="fade"
+      transparent={true}
+      visible={showFilterModal}
+      onRequestClose={() => setShowFilterModal(false)}
+    >
+      <TouchableOpacity 
+        style={styles.cardMenuOverlay} 
+        activeOpacity={1} 
+        onPress={() => setShowFilterModal(false)}
+      >
+        <View style={styles.cardMenuContent}>
+          <Text style={styles.slotSelectorTitle}>Filter Collection</Text>
+          
+          <Text style={styles.deckSelectorLabel}>RARITY</Text>
+          <View style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8, marginBottom: 20}}>
+            <TouchableOpacity 
+              style={[styles.filterButton, filterRarity === 'all' && styles.filterButtonActive]} 
+              onPress={() => setFilterRarity('all')}
+            >
+              <Text style={[styles.filterButtonText, filterRarity === 'all' && styles.filterButtonTextActive]}>All</Text>
+            </TouchableOpacity>
+            {['common', 'rare', 'epic', 'legendary'].map(rarity => (
+              <TouchableOpacity 
+                key={rarity}
+                style={[styles.filterButton, filterRarity === rarity && styles.filterButtonActive, { borderColor: RARITY_COLORS[rarity] }]} 
+                onPress={() => setFilterRarity(rarity)}
+              >
+                <Text style={[styles.filterButtonText, filterRarity === rarity && styles.filterButtonTextActive, { color: filterRarity === rarity ? '#fff' : RARITY_COLORS[rarity] }]}>
+                  {rarity.charAt(0).toUpperCase() + rarity.slice(1)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <Text style={styles.deckSelectorLabel}>SORT BY</Text>
+          <View style={{flexDirection: 'row', justifyContent: 'center', marginBottom: 20}}>
+            <TouchableOpacity 
+              style={[styles.filterButton, sortByElixir && styles.filterButtonActive]} 
+              onPress={() => setSortByElixir(!sortByElixir)}
+            >
+              <Text style={[styles.filterButtonText, sortByElixir && styles.filterButtonTextActive]}>Elixir Cost {sortByElixir ? '▲' : ''}</Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            style={styles.cardMenuCancel}
+            onPress={() => setShowFilterModal(false)}
+          >
+            <Text style={styles.cardMenuCancelText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    </Modal>
+  );
 
   // Show card menu for collection cards
   const handleCollectionCardTap = (card) => {
@@ -2885,36 +3005,18 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
       </View>
 
       {/* All Cards Section */}
-      <Text style={styles.deckBoxTitle}>Collection</Text>
-      
-      {/* Filters */}
-      <View style={styles.filterContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 10 }}>
-          <TouchableOpacity 
-            style={[styles.filterButton, filterRarity === 'all' && styles.filterButtonActive]} 
-            onPress={() => setFilterRarity('all')}
-          >
-            <Text style={[styles.filterButtonText, filterRarity === 'all' && styles.filterButtonTextActive]}>All</Text>
-          </TouchableOpacity>
-          {['common', 'rare', 'epic', 'legendary'].map(rarity => (
-            <TouchableOpacity 
-              key={rarity}
-              style={[styles.filterButton, filterRarity === rarity && styles.filterButtonActive, { borderColor: RARITY_COLORS[rarity] }]} 
-              onPress={() => setFilterRarity(rarity)}
-            >
-              <Text style={[styles.filterButtonText, filterRarity === rarity && styles.filterButtonTextActive, { color: filterRarity === rarity ? '#fff' : RARITY_COLORS[rarity] }]}>
-                {rarity.charAt(0).toUpperCase() + rarity.slice(1)}
-              </Text>
-            </TouchableOpacity>
-          ))}
-          <TouchableOpacity 
-            style={[styles.filterButton, sortByElixir && styles.filterButtonActive]} 
-            onPress={() => setSortByElixir(!sortByElixir)}
-          >
-            <Text style={[styles.filterButtonText, sortByElixir && styles.filterButtonTextActive]}>Elixir {sortByElixir ? '▲' : '▼'}</Text>
-          </TouchableOpacity>
-        </ScrollView>
+      <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5}}>
+        <Text style={[styles.deckBoxTitle, {marginBottom: 0}]}>Collection</Text>
+        <TouchableOpacity 
+          style={styles.filterButton} 
+          onPress={() => setShowFilterModal(true)}
+        >
+          <Text style={styles.filterButtonText}>Filters {filterRarity !== 'all' || sortByElixir ? '•' : ''} ▾</Text>
+        </TouchableOpacity>
       </View>
+      
+      {/* Filter Modal */}
+      <FilterModal />
 
       <View style={[styles.deckBox, { flex: 1, paddingVertical: 8, paddingHorizontal: 4, overflow: 'hidden' }]}>
         <ScrollView
@@ -4651,6 +4753,19 @@ export default function App() {
             damage: u.spawnDamage,
             slow: u.slow
           });
+
+          // Mega Knight spawn slam visual effect
+          if (u.spriteId === 'mega_knight') {
+            setVisualEffects(prev => [...prev, {
+              id: Date.now() + Math.random(),
+              type: 'mega_knight_slam',
+              x: u.x,
+              y: u.y,
+              radius: 70,
+              startTime: Date.now(),
+              duration: 600
+            }]);
+          }
         }
 
         // Handle Tesla hidden mechanic
@@ -4677,6 +4792,17 @@ export default function App() {
             u.hidden.lastCombatTime = now;
             if (u.hidden.active) {
               u.hidden.wakeTime = now;
+
+              // Tesla reveal visual effect
+              setVisualEffects(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: 'tesla_reveal',
+                x: u.x,
+                y: u.y,
+                radius: 50,
+                startTime: Date.now(),
+                duration: 500
+              }]);
             }
             u.hidden.active = false;
           } else {
