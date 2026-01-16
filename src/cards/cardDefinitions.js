@@ -1,0 +1,110 @@
+// Card Definitions & Unit Stats
+const CARDS = [
+  // Original 8 cards
+  { id: 'knight', name: 'Knight', cost: 3, color: '#f1c40f', hp: 1766, speed: 1.5, type: 'ground', range: 20, damage: 202, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common' },
+  { id: 'archers', name: 'Archers', cost: 3, color: '#e67e22', hp: 304, speed: 2, type: 'ground', range: 80, damage: 107, attackSpeed: 900, projectile: 'arrow', count: 2, rarity: 'common' },
+  { id: 'giant', name: 'Giant', cost: 5, color: '#e74c3c', hp: 4091, speed: 1, type: 'ground', range: 20, damage: 254, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', rarity: 'rare' },
+  { id: 'mini_pekka', name: 'Mini P', cost: 4, color: '#9b59b6', hp: 1361, speed: 2.5, type: 'ground', range: 25, damage: 720, attackSpeed: 1600, projectile: null, count: 1, rarity: 'rare' },
+  { id: 'spear_goblins', name: 'Spear Gobs', cost: 2, color: '#2ecc71', hp: 133, speed: 3, type: 'ground', range: 110, damage: 81, attackSpeed: 1700, projectile: 'spear', count: 3, rarity: 'common' },
+  { id: 'musketeer', name: 'Musket', cost: 4, color: '#34495e', hp: 720, speed: 1.5, type: 'ground', range: 100, damage: 218, attackSpeed: 1100, projectile: 'bullet', count: 1, rarity: 'rare' },
+  { id: 'baby_dragon', name: 'Baby D', cost: 4, color: '#27ae60', hp: 1152, speed: 2, type: 'flying', range: 80, damage: 160, attackSpeed: 1500, projectile: 'dragon_fire', count: 1, splash: true, rarity: 'epic' },
+  { id: 'fireball', name: 'Fireball', cost: 4, color: '#ff4500', type: 'spell', damage: 689, radius: 60, count: 1, rarity: 'rare' },
+
+  // New cards
+  { id: 'cannon', name: 'Cannon', cost: 3, color: '#8B4513', hp: 896, speed: 0, type: 'building', range: 90, damage: 212, attackSpeed: 900, projectile: 'cannonball', count: 1, lifetime: 30, rarity: 'common' },
+  { id: 'barbarians', name: 'Barbarians', cost: 5, color: '#CD853F', hp: 670, speed: 1.5, type: 'ground', range: 30, damage: 192, attackSpeed: 1300, projectile: null, count: 5, rarity: 'common' },
+  { id: 'arrows', name: 'Arrows', cost: 3, color: '#2ecc71', type: 'spell', damage: 366, radius: 40, count: 1, rarity: 'common' },
+  { id: 'zap', name: 'Zap', cost: 2, color: '#3498db', type: 'spell', damage: 192, radius: 35, count: 1, stun: 0.5, rarity: 'common' },
+  { id: 'minions', name: 'Minions', cost: 3, color: '#9b59b6', hp: 230, speed: 3, type: 'flying', range: 50, damage: 102, attackSpeed: 1000, projectile: 'dark_ball', count: 3, rarity: 'common' },
+  { id: 'skeleton_army', name: 'Skeleton Army', cost: 3, color: '#ecf0f1', hp: 81, speed: 2, type: 'ground', range: 25, damage: 81, attackSpeed: 1000, projectile: null, count: 15, rarity: 'epic' },
+  { id: 'skeletons', name: 'Skelly', cost: 1, color: '#bdc3c7', hp: 81, speed: 2, type: 'ground', range: 25, damage: 81, attackSpeed: 1000, projectile: null, count: 3, rarity: 'common' },
+  { id: 'valkyrie', name: 'Valkyrie', cost: 4, color: '#e74c3c', hp: 1908, speed: 1.5, type: 'ground', range: 25, damage: 267, attackSpeed: 1500, projectile: null, count: 1, splash: true, rarity: 'rare' },
+  { id: 'poison', name: 'Poison', cost: 4, color: '#27ae60', type: 'spell', damage: 91, radius: 50, count: 1, duration: 8, rarity: 'epic' },
+  { id: 'minion_horde', name: 'Minion H', cost: 5, color: '#8e44ad', hp: 230, speed: 3, type: 'flying', range: 50, damage: 102, attackSpeed: 1000, projectile: 'dark_ball', count: 6, rarity: 'common' },
+  { id: 'witch', name: 'Witch', cost: 5, color: '#9b59b6', hp: 838, speed: 1.5, type: 'ground', range: 55, damage: 134, attackSpeed: 1100, projectile: 'witch_projectile', count: 1, splash: true, spawns: 'skeletons', spawnRate: 5, spawnCount: 3, rarity: 'epic' },
+  { id: 'hog_rider', name: 'Hog', cost: 4, color: '#e67e22', hp: 1696, speed: 3.5, type: 'ground', range: 25, damage: 318, attackSpeed: 1600, projectile: null, count: 1, targetType: 'buildings', jumps: true, rarity: 'rare' },
+  { id: 'prince', name: 'Prince', cost: 5, color: '#f39c12', hp: 1920, speed: 2, type: 'ground', range: 30, damage: 392, attackSpeed: 1400, projectile: null, count: 1, charge: true, rarity: 'epic' },
+  { id: 'tesla', name: 'Tesla', cost: 4, color: '#f1c40f', hp: 1152, speed: 0, type: 'building', range: 55, damage: 230, attackSpeed: 1100, projectile: 'tesla_lightning', count: 1, lifetime: 35, hidden: true, rarity: 'common' },
+  { id: 'wizard', name: 'Wizard', cost: 5, color: '#9b59b6', hp: 720, speed: 1.5, type: 'ground', range: 60, damage: 281, attackSpeed: 1400, projectile: 'fireball_small', count: 1, splash: true, rarity: 'rare' },
+  { id: 'tombstone', name: 'Tombstone', cost: 3, color: '#95a5a6', hp: 534, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 40, spawns: 'skeletons', spawnRate: 3.1, spawnCount: 2, deathSpawnCount: 4, rarity: 'rare' },
+  { id: 'sword_goblins', name: 'Sword Gobs', cost: 3, color: '#2ecc71', hp: 202, speed: 3, type: 'ground', range: 25, damage: 120, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common' },
+  { id: 'ice_wizard', name: 'Ice Wiz', cost: 3, color: '#3498db', hp: 688, speed: 1.5, type: 'ground', range: 55, damage: 91, attackSpeed: 1700, projectile: 'ice_shard', count: 1, splash: true, rarity: 'legendary', slow: 0.35, spawnDamage: 91 },
+
+  // Lava Hound & Lava Pups
+  { id: 'lava_hound', name: 'Lava Hound', cost: 7, color: '#c0392b', hp: 3664, speed: 1, type: 'flying', range: 25, damage: 53, attackSpeed: 1300, projectile: null, count: 1, targetType: 'buildings', rarity: 'legendary', deathSpawns: 'lava_pups', deathSpawnCount: 6 },
+  { id: 'lava_pups', name: 'Lava Pups', cost: 0, color: '#e74c3c', hp: 216, speed: 2, type: 'flying', range: 50, damage: 53, attackSpeed: 1000, projectile: 'lava_shot', count: 1, rarity: 'common', isToken: true },
+
+  // Super easy additions
+  { id: 'three_musketeers', name: '3 Musketeers', cost: 9, color: '#34495e', hp: 720, speed: 1.5, type: 'ground', range: 100, damage: 218, attackSpeed: 1100, projectile: 'bullet', count: 3, rarity: 'rare' },
+  { id: 'royal_giant', name: 'Royal Giant', cost: 6, color: '#e67e22', hp: 3072, speed: 1.2, type: 'ground', range: 90, damage: 307, attackSpeed: 1700, projectile: 'cannonball', count: 1, targetType: 'buildings', rarity: 'rare' },
+  { id: 'rocket', name: 'Rocket', cost: 6, color: '#ff4500', type: 'spell', damage: 1484, radius: 30, count: 1, rarity: 'rare' },
+
+  // Medium easy additions
+  { id: 'dark_prince', name: 'Dark Prince', cost: 4, color: '#2c3e50', hp: 1200, shieldHp: 240, speed: 2, type: 'ground', range: 30, damage: 248, attackSpeed: 1300, projectile: null, count: 1, splash: true, frontalSplash: true, charge: true, rarity: 'epic', hasShield: true },
+  { id: 'elite_barbarians', name: 'Elite Barbs', cost: 6, color: '#c0392b', hp: 1341, speed: 3, type: 'ground', range: 30, damage: 384, attackSpeed: 1400, projectile: null, count: 2, rarity: 'epic' },
+  { id: 'golem', name: 'Golem', cost: 8, color: '#7f8c8d', hp: 5120, speed: 0.9, type: 'ground', range: 20, damage: 312, attackSpeed: 2500, projectile: null, count: 1, targetType: 'buildings', rarity: 'epic', deathDamage: 312, deathSpawns: 'golemite', deathSpawnCount: 2, spawnDelay: 3000 },
+  { id: 'golemite', name: 'Golemite', cost: 0, color: '#95a5a6', hp: 1040, speed: 1, type: 'ground', range: 20, damage: 66, attackSpeed: 2500, projectile: null, count: 1, targetType: 'buildings', rarity: 'common', isToken: true, deathDamage: 66, spawnDelay: 1000 },
+
+  // Next set of additions
+  { id: 'pekka', name: 'P.E.K.K.A', cost: 7, color: '#8e44ad', hp: 3760, speed: 1, type: 'ground', range: 25, damage: 816, attackSpeed: 1800, projectile: null, count: 1, rarity: 'epic' },
+  { id: 'mega_knight', name: 'Mega Knight', cost: 7, color: '#e67e22', hp: 3993, speed: 1.5, type: 'ground', range: 25, damage: 268, attackSpeed: 1700, projectile: null, count: 1, splash: true, spawnDamage: 536, jumps: true, rarity: 'legendary' },
+  { id: 'electro_wizard', name: 'Electro Wiz', cost: 4, color: '#3498db', hp: 713, speed: 1.5, type: 'ground', range: 55, damage: 231, attackSpeed: 1800, projectile: 'electric_bolt', count: 1, splash: false, stun: 0.5, rarity: 'legendary', spawnDamage: 192 },
+  { id: 'lightning', name: 'Lightning', cost: 6, color: '#f1c40f', type: 'spell', damage: 1056, radius: 70, count: 1, rarity: 'epic' },
+  { id: 'x_bow', name: 'X-Bow', cost: 6, color: '#95a5a6', hp: 1600, speed: 0, type: 'building', range: 230, damage: 30, attackSpeed: 250, projectile: 'arrow', count: 1, lifetime: 30, rarity: 'epic', spawnDelay: 3500 },
+  { id: 'mirror', name: 'Mirror', cost: 1, color: '#ecf0f1', type: 'spell', isMirror: true, rarity: 'epic' },
+
+  // Spirit Cards - All cost 1 Elixir and die when they attack
+  { id: 'fire_spirit', name: 'Fire Spirit', cost: 1, color: '#e74c3c', hp: 230, speed: 4, type: 'ground', range: 25, damage: 207, attackSpeed: 1000, projectile: null, count: 1, splash: true, rarity: 'common', kamikaze: true },
+  { id: 'ice_spirit', name: 'Ice Spirit', cost: 1, color: '#E8F4F8', hp: 230, speed: 4, type: 'ground', range: 25, damage: 110, attackSpeed: 1000, projectile: null, count: 1, splash: true, stun: 1.0, rarity: 'common', kamikaze: true },
+  { id: 'electro_spirit', name: 'Electro Spirit', cost: 1, color: '#9b59b6', hp: 230, speed: 4, type: 'ground', range: 25, damage: 99, attackSpeed: 1000, projectile: null, count: 1, chain: 9, stun: 0.5, rarity: 'common', kamikaze: true },
+  { id: 'heal_spirit', name: 'Heal Spirit', cost: 1, color: '#F1C40F', hp: 230, speed: 4, type: 'ground', range: 25, damage: 0, attackSpeed: 1000, projectile: null, count: 1, splash: true, rarity: 'rare', kamikaze: true, healsOnAttack: 432, healRadius: 50 },
+
+  // Additional cards for new decks
+  { id: 'bomber', name: 'Bomber', cost: 2, color: '#e67e22', hp: 398, speed: 2, type: 'ground', range: 55, damage: 222, attackSpeed: 1800, projectile: 'bomb', count: 1, splash: true, rarity: 'common' },
+  { id: 'goblin_barrel', name: 'Goblin B', cost: 3, color: '#2ecc71', type: 'spell', damage: 0, radius: 20, count: 3, spawns: 'sword_goblins', spawnCount: 3, rarity: 'epic' },
+  { id: 'elixir_collector', name: 'Elixir G', cost: 6, color: '#9b59b6', hp: 1070, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 70, rarity: 'rare', generatesElixir: true },
+  { id: 'goblin_hut', name: 'Goblin Hut', cost: 5, color: '#2ecc71', hp: 1293, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 60, spawns: 'spear_goblins', spawnRate: 4.5, spawnCount: 1, rarity: 'rare' },
+  { id: 'furnace', name: 'Furnace', cost: 4, color: '#e74c3c', hp: 1003, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 50, spawns: 'fire_spirit', spawnRate: 7, spawnCount: 1, rarity: 'rare' },
+  { id: 'earthquake', name: 'Earthquake', cost: 3, color: '#7f8c8d', type: 'spell', damage: 81, radius: 70, count: 1, slow: 0.35, rarity: 'rare' },
+  { id: 'graveyard', name: 'Graveyard', cost: 5, color: '#2c3e50', type: 'spell', damage: 0, radius: 80, count: 20, spawns: 'skeletons', spawnCount: 20, rarity: 'legendary' },
+  { id: 'lumberjack', name: 'Lumberjack', cost: 4, color: '#e67e22', hp: 1232, speed: 2.5, type: 'ground', range: 25, damage: 240, attackSpeed: 800, projectile: null, count: 1, splash: true, deathRage: true, rarity: 'legendary' },
+
+  // 5 Easy New Cards
+  { id: 'guards', name: 'Guards', cost: 3, color: '#95a5a6', hp: 108, shieldHp: 240, speed: 2, type: 'ground', range: 25, damage: 108, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common', hasShield: true },
+  { id: 'bats', name: 'Bats', cost: 2, color: '#8e44ad', hp: 81, speed: 3.5, type: 'flying', range: 50, damage: 81, attackSpeed: 1300, projectile: null, count: 5, rarity: 'common' },
+  { id: 'ram_rider', name: 'Ram Rider', cost: 5, color: '#3498db', hp: 1717, speed: 2, type: 'ground', range: 25, damage: 266, attackSpeed: 1800, projectile: null, count: 1, targetType: 'buildings', stun: 1.0, charge: true, rarity: 'rare' },
+  { id: 'battle_healer', name: 'Battle Healer', cost: 4, color: '#e74c3c', hp: 1717, speed: 1.5, type: 'ground', range: 25, damage: 148, attackSpeed: 1500, projectile: null, count: 1, splash: true, healsOnAttack: 48, healRadius: 50, passiveHeal: 48, rarity: 'rare' },
+  { id: 'skeleton_barrel', name: 'Skeleton B', cost: 3, color: '#bdc3c8', hp: 636, speed: 6, type: 'flying', range: 0, radius: 25, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 20, targetType: 'buildings', rarity: 'epic', deathSpawns: 'skeletons', deathSpawnCount: 8, deathDamage: 133, deathRadius: 40 },
+
+  // New Cards (Ice Golem, Mega Minion, Dart Goblin, Princess, Barbarian Hut)
+  { id: 'ice_golem', name: 'Ice Golem', cost: 2, color: '#E8F4F8', hp: 1197, speed: 1.5, type: 'ground', range: 20, damage: 84, attackSpeed: 2500, projectile: null, count: 1, targetType: 'buildings', rarity: 'rare', deathDamage: 84, deathRadius: 60, deathSlow: 1.0 },
+  { id: 'mega_minion', name: 'Mega Minion', cost: 3, color: '#8e44ad', hp: 830, speed: 2, type: 'flying', range: 45, damage: 300, attackSpeed: 1600, projectile: 'dark_ball_big', count: 1, rarity: 'rare' },
+  { id: 'dart_goblin', name: 'Dart Goblin', cost: 3, color: '#2ecc71', hp: 260, speed: 3.5, type: 'ground', range: 100, damage: 131, attackSpeed: 700, projectile: 'dart', count: 1, rarity: 'rare' },
+  { id: 'princess', name: 'Princess', cost: 3, color: '#e67e22', hp: 261, speed: 2, type: 'ground', range: 180, damage: 250, attackSpeed: 3000, projectile: 'fire_arrows', count: 1, splash: true, rarity: 'legendary' },
+  { id: 'barbarian_hut', name: 'Barb Hut', cost: 7, color: '#e67e22', hp: 1300, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 40, spawns: 'barbarians', spawnRate: 8, spawnCount: 2, deathSpawns: 'barbarians', deathSpawnCount: 2, rarity: 'rare' },
+
+  // 5 New Cards
+  { id: 'bandit', name: 'Bandit', cost: 3, color: '#e67e22', hp: 600, speed: 4, type: 'ground', range: 25, damage: 320, attackSpeed: 1100, projectile: null, count: 1, rarity: 'legendary', dashInvincible: true, dashRange: 80 },
+  { id: 'battle_ram', name: 'Battle Ram', cost: 4, color: '#e67e22', hp: 756, speed: 4, type: 'ground', range: 25, damage: 246, attackSpeed: 100, projectile: null, count: 1, targetType: 'buildings', charge: true, rarity: 'rare', deathSpawns: 'barbarians', deathSpawnCount: 2, kamikaze: true },
+  { id: 'inferno_tower', name: 'Inferno', cost: 5, color: '#e74c3c', hp: 1100, speed: 0, type: 'building', range: 70, damage: 30, attackSpeed: 400, projectile: null, count: 1, lifetime: 35, rarity: 'rare', damageRamp: true },
+  { id: 'balloon', name: 'Balloon', cost: 5, color: '#e74c3c', hp: 1500, speed: 2, type: 'flying', range: 5, damage: 400, attackSpeed: 2000, projectile: null, count: 1, targetType: 'buildings', rarity: 'epic', bombDrops: true, deathDamage: 400, deathRadius: 60, deathBombDelay: 3000 },
+  { id: 'hunter', name: 'Hunter', cost: 4, color: '#95a5a6', hp: 1050, speed: 2, type: 'ground', range: 75, damage: 180, attackSpeed: 1500, projectile: 'shotgun_blast', count: 1, splash: true, shotgunSpread: true, rarity: 'epic' },
+
+  // 5 More NEW Cards (not duplicates!)
+  { id: 'electro_giant', name: 'Electro Giant', cost: 7, color: '#3498db', hp: 2800, speed: 1, type: 'ground', range: 25, damage: 200, attackSpeed: 1400, projectile: null, count: 1, shockOnHit: true, shockRadius: 50, shockDamage: 100, shockStun: 0.5, rarity: 'epic' },
+  { id: 'night_witch', name: 'Night Witch', cost: 4, color: '#2c3e50', hp: 750, speed: 2, type: 'ground', range: 25, damage: 220, attackSpeed: 1500, projectile: null, count: 1, spawns: 'bats', spawnRate: 5, spawnCount: 2, rarity: 'legendary', deathSpawns: 'bats', deathSpawnCount: 3 },
+  { id: 'inferno_dragon', name: 'Inferno Dragon', cost: 4, color: '#e74c3c', hp: 950, speed: 2.5, type: 'flying', range: 40, damage: 30, attackSpeed: 100, projectile: null, count: 1, damageRamp: true, rarity: 'epic' },
+  { id: 'elixir_golem', name: 'Elixir Golem', cost: 3, color: '#D442F5', hp: 1600, speed: 1.5, type: 'ground', range: 25, damage: 100, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', deathSpawns: 'elixir_golemite', deathSpawnCount: 2, rarity: 'epic' },
+  { id: 'elixir_golemite', name: 'Elixir Golemite', cost: 0, color: '#D442F5', hp: 800, speed: 1.5, type: 'ground', range: 25, damage: 50, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', deathSpawns: 'elixir_blob', deathSpawnCount: 2, rarity: 'rare', isToken: true },
+  { id: 'elixir_blob', name: 'Elixir Blob', cost: 0, color: '#D442F5', hp: 400, speed: 1.5, type: 'ground', range: 25, damage: 25, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', givesOpponentElixir: true, rarity: 'common', isToken: true },
+  { id: 'firecracker', name: 'Firecracker', cost: 3, color: '#e67e22', hp: 240, speed: 3, type: 'ground', range: 100, damage: 180, attackSpeed: 2500, projectile: 'firecracker_burst', count: 1, splash: true, stun: 0.5, recoil: 60, spreadCount: 8, spreadArc: 0.5, rarity: 'common' },
+
+  // 5 More NEW Cards
+  { id: 'giant_skeleton', name: 'Giant Skel', cost: 6, color: '#bdc3c7', hp: 2800, speed: 1.5, type: 'ground', range: 25, damage: 170, attackSpeed: 1500, projectile: null, count: 1, rarity: 'epic', deathDamage: 1000, deathRadius: 100, deathBombDelay: 3000 },
+  { id: 'electro_dragon', name: 'Electro D', cost: 5, color: '#3498db', hp: 1000, speed: 2, type: 'flying', range: 70, damage: 160, attackSpeed: 2100, projectile: 'electric_bolt', count: 1, rarity: 'epic', chain: 3, stun: 0.5 },
+  { id: 'magic_archer', name: 'Magic Arch', cost: 4, color: '#27ae60', hp: 440, speed: 2, type: 'ground', range: 140, damage: 111, attackSpeed: 1100, projectile: 'magic_arrow', count: 1, rarity: 'legendary', pierce: true },
+  { id: 'royal_ghost', name: 'Royal Ghost', cost: 3, color: '#ecf0f1', hp: 1000, speed: 2, type: 'ground', range: 25, damage: 216, attackSpeed: 1800, projectile: null, count: 1, rarity: 'legendary', splash: true, hidden: true },
+  { id: 'hunter', name: 'Hunter', cost: 4, color: '#2c3e50', hp: 700, speed: 2, type: 'ground', range: 80, damage: 700, attackSpeed: 2200, projectile: 'shotgun_blast', count: 1, rarity: 'epic', shotgunSpread: true }
+];
+
+export default CARDS;
