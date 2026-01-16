@@ -9,11 +9,6 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
   // Check if unit is flying to add shadow
   const card = CARDS.find(c => c.id === id);
   const isFlying = card?.type === 'flying';
-  const isHidden = unit?.hidden?.active;
-
-  // Check if unit is flying to add shadow
-  const card = CARDS.find(c => c.id === id);
-  const isFlying = card?.type === 'flying';
 
   switch (id) {
     case 'knight':
