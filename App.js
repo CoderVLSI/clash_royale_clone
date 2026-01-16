@@ -23,80 +23,80 @@ const FIRE_RATE_KING = 1000;
 // Card Definitions & Unit Stats
 const CARDS = [
   // Original 8 cards
-  { id: 'knight', name: 'Knight', cost: 3, color: '#f1c40f', hp: 1400, speed: 1.5, type: 'ground', range: 20, damage: 150, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common' },
-  { id: 'archers', name: 'Archers', cost: 3, color: '#e67e22', hp: 375, speed: 2, type: 'ground', range: 80, damage: 100, attackSpeed: 1000, projectile: 'arrow', count: 2, rarity: 'common' },
-  { id: 'giant', name: 'Giant', cost: 5, color: '#e74c3c', hp: 3000, speed: 1, type: 'ground', range: 20, damage: 200, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', rarity: 'rare' },
-  { id: 'mini_pekka', name: 'Mini P', cost: 4, color: '#9b59b6', hp: 1100, speed: 2.5, type: 'ground', range: 25, damage: 350, attackSpeed: 1400, projectile: null, count: 1, rarity: 'rare' },
-  { id: 'spear_goblins', name: 'Spear Gobs', cost: 2, color: '#2ecc71', hp: 146, speed: 3, type: 'ground', range: 110, damage: 65, attackSpeed: 1100, projectile: 'spear', count: 3, rarity: 'common' },
-  { id: 'musketeer', name: 'Musket', cost: 4, color: '#34495e', hp: 800, speed: 1.5, type: 'ground', range: 100, damage: 180, attackSpeed: 1100, projectile: 'bullet', count: 1, rarity: 'rare' },
-  { id: 'baby_dragon', name: 'Baby D', cost: 4, color: '#27ae60', hp: 1200, speed: 2, type: 'flying', range: 80, damage: 130, attackSpeed: 1300, projectile: 'dragon_fire', count: 1, splash: true, rarity: 'epic' },
-  { id: 'fireball', name: 'Fireball', cost: 4, color: '#ff4500', type: 'spell', damage: 325, radius: 60, count: 1, rarity: 'rare' },
+  { id: 'knight', name: 'Knight', cost: 3, color: '#f1c40f', hp: 1766, speed: 1.5, type: 'ground', range: 20, damage: 202, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common' },
+  { id: 'archers', name: 'Archers', cost: 3, color: '#e67e22', hp: 304, speed: 2, type: 'ground', range: 80, damage: 107, attackSpeed: 900, projectile: 'arrow', count: 2, rarity: 'common' },
+  { id: 'giant', name: 'Giant', cost: 5, color: '#e74c3c', hp: 4091, speed: 1, type: 'ground', range: 20, damage: 254, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', rarity: 'rare' },
+  { id: 'mini_pekka', name: 'Mini P', cost: 4, color: '#9b59b6', hp: 1361, speed: 2.5, type: 'ground', range: 25, damage: 720, attackSpeed: 1600, projectile: null, count: 1, rarity: 'rare' },
+  { id: 'spear_goblins', name: 'Spear Gobs', cost: 2, color: '#2ecc71', hp: 133, speed: 3, type: 'ground', range: 110, damage: 81, attackSpeed: 1700, projectile: 'spear', count: 3, rarity: 'common' },
+  { id: 'musketeer', name: 'Musket', cost: 4, color: '#34495e', hp: 720, speed: 1.5, type: 'ground', range: 100, damage: 218, attackSpeed: 1100, projectile: 'bullet', count: 1, rarity: 'rare' },
+  { id: 'baby_dragon', name: 'Baby D', cost: 4, color: '#27ae60', hp: 1152, speed: 2, type: 'flying', range: 80, damage: 160, attackSpeed: 1500, projectile: 'dragon_fire', count: 1, splash: true, rarity: 'epic' },
+  { id: 'fireball', name: 'Fireball', cost: 4, color: '#ff4500', type: 'spell', damage: 689, radius: 60, count: 1, rarity: 'rare' },
 
   // New cards
-  { id: 'cannon', name: 'Cannon', cost: 3, color: '#8B4513', hp: 380, speed: 0, type: 'building', range: 90, damage: 60, attackSpeed: 1000, projectile: 'cannonball', count: 1, lifetime: 30, rarity: 'common' },
-  { id: 'barbarians', name: 'Barbarians', cost: 5, color: '#CD853F', hp: 300, speed: 1.5, type: 'ground', range: 30, damage: 75, attackSpeed: 1500, projectile: null, count: 5, rarity: 'common' },
+  { id: 'cannon', name: 'Cannon', cost: 3, color: '#8B4513', hp: 896, speed: 0, type: 'building', range: 90, damage: 212, attackSpeed: 900, projectile: 'cannonball', count: 1, lifetime: 30, rarity: 'common' },
+  { id: 'barbarians', name: 'Barbarians', cost: 5, color: '#CD853F', hp: 670, speed: 1.5, type: 'ground', range: 30, damage: 192, attackSpeed: 1300, projectile: null, count: 5, rarity: 'common' },
   { id: 'arrows', name: 'Arrows', cost: 3, color: '#2ecc71', type: 'spell', damage: 366, radius: 40, count: 1, rarity: 'common' },
   { id: 'zap', name: 'Zap', cost: 2, color: '#3498db', type: 'spell', damage: 192, radius: 35, count: 1, stun: 0.5, rarity: 'common' },
-  { id: 'minions', name: 'Minions', cost: 3, color: '#9b59b6', hp: 90, speed: 3, type: 'flying', range: 50, damage: 80, attackSpeed: 1000, projectile: 'dark_ball', count: 3, rarity: 'common' },
-  { id: 'skeleton_army', name: 'Skeleton Army', cost: 3, color: '#ecf0f1', hp: 40, speed: 2, type: 'ground', range: 25, damage: 40, attackSpeed: 1000, projectile: null, count: 15, rarity: 'epic' },
-  { id: 'skeletons', name: 'Skelly', cost: 1, color: '#bdc3c7', hp: 40, speed: 2, type: 'ground', range: 25, damage: 40, attackSpeed: 1000, projectile: null, count: 3, rarity: 'common' },
-  { id: 'valkyrie', name: 'Valkyrie', cost: 4, color: '#e74c3c', hp: 1200, speed: 1.5, type: 'ground', range: 25, damage: 120, attackSpeed: 1500, projectile: null, count: 1, splash: true, rarity: 'rare' },
-  { id: 'poison', name: 'Poison', cost: 4, color: '#27ae60', type: 'spell', damage: 70, radius: 50, count: 1, duration: 5, rarity: 'epic' },
-  { id: 'minion_horde', name: 'Minion H', cost: 5, color: '#8e44ad', hp: 90, speed: 3, type: 'flying', range: 50, damage: 80, attackSpeed: 1000, projectile: 'dark_ball', count: 6, rarity: 'common' },
-  { id: 'witch', name: 'Witch', cost: 5, color: '#9b59b6', hp: 700, speed: 1.5, type: 'ground', range: 55, damage: 100, attackSpeed: 1000, projectile: 'witch_projectile', count: 1, splash: true, spawns: 'skeletons', spawnRate: 5, spawnCount: 3, rarity: 'epic' },
-  { id: 'hog_rider', name: 'Hog', cost: 4, color: '#e67e22', hp: 1600, speed: 3.5, type: 'ground', range: 25, damage: 180, attackSpeed: 1600, projectile: null, count: 1, targetType: 'buildings', jumps: true, rarity: 'rare' },
-  { id: 'prince', name: 'Prince', cost: 5, color: '#f39c12', hp: 1100, speed: 2, type: 'ground', range: 30, damage: 245, attackSpeed: 1500, projectile: null, count: 1, charge: true, rarity: 'epic' },
-  { id: 'tesla', name: 'Tesla', cost: 4, color: '#f1c40f', hp: 600, speed: 0, type: 'building', range: 55, damage: 100, attackSpeed: 800, projectile: 'tesla_lightning', count: 1, lifetime: 35, hidden: true, rarity: 'common' },
-  { id: 'wizard', name: 'Wizard', cost: 5, color: '#9b59b6', hp: 600, speed: 1.5, type: 'ground', range: 60, damage: 390, attackSpeed: 1400, projectile: 'fireball_small', count: 1, splash: true, rarity: 'rare' },
-  { id: 'tombstone', name: 'Tombstone', cost: 3, color: '#95a5a6', hp: 450, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 40, spawns: 'skeletons', spawnRate: 3.1, spawnCount: 2, deathSpawnCount: 4, rarity: 'rare' },
-  { id: 'sword_goblins', name: 'Sword Gobs', cost: 3, color: '#2ecc71', hp: 162, speed: 3, type: 'ground', range: 25, damage: 100, attackSpeed: 900, projectile: null, count: 3, rarity: 'common' },
-  { id: 'ice_wizard', name: 'Ice Wiz', cost: 3, color: '#3498db', hp: 590, speed: 1.5, type: 'ground', range: 55, damage: 75, attackSpeed: 1700, projectile: 'ice_shard', count: 1, splash: true, rarity: 'legendary', slow: 0.35, spawnDamage: 75 },
+  { id: 'minions', name: 'Minions', cost: 3, color: '#9b59b6', hp: 230, speed: 3, type: 'flying', range: 50, damage: 102, attackSpeed: 1000, projectile: 'dark_ball', count: 3, rarity: 'common' },
+  { id: 'skeleton_army', name: 'Skeleton Army', cost: 3, color: '#ecf0f1', hp: 81, speed: 2, type: 'ground', range: 25, damage: 81, attackSpeed: 1000, projectile: null, count: 15, rarity: 'epic' },
+  { id: 'skeletons', name: 'Skelly', cost: 1, color: '#bdc3c7', hp: 81, speed: 2, type: 'ground', range: 25, damage: 81, attackSpeed: 1000, projectile: null, count: 3, rarity: 'common' },
+  { id: 'valkyrie', name: 'Valkyrie', cost: 4, color: '#e74c3c', hp: 1908, speed: 1.5, type: 'ground', range: 25, damage: 267, attackSpeed: 1500, projectile: null, count: 1, splash: true, rarity: 'rare' },
+  { id: 'poison', name: 'Poison', cost: 4, color: '#27ae60', type: 'spell', damage: 91, radius: 50, count: 1, duration: 8, rarity: 'epic' },
+  { id: 'minion_horde', name: 'Minion H', cost: 5, color: '#8e44ad', hp: 230, speed: 3, type: 'flying', range: 50, damage: 102, attackSpeed: 1000, projectile: 'dark_ball', count: 6, rarity: 'common' },
+  { id: 'witch', name: 'Witch', cost: 5, color: '#9b59b6', hp: 838, speed: 1.5, type: 'ground', range: 55, damage: 134, attackSpeed: 1100, projectile: 'witch_projectile', count: 1, splash: true, spawns: 'skeletons', spawnRate: 5, spawnCount: 3, rarity: 'epic' },
+  { id: 'hog_rider', name: 'Hog', cost: 4, color: '#e67e22', hp: 1696, speed: 3.5, type: 'ground', range: 25, damage: 318, attackSpeed: 1600, projectile: null, count: 1, targetType: 'buildings', jumps: true, rarity: 'rare' },
+  { id: 'prince', name: 'Prince', cost: 5, color: '#f39c12', hp: 1920, speed: 2, type: 'ground', range: 30, damage: 392, attackSpeed: 1400, projectile: null, count: 1, charge: true, rarity: 'epic' },
+  { id: 'tesla', name: 'Tesla', cost: 4, color: '#f1c40f', hp: 1152, speed: 0, type: 'building', range: 55, damage: 230, attackSpeed: 1100, projectile: 'tesla_lightning', count: 1, lifetime: 35, hidden: true, rarity: 'common' },
+  { id: 'wizard', name: 'Wizard', cost: 5, color: '#9b59b6', hp: 720, speed: 1.5, type: 'ground', range: 60, damage: 281, attackSpeed: 1400, projectile: 'fireball_small', count: 1, splash: true, rarity: 'rare' },
+  { id: 'tombstone', name: 'Tombstone', cost: 3, color: '#95a5a6', hp: 534, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 40, spawns: 'skeletons', spawnRate: 3.1, spawnCount: 2, deathSpawnCount: 4, rarity: 'rare' },
+  { id: 'sword_goblins', name: 'Sword Gobs', cost: 3, color: '#2ecc71', hp: 202, speed: 3, type: 'ground', range: 25, damage: 120, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common' },
+  { id: 'ice_wizard', name: 'Ice Wiz', cost: 3, color: '#3498db', hp: 688, speed: 1.5, type: 'ground', range: 55, damage: 91, attackSpeed: 1700, projectile: 'ice_shard', count: 1, splash: true, rarity: 'legendary', slow: 0.35, spawnDamage: 91 },
 
   // Lava Hound & Lava Pups
-  { id: 'lava_hound', name: 'Lava Hound', cost: 7, color: '#c0392b', hp: 3150, speed: 1, type: 'flying', range: 25, damage: 35, attackSpeed: 1300, projectile: null, count: 1, targetType: 'buildings', rarity: 'legendary', deathSpawns: 'lava_pups', deathSpawnCount: 6 },
-  { id: 'lava_pups', name: 'Lava Pups', cost: 0, color: '#e74c3c', hp: 180, speed: 2, type: 'flying', range: 50, damage: 45, attackSpeed: 1000, projectile: 'lava_shot', count: 1, rarity: 'common', isToken: true },
+  { id: 'lava_hound', name: 'Lava Hound', cost: 7, color: '#c0392b', hp: 3664, speed: 1, type: 'flying', range: 25, damage: 53, attackSpeed: 1300, projectile: null, count: 1, targetType: 'buildings', rarity: 'legendary', deathSpawns: 'lava_pups', deathSpawnCount: 6 },
+  { id: 'lava_pups', name: 'Lava Pups', cost: 0, color: '#e74c3c', hp: 216, speed: 2, type: 'flying', range: 50, damage: 53, attackSpeed: 1000, projectile: 'lava_shot', count: 1, rarity: 'common', isToken: true },
 
   // Super easy additions
-  { id: 'three_musketeers', name: '3 Musketeers', cost: 9, color: '#34495e', hp: 800, speed: 1.5, type: 'ground', range: 100, damage: 180, attackSpeed: 1100, projectile: 'bullet', count: 3, rarity: 'rare' },
-  { id: 'royal_giant', name: 'Royal Giant', cost: 6, color: '#e67e22', hp: 1800, speed: 1.2, type: 'ground', range: 90, damage: 140, attackSpeed: 1300, projectile: 'cannonball', count: 1, targetType: 'buildings', rarity: 'rare' },
-  { id: 'rocket', name: 'Rocket', cost: 6, color: '#ff4500', type: 'spell', damage: 600, radius: 30, count: 1, rarity: 'rare' },
+  { id: 'three_musketeers', name: '3 Musketeers', cost: 9, color: '#34495e', hp: 720, speed: 1.5, type: 'ground', range: 100, damage: 218, attackSpeed: 1100, projectile: 'bullet', count: 3, rarity: 'rare' },
+  { id: 'royal_giant', name: 'Royal Giant', cost: 6, color: '#e67e22', hp: 3072, speed: 1.2, type: 'ground', range: 90, damage: 307, attackSpeed: 1700, projectile: 'cannonball', count: 1, targetType: 'buildings', rarity: 'rare' },
+  { id: 'rocket', name: 'Rocket', cost: 6, color: '#ff4500', type: 'spell', damage: 1484, radius: 30, count: 1, rarity: 'rare' },
 
   // Medium easy additions
-  { id: 'dark_prince', name: 'Dark Prince', cost: 4, color: '#2c3e50', hp: 1100, shieldHp: 160, speed: 2, type: 'ground', range: 30, damage: 220, attackSpeed: 1500, projectile: null, count: 1, splash: true, frontalSplash: true, charge: true, rarity: 'epic', hasShield: true },
-  { id: 'elite_barbarians', name: 'Elite Barbs', cost: 6, color: '#c0392b', hp: 600, speed: 3, type: 'ground', range: 30, damage: 200, attackSpeed: 1400, projectile: null, count: 2, rarity: 'epic' },
-  { id: 'golem', name: 'Golem', cost: 8, color: '#7f8c8d', hp: 4000, speed: 0.9, type: 'ground', range: 20, damage: 200, attackSpeed: 1700, projectile: null, count: 1, targetType: 'buildings', rarity: 'epic', deathSpawns: 'golemite', deathSpawnCount: 2, spawnDelay: 1000 },
-  { id: 'golemite', name: 'Golemite', cost: 0, color: '#95a5a6', hp: 1300, speed: 1, type: 'ground', range: 20, damage: 100, attackSpeed: 1700, projectile: null, count: 1, targetType: 'buildings', rarity: 'common', isToken: true, deathSpawns: 'golemite', deathSpawnCount: 1, spawnDelay: 500 },
+  { id: 'dark_prince', name: 'Dark Prince', cost: 4, color: '#2c3e50', hp: 1200, shieldHp: 240, speed: 2, type: 'ground', range: 30, damage: 248, attackSpeed: 1300, projectile: null, count: 1, splash: true, frontalSplash: true, charge: true, rarity: 'epic', hasShield: true },
+  { id: 'elite_barbarians', name: 'Elite Barbs', cost: 6, color: '#c0392b', hp: 1341, speed: 3, type: 'ground', range: 30, damage: 384, attackSpeed: 1400, projectile: null, count: 2, rarity: 'epic' },
+  { id: 'golem', name: 'Golem', cost: 8, color: '#7f8c8d', hp: 5120, speed: 0.9, type: 'ground', range: 20, damage: 312, attackSpeed: 2500, projectile: null, count: 1, targetType: 'buildings', rarity: 'epic', deathDamage: 312, deathSpawns: 'golemite', deathSpawnCount: 2, spawnDelay: 3000 },
+  { id: 'golemite', name: 'Golemite', cost: 0, color: '#95a5a6', hp: 1040, speed: 1, type: 'ground', range: 20, damage: 66, attackSpeed: 2500, projectile: null, count: 1, targetType: 'buildings', rarity: 'common', isToken: true, deathDamage: 66, spawnDelay: 1000 },
 
   // Next set of additions
-  { id: 'pekka', name: 'P.E.K.K.A', cost: 7, color: '#8e44ad', hp: 2900, speed: 1, type: 'ground', range: 25, damage: 650, attackSpeed: 1800, projectile: null, count: 1, rarity: 'epic' },
-  { id: 'mega_knight', name: 'Mega Knight', cost: 7, color: '#e67e22', hp: 3300, speed: 1.5, type: 'ground', range: 25, damage: 240, attackSpeed: 1600, projectile: null, count: 1, splash: true, spawnDamage: 180, jumps: true, rarity: 'legendary' },
-  { id: 'electro_wizard', name: 'Electro Wiz', cost: 4, color: '#3498db', hp: 590, speed: 1.5, type: 'ground', range: 55, damage: 170, attackSpeed: 1100, projectile: 'electric_bolt', count: 1, splash: false, stun: 0.5, rarity: 'legendary', spawnDamage: 170 },
-  { id: 'lightning', name: 'Lightning', cost: 6, color: '#f1c40f', type: 'spell', damage: 900, radius: 70, count: 1, rarity: 'epic' },
-  { id: 'x_bow', name: 'X-Bow', cost: 6, color: '#95a5a6', hp: 700, speed: 0, type: 'building', range: 280, damage: 40, attackSpeed: 100, projectile: 'arrow', count: 1, lifetime: 30, rarity: 'epic', spawnDelay: 3500 },
+  { id: 'pekka', name: 'P.E.K.K.A', cost: 7, color: '#8e44ad', hp: 3760, speed: 1, type: 'ground', range: 25, damage: 816, attackSpeed: 1800, projectile: null, count: 1, rarity: 'epic' },
+  { id: 'mega_knight', name: 'Mega Knight', cost: 7, color: '#e67e22', hp: 3993, speed: 1.5, type: 'ground', range: 25, damage: 268, attackSpeed: 1700, projectile: null, count: 1, splash: true, spawnDamage: 536, jumps: true, rarity: 'legendary' },
+  { id: 'electro_wizard', name: 'Electro Wiz', cost: 4, color: '#3498db', hp: 713, speed: 1.5, type: 'ground', range: 55, damage: 231, attackSpeed: 1800, projectile: 'electric_bolt', count: 1, splash: false, stun: 0.5, rarity: 'legendary', spawnDamage: 192 },
+  { id: 'lightning', name: 'Lightning', cost: 6, color: '#f1c40f', type: 'spell', damage: 1056, radius: 70, count: 1, rarity: 'epic' },
+  { id: 'x_bow', name: 'X-Bow', cost: 6, color: '#95a5a6', hp: 1600, speed: 0, type: 'building', range: 230, damage: 30, attackSpeed: 250, projectile: 'arrow', count: 1, lifetime: 30, rarity: 'epic', spawnDelay: 3500 },
   { id: 'mirror', name: 'Mirror', cost: 1, color: '#ecf0f1', type: 'spell', isMirror: true, rarity: 'epic' },
 
   // Spirit Cards - All cost 1 Elixir and die when they attack
-  { id: 'fire_spirit', name: 'Fire Spirit', cost: 1, color: '#e74c3c', hp: 90, speed: 4, type: 'ground', range: 25, damage: 81, attackSpeed: 1000, projectile: null, count: 1, splash: true, rarity: 'common', kamikaze: true },
-  { id: 'ice_spirit', name: 'Ice Spirit', cost: 1, color: '#E8F4F8', hp: 90, speed: 4, type: 'ground', range: 25, damage: 91, attackSpeed: 1000, projectile: null, count: 1, splash: true, stun: 1.0, rarity: 'common', kamikaze: true },
-  { id: 'electro_spirit', name: 'Electro Spirit', cost: 1, color: '#9b59b6', hp: 90, speed: 4, type: 'ground', range: 25, damage: 100, attackSpeed: 1000, projectile: null, count: 1, chain: 9, stun: 0.5, rarity: 'common', kamikaze: true },
-  { id: 'heal_spirit', name: 'Heal Spirit', cost: 1, color: '#F1C40F', hp: 110, speed: 4, type: 'ground', range: 25, damage: 230, attackSpeed: 1000, projectile: null, count: 1, splash: true, rarity: 'rare', kamikaze: true, healsOnAttack: 400, healRadius: 50 },
+  { id: 'fire_spirit', name: 'Fire Spirit', cost: 1, color: '#e74c3c', hp: 230, speed: 4, type: 'ground', range: 25, damage: 207, attackSpeed: 1000, projectile: null, count: 1, splash: true, rarity: 'common', kamikaze: true },
+  { id: 'ice_spirit', name: 'Ice Spirit', cost: 1, color: '#E8F4F8', hp: 230, speed: 4, type: 'ground', range: 25, damage: 110, attackSpeed: 1000, projectile: null, count: 1, splash: true, stun: 1.0, rarity: 'common', kamikaze: true },
+  { id: 'electro_spirit', name: 'Electro Spirit', cost: 1, color: '#9b59b6', hp: 230, speed: 4, type: 'ground', range: 25, damage: 99, attackSpeed: 1000, projectile: null, count: 1, chain: 9, stun: 0.5, rarity: 'common', kamikaze: true },
+  { id: 'heal_spirit', name: 'Heal Spirit', cost: 1, color: '#F1C40F', hp: 230, speed: 4, type: 'ground', range: 25, damage: 0, attackSpeed: 1000, projectile: null, count: 1, splash: true, rarity: 'rare', kamikaze: true, healsOnAttack: 432, healRadius: 50 },
 
   // Additional cards for new decks
-  { id: 'bomber', name: 'Bomber', cost: 2, color: '#e67e22', hp: 340, speed: 2, type: 'ground', range: 55, damage: 145, attackSpeed: 1600, projectile: 'bomb', count: 1, splash: true, rarity: 'common' },
+  { id: 'bomber', name: 'Bomber', cost: 2, color: '#e67e22', hp: 398, speed: 2, type: 'ground', range: 55, damage: 222, attackSpeed: 1800, projectile: 'bomb', count: 1, splash: true, rarity: 'common' },
   { id: 'goblin_barrel', name: 'Goblin B', cost: 3, color: '#2ecc71', type: 'spell', damage: 0, radius: 20, count: 3, spawns: 'sword_goblins', spawnCount: 3, rarity: 'epic' },
-  { id: 'elixir_collector', name: 'Elixir G', cost: 6, color: '#9b59b6', hp: 1070, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 93, rarity: 'rare', generatesElixir: true },
-  { id: 'goblin_hut', name: 'Goblin Hut', cost: 5, color: '#2ecc71', hp: 1293, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 60, spawns: 'spear_goblins', spawnRate: 4.7, spawnCount: 1, rarity: 'rare' },
-  { id: 'furnace', name: 'Furnace', cost: 4, color: '#e74c3c', hp: 727, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 60, spawns: 'fire_spirit', spawnRate: 7, spawnCount: 1, rarity: 'rare' },
-  { id: 'earthquake', name: 'Earthquake', cost: 3, color: '#7f8c8d', type: 'spell', damage: 243, radius: 70, count: 1, slow: 0.35, rarity: 'rare' },
+  { id: 'elixir_collector', name: 'Elixir G', cost: 6, color: '#9b59b6', hp: 1070, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 70, rarity: 'rare', generatesElixir: true },
+  { id: 'goblin_hut', name: 'Goblin Hut', cost: 5, color: '#2ecc71', hp: 1293, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 60, spawns: 'spear_goblins', spawnRate: 4.5, spawnCount: 1, rarity: 'rare' },
+  { id: 'furnace', name: 'Furnace', cost: 4, color: '#e74c3c', hp: 1003, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 50, spawns: 'fire_spirit', spawnRate: 7, spawnCount: 1, rarity: 'rare' },
+  { id: 'earthquake', name: 'Earthquake', cost: 3, color: '#7f8c8d', type: 'spell', damage: 81, radius: 70, count: 1, slow: 0.35, rarity: 'rare' },
   { id: 'graveyard', name: 'Graveyard', cost: 5, color: '#2c3e50', type: 'spell', damage: 0, radius: 80, count: 20, spawns: 'skeletons', spawnCount: 20, rarity: 'legendary' },
-  { id: 'lumberjack', name: 'Lumberjack', cost: 4, color: '#e67e22', hp: 820, speed: 2.5, type: 'ground', range: 25, damage: 200, attackSpeed: 700, projectile: null, count: 1, splash: true, deathRage: true, rarity: 'legendary' },
+  { id: 'lumberjack', name: 'Lumberjack', cost: 4, color: '#e67e22', hp: 1232, speed: 2.5, type: 'ground', range: 25, damage: 240, attackSpeed: 800, projectile: null, count: 1, splash: true, deathRage: true, rarity: 'legendary' },
 
   // 5 Easy New Cards
-  { id: 'guards', name: 'Guards', cost: 3, color: '#95a5a6', hp: 100, shieldHp: 100, speed: 2, type: 'ground', range: 25, damage: 60, attackSpeed: 1200, projectile: null, count: 3, rarity: 'common', hasShield: true },
-  { id: 'bats', name: 'Bats', cost: 2, color: '#8e44ad', hp: 50, speed: 3.5, type: 'flying', range: 50, damage: 70, attackSpeed: 1000, projectile: null, count: 4, rarity: 'common' },
-  { id: 'ram_rider', name: 'Ram Rider', cost: 5, color: '#3498db', hp: 1000, speed: 2, type: 'ground', range: 25, damage: 150, attackSpeed: 1700, projectile: null, count: 1, targetType: 'buildings', stun: 1.0, charge: true, rarity: 'rare' },
-  { id: 'battle_healer', name: 'Battle Healer', cost: 4, color: '#e74c3c', hp: 1717, speed: 1.5, type: 'ground', range: 25, damage: 140, attackSpeed: 1500, projectile: null, count: 1, splash: true, healsOnAttack: 84, healRadius: 50, passiveHeal: 84, rarity: 'rare' },
-  { id: 'skeleton_barrel', name: 'Skeleton B', cost: 3, color: '#bdc3c8', hp: 400, speed: 6, type: 'flying', range: 0, radius: 25, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 20, targetType: 'buildings', rarity: 'epic', deathSpawns: 'skeletons', deathSpawnCount: 7, deathDamage: 150, deathRadius: 40 },
+  { id: 'guards', name: 'Guards', cost: 3, color: '#95a5a6', hp: 108, shieldHp: 240, speed: 2, type: 'ground', range: 25, damage: 108, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common', hasShield: true },
+  { id: 'bats', name: 'Bats', cost: 2, color: '#8e44ad', hp: 81, speed: 3.5, type: 'flying', range: 50, damage: 81, attackSpeed: 1300, projectile: null, count: 5, rarity: 'common' },
+  { id: 'ram_rider', name: 'Ram Rider', cost: 5, color: '#3498db', hp: 1717, speed: 2, type: 'ground', range: 25, damage: 266, attackSpeed: 1800, projectile: null, count: 1, targetType: 'buildings', stun: 1.0, charge: true, rarity: 'rare' },
+  { id: 'battle_healer', name: 'Battle Healer', cost: 4, color: '#e74c3c', hp: 1717, speed: 1.5, type: 'ground', range: 25, damage: 148, attackSpeed: 1500, projectile: null, count: 1, splash: true, healsOnAttack: 48, healRadius: 50, passiveHeal: 48, rarity: 'rare' },
+  { id: 'skeleton_barrel', name: 'Skeleton B', cost: 3, color: '#bdc3c8', hp: 636, speed: 6, type: 'flying', range: 0, radius: 25, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 20, targetType: 'buildings', rarity: 'epic', deathSpawns: 'skeletons', deathSpawnCount: 8, deathDamage: 133, deathRadius: 40 },
 
   // New Cards (Ice Golem, Mega Minion, Dart Goblin, Princess, Barbarian Hut)
   { id: 'ice_golem', name: 'Ice Golem', cost: 2, color: '#E8F4F8', hp: 1197, speed: 1.5, type: 'ground', range: 20, damage: 84, attackSpeed: 2500, projectile: null, count: 1, targetType: 'buildings', rarity: 'rare', deathDamage: 84, deathRadius: 60, deathSlow: 1.0 },
@@ -3608,34 +3608,52 @@ const MiniCard = ({ card }) => (
 );
 
 const ShopTab = () => {
-  const deals = [
+  const dailyDeals = [
     { id: 'knight', name: 'Knight', count: 50, cost: 500, currency: 'GOLD', rarity: 'common' },
     { id: 'musketeer', name: 'Musketeer', count: 20, cost: 1000, currency: 'GOLD', rarity: 'rare' },
     { id: 'baby_dragon', name: 'Baby Dragon', count: 2, cost: 2000, currency: 'GOLD', rarity: 'epic' },
-    { id: 'archers', name: 'Archers', count: 50, cost: 0, currency: 'FREE', rarity: 'common' }, // Free daily
+    { id: 'archers', name: 'Archers', count: 50, cost: 0, currency: 'FREE', rarity: 'common' },
     { id: 'hog_rider', name: 'Hog Rider', count: 20, cost: 1000, currency: 'GOLD', rarity: 'rare' },
     { id: 'witch', name: 'Witch', count: 2, cost: 100, currency: 'GEM', rarity: 'epic' },
   ];
 
   return (
     <ScrollView style={styles.shopContainer} contentContainerStyle={{ paddingBottom: 100 }}>
+      {/* Special Offer Banner */}
+      <View style={styles.specialOfferBanner}>
+        <LinearGradient colors={['#f39c12', '#e67e22']} style={styles.specialOfferGradient}>
+          <View style={styles.offerContent}>
+            <Text style={styles.offerTag}>BEST VALUE!</Text>
+            <Text style={styles.offerTitle}>SUPER MAGICAL BUNDLE</Text>
+            <View style={styles.offerImageRow}>
+              <Text style={{fontSize: 40}}>🎁</Text>
+              <Text style={{fontSize: 40}}>💰</Text>
+              <Text style={{fontSize: 40}}>💎</Text>
+            </View>
+            <TouchableOpacity style={styles.offerButton}>
+              <Text style={styles.offerButtonText}>$9.99</Text>
+            </TouchableOpacity>
+          </View>
+        </LinearGradient>
+      </View>
+
       <View style={styles.shopSectionHeader}>
         <Text style={styles.shopSectionTitle}>DAILY DEALS</Text>
-        <Text style={styles.shopSectionTimer}>Refreshes in 4h 20m</Text>
+        <Text style={styles.shopSectionTimer}>4h 20m</Text>
       </View>
 
       <View style={styles.dealsGrid}>
-        {deals.map((deal, index) => (
+        {dailyDeals.map((deal, index) => (
           <View key={index} style={styles.dealCard}>
-            <Text style={styles.dealHeader}>{deal.currency === 'FREE' ? 'FREE' : 'DAILY DEAL'}</Text>
+            <View style={[styles.dealRarityBar, {backgroundColor: RARITY_COLORS[deal.rarity]}]} />
+            <Text style={styles.dealHeader}>{deal.currency === 'FREE' ? 'FREE' : 'x' + deal.count}</Text>
             <View style={styles.dealImageContainer}>
-              <UnitSprite id={deal.id} isOpponent={false} size={50} />
-              <Text style={styles.dealCount}>x{deal.count}</Text>
+              <UnitSprite id={deal.id} size={45} />
             </View>
             <Text style={styles.dealName}>{deal.name}</Text>
             <TouchableOpacity style={[styles.buyButton, deal.currency === 'FREE' && styles.buyButtonFree]}>
               <Text style={styles.buyButtonText}>
-                {deal.currency === 'FREE' ? 'CLAIM' : `${deal.cost} ${deal.currency === 'GEM' ? '💎' : '💰'}`}
+                {deal.currency === 'FREE' ? 'CLAIM' : deal.cost} {deal.currency === 'GOLD' ? '💰' : deal.currency === 'GEM' ? '💎' : ''}
               </Text>
             </TouchableOpacity>
           </View>
@@ -3643,28 +3661,57 @@ const ShopTab = () => {
       </View>
 
       <View style={styles.shopSectionHeader}>
-        <Text style={styles.shopSectionTitle}>ROYALE PASS</Text>
+        <Text style={styles.shopSectionTitle}>CHESTS</Text>
       </View>
-      <View style={styles.passBanner}>
-        <View style={styles.passBannerLeft}>
-          <Text style={styles.passBannerTitle}>UNLOCK EXCLUSIVE REWARDS!</Text>
-          <TouchableOpacity style={styles.passButton}>
-            <Text style={styles.passButtonText}>GET PASS</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.passBannerRight}>
-          <UnitSprite id="king" isOpponent={false} size={60} />
-        </View>
+      <View style={styles.chestShopRow}>
+        <TouchableOpacity style={styles.shopChestCard}>
+          <Text style={{fontSize: 40}}>🥈</Text>
+          <Text style={styles.shopChestName}>Silver Chest</Text>
+          <View style={styles.shopChestPrice}><Text style={styles.shopChestPriceText}>50 💎</Text></View>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.shopChestCard}>
+          <Text style={{fontSize: 40}}>🥇</Text>
+          <Text style={styles.shopChestName}>Gold Chest</Text>
+          <View style={styles.shopChestPrice}><Text style={styles.shopChestPriceText}>150 💎</Text></View>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
 };
 
-const MagicItems = () => (
-  <View style={styles.magicItemsContainer}>
-    <View style={styles.magicItem}><Text style={{ fontSize: 12 }}>✨</Text></View>
-    <View style={styles.magicItem}><Text style={{ fontSize: 12 }}>🃏</Text></View>
-  </View>
+const EventsTab = () => (
+  <ScrollView style={styles.eventsContainer} contentContainerStyle={{ paddingBottom: 100 }}>
+    <View style={styles.eventCard}>
+      <LinearGradient colors={['#8e44ad', '#2c3e50']} style={styles.eventGradient}>
+        <View style={styles.eventBadge}><Text style={styles.eventBadgeText}>CHALLENGE</Text></View>
+        <Text style={styles.eventTitle}>MEGA KNIGHT CHALLENGE</Text>
+        <Text style={styles.eventSubtitle}>Win to unlock the Mega Knight!</Text>
+        <View style={styles.eventRewards}>
+          <View style={styles.rewardItem}><Text>💰</Text><Text style={styles.rewardValue}>1000</Text></View>
+          <View style={styles.rewardItem}><Text>🃏</Text><Text style={styles.rewardValue}>x10</Text></View>
+          <View style={styles.rewardItem}><Text>✨</Text><Text style={styles.rewardValue}>Free</Text></View>
+        </View>
+        <TouchableOpacity style={styles.eventButton}>
+          <Text style={styles.eventButtonText}>JOIN NOW</Text>
+        </TouchableOpacity>
+      </LinearGradient>
+    </View>
+
+    <View style={styles.eventCard}>
+      <LinearGradient colors={['#2980b9', '#34495e']} style={styles.eventGradient}>
+        <View style={styles.eventBadge}><Text style={styles.eventBadgeText}>TOURNAMENT</Text></View>
+        <Text style={styles.eventTitle}>GLOBAL TOURNAMENT</Text>
+        <Text style={styles.eventSubtitle}>Competing for the top spot!</Text>
+        <View style={styles.eventStatsRow}>
+          <Text style={styles.eventStat}>Wins: 0</Text>
+          <Text style={styles.eventStat}>Losses: 0/3</Text>
+        </View>
+        <TouchableOpacity style={[styles.eventButton, {backgroundColor: '#3498db'}]}>
+          <Text style={styles.eventButtonText}>ENTER</Text>
+        </TouchableOpacity>
+      </LinearGradient>
+    </View>
+  </ScrollView>
 );
 
 const ElixirDroplet = ({ size = 20, value, isDouble }) => (
@@ -3914,128 +3961,27 @@ const DeckSlotSelector = memo(({ visible, onClose, cards, onSwap }) => {
 });
 
 const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeckIndex, setSelectedDeckIndex }) => {
-  const [selectedCard, setSelectedCard] = useState(null); // For detail modal
-  const [cardMenuCard, setCardMenuCard] = useState(null); // For popup menu
-  const [showSlotSelector, setShowSlotSelector] = useState(null); // For slot selector
+  const [selectedCard, setSelectedCard] = useState(null);
+  const [cardMenuCard, setCardMenuCard] = useState(null);
+  const [showSlotSelector, setShowSlotSelector] = useState(null);
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [filterRarity, setFilterRarity] = useState('all');
   const [sortByElixir, setSortByElixir] = useState(false);
 
-  // Drag & drop refs
   const dropZones = useRef([]);
   const deckSlotRefs = useRef([]);
-
-  // Drag state
   const [localDraggingCard, setLocalDraggingCard] = useState(null);
   const [scrollEnabled, setScrollEnabled] = useState(true);
 
-  // Filter Logic - Memoized to prevent re-computation on every render
   const filteredCards = useMemo(() => {
     return CARDS.filter(card => !card.isToken).filter(card => {
       if (filterRarity === 'all') return true;
       return card.rarity === filterRarity;
-    }).sort((a, b) => {
-      if (sortByElixir) {
-        return a.cost - b.cost;
-      }
-      // Default sort by id/name stability or rarity if needed
-      return 0;
-    });
+    }).sort((a, b) => sortByElixir ? a.cost - b.cost : 0);
   }, [filterRarity, sortByElixir]);
 
-  // Filter Modal Component
-  const FilterModal = () => (
-    <Modal
-      animationType="fade"
-      transparent={true}
-      visible={showFilterModal}
-      onRequestClose={() => setShowFilterModal(false)}
-    >
-      <TouchableOpacity 
-        style={styles.cardMenuOverlay} 
-        activeOpacity={1} 
-        onPress={() => setShowFilterModal(false)}
-      >
-        <View style={styles.cardMenuContent}>
-          <Text style={styles.slotSelectorTitle}>Filter Collection</Text>
-          
-          <Text style={styles.deckSelectorLabel}>RARITY</Text>
-          <View style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8, marginBottom: 20}}>
-            <TouchableOpacity 
-              style={[styles.filterButton, filterRarity === 'all' && styles.filterButtonActive]} 
-              onPress={() => setFilterRarity('all')}
-            >
-              <Text style={[styles.filterButtonText, filterRarity === 'all' && styles.filterButtonTextActive]}>All</Text>
-            </TouchableOpacity>
-            {['common', 'rare', 'epic', 'legendary'].map(rarity => (
-              <TouchableOpacity 
-                key={rarity}
-                style={[styles.filterButton, filterRarity === rarity && styles.filterButtonActive, { borderColor: RARITY_COLORS[rarity] }]} 
-                onPress={() => setFilterRarity(rarity)}
-              >
-                <Text style={[styles.filterButtonText, filterRarity === rarity && styles.filterButtonTextActive, { color: filterRarity === rarity ? '#fff' : RARITY_COLORS[rarity] }]}>
-                  {rarity.charAt(0).toUpperCase() + rarity.slice(1)}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          <Text style={styles.deckSelectorLabel}>SORT BY</Text>
-          <View style={{flexDirection: 'row', justifyContent: 'center', marginBottom: 20}}>
-            <TouchableOpacity 
-              style={[styles.filterButton, sortByElixir && styles.filterButtonActive]} 
-              onPress={() => setSortByElixir(!sortByElixir)}
-            >
-              <Text style={[styles.filterButtonText, sortByElixir && styles.filterButtonTextActive]}>Elixir Cost {sortByElixir ? '▲' : ''}</Text>
-            </TouchableOpacity>
-          </View>
-
-          <TouchableOpacity
-            style={styles.cardMenuCancel}
-            onPress={() => setShowFilterModal(false)}
-          >
-            <Text style={styles.cardMenuCancelText}>Close</Text>
-          </TouchableOpacity>
-        </View>
-      </TouchableOpacity>
-    </Modal>
-  );
-
-  // Show card menu for collection cards
-  const handleCollectionCardTap = useCallback((card) => {
-    setCardMenuCard(card);
-  }, []);
-
-  // Handle tap on deck slot card
-  const handleDeckCardTap = useCallback((card, index) => {
-    // Just show details for deck cards
-    setSelectedCard(card);
-  }, []);
-
-  // Handle swap from menu
-  const handleSwapFromMenu = useCallback((deckIndex) => {
-    // Use showSlotSelector as the source card (it's set when Swap is clicked)
-    const sourceCard = showSlotSelector || cardMenuCard;
-    if (sourceCard) {
-      const fromIndex = cards.findIndex(c => c.id === sourceCard.id);
-      if (fromIndex !== -1) {
-        // Source is in deck - swap indices
-        if (fromIndex !== deckIndex) {
-          onSwapCards(fromIndex, deckIndex);
-        }
-      } else {
-        // Source is from collection - pass card object
-        onSwapCards(sourceCard, deckIndex);
-      }
-      // Clear both states
-      setCardMenuCard(null);
-      setShowSlotSelector(null);
-    }
-  }, [showSlotSelector, cardMenuCard, cards, onSwapCards]);
-
-  const handleCardMenuClose = useCallback(() => {
-    setCardMenuCard(null);
-  }, []);
+  const handleCollectionCardTap = useCallback((card) => setCardMenuCard(card), []);
+  const handleDeckCardTap = useCallback((card) => setSelectedCard(card), []);
 
   const handleCardInfo = useCallback((card) => {
     setCardMenuCard(null);
@@ -4047,439 +3993,217 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
     setShowSlotSelector(card);
   }, []);
 
-  const handleSlotSelectorClose = useCallback(() => {
-    setShowSlotSelector(null);
-  }, []);
-
-  const measureDropZones = useCallback(() => {
-    dropZones.current = [];
-    deckSlotRefs.current.forEach((ref, index) => {
-      if (ref) {
-        ref.measure((x, y, width, height, pageX, pageY) => {
-          dropZones.current[index] = { x: pageX, y: pageY, width, height, index };
-        });
-      }
-    });
-  }, []);
+  const handleSwapFromMenu = useCallback((deckIndex) => {
+    const sourceCard = showSlotSelector || cardMenuCard;
+    if (sourceCard) {
+      const fromIndex = cards.findIndex(c => c.id === sourceCard.id);
+      if (fromIndex !== -1) {
+        if (fromIndex !== deckIndex) onSwapCards(fromIndex, deckIndex);
+      } else onSwapCards(sourceCard, deckIndex);
+      setCardMenuCard(null);
+      setShowSlotSelector(null);
+    }
+  }, [showSlotSelector, cardMenuCard, cards, onSwapCards]);
 
   const handleDragStart = useCallback((card, gesture, componentRef) => {
     setScrollEnabled(false);
     setLocalDraggingCard(card);
-
     componentRef.measure((x, y, width, height, pageX, pageY) => {
-      // Notify global handler
-      if (dragHandlers && dragHandlers.start) {
-        dragHandlers.start(card, pageX, pageY);
-      }
-      // Also measure drop zones now
-      measureDropZones();
+      if (dragHandlers?.start) dragHandlers.start(card, pageX, pageY);
+      deckSlotRefs.current.forEach((ref, index) => {
+        if (ref) ref.measure((x, y, width, height, pageX, pageY) => {
+          dropZones.current[index] = { x: pageX, y: pageY, width, height, index };
+        });
+      });
     });
-  }, [dragHandlers, measureDropZones]);
-
-  const handleDragMove = useCallback((gesture) => {
-    if (dragHandlers && dragHandlers.move) {
-      dragHandlers.move(gesture.moveX, gesture.moveY);
-    }
   }, [dragHandlers]);
 
   const handleDragEnd = useCallback((gesture) => {
-    const dropX = gesture.moveX;
-    const dropY = gesture.moveY;
-
-    // Check collision with drop zones
-    const target = dropZones.current.find(zone => {
-      return dropX >= zone.x && dropX <= zone.x + zone.width &&
-        dropY >= zone.y && dropY <= zone.y + zone.height;
-    });
-
+    const target = dropZones.current.find(zone => 
+      gesture.moveX >= zone.x && gesture.moveX <= zone.x + zone.width &&
+      gesture.moveY >= zone.y && gesture.moveY <= zone.y + zone.height
+    );
     if (target) {
       const fromIndex = cards.findIndex(c => c.id === localDraggingCard?.id);
-      const toIndex = target.index;
-
-      if (fromIndex !== -1 && fromIndex !== toIndex) {
-        onSwapCards(fromIndex, toIndex);
-      }
+      if (fromIndex !== -1 && fromIndex !== target.index) onSwapCards(fromIndex, target.index);
     }
-
-    if (dragHandlers && dragHandlers.end) {
-      dragHandlers.end();
-    }
+    if (dragHandlers?.end) dragHandlers.end();
     setLocalDraggingCard(null);
     setScrollEnabled(true);
   }, [cards, localDraggingCard, onSwapCards, dragHandlers]);
 
-  const renderCollectionCard = useCallback(({ item }) => {
-    const isInDeck = cards.some(c => c && c.id === item.id);
-    const isDragging = localDraggingCard?.id === item.id;
-    
-    return (
-      <View style={{ margin: 3 }}>
-        <CollectionCard 
-          card={item} 
-          isInDeck={isInDeck} 
-          isDragging={isDragging}
-          onTap={handleCollectionCardTap}
-          onDragStart={handleDragStart}
-          onDragMove={handleDragMove}
-          onDragEnd={handleDragEnd}
-          globalDragHandlers={dragHandlers}
-        />
-      </View>
-    );
-  }, [cards, localDraggingCard, handleCollectionCardTap, handleDragStart, handleDragMove, handleDragEnd, dragHandlers]);
+  const renderCollectionCard = useCallback(({ item }) => (
+    <View style={{ margin: 3 }}>
+      <CollectionCard
+        card={item}
+        isInDeck={cards.some(c => c?.id === item.id)}
+        isDragging={localDraggingCard?.id === item.id}
+        onTap={handleCollectionCardTap}
+        onDragStart={handleDragStart}
+        onDragMove={(g) => dragHandlers?.move?.(g.moveX, g.moveY)}
+        onDragEnd={handleDragEnd}
+        globalDragHandlers={dragHandlers}
+      />
+    </View>
+  ), [cards, localDraggingCard, handleCollectionCardTap, handleDragStart, handleDragEnd, dragHandlers]);
 
   return (
     <View style={styles.deckTabContainer}>
-      <View style={styles.deckHeaderRow}>
-        <Text style={styles.deckTabTitle}>Battle Deck {selectedDeckIndex + 1}</Text>
-        <MagicItems />
-      </View>
-
-      <DeckStats cards={cards} />
-
-      {/* Deck Selector - 5 Deck Slots */}
-      <View style={styles.deckSelectorContainer}>
-        <Text style={styles.deckSelectorLabel}>SELECT DECK:</Text>
-        <View style={styles.deckSelectorButtons}>
-          {allDecks.map((_, deckIndex) => (
-            <TouchableOpacity
-              key={deckIndex}
-              style={[
-                styles.deckSelectorButton,
-                selectedDeckIndex === deckIndex && styles.deckSelectorButtonActive
-              ]}
-              onPress={() => setSelectedDeckIndex(deckIndex)}
-            >
-              <Text style={[
-                styles.deckSelectorButtonText,
-                selectedDeckIndex === deckIndex && styles.deckSelectorButtonTextActive
-              ]}>
-                Deck {deckIndex + 1}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-
-      {/* Current Battle Deck Box */}
-      <View style={styles.deckBox}>
-        <View style={styles.deckBoxInner}>
-          <View style={styles.cardRow}>
-            {(cards || []).slice(0, 4).map((card, index) => {
-              if (!card) return null;
-              const isLegendary = card.rarity === 'legendary';
-              return (
-                <TouchableOpacity
-                  key={card.id}
-                  ref={el => deckSlotRefs.current[index] = el}
-                  style={[
-                    styles.deckCard,
-                    !isLegendary && { borderColor: RARITY_COLORS[card.rarity] || '#000' },
-                    isLegendary && { backgroundColor: 'transparent', borderWidth: 0 }
-                  ]}
-                  onPress={() => handleDeckCardTap(card, index)}
-                  activeOpacity={0.7}
-                >
-                  {isLegendary && (
-                    <Svg width="70" height="85" viewBox="0 0 60 75" style={{ position: 'absolute', top: 0, left: 0 }}>
-                      <Defs>
-                        <LinearGradient id="rainbow_deck" x1="0" y1="0" x2="1" y2="1">
-                          <Stop offset="0%" stopColor="#ff0000" />
-                          <Stop offset="20%" stopColor="#ffff00" />
-                          <Stop offset="40%" stopColor="#00ff00" />
-                          <Stop offset="60%" stopColor="#00ffff" />
-                          <Stop offset="80%" stopColor="#0000ff" />
-                          <Stop offset="100%" stopColor="#ff00ff" />
-                        </LinearGradient>
-                      </Defs>
-                      <Polygon
-                        points="30,2 58,18 58,57 30,73 2,57 2,18"
-                        fill="rgba(255, 255, 255, 0.95)"
-                        stroke="url(#rainbow_deck)"
-                        strokeWidth="2"
-                      />
-                    </Svg>
-                  )}
-                  <UnitSprite id={card.id} isOpponent={false} size={40} />
-                  <Text style={styles.deckCardName}>{card.name || 'Card'}</Text>
-                  <View style={styles.deckCardCost}>
-                    <Text style={styles.deckCardCostText}>{card.cost || 0}</Text>
-                  </View>
-                  {card.type === 'spell' && <View style={styles.cardTypeBadge}><Text style={styles.cardTypeText}>SPELL</Text></View>}
-                  {card.type === 'flying' && <View style={styles.cardTypeBadgeFlying}><Text style={styles.cardTypeText}>FLY</Text></View>}
-                  {card.targetType === 'buildings' && <View style={styles.cardTypeBadgeBuilding}><Text style={styles.cardTypeText}>BLD</Text></View>}
-                </TouchableOpacity>
-              );
-            })}
+      {/* Header Deck Grid (Persistent) */}
+      <View style={styles.deckGridContainer}>
+        <View style={styles.deckHeaderRow}>
+          <Text style={styles.deckTabTitle}>Battle Deck</Text>
+          <View style={styles.deckSelectorMini}>
+            {allDecks.map((_, i) => (
+              <TouchableOpacity key={i} onPress={() => setSelectedDeckIndex(i)} style={[styles.deckDot, selectedDeckIndex === i && styles.deckDotActive]} />
+            ))}
           </View>
-          <View style={styles.cardRow}>
-            {(cards || []).slice(4, 8).map((card, index) => {
-              if (!card) return null;
-              const isLegendary = card.rarity === 'legendary';
-              return (
-                <TouchableOpacity
-                  key={card.id}
-                  ref={el => deckSlotRefs.current[index + 4] = el}
-                  style={[
-                    styles.deckCard,
-                    !isLegendary && { borderColor: RARITY_COLORS[card.rarity] || '#000' },
-                    isLegendary && { backgroundColor: 'transparent', borderWidth: 0 }
-                  ]}
-                  onPress={() => handleDeckCardTap(card, index + 4)}
-                  activeOpacity={0.7}
-                >
-                  {isLegendary && (
-                    <Svg width="70" height="85" viewBox="0 0 60 75" style={{ position: 'absolute', top: 0, left: 0 }}>
-                      <Defs>
-                        <LinearGradient id="rainbow_deck" x1="0" y1="0" x2="1" y2="1">
-                          <Stop offset="0%" stopColor="#ff0000" />
-                          <Stop offset="20%" stopColor="#ffff00" />
-                          <Stop offset="40%" stopColor="#00ff00" />
-                          <Stop offset="60%" stopColor="#00ffff" />
-                          <Stop offset="80%" stopColor="#0000ff" />
-                          <Stop offset="100%" stopColor="#ff00ff" />
-                        </LinearGradient>
-                      </Defs>
-                      <Polygon
-                        points="30,2 58,18 58,57 30,73 2,57 2,18"
-                        fill="rgba(255, 255, 255, 0.95)"
-                        stroke="url(#rainbow_deck)"
-                        strokeWidth="2"
-                      />
-                    </Svg>
-                  )}
-                  <UnitSprite id={card.id} isOpponent={false} size={40} />
-                  <Text style={styles.deckCardName}>{card.name || 'Card'}</Text>
-                  <View style={styles.deckCardCost}>
-                    <Text style={styles.deckCardCostText}>{card.cost || 0}</Text>
-                  </View>
-                  {card.type === 'spell' && <View style={styles.cardTypeBadge}><Text style={styles.cardTypeText}>SPELL</Text></View>}
-                  {card.type === 'flying' && <View style={styles.cardTypeBadgeFlying}><Text style={styles.cardTypeText}>FLY</Text></View>}
-                  {card.targetType === 'buildings' && <View style={styles.cardTypeBadgeBuilding}><Text style={styles.cardTypeText}>BLD</Text></View>}
-                </TouchableOpacity>
-              );
-            })}
+        </View>
+
+        <View style={styles.deckCardGrid}>
+          <View style={styles.cardRowCompact}>
+            {cards.slice(0, 4).map((card, i) => (
+              <TouchableOpacity key={card.id} ref={el => deckSlotRefs.current[i] = el} onPress={() => handleDeckCardTap(card)} style={[styles.deckCardCompact, {borderColor: RARITY_COLORS[card.rarity]}]}>
+                <UnitSprite id={card.id} size={35} />
+                <View style={styles.cardCostSmall}><Text style={styles.cardCostSmallText}>{card.cost}</Text></View>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View style={styles.cardRowCompact}>
+            {cards.slice(4, 8).map((card, i) => (
+              <TouchableOpacity key={card.id} ref={el => deckSlotRefs.current[i+4] = el} onPress={() => handleDeckCardTap(card)} style={[styles.deckCardCompact, {borderColor: RARITY_COLORS[card.rarity]}]}>
+                <UnitSprite id={card.id} size={35} />
+                <View style={styles.cardCostSmall}><Text style={styles.cardCostSmallText}>{card.cost}</Text></View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        <View style={styles.deckFooterRow}>
+          <View style={styles.towerTroopSlot}>
+            <UnitSprite id="princess" size={25} />
+            <Text style={styles.towerTroopText}>Princess</Text>
+          </View>
+          <View style={styles.avgElixirContainer}>
+            <Text style={styles.avgElixirText}>Avg. Elixir: {(cards.reduce((s,c)=>s+c.cost,0)/8).toFixed(1)}</Text>
           </View>
         </View>
       </View>
 
-      {/* All Cards Section */}
-      <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 5}}>
-        <Text style={[styles.deckBoxTitle, {marginBottom: 0}]}>Collection</Text>
-        <TouchableOpacity 
-          style={styles.filterButton} 
-          onPress={() => setShowFilterModal(true)}
-        >
-          <Text style={styles.filterButtonText}>Filters {filterRarity !== 'all' || sortByElixir ? '•' : ''} ▾</Text>
+      {/* Collection Section */}
+      <View style={styles.collectionHeader}>
+        <Text style={styles.collectionTitle}>Collection</Text>
+        <TouchableOpacity style={styles.filterButtonMini} onPress={() => setShowFilterModal(true)}>
+          <Text style={styles.filterButtonText}>Sort By ▾</Text>
         </TouchableOpacity>
       </View>
-      
-      {/* Filter Modal */}
-      <FilterModal />
 
-      <View style={[styles.deckBox, { flex: 1, paddingVertical: 8, paddingHorizontal: 4 }]}>
-        <FlatList
-          data={filteredCards}
-          keyExtractor={item => item.id}
-          numColumns={4}
-          renderItem={renderCollectionCard}
-          scrollEnabled={scrollEnabled}
-          initialNumToRender={12}
-          maxToRenderPerBatch={8}
-          windowSize={5}
-          removeClippedSubviews={true}
-          showsVerticalScrollIndicator={true}
-          contentContainerStyle={{ paddingBottom: 20 }}
-          columnWrapperStyle={{ justifyContent: 'flex-start' }}
-        />
-      </View>
-
-      {/* Card Menu Modal */}
-      <CardMenu 
-        card={cardMenuCard} 
-        onClose={handleCardMenuClose}
-        onInfo={handleCardInfo}
-        onSwap={handleCardSwapRequest}
+      <FlatList
+        data={filteredCards}
+        keyExtractor={item => item.id}
+        numColumns={4}
+        renderItem={renderCollectionCard}
+        scrollEnabled={scrollEnabled}
+        contentContainerStyle={{ paddingBottom: 100 }}
+        columnWrapperStyle={{ justifyContent: 'space-between' }}
       />
 
-      {/* Deck Slot Selector Modal */}
-      <DeckSlotSelector 
-        visible={showSlotSelector}
-        onClose={handleSlotSelectorClose}
-        cards={cards}
-        onSwap={handleSwapFromMenu}
-      />
-
-      {/* Card Detail Modal */}
-      {selectedCard && (
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={!!selectedCard}
-          onRequestClose={() => setSelectedCard(null)}
-        >
-          <View style={styles.cardDetailModal}>
-            <View style={[styles.cardDetailModalContent, { borderColor: RARITY_COLORS[selectedCard.rarity] || '#F1C40F' }]}>
-              <View style={styles.cardDetailCostBig}>
-                <Text style={styles.cardDetailCostBigText}>{selectedCard.cost}</Text>
-              </View>
-
-              <TouchableOpacity style={styles.closeButton} onPress={() => setSelectedCard(null)}>
-                <Text style={styles.closeButtonText}>✕</Text>
-              </TouchableOpacity>
-
-              <View style={styles.cardDetailHeader}>
-                <View style={styles.cardDetailIconBig}>
-                  <UnitSprite id={selectedCard.id} isOpponent={false} size={80} />
-                </View>
-                <Text style={styles.cardDetailNameBig}>{selectedCard.name}</Text>
-                {selectedCard.type === 'spell' && <Text style={styles.cardDetailTypeBig}>🔥 SPELL</Text>}
-                {selectedCard.type === 'flying' && <Text style={styles.cardDetailTypeBigFlying}>🦅 FLYING</Text>}
-                {selectedCard.targetType === 'buildings' && <Text style={styles.cardDetailTypeBigBuilding}>🏠 TARGETS BUILDINGS</Text>}
-                {selectedCard.type === 'building' && <Text style={styles.cardDetailTypeBigBuilding}>🏠 BUILDING</Text>}
-              </View>
-
-              <View style={styles.cardDetailStatsBig}>
-                {/* Special Abilities */}
-                {Boolean(selectedCard.charge || selectedCard.spawns || selectedCard.splash || (selectedCard.stun && selectedCard.stun > 0) || selectedCard.jumps) && (
-                  <View style={{ marginBottom: 15, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.2)' }}>
-                    {selectedCard.charge && (
-                      <View style={styles.statRow}>
-                        <Text style={[styles.statLabel, { color: '#f1c40f' }]}>⚡ Special:</Text>
-                        <Text style={[styles.statValue, { color: '#fff' }]}>Charge Attack</Text>
-                      </View>
-                    )}
-                    {selectedCard.spawns && (
-                      <View style={styles.statRow}>
-                        <Text style={[styles.statLabel, { color: '#9b59b6' }]}>💀 Spawns:</Text>
-                        <Text style={[styles.statValue, { color: '#fff' }]}>{selectedCard.spawnCount}x {selectedCard.spawns}</Text>
-                      </View>
-                    )}
-                    {selectedCard.splash && (
-                      <View style={styles.statRow}>
-                        <Text style={[styles.statLabel, { color: '#e74c3c' }]}>💥 Area:</Text>
-                        <Text style={[styles.statValue, { color: '#fff' }]}>Splash Damage</Text>
-                      </View>
-                    )}
-                    {selectedCard.stun > 0 && (
-                      <View style={styles.statRow}>
-                        <Text style={[styles.statLabel, { color: '#3498db' }]}>💫 Effect:</Text>
-                        <Text style={[styles.statValue, { color: '#fff' }]}>Stun ({selectedCard.stun}s)</Text>
-                      </View>
-                    )}
-                    {selectedCard.jumps && (
-                      <View style={styles.statRow}>
-                        <Text style={[styles.statLabel, { color: '#e67e22' }]}>🐇 Trait:</Text>
-                        <Text style={[styles.statValue, { color: '#fff' }]}>River Jump</Text>
-                      </View>
-                    )}
-                  </View>
-                )}
-
-                {Boolean(selectedCard.hp) && (
-                  <View style={styles.statRow}>
-                    <Text style={styles.statLabel}>❤️ Hitpoints:</Text>
-                    <Text style={styles.statValue}>{selectedCard.hp}</Text>
-                  </View>
-                )}
-                {Boolean(selectedCard.damage) && (
-                  <View style={styles.statRow}>
-                    <Text style={styles.statLabel}>⚔️ Damage:</Text>
-                    <Text style={styles.statValue}>{selectedCard.damage}</Text>
-                  </View>
-                )}
-                {Boolean(selectedCard.speed !== undefined && selectedCard.speed > 0) && (
-                  <View style={styles.statRow}>
-                    <Text style={styles.statLabel}>👟 Speed:</Text>
-                    <Text style={styles.statValue}>{selectedCard.speed}</Text>
-                  </View>
-                )}
-                {Boolean(selectedCard.range) && (
-                  <View style={styles.statRow}>
-                    <Text style={styles.statLabel}>🎯 Range:</Text>
-                    <Text style={styles.statValue}>{selectedCard.range}</Text>
-                  </View>
-                )}
-                {Boolean(selectedCard.count > 1) && (
-                  <View style={styles.statRow}>
-                    <Text style={styles.statLabel}>👥 Count:</Text>
-                    <Text style={styles.statValue}>{selectedCard.count}</Text>
-                  </View>
-                )}
-                {Boolean(selectedCard.attackSpeed) && (
-                  <View style={styles.statRow}>
-                    <Text style={styles.statLabel}>⚡ Hit Speed:</Text>
-                    <Text style={styles.statValue}>{selectedCard.attackSpeed}ms</Text>
-                  </View>
-                )}
-              </View>
-
-              <TouchableOpacity style={styles.upgradeButton} onPress={() => setSelectedCard(null)}>
-                <Text style={styles.upgradeButtonText}>CLOSE</Text>
-              </TouchableOpacity>
+      {/* Modals */}
+      <CardMenu card={cardMenuCard} onClose={() => setCardMenuCard(null)} onInfo={handleCardInfo} onSwap={handleCardSwapRequest} />
+      <DeckSlotSelector visible={showSlotSelector} onClose={() => setShowSlotSelector(null)} cards={cards} onSwap={handleSwapFromMenu} />
+      <Modal animationType="fade" transparent visible={!!selectedCard} onRequestClose={() => setSelectedCard(null)}>
+        <View style={styles.cardDetailModal}>
+          <View style={[styles.cardDetailModalContent, { borderColor: RARITY_COLORS[selectedCard?.rarity] || '#F1C40F' }]}>
+            <TouchableOpacity style={styles.closeButton} onPress={() => setSelectedCard(null)}><Text style={styles.closeButtonText}>✕</Text></TouchableOpacity>
+            <View style={styles.cardDetailHeader}>
+              <UnitSprite id={selectedCard?.id} size={80} />
+              <Text style={styles.cardDetailNameBig}>{selectedCard?.name}</Text>
+              <Text style={styles.cardDetailTypeBig}>{selectedCard?.rarity?.toUpperCase()} {selectedCard?.type?.toUpperCase()}</Text>
+            </View>
+            <View style={styles.cardDetailStatsBig}>
+              {selectedCard?.hp && <View style={styles.statRow}><Text style={styles.statLabel}>HP</Text><Text style={styles.statValue}>{selectedCard.hp}</Text></View>}
+              {selectedCard?.damage && <View style={styles.statRow}><Text style={styles.statLabel}>Damage</Text><Text style={styles.statValue}>{selectedCard.damage}</Text></View>}
+              {selectedCard?.range && <View style={styles.statRow}><Text style={styles.statLabel}>Range</Text><Text style={styles.statValue}>{selectedCard.range}</Text></View>}
             </View>
           </View>
-        </Modal>
-      )}
+        </View>
+      </Modal>
     </View>
   );
 };
-
 const BattleTab = ({ currentDeck, onStartBattle, chests, onUnlockChest, onOpenChest, onFriendlyBattle }) => (
   <View style={styles.battleTabContainer}>
-    <View style={styles.arenaTitleContainer}>
-      <Text style={styles.arenaTitle}>ARENA 1</Text>
-      <Text style={styles.arenaSubtitle}>Goblin Stadium</Text>
-    </View>
-
-    <View style={styles.deckBox}>
-      <Text style={styles.deckBoxTitle}>Battle Deck</Text>
-      <View style={styles.deckBoxInner}>
-        <View style={styles.cardRow}>
-          {(currentDeck || []).slice(0, 4).map(card => (
-            <View key={card.id} style={[styles.deckCard, { borderColor: RARITY_COLORS[card.rarity] || '#000' }]}>
-              <UnitSprite id={card.id} isOpponent={false} size={40} />
-              <Text style={styles.deckCardName}>{card.name}</Text>
-              <View style={styles.deckCardCost}>
-                <Text style={styles.deckCardCostText}>{card.cost}</Text>
-              </View>
-              {card.type === 'spell' && <View style={styles.cardTypeBadge}><Text style={styles.cardTypeText}>SPELL</Text></View>}
-              {card.type === 'flying' && <View style={styles.cardTypeBadgeFlying}><Text style={styles.cardTypeText}>FLY</Text></View>}
-              {card.targetType === 'buildings' && <View style={styles.cardTypeBadgeBuilding}><Text style={styles.cardTypeText}>BLD</Text></View>}
-            </View>
-          ))}
+    {/* Crown Chest / Pass Royale Bar */}
+    <View style={styles.crownChestBar}>
+      <View style={styles.passRoyaleIcon}>
+        <Text style={{fontSize: 16}}>👑</Text>
+      </View>
+      <View style={styles.crownProgressContainer}>
+        <View style={styles.crownProgressBar}>
+          <View style={[styles.crownProgressFill, { width: '60%' }]} />
         </View>
-        <View style={styles.cardRow}>
-          {(currentDeck || []).slice(4, 8).map(card => (
-            <View key={card.id} style={[styles.deckCard, { borderColor: RARITY_COLORS[card.rarity] || '#000' }]}>
-              <UnitSprite id={card.id} isOpponent={false} size={40} />
-              <Text style={styles.deckCardName}>{card.name}</Text>
-              <View style={styles.deckCardCost}>
-                <Text style={styles.deckCardCostText}>{card.cost}</Text>
-              </View>
-              {card.type === 'spell' && <View style={styles.cardTypeBadge}><Text style={styles.cardTypeText}>SPELL</Text></View>}
-              {card.type === 'flying' && <View style={styles.cardTypeBadgeFlying}><Text style={styles.cardTypeText}>FLY</Text></View>}
-              {card.targetType === 'buildings' && <View style={styles.cardTypeBadgeBuilding}><Text style={styles.cardTypeText}>BLD</Text></View>}
-            </View>
-          ))}
-        </View>
+        <Text style={styles.crownProgressText}>6/10</Text>
+      </View>
+      <View style={styles.crownChestReward}>
+        <Text style={{fontSize: 18}}>🎁</Text>
       </View>
     </View>
 
-    <TouchableOpacity style={styles.battleButton} onPress={onStartBattle}>
-      <Text style={styles.battleButtonText}>BATTLE</Text>
-      <Text style={styles.battleButtonSubtext}>Ranked 1v1</Text>
-    </TouchableOpacity>
+    {/* Arena & Trophy Road Area */}
+    <View style={styles.arenaMainView}>
+      <View style={styles.trophyRoadHeader}>
+        <Text style={styles.arenaTitle}>ARENA 11</Text>
+        <Text style={styles.arenaSubtitle}>Electro Valley</Text>
+      </View>
+      
+      <View style={styles.trophyRoadContainer}>
+        <View style={styles.trorophyRoadTrack}>
+          <View style={[styles.trophyRoadFill, { width: '75%' }]} />
+          <View style={[styles.trophyMarker, { left: '75%' }]}>
+            <Text style={styles.trophyMarkerText}>3400 🏆</Text>
+          </View>
+        </View>
+      </View>
 
-    <TouchableOpacity style={styles.friendlyButton} onPress={onFriendlyBattle}>
-      <Text style={styles.friendlyButtonText}>Play with Friend</Text>
-    </TouchableOpacity>
+      <View style={styles.arenaVisualContainer}>
+        <Svg width="200" height="150" viewBox="0 0 200 150">
+          <Defs>
+            <LinearGradient id="arenaGrad" x1="0" y1="0" x2="0" y2="1">
+              <Stop offset="0%" stopColor="#3498db" stopOpacity="0.2" />
+              <Stop offset="100%" stopColor="#2c3e50" stopOpacity="0.8" />
+            </LinearGradient>
+          </Defs>
+          <Path d="M20 130 L180 130 L160 20 L40 20 Z" fill="url(#arenaGrad)" stroke="#f1c40f" strokeWidth="2" />
+          <Circle cx="100" cy="75" r="30" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="2" />
+        </Svg>
+      </View>
+    </View>
 
+    {/* Action Buttons */}
+    <View style={styles.battleActionsRow}>
+      <TouchableOpacity style={styles.smallBlueButton} onPress={onFriendlyBattle}>
+        <Text style={styles.smallButtonIcon}>👥</Text>
+      </TouchableOpacity>
+      
+      <TouchableOpacity style={styles.battleButton} onPress={onStartBattle}>
+        <Text style={styles.battleButtonText}>BATTLE</Text>
+        <View style={styles.battleButtonTrophyRow}>
+          <Text style={styles.battleButtonTrophyText}>+30</Text>
+          <Text style={{fontSize: 10}}>🏆</Text>
+        </View>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.smallBlueButton}>
+        <Text style={styles.smallButtonIcon}>🎮</Text>
+      </TouchableOpacity>
+    </View>
+
+    {/* Chest Slots */}
     <ChestSlots chests={chests} onUnlock={onUnlockChest} onOpen={onOpenChest} />
   </View>
 );
 
-const ClanTab = () => {
+const SocialTab = () => {
   const [messages, setMessages] = useState([
     { id: '1', user: 'KingSlayer', text: 'Good game everyone!', role: 'Elder', time: '2h ago' },
     { id: '2', user: 'PrincessLover', text: 'Can someone donate Wizards?', role: 'Member', time: '1h ago' },
@@ -4489,31 +4213,18 @@ const ClanTab = () => {
 
   const sendMessage = () => {
     if (inputText.trim().length === 0) return;
-    const newMsg = {
-      id: Date.now().toString(),
-      user: 'You',
-      text: inputText,
-      role: 'Leader',
-      time: 'Just now'
-    };
+    const newMsg = { id: Date.now().toString(), user: 'You', text: inputText, role: 'Leader', time: 'Just now' };
     setMessages(prev => [...prev, newMsg]);
     setInputText('');
   };
 
   const renderMessage = ({ item }) => {
-    if (item.role === 'System') {
-      return (
-        <View style={styles.systemMessage}>
-          <Text style={styles.systemMessageText}>{item.text}</Text>
-        </View>
-      );
-    }
+    if (item.role === 'System') return <View style={styles.systemMessage}><Text style={styles.systemMessageText}>{item.text}</Text></View>;
     const isMe = item.user === 'You';
     return (
       <View style={[styles.chatRow, isMe ? styles.chatRowMe : styles.chatRowOther]}>
-        {!isMe && <View style={styles.chatAvatar}><Text style={{ fontSize: 12 }}>👤</Text></View>}
         <View style={[styles.chatBubble, isMe ? styles.chatBubbleMe : styles.chatBubbleOther]}>
-          {!isMe && <Text style={styles.chatUser}>{item.user} <Text style={styles.chatRole}>({item.role})</Text></Text>}
+          {!isMe && <Text style={[styles.chatUser, {color: item.role === 'Elder' ? '#f1c40f' : '#3498db'}]}>{item.user}</Text>}
           <Text style={styles.chatText}>{item.text}</Text>
           <Text style={styles.chatTime}>{item.time}</Text>
         </View>
@@ -4523,38 +4234,32 @@ const ClanTab = () => {
 
   return (
     <View style={styles.clanTabContainer}>
-      {/* Clan Header */}
-      <View style={styles.clanHeader}>
-        <View style={styles.clanHeaderLeft}>
-          <View style={styles.clanBadge}><Text style={{ fontSize: 24 }}>🛡️</Text></View>
+      <View style={styles.socialHeader}>
+        <View style={styles.clanMainInfo}>
+          <View style={styles.clanBadgeLarge}><Text style={{fontSize: 24}}>🛡️</Text></View>
           <View>
-            <Text style={styles.clanName}>Blue Kings</Text>
-            <Text style={styles.clanStats}>48/50 Members • 24000 🏆</Text>
+            <Text style={styles.clanNameText}>Blue Kings</Text>
+            <Text style={styles.clanStatusText}>48/50 Members • 🏆 4000+</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.clanInfoButton}><Text style={{ color: '#fff', fontWeight: 'bold' }}>i</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.clanSettingsIcon}><Text style={{fontSize: 18}}>ℹ️</Text></TouchableOpacity>
       </View>
 
-      {/* Chat Area */}
-      <KeyboardAvoidingView behavior="padding" style={styles.chatContainer}>
+      <View style={styles.requestBanner}>
+        <Text style={styles.requestText}>New card request available!</Text>
+        <TouchableOpacity style={styles.requestButton}><Text style={styles.requestButtonText}>REQUEST</Text></TouchableOpacity>
+      </View>
+
+      <KeyboardAvoidingView behavior="padding" style={styles.chatContainer} keyboardVerticalOffset={80}>
         <FlatList
           data={messages}
           renderItem={renderMessage}
           keyExtractor={item => item.id}
-          style={styles.chatList}
-          contentContainerStyle={{ padding: 10, paddingBottom: 20 }}
+          contentContainerStyle={{ padding: 10 }}
         />
         <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.chatInput}
-            placeholder="Type a message..."
-            placeholderTextColor="#888"
-            value={inputText}
-            onChangeText={setInputText}
-          />
-          <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-            <Text style={styles.sendButtonText}>Send</Text>
-          </TouchableOpacity>
+          <TextInput style={styles.chatInput} placeholder="Message..." placeholderTextColor="#888" value={inputText} onChangeText={setInputText} />
+          <TouchableOpacity style={styles.sendButton} onPress={sendMessage}><Text style={styles.sendButtonText}>S</Text></TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </View>
@@ -4564,9 +4269,10 @@ const ClanTab = () => {
 const BottomNavigation = ({ activeTab, onTabChange }) => {
   const tabs = [
     { id: 0, name: 'Shop', icon: '🛒' },
-    { id: 1, name: 'Deck', icon: '📚' },
+    { id: 1, name: 'Decks', icon: '📚' },
     { id: 2, name: 'Battle', icon: '⚔️' },
-    { id: 3, name: 'Clan', icon: '👥' }
+    { id: 3, name: 'Social', icon: '👥' },
+    { id: 4, name: 'Events', icon: '🏆' }
   ];
 
   return (
@@ -4577,7 +4283,7 @@ const BottomNavigation = ({ activeTab, onTabChange }) => {
           style={[styles.tabButton, activeTab === tab.id && styles.tabButtonActive]}
           onPress={() => onTabChange(tab.id)}
         >
-          <Text style={styles.tabIcon}>{tab.icon}</Text>
+          <Text style={[styles.tabIcon, activeTab === tab.id && { transform: [{ scale: 1.2 }] }]}>{tab.icon}</Text>
           <Text style={[styles.tabLabel, activeTab === tab.id && styles.tabLabelActive]}>
             {tab.name}
           </Text>
@@ -4603,21 +4309,16 @@ const MainLobby = ({
         setSelectedDeckIndex={setSelectedDeckIndex}
         allDecks={allDecks}
       />;
-      case 2: return <BattleTab 
-        currentDeck={currentDeck} 
-        onStartBattle={onStartGame} 
+      case 2: return <BattleTab
+        currentDeck={currentDeck}
+        onStartBattle={onStartGame}
         chests={chests}
         onUnlockChest={onUnlockChest}
         onOpenChest={onOpenChest}
       />;
-      case 3: return <ClanTab />;
-      default: return <BattleTab 
-        currentDeck={currentDeck} 
-        onStartBattle={onStartGame}
-        chests={chests}
-        onUnlockChest={onUnlockChest}
-        onOpenChest={onOpenChest} 
-      />;
+      case 3: return <SocialTab />;
+      case 4: return <EventsTab />;
+      default: return null;
     }
   };
 
@@ -4637,7 +4338,7 @@ const MainLobby = ({
 // --- Game Board Component (Extracted) ---
 const GameBoard = ({
   towers, units, projectiles, visualEffects, setVisualEffects, screenShake, setScreenShake, timeLeft, gameOver,
-  elixir, hand, nextCard, draggingCard, dragPosition,
+  elixir, enemyElixir, hand, nextCard, draggingCard, dragPosition,
   handleDragStart, handleDragMove, handleDragEnd,
   spawnTestEnemy, formatTime, onRestart, score,
   isDoubleElixir, showDoubleElixirAlert,
@@ -4686,14 +4387,16 @@ const GameBoard = ({
           transform: [{ translateX: shakeAnim }]
         }
       ]}>
-        {/* Top Info Bar (Opponent) */}
-        <View style={styles.topInfoBar}>
-          <View style={styles.playerInfoContainer}>
-            <Text style={styles.playerName}>Trainer Cheddar</Text>
-            <Text style={styles.clanName}>Training Camp</Text>
-          </View>
-        </View>
-
+            {/* Top Info Bar (Opponent) */}
+            <View style={styles.topInfoBar}>
+              <View style={styles.playerInfoContainer}>
+                <Text style={styles.playerName}>Trainer Cheddar</Text>
+                <Text style={styles.clanName}>Training Camp</Text>
+              </View>
+                    {/* AI Elixir Bar - Small and subtle */}
+                    <View style={{ width: 80, height: 10, backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: 5, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }}>
+                      <View style={{ width: `${(enemyElixir / 10) * 100}%`, height: '100%', backgroundColor: '#D442F5', opacity: 0.7 }} />
+                    </View>            </View>
         {/* Score & Time Board */}
         <View style={styles.scoreBoard}>
           <View style={styles.crownContainer}>
@@ -5283,6 +4986,7 @@ export default function App() {
   const [enemyHand, setEnemyHand] = useState([allDecks[4][0], allDecks[4][1], allDecks[4][2], allDecks[4][3]]);
   const [enemyNextCard, setEnemyNextCard] = useState(allDecks[4][4]);
   const [enemyDeckQueue, setEnemyDeckQueue] = useState([allDecks[4][5], allDecks[4][6], allDecks[4][7]]);
+  const [enemyDeckIndex, setEnemyDeckIndex] = useState(4);
 
   const [towers, setTowers] = useState([
     { id: 0, type: 'king', isOpponent: true, hp: 4000, maxHp: 4000, x: width / 2, y: 80, range: KING_RANGE, lastShot: 0 },
@@ -5297,6 +5001,7 @@ export default function App() {
   const [projectiles, setProjectiles] = useState([]);
   const [visualEffects, setVisualEffects] = useState([]); // Temporary visual effects (explosions, heals, etc.)
   const [lastPlayedCard, setLastPlayedCard] = useState(null);
+  const [enemyLastPlayedCard, setEnemyLastPlayedCard] = useState(null);
 
   const towersRef = useRef(towers);
   const unitsRef = useRef(units);
@@ -5306,6 +5011,7 @@ export default function App() {
   const enemyNextCardRef = useRef(enemyNextCard);
   const enemyDeckQueueRef = useRef(enemyDeckQueue);
   const lastPlayedCardRef = useRef(lastPlayedCard);
+  const enemyLastPlayedCardRef = useRef(enemyLastPlayedCard);
 
   useEffect(() => { towersRef.current = towers; }, [towers]);
   useEffect(() => { unitsRef.current = units; }, [units]);
@@ -5315,6 +5021,7 @@ export default function App() {
   useEffect(() => { enemyNextCardRef.current = enemyNextCard; }, [enemyNextCard]);
   useEffect(() => { enemyDeckQueueRef.current = enemyDeckQueue; }, [enemyDeckQueue]);
   useEffect(() => { lastPlayedCardRef.current = lastPlayedCard; }, [lastPlayedCard]);
+  useEffect(() => { enemyLastPlayedCardRef.current = enemyLastPlayedCard; }, [enemyLastPlayedCard]);
 
   const concedeGame = () => {
     setGameOver('LOSE');
@@ -5337,6 +5044,7 @@ export default function App() {
     // Enemy AI Deck Randomization
     setEnemyElixir(5);
     const randomEnemyDeckIndex = Math.floor(Math.random() * allDecks.length);
+    setEnemyDeckIndex(randomEnemyDeckIndex);
     const enemyDeck = allDecks[randomEnemyDeckIndex];
     const shuffledEnemyDeck = [...enemyDeck].sort(() => Math.random() - 0.5);
     setEnemyHand([shuffledEnemyDeck[0], shuffledEnemyDeck[1], shuffledEnemyDeck[2], shuffledEnemyDeck[3]]);
@@ -5441,457 +5149,511 @@ export default function App() {
     }
   };
 
-  const spawnCard = (card, x, y) => {
-    console.log('[spawnCard] Starting - Card:', card.name, 'cost:', card.cost, 'current elixir:', elixir);
+    const spawnCard = (card, x, y, isOpponent = false) => {
 
-    // Handle Mirror card - copy the last played card with +1 level
-    let actualCard = card;
-    let levelBoost = 0;
-    if (card.id === 'mirror') {
-      const lastCard = lastPlayedCardRef.current;
-      if (!lastCard) {
-        console.log('[spawnCard] No card to mirror!');
-        return;
-      }
-      levelBoost = (lastCard.level || 9) + 1; // Default to level 9 (common) + 1
-      actualCard = { ...lastCard };
-      // Mirror costs (copied card cost + 1)
-      actualCard.cost = lastCard.cost + 1;
-      actualCard.level = levelBoost;
-      // Apply level boost to stats (+10% per level above level 9)
-      const levelBonus = 1 + (levelBoost - 9) * 0.1; // Level 9 = 100%, Level 10 = 110%, etc.
-      actualCard.hp = Math.floor(lastCard.hp * levelBonus);
-      actualCard.damage = Math.floor(lastCard.damage * levelBonus);
-      console.log('[spawnCard] Mirroring:', actualCard.name, 'new cost:', actualCard.cost, 'level:', levelBoost, 'hp:', actualCard.hp, 'damage:', actualCard.damage);
-    }
+      console.log(`[spawnCard] ${isOpponent ? 'Opponent' : 'Player'} spawning:`, card.name, 'cost:', card.cost);
 
-    setElixir(currentElixir => {
-      const costToUse = actualCard.cost;
-      console.log('[spawnCard] Inside setElixir - currentElixir:', currentElixir, 'card.cost:', costToUse);
-      if (currentElixir < costToUse) {
-        console.log('[spawnCard] BLOCKED - Not enough elixir!');
-        return currentElixir;
-      }
-      const newElixir = currentElixir - costToUse;
+  
 
-      if (actualCard.type === 'spell') {
-        // Different spell types have different visuals and timing
-        let spellType = 'fireball_spell';
-        let spellSpeed = 15;
-        let startX = width / 2;
-        let startY = height;
+      // Handle Mirror card - copy the last played card with +1 level
 
-        if (actualCard.id === 'lightning') {
-          // Lightning - Hits 3 highest HP units/towers
-          spellType = 'lightning_bolt';
-          spellSpeed = 100; // Instant
+      let actualCard = card;
 
-          // Find targets
-          const allTargets = [
-            ...(unitsRef.current || []).filter(u => u.isOpponent !== (card.isOpponent || false)),
-            ...(towersRef.current || []).filter(t => t.isOpponent !== (card.isOpponent || false) && t.hp > 0)
-          ];
+      let levelBoost = 0;
 
-          const targetsInRange = allTargets.filter(t => {
-            const dist = Math.sqrt(Math.pow(t.x - x, 2) + Math.pow(t.y - y, 2));
-            return dist <= actualCard.radius;
-          });
+      if (card.id === 'mirror') {
 
-          // Sort by HP descending and take top 3
-          const topTargets = targetsInRange.sort((a, b) => b.hp - a.hp).slice(0, 3);
+        const lastCard = isOpponent ? enemyLastPlayedCardRef.current : lastPlayedCardRef.current;
 
-          if (topTargets.length > 0) {
-            const newProjectiles = topTargets.map((t, index) => ({
-              id: Date.now() + index,
-              x: t.x, // Lightning strikes directly
-              y: t.y - 50, // Start slightly above
-              targetX: t.x,
-              targetY: t.y,
-              speed: 100,
-              damage: actualCard.damage,
-              type: 'lightning_bolt', // Use specific lightning strike visual
-              isSpell: true,
-              stun: 0.5,
-              hit: true,
-              spawnTime: Date.now()
-            }));
+        if (!lastCard) {
 
-            // Apply damage and stun directly for instant feedback (since we mark hit: true)
-            // But the main loop handles hit: true projectiles too?
-            // Actually, hit: true projectiles are filtered out unless we handle them.
-            // Let's use the standard spell logic but push multiple projectiles.
-            // We need to verify if the projectile loop applies damage for all 'hit: true' spells.
-            // Yes, it does (lines 3510+). However, standard logic expects ONE projectile per spell cast.
-            // If we push multiple, it should work fine.
-            setProjectiles(prev => [...prev, ...newProjectiles]);
+          console.log('[spawnCard] No card to mirror!');
 
-            // Manually apply damage/stun here to ensure it hits exactly these targets
-            // The loop might re-find targets in radius which isn't what we want for Lightning (specific targets).
-            // So: Apply state changes immediately.
+          return;
 
-            setUnits(prev => prev.map(u => {
-              if (topTargets.some(t => t.id === u.id)) {
-                return {
-                  ...u,
-                  hp: u.hp - actualCard.damage,
-                  stunUntil: Date.now() + 500,
-                  wasStunned: true
-                };
-              }
-              return u;
-            }));
-
-            setTowers(prev => prev.map(t => {
-              if (topTargets.some(target => target.id === t.id)) {
-                return { ...t, hp: t.hp - actualCard.damage };
-              }
-              return t;
-            }));
-          }
-
-        } else if (actualCard.id === 'zap') {
-          // Zap is instant with lightning
-          spellType = 'zap_spell';
-          spellSpeed = 100; // Very fast (instant)
-        } else if (actualCard.id === 'arrows') {
-          // Arrows fall from sky with volley visual
-          spellType = 'arrows_spell';
-          startY = 0; // Start from top of screen
-          spellSpeed = 20;
-        } else if (actualCard.id === 'poison') {
-          // Poison is instant area that stays and ticks damage
-          spellType = 'poison_spell';
-          spellSpeed = 100; // Instant - no travel time
-          startX = x; // Start at target location
-          startY = y;  // Start at target location
-        } else if (actualCard.id === 'rocket') {
-          // Rocket shoots straight up then down on target
-          spellType = 'rocket_spell';
-          startY = height;
-          spellSpeed = 12; // Slower than fireball
-        } else if (actualCard.id === 'goblin_barrel') {
-          // Goblin Barrel - spawns 3 goblins around target after delay
-          spellType = 'goblin_barrel_spell';
-          spellSpeed = 25; // Barrel falls from sky
-          startX = x;
-          startY = 0; // Start from top of screen
-
-          // Create barrel projectile that will spawn goblins on impact
-          const spawnCardId = actualCard.spawns;
-          const spawnCard = CARDS.find(c => c.id === spawnCardId);
-          const spawnCount = actualCard.spawnCount || 3;
-
-          setProjectiles(prev => [...prev, {
-            id: Date.now(),
-            x: startX,
-            y: startY,
-            targetX: x,
-            targetY: y,
-            speed: spellSpeed,
-            damage: 0,
-            radius: actualCard.radius,
-            type: spellType,
-            isSpell: true,
-            hit: false,
-            spawnTime: Date.now(),
-            isGoblinBarrel: true,
-            spawns: spawnCardId,
-            spawnCount: spawnCount,
-            isOpponent: actualCard.isOpponent || false // Explicitly set isOpponent
-          }]);
-        } else if (actualCard.id === 'earthquake') {
-          // Earthquake - instant damage with screen shake
-          spellType = 'earthquake_spell';
-          spellSpeed = 100; // Instant
-
-          setProjectiles(prev => [...prev, {
-            id: Date.now(),
-            x: x, // Start at target (instant)
-            y: y,
-            targetX: x,
-            targetY: y,
-            speed: spellSpeed,
-            damage: actualCard.damage,
-            radius: actualCard.radius,
-            type: spellType,
-            isSpell: true,
-            stun: actualCard.stun || 0,
-            duration: actualCard.duration || 0,
-            hit: true, // Instant - already hit the ground
-            spawnTime: Date.now(),
-            slow: actualCard.slow
-          }]);
-
-          // Trigger screen shake
-          setScreenShake({ intensity: 1.0, duration: 500 });
-        } else if (actualCard.id === 'graveyard') {
-          // Graveyard - spawns skeletons gradually over time
-          spellType = 'graveyard_spell';
-          spellSpeed = 100; // Instant
-
-          const spawnCardId = actualCard.spawns;
-          const spawnCard = CARDS.find(c => c.id === spawnCardId);
-          const spawnCount = actualCard.spawnCount || 15;
-
-          // Create a graveyard zone that spawns skeletons over 4 seconds
-          const newUnit = {
-            id: 'graveyard_' + Date.now(),
-            x: x,
-            y: y,
-            hp: 9999, // Invincible - cannot be destroyed
-            maxHp: 9999,
-            isOpponent: false,
-            speed: 0, // Stationary
-            lane: x < width / 2 ? 'LEFT' : 'RIGHT',
-            lastAttack: 0,
-            spriteId: 'graveyard_zone',
-            type: 'graveyard_zone', // Special type
-            range: 0,
-            damage: 0,
-            attackSpeed: 0,
-            spawns: spawnCardId,
-            spawnRate: 0.5, // Spawn every 0.5 seconds (20 skeletons in 10 seconds)
-            spawnCount: 1, // Spawn 1 skeleton at a time
-            lastSpawn: Date.now(),
-            lifetimeDuration: 10, // Lasts 10 seconds
-            spawnTime: Date.now(),
-            totalToSpawn: 20, // 10s / 0.5s = 20 skeletons
-            spawnedSoFar: 0,
-            isOpponent: false,
-            isZone: true, // Mark as a zone (untargetable by units)
-            radius: actualCard.radius // Set the radius for visual scaling
-          };
-          setUnits(prev => [...prev, newUnit]);
         }
 
-        // For poison, mark it as already hit since it's instant
-        const isPoison = actualCard.id === 'poison';
-        // Skip default projectile creation for Lightning, Goblin Barrel, Graveyard, and Earthquake as we handled them
-        if (actualCard.id !== 'lightning' && actualCard.id !== 'goblin_barrel' && actualCard.id !== 'graveyard' && actualCard.id !== 'earthquake') {
-          const currentTime = Date.now();
-          setProjectiles(prev => [...prev, {
-            id: Date.now(),
-            x: startX,
-            y: startY,
-            targetX: x,
-            targetY: y,
-            speed: spellSpeed,
-            damage: actualCard.damage,
-            radius: actualCard.radius,
-            type: spellType,
-            isSpell: true,
-            stun: actualCard.stun || 0,
-            duration: actualCard.duration || 0,
-            hit: isPoison, // Poison is instant
-            spawnTime: currentTime, // Track when poison was spawned
-            isPoison: isPoison // Mark as poison for special handling
-          }]);
-        }
-      } else {
-        const lane = x < width / 2 ? 'LEFT' : 'RIGHT';
-        const count = actualCard.count || 1;
-        const newUnits = [];
+        levelBoost = (lastCard.level || 11) + 1; // Tournament Standard 11 + 1
 
-        for (let i = 0; i < count; i++) {
-          const offsetX = count > 1 ? (Math.random() * 40 - 20) : 0;
-          const offsetY = count > 1 ? (Math.random() * 40 - 20) : 0;
+        actualCard = { ...lastCard };
 
-          // Three Musketeers special split: 2 to one lane, 1 to the other
-          let unitLane = lane;
-          let spawnX = x + offsetX;
-          let spawnY = y + offsetY;
+        actualCard.cost = lastCard.cost + 1;
 
-          if (actualCard.id === 'three_musketeers' && count === 3) {
-            if (i < 2) {
-              // First 2 go to the dropped lane
-              unitLane = lane;
-              spawnX = x + offsetX;
-              spawnY = y + offsetY;
-            } else {
-              // Third one goes to opposite lane
-              unitLane = lane === 'LEFT' ? 'RIGHT' : 'LEFT';
-              // Spawn on opposite side of the river
-              spawnX = unitLane === 'LEFT' ? 70 + offsetX : width - 70 + offsetX;
-              spawnY = y + offsetY;
+        actualCard.level = levelBoost;
+
+        const levelBonus = 1 + (levelBoost - 11) * 0.1; 
+
+        actualCard.hp = Math.floor(lastCard.hp * levelBonus);
+
+        actualCard.damage = Math.floor(lastCard.damage * levelBonus);
+
+      }
+
+  
+
+      const setTargetElixir = isOpponent ? setEnemyElixir : setElixir;
+
+      const setTargetHand = isOpponent ? setEnemyHand : setHand;
+
+      const setTargetQueue = isOpponent ? setEnemyDeckQueue : setDeckQueue;
+
+      const setTargetNext = isOpponent ? setEnemyNextCard : setNextCard;
+
+      const nextCardToUse = isOpponent ? enemyNextCardRef.current : nextCard;
+
+  
+
+      setTargetElixir(currentElixir => {
+
+        const costToUse = actualCard.cost;
+
+        if (currentElixir < costToUse) return currentElixir;
+
+        const newElixir = currentElixir - costToUse;
+
+  
+
+        if (actualCard.type === 'spell') {
+
+          let spellType = 'fireball_spell';
+
+          let spellSpeed = 15;
+
+          let startX = width / 2;
+
+          let startY = isOpponent ? 0 : height;
+
+  
+
+          if (actualCard.id === 'lightning') {
+
+            spellType = 'lightning_bolt';
+
+            spellSpeed = 100;
+
+            const allTargets = [
+
+              ...(unitsRef.current || []).filter(u => u.isOpponent !== isOpponent),
+
+              ...(towersRef.current || []).filter(t => t.isOpponent !== isOpponent && t.hp > 0)
+
+            ];
+
+            const targetsInRange = allTargets.filter(t => {
+
+              const dist = Math.sqrt(Math.pow(t.x - x, 2) + Math.pow(t.y - y, 2));
+
+              return dist <= actualCard.radius;
+
+            });
+
+            const topTargets = targetsInRange.sort((a, b) => b.hp - a.hp).slice(0, 3);
+
+            if (topTargets.length > 0) {
+
+              const newProjectiles = topTargets.map((t, index) => ({
+
+                id: Date.now() + index,
+
+                x: t.x, y: t.y - 50, targetX: t.x, targetY: t.y,
+
+                speed: 100, damage: actualCard.damage, type: 'lightning_bolt',
+
+                isSpell: true, stun: 0.5, hit: true, spawnTime: Date.now(), isOpponent
+
+              }));
+
+              setProjectiles(prev => [...prev, ...newProjectiles]);
+
+              setUnits(prev => prev.map(u => {
+
+                if (topTargets.some(t => t.id === u.id)) {
+
+                  return { ...u, hp: u.hp - actualCard.damage, stunUntil: Date.now() + 500, wasStunned: true };
+
+                }
+
+                return u;
+
+              }));
+
+              setTowers(prev => prev.map(t => {
+
+                if (topTargets.some(target => target.id === t.id)) {
+
+                  const towerDamage = Math.floor(actualCard.damage * 0.3);
+
+                  return { ...t, hp: t.hp - towerDamage };
+
+                }
+
+                return t;
+
+              }));
+
             }
+
+          } else if (actualCard.id === 'zap') {
+
+            spellType = 'zap_spell';
+
+            spellSpeed = 100;
+
+          } else if (actualCard.id === 'arrows') {
+
+            spellType = 'arrows_spell';
+
+            startY = isOpponent ? 0 : 0;
+
+            spellSpeed = 20;
+
+          } else if (actualCard.id === 'poison') {
+
+            spellType = 'poison_spell';
+
+            spellSpeed = 100;
+
+            startX = x; startY = y;
+
+          } else if (actualCard.id === 'rocket') {
+
+            spellType = 'rocket_spell';
+
+            startY = isOpponent ? 0 : height;
+
+            spellSpeed = 12;
+
+          } else if (actualCard.id === 'goblin_barrel') {
+
+            spellType = 'goblin_barrel_spell';
+
+            spellSpeed = 25;
+
+            startX = x; startY = isOpponent ? 0 : 0;
+
+            setProjectiles(prev => [...prev, {
+
+              id: Date.now(), x: startX, y: startY, targetX: x, targetY: y,
+
+              speed: spellSpeed, damage: 0, radius: actualCard.radius,
+
+              type: spellType, isSpell: true, hit: false, spawnTime: Date.now(),
+
+              isGoblinBarrel: true, spawns: actualCard.spawns, spawnCount: actualCard.spawnCount || 3, isOpponent
+
+            }]);
+
+          } else if (actualCard.id === 'earthquake') {
+
+            spellType = 'earthquake_spell';
+
+            spellSpeed = 100;
+
+            setProjectiles(prev => [...prev, {
+
+              id: Date.now(), x: x, y: y, targetX: x, targetY: y,
+
+              speed: spellSpeed, damage: actualCard.damage, radius: actualCard.radius,
+
+              type: spellType, isSpell: true, stun: actualCard.stun || 0,
+
+              duration: actualCard.duration || 0, hit: true, spawnTime: Date.now(),
+
+              slow: actualCard.slow, isOpponent
+
+            }]);
+
+            setScreenShake({ intensity: 1.0, duration: 500 });
+
+          } else if (actualCard.id === 'graveyard') {
+
+            spellType = 'graveyard_spell';
+
+            spellSpeed = 100;
+
+            setUnits(prev => [...prev, {
+
+              id: 'graveyard_' + Date.now(), x: x, y: y, hp: 9999, maxHp: 9999,
+
+              isOpponent, speed: 0, lane: x < width / 2 ? 'LEFT' : 'RIGHT',
+
+              lastAttack: 0, spriteId: 'graveyard_zone', type: 'graveyard_zone',
+
+              range: 0, damage: 0, attackSpeed: 0, spawns: actualCard.spawns,
+
+              spawnRate: 0.5, spawnCount: 1, lastSpawn: Date.now(), lifetimeDuration: 10,
+
+              spawnTime: Date.now(), totalToSpawn: 20, spawnedSoFar: 0, isZone: true, radius: actualCard.radius
+
+            }]);
+
           }
 
-          newUnits.push({
-            id: Date.now() + i,
-            x: spawnX,
-            y: spawnY,
-            hp: actualCard.hp,
-            maxHp: actualCard.hp,
-            isOpponent: false,
-            speed: actualCard.speed,
-            lane: unitLane,
-            lastAttack: 0,
-            spriteId: actualCard.id,
-            type: actualCard.type,
-            range: actualCard.range,
-            damage: actualCard.damage,
-            attackSpeed: actualCard.attackSpeed,
-            projectile: actualCard.projectile,
-            targetType: actualCard.targetType,
-            // Special properties
-            charge: actualCard.charge ? {
-              active: false,
-              distance: 0,      // Distance traveled so far
-              threshold: 2      // Charge activates after 2 tiles
-            } : undefined,
-            hidden: actualCard.hidden ? { active: true, visibleHp: actualCard.hp } : undefined,
-            splash: actualCard.splash || false,
-            frontalSplash: actualCard.frontalSplash || false,
-            spawnDamage: actualCard.spawnDamage || undefined,
-            spawns: actualCard.spawns || undefined,
-            spawnRate: actualCard.spawnRate || undefined,
-            spawnCount: actualCard.spawnCount || undefined,  // Custom spawn count (e.g., Tombstone: 2, Witch: 3)
-            deathSpawnCount: actualCard.deathSpawnCount || undefined,  // Units to spawn on death (Tombstone: 4, Lava Hound: 6)
-            deathSpawns: actualCard.deathSpawns || undefined,  // What unit type to spawn on death (e.g., 'lava_pups')
-            lastSpawn: actualCard.spawnRate ? Date.now() : 0,  // Initialize to now for buildings with spawnRate
-            lifetimeDuration: actualCard.lifetime || undefined,  // Store lifetime duration in seconds
-            spawnTime: Date.now(),  // Track when building was spawned for HP depreciation
-            spawnDelay: actualCard.spawnDelay || 0,  // Spawn delay before unit can move/attack (Golem: 1000ms, Golemite: 500ms)
-            maxHp: actualCard.hp,  // Store initial max HP for depreciation calculation
-            jumps: actualCard.jumps || false,  // Hog Rider can jump over river
-            slow: actualCard.slow || 0,
-            slowUntil: 0,
-            stunUntil: 0,
-            baseDamage: actualCard.damage,
-            lockedTarget: null,  // Once locked, unit won't switch targets
-            wasPushed: false,    // Track if unit was pushed back (unlocks target)
-            wasStunned: false,   // Track if unit was stunned (unlocks target when stun ends)
-            kamikaze: actualCard.kamikaze || false,  // Spirit cards die when they attack
-            chain: actualCard.chain || 0,  // Electro Spirit chain count
-            healsOnAttack: actualCard.healsOnAttack || 0,  // Heal Spirit/Battle Healer healing amount
-            healRadius: actualCard.healRadius || 0,  // Heal Spirit/Battle Healer healing radius
-            passiveHeal: actualCard.passiveHeal || 0, // Battle Healer passive regeneration
-            deathRage: actualCard.deathRage || false,  // Lumberjack rage on death
-            generatesElixir: actualCard.generatesElixir || false,  // Elixir Collector generates elixir
-            elixirGenerationTime: 0,  // Track last elixir generation time
-            // Shield properties (Guards, Dark Prince)
-            hasShield: actualCard.hasShield || false,
-            currentShieldHp: actualCard.shieldHp || 0,
-            shieldHp: actualCard.shieldHp || 0,
-            deathDamage: actualCard.deathDamage || 0,
-            deathRadius: actualCard.deathRadius || 0,
-            deathSlow: actualCard.deathSlow || 0,
-            // New card properties
-            dashInvincible: actualCard.dashInvincible || false,  // Bandit dash invincibility
-            dashRange: actualCard.dashRange || 80,  // Bandit dash activation range
-            isDashing: false,  // Track if Bandit is currently dashing
-            dashEndTime: 0,  // When Bandit dash ends
-            damageRamp: actualCard.damageRamp || false,  // Inferno Tower damage ramp
-            currentDamageBonus: 0,  // Track Inferno Tower damage ramp
-            lastDamageRampTime: Date.now(),  // Track when damage ramp started
-            lastTargetId: null,  // Track last target for Inferno Tower damage ramp reset
-            bombDrops: actualCard.bombDrops || false,  // Balloon bomb drops
-            lastBombDrop: Date.now(),  // Track last bomb drop time
-            shotgunSpread: actualCard.shotgunSpread || false,  // Hunter shotgun spread
-            pierce: actualCard.pierce || false,  // Magic Archer pierce
-            givesOpponentElixir: actualCard.givesOpponentElixir || false  // Elixir Golem return
-          });
-        }
-        setUnits(prev => [...(prev || []), ...newUnits]);
+  
 
-        // Electro Wizard spawn zap & Mega Knight Spawn Knockback
-        if (actualCard.id === 'electro_wizard' || actualCard.id === 'mega_knight') {
-          setUnits(prevUnits => {
+          const isPoison = actualCard.id === 'poison';
+
+          if (actualCard.id !== 'lightning' && actualCard.id !== 'goblin_barrel' && actualCard.id !== 'graveyard' && actualCard.id !== 'earthquake') {
+
+            setProjectiles(prev => [...prev, {
+
+              id: Date.now(), x: startX, y: startY, targetX: x, targetY: y,
+
+              speed: spellSpeed, damage: actualCard.damage, radius: actualCard.radius,
+
+              type: spellType, isSpell: true, stun: actualCard.stun || 0,
+
+              duration: actualCard.duration || 0, hit: isPoison, spawnTime: Date.now(),
+
+              isPoison, isOpponent
+
+            }]);
+
+          }
+
+        } else {
+
+          const lane = x < width / 2 ? 'LEFT' : 'RIGHT';
+
+          const count = actualCard.count || 1;
+
+          const newUnits = [];
+
+          for (let i = 0; i < count; i++) {
+
+            const offsetX = count > 1 ? (Math.random() * 40 - 20) : 0;
+
+            const offsetY = count > 1 ? (Math.random() * 40 - 20) : 0;
+
+            let unitLane = lane;
+
+            let spawnX = x + offsetX;
+
+            let spawnY = y + offsetY;
+
+            if (actualCard.id === 'three_musketeers' && count === 3) {
+
+              if (i < 2) unitLane = lane;
+
+              else {
+
+                unitLane = lane === 'LEFT' ? 'RIGHT' : 'LEFT';
+
+                spawnX = unitLane === 'LEFT' ? 70 + offsetX : width - 70 + offsetX;
+
+              }
+
+            }
+
+            newUnits.push({
+
+              id: Date.now() + i + (isOpponent ? 10000 : 0),
+
+              x: spawnX, y: spawnY, hp: actualCard.hp, maxHp: actualCard.hp,
+
+              isOpponent, speed: actualCard.speed, lane: unitLane,
+
+              lastAttack: 0, spriteId: actualCard.id, type: actualCard.type,
+
+              range: actualCard.range, damage: actualCard.damage,
+
+              attackSpeed: actualCard.attackSpeed, projectile: actualCard.projectile,
+
+              targetType: actualCard.targetType,
+
+              charge: actualCard.charge ? { active: false, distance: 0, threshold: 2 } : undefined,
+
+              hidden: actualCard.hidden ? { active: true, visibleHp: actualCard.hp } : undefined,
+
+              splash: actualCard.splash || false,
+
+              frontalSplash: actualCard.frontalSplash || false,
+
+              spawnDamage: actualCard.spawnDamage || undefined,
+
+              spawns: actualCard.spawns || undefined,
+
+              spawnRate: actualCard.spawnRate || undefined,
+
+              spawnCount: actualCard.spawnCount || undefined,
+
+              deathSpawnCount: actualCard.deathSpawnCount || undefined,
+
+              deathSpawns: actualCard.deathSpawns || undefined,
+
+              lastSpawn: actualCard.spawnRate ? Date.now() : 0,
+
+              lifetimeDuration: actualCard.lifetime || undefined,
+
+              spawnTime: Date.now(),
+
+              spawnDelay: actualCard.spawnDelay || 0,
+
+              jumps: actualCard.jumps || false,
+
+              slow: actualCard.slow || 0,
+
+              slowUntil: 0, stunUntil: 0, baseDamage: actualCard.damage,
+
+              lockedTarget: null, wasPushed: false, wasStunned: false,
+
+              kamikaze: actualCard.kamikaze || false,
+
+              chain: actualCard.chain || 0,
+
+              healsOnAttack: actualCard.healsOnAttack || 0,
+
+              healRadius: actualCard.healRadius || 0,
+
+              passiveHeal: actualCard.passiveHeal || 0,
+
+              deathRage: actualCard.deathRage || false,
+
+              generatesElixir: actualCard.generatesElixir || false,
+
+              elixirGenerationTime: 0,
+
+              hasShield: actualCard.hasShield || false,
+
+              currentShieldHp: actualCard.shieldHp || 0,
+
+              shieldHp: actualCard.shieldHp || 0,
+
+              deathDamage: actualCard.deathDamage || 0,
+
+              deathRadius: actualCard.deathRadius || 0,
+
+              deathSlow: actualCard.deathSlow || 0,
+
+              dashInvincible: actualCard.dashInvincible || false,
+
+              dashRange: actualCard.dashRange || 80,
+
+              isDashing: false, dashEndTime: 0,
+
+              damageRamp: actualCard.damageRamp || false,
+
+              currentDamageBonus: 0, lastDamageRampTime: Date.now(),
+
+              lastTargetId: null, bombDrops: actualCard.bombDrops || false,
+
+              lastBombDrop: Date.now(), shotgunSpread: actualCard.shotgunSpread || false,
+
+              pierce: actualCard.pierce || false,
+
+              givesOpponentElixir: actualCard.givesOpponentElixir || false
+
+            });
+
+          }
+
+          setUnits(prev => [...(prev || []), ...newUnits]);
+
+          if (actualCard.id === 'electro_wizard' || actualCard.id === 'mega_knight') {
+
             const spawnZapRange = actualCard.id === 'mega_knight' ? 80 : 60;
-            const spawnZapDamage = actualCard.spawnDamage || actualCard.damage;
-            const stunDuration = actualCard.stun || (actualCard.id === 'mega_knight' ? 0 : 0.5);
-            const knockbackForce = actualCard.id === 'mega_knight' ? 40 : 0; // Mega Knight knocks back
 
-            return prevUnits.map(u => {
-              // Only affect enemy units within range
-              if (!u.isOpponent) return u; // Skip friendly units
+            const spawnZapDamage = actualCard.spawnDamage || actualCard.damage;
+
+            const stunDuration = actualCard.stun || (actualCard.id === 'mega_knight' ? 0 : 0.5);
+
+            const knockbackForce = actualCard.id === 'mega_knight' ? 40 : 0;
+
+            setUnits(prevUnits => prevUnits.map(u => {
+
+              if (u.isOpponent === isOpponent) return u;
 
               const dist = Math.sqrt(Math.pow(u.x - x, 2) + Math.pow(u.y - y, 2));
+
               if (dist <= spawnZapRange) {
-                // Visual effect handled by adding a projectile or just implied?
-                // For E-Wiz we added a projectile. For MK we might want one too or just a splash event.
 
                 if (actualCard.id === 'electro_wizard') {
+
                   setProjectiles(prevProjs => [...prevProjs, {
-                    id: Date.now() + Math.random(),
-                    x: x,
-                    y: y,
-                    targetX: u.x,
-                    targetY: u.y,
-                    speed: 50,
-                    damage: 0, // Damage applied below manually
-                    type: 'electric_bolt',
-                    stun: stunDuration,
-                    isSpell: true,
-                    hit: true,
-                    spawnZap: true
+
+                    id: Date.now() + Math.random(), x, y, targetX: u.x, targetY: u.y,
+
+                    speed: 50, damage: 0, type: 'electric_bolt', stun: stunDuration,
+
+                    isSpell: true, hit: true, spawnZap: true, isOpponent
+
                   }]);
+
                 }
 
-                // Apply damage, stun, and KNOCKBACK
-                let newX = u.x;
-                let newY = u.y;
+                let newX = u.x; let newY = u.y;
 
                 if (knockbackForce > 0) {
+
                   const angle = Math.atan2(u.y - y, u.x - x);
+
                   newX += Math.cos(angle) * knockbackForce;
+
                   newY += Math.sin(angle) * knockbackForce;
-                  // Boundary checks
+
                   newX = Math.max(10, Math.min(width - 10, newX));
+
                   newY = Math.max(10, Math.min(height - 10, newY));
+
                 }
 
-                return {
-                  ...u,
-                  x: newX,
-                  y: newY,
-                  hp: u.hp - spawnZapDamage,
-                  stunUntil: stunDuration > 0 ? Date.now() + (stunDuration * 1000) : u.stunUntil,
-                  wasStunned: stunDuration > 0,
-                  wasPushed: knockbackForce > 0
-                };
+                return { ...u, x: newX, y: newY, hp: u.hp - spawnZapDamage, stunUntil: stunDuration > 0 ? Date.now() + (stunDuration * 1000) : u.stunUntil, wasStunned: stunDuration > 0, wasPushed: knockbackForce > 0 };
+
               }
+
               return u;
-            });
-          });
-        }
-      }
 
-      // Track the last played card (but NOT when playing Mirror itself)
-      if (card.id !== 'mirror') {
-        setLastPlayedCard(card);
-      }
+            }));
 
-      // Cycle cards - use findIndex + splice to remove only first occurrence
-      // For Mirror, we remove Mirror from hand, not the copied card
-      const cardToCycle = card;
-      setHand(currentHand => {
-        const newHand = [...currentHand];
-        const cardIndex = newHand.findIndex(c => c.id === cardToCycle.id);
-        if (cardIndex !== -1) {
-          newHand.splice(cardIndex, 1);
+          }
+
         }
-        newHand.push(nextCard);
-        console.log('[spawnCard] Card cycled successfully - removed', cardToCycle.name, 'from hand, added', nextCard.name);
-        return newHand;
+
+  
+
+        if (!isOpponent) setLastPlayedCard(actualCard);
+
+        else setEnemyLastPlayedCard(actualCard);
+
+  
+
+        setTargetHand(currentHand => {
+
+          const newHand = [...currentHand];
+
+          const cardIndex = newHand.findIndex(c => c.id === card.id);
+
+          if (cardIndex !== -1) newHand.splice(cardIndex, 1);
+
+          newHand.push(nextCardToUse);
+
+          return newHand;
+
+        });
+
+  
+
+        setTargetQueue(currentQueue => {
+
+          const newQueue = [...currentQueue];
+
+          const newNext = newQueue.shift();
+
+          if (card.id !== 'mirror') newQueue.push(card);
+
+          setTargetNext(newNext);
+
+          return newQueue;
+
+        });
+
+  
+
+        return newElixir;
+
       });
 
-      setDeckQueue(currentQueue => {
-        const newQueue = [...currentQueue];
-        const newNext = newQueue.shift();
-        // Don't add Mirror to deck queue - Mirror copies cards, it doesn't get recycled
-        if (cardToCycle.id !== 'mirror') {
-          newQueue.push(cardToCycle);
-        }
-        setNextCard(newNext);
-        console.log('[spawnCard] Deck updated - new next card:', newNext?.name);
-        return newQueue;
-      });
-
-      console.log('[spawnCard] SUCCESS -', actualCard.name, 'spawned, elixir:', newElixir);
-      return newElixir;
-    });
-  };
+    };
 
   const spawnTestEnemy = () => {
     if (gameOver) return;
@@ -7464,6 +7226,7 @@ export default function App() {
                   damage: spawnCard.damage,
                   attackSpeed: spawnCard.attackSpeed,
                   projectile: spawnCard.projectile,
+                  targetType: spawnCard.targetType,
                   lockedTarget: null,
                   wasPushed: false,
                   wasStunned: false,
@@ -7475,20 +7238,27 @@ export default function App() {
                   frontalSplash: spawnCard.frontalSplash || false,
                   hasShield: spawnCard.hasShield || false,
                   currentShieldHp: spawnCard.shieldHp || 0,
-                  shieldHp: spawnCard.shieldHp || 0
+                  shieldHp: spawnCard.shieldHp || 0,
+                  deathSpawns: spawnCard.deathSpawns,
+                  deathSpawnCount: spawnCard.deathSpawnCount,
+                  deathDamage: spawnCard.deathDamage,
+                  deathRadius: spawnCard.deathRadius,
+                  deathSlow: spawnCard.deathSlow,
+                  givesOpponentElixir: spawnCard.givesOpponentElixir || false,
+                  bombDrops: spawnCard.bombDrops || false
                 });
               }
             }
           }
 
           // Add death visual effects based on unit type
-          if (deadUnit.spriteId === 'golem' || deadUnit.spriteId === 'golemite') {
+          if (deadUnit.spriteId === 'golem' || deadUnit.spriteId === 'golemite' || deadUnit.spriteId === 'elixir_golem' || deadUnit.spriteId === 'elixir_golemite') {
             setVisualEffects(prev => [...prev, {
               id: Date.now() + Math.random(),
               type: 'golem_death',
               x: deadUnit.x,
               y: deadUnit.y,
-              radius: 80,
+              radius: deadUnit.spriteId.includes('elixir') ? 60 : 80,
               startTime: Date.now(),
               duration: 1000
             }]);
@@ -7936,16 +7706,16 @@ export default function App() {
                     }
                     return u;
                   });
-                  // Deal damage to towers in radius
-                  nextTowers = nextTowers.map(t => {
-                    const isEnemy = t.isOpponent !== (h.isOpponent || false);
-                    const dist = Math.sqrt(Math.pow(t.x - h.x, 2) + Math.pow(t.y - h.y, 2));
-                    if (isEnemy && dist < h.radius + 30) {
-                      return { ...t, hp: t.hp - h.damage };
-                    }
-                    return t;
-                  });
-                  // Update last tick time by modifying the projectile
+                                      // Deal damage to towers in radius
+                                      nextTowers = nextTowers.map(t => {
+                                        const isEnemy = t.isOpponent !== (h.isOpponent || false);
+                                        const dist = Math.sqrt(Math.pow(t.x - h.x, 2) + Math.pow(t.y - h.y, 2));
+                                        if (isEnemy && dist < h.radius + 30) {
+                                          const towerDamage = Math.floor(h.damage * 0.3); // 30% Crown Tower damage
+                                          return { ...t, hp: t.hp - towerDamage };
+                                        }
+                                        return t;
+                                      });                  // Update last tick time by modifying the projectile
                   h.lastDamageTick = now;
                 }
               }
@@ -8110,22 +7880,21 @@ export default function App() {
                 }
                 return u;
               });
-              nextTowers = nextTowers.map(t => {
-                const isEnemy = t.isOpponent !== (h.isOpponent || false);
-                const dist = Math.sqrt(Math.pow(t.x - h.targetX, 2) + Math.pow(t.y - h.targetY, 2));
-                if (isEnemy && dist < h.radius + 30) {
-                  let damageToDeal = h.damage;
-
-                  // Earthquake: 3.5x damage to buildings (towers are buildings)
-                  if (h.type === 'earthquake_spell') {
-                    damageToDeal = Math.floor(h.damage * 3.5);
-                  }
-
-                  return { ...t, hp: t.hp - damageToDeal };
-                }
-                return t;
-              });
-
+                                nextTowers = nextTowers.map(t => {
+                                  const isEnemy = t.isOpponent !== (h.isOpponent || false);
+                                  const dist = Math.sqrt(Math.pow(t.x - h.targetX, 2) + Math.pow(t.y - h.targetY, 2));
+                                  if (isEnemy && dist < h.radius + 30) {
+                                    let damageToDeal = Math.floor(h.damage * 0.3); // 30% Crown Tower damage
+                                    
+                                    // Earthquake exception: higher relative tower damage
+                                    if (h.type === 'earthquake_spell') {
+                                      damageToDeal = Math.floor(h.damage * 0.35);
+                                    }
+                                    
+                                    return { ...t, hp: t.hp - damageToDeal };
+                                  }
+                                  return t;
+                                });
               // Create visual effects for spells
               if (h.type === 'fireball_spell') {
                 setVisualEffects(prev => [...prev, {
@@ -8321,71 +8090,76 @@ export default function App() {
               });
             }
 
-            // Also damage towers (primary target)
-            if (h.targetId < 100) {
-              const tIndex = nextTowers.findIndex(t => t.id === h.targetId);
-              if (tIndex !== -1) {
-                const tower = nextTowers[tIndex];
-                let updatedTower = { ...tower, hp: tower.hp - h.damage };
-
-                // Tower hit visual effect for significant damage
-                if (h.damage > 50) {
-                  setVisualEffects(prev => [...prev, {
-                    id: Date.now() + Math.random(),
-                    type: 'tower_hit',
-                    x: tower.x,
-                    y: tower.y,
-                    radius: 40,
-                    startTime: Date.now(),
-                    duration: 200
-                  }]);
-                }
-
-                // Apply stun effect (Electro Wizard) to towers
-                if (h.stun && h.stun > 0) {
-                  updatedTower.stunUntil = now + (h.stun * 1000);
-                }
-
-                // Apply slow effect (Ice Wizard) to towers
-                if (h.slow && h.slow > 0) {
-                  updatedTower.slowUntil = now + 2000;
-                  updatedTower.slowAmount = h.slow;
-                }
-
-                nextTowers[tIndex] = updatedTower;
-              }
-
-              // Apply splash damage to OTHER towers (not primary target)
-              if (h.splash) {
-                const splashRadius = h.splashRadius || 50;
-                nextTowers = nextTowers.map(tower => {
-                  if (tower.id !== h.targetId && tower.hp > 0) {
-                    const isEnemy = h.isOpponent !== undefined ? !h.isOpponent : tower.isOpponent;
-                    if (isEnemy) {
-                      const dist = Math.sqrt(Math.pow(tower.x - hitX, 2) + Math.pow(tower.y - hitY, 2));
-                      if (dist <= splashRadius + 30) { // +30 for tower size
-                        let updatedTower = { ...tower, hp: tower.hp - Math.floor(h.damage * 0.5) };
-
-                        // Apply stun effect to towers
-                        if (h.stun && h.stun > 0) {
-                          updatedTower.stunUntil = now + (h.stun * 1000);
-                        }
-
-                        // Apply slow effect to towers
-                        if (h.slow && h.slow > 0) {
-                          updatedTower.slowUntil = now + 2000;
-                          updatedTower.slowAmount = h.slow;
-                        }
-
-                        return updatedTower;
-                      }
-                    }
-                  }
-                  return tower;
-                });
-              }
-            }
-          }
+                            // Also damage towers (primary target)
+                            if (h.targetId < 100) {
+                              const tIndex = nextTowers.findIndex(t => t.id === h.targetId);
+                              if (tIndex !== -1) {
+                                const tower = nextTowers[tIndex];
+                                let damageToDeal = h.damage;
+                                if (h.isSpell) damageToDeal = Math.floor(damageToDeal * 0.3); // 30% for spells
+                                
+                                let updatedTower = { ...tower, hp: tower.hp - damageToDeal };
+            
+                                // Tower hit visual effect for significant damage
+                                if (damageToDeal > 15) {
+                                  setVisualEffects(prev => [...prev, {
+                                    id: Date.now() + Math.random(),
+                                    type: 'tower_hit',
+                                    x: tower.x,
+                                    y: tower.y,
+                                    radius: 40,
+                                    startTime: Date.now(),
+                                    duration: 200
+                                  }]);
+                                }
+            
+                                // Apply stun effect (Electro Wizard) to towers
+                                if (h.stun && h.stun > 0) {
+                                  updatedTower.stunUntil = now + (h.stun * 1000);
+                                }
+            
+                                // Apply slow effect (Ice Wizard) to towers
+                                if (h.slow && h.slow > 0) {
+                                  updatedTower.slowUntil = now + 2000;
+                                  updatedTower.slowAmount = h.slow;
+                                }
+            
+                                nextTowers[tIndex] = updatedTower;
+                              }
+            
+                              // Apply splash damage to OTHER towers (not primary target)
+                              if (h.splash) {
+                                const splashRadius = h.splashRadius || 50;
+                                nextTowers = nextTowers.map(tower => {
+                                  if (tower.id !== h.targetId && tower.hp > 0) {
+                                    const isEnemy = h.isOpponent !== undefined ? !h.isOpponent : tower.isOpponent;
+                                    if (isEnemy) {
+                                      const dist = Math.sqrt(Math.pow(tower.x - hitX, 2) + Math.pow(tower.y - hitY, 2));
+                                      if (dist <= splashRadius + 30) { // +30 for tower size
+                                        let damageToDeal = Math.floor(h.damage * 0.5);
+                                        if (h.isSpell) damageToDeal = Math.floor(damageToDeal * 0.3); // 30% reduction for spells
+                                        
+                                        let updatedTower = { ...tower, hp: tower.hp - damageToDeal };
+            
+                                        // Apply stun effect to towers
+                                        if (h.stun && h.stun > 0) {
+                                          updatedTower.stunUntil = now + (h.stun * 1000);
+                                        }
+            
+                                        // Apply slow effect to towers
+                                        if (h.slow && h.slow > 0) {
+                                          updatedTower.slowUntil = now + 2000;
+                                          updatedTower.slowAmount = h.slow;
+                                        }
+            
+                                        return updatedTower;
+                                      }
+                                    }
+                                  }
+                                  return tower;
+                                });
+                              }
+                            }          }
         });
 
         // Remove hit projectiles, but keep poison and visual-only projectiles
@@ -8563,248 +8337,99 @@ export default function App() {
       const allUnits = unitsRef.current || [];
       const playerUnits = allUnits.filter(u => !u.isOpponent && u.hp > 0);
       const enemyUnits = allUnits.filter(u => u.isOpponent && u.hp > 0);
+      const enemyTowers = towersRef.current.filter(t => t.isOpponent && t.hp > 0);
+      const playerTowers = towersRef.current.filter(t => !t.isOpponent && t.hp > 0);
 
-      if (!currentHand.length) return; // Skip if no hand
+      if (!currentHand.length) return;
 
-      console.log('[Enemy AI] Thinking - Elixir:', currentElixir, 'Hand:', currentHand.map(c => c.name), 'Player units:', playerUnits.length);
+      // --- DECK STRATEGY SETTINGS ---
+      const deckType = enemyDeckIndex; // 0: Hog, 1: Bait, 2: BridgeSpam, 3: Golem, 4: Giant
+      let elixirThreshold = 5; // Default: play cards at 5 elixir
+      
+      if (deckType === 3) elixirThreshold = 9.5; // Golem AI waits for max elixir
+      if (deckType === 2) elixirThreshold = 7;   // Bridge Spam waits for decent elixir
+      if (deckType === 0) elixirThreshold = 4;   // Hog Cycle plays fast
 
-      // SMART CARD SELECTION
+      // Always defend if under attack
+      const isUnderAttack = playerUnits.some(u => u.y < height / 2 + 100);
+      if (isUnderAttack) elixirThreshold = Math.min(elixirThreshold, 3);
+
+      if (currentElixir < elixirThreshold) return;
+
+      // --- CARD SELECTION ---
       let cardToPlay = null;
-      let cardIndex = -1;
+      let targetX = width / 2;
+      let targetY = 100;
 
-      // Priority 1: Counter swarm units with spells or splash
-      const swarmUnits = playerUnits.filter(u => (u.spriteId === 'skeleton_army' || u.spriteId === 'minions' || u.spriteId === 'minion_horde' || u.spriteId === 'spear_goblins' || u.spriteId === 'barbarians' || u.spriteId === 'skeletons') && u.hp > 0);
+      // 1. Spell Countering (Reactive)
+      const swarmUnits = playerUnits.filter(u => ['skeleton_army', 'minions', 'minion_horde', 'skeletons', 'bats'].includes(u.spriteId));
       if (swarmUnits.length >= 3) {
-        // Look for spells first (arrows, zap, fireball)
-        const spellCard = currentHand.findIndex(c => c.type === 'spell' && c.cost <= currentElixir && (c.id === 'arrows' || c.id === 'zap' || c.id === 'fireball'));
-        if (spellCard !== -1) {
-          cardToPlay = currentHand[spellCard];
-          cardIndex = spellCard;
-          console.log('[Enemy AI] COUNTER: Using spell on swarm');
-        } else {
-          // Look for splash units (Valkyrie, Wizard, Baby Dragon)
-          const splashCard = currentHand.findIndex(c => c.splash && c.cost <= currentElixir && c.type !== 'spell');
-          if (splashCard !== -1) {
-            cardToPlay = currentHand[splashCard];
-            cardIndex = splashCard;
-            console.log('[Enemy AI] COUNTER: Using splash on swarm');
+        const spellIdx = currentHand.findIndex(c => c.type === 'spell' && ['arrows', 'zap', 'fireball', 'poison'].includes(c.id));
+        if (spellIdx !== -1) {
+          cardToPlay = currentHand[spellIdx];
+          const target = swarmUnits[Math.floor(swarmUnits.length / 2)];
+          targetX = target.x; targetY = target.y;
+        }
+      }
+
+      // 2. Win Condition / Deck Strategy (Proactive)
+      if (!cardToPlay) {
+        if (deckType === 3 && currentElixir >= 9.5) {
+          // Golem: Spawn in back
+          const golemIdx = currentHand.findIndex(c => c.id === 'golem');
+          if (golemIdx !== -1) {
+            cardToPlay = currentHand[golemIdx];
+            targetX = Math.random() < 0.5 ? 70 : width - 70;
+            targetY = 50; // Deep back
+          }
+        } else if (deckType === 0) {
+          // Hog: Play at bridge
+          const hogIdx = currentHand.findIndex(c => c.id === 'hog_rider');
+          if (hogIdx !== -1) {
+            cardToPlay = currentHand[hogIdx];
+            targetX = Math.random() < 0.5 ? 95 : width - 95;
+            targetY = height / 2 - 40; // Bridge
+          }
+        } else if (deckType === 1) {
+          // Bait: Goblin Barrel on tower
+          const barrelIdx = currentHand.findIndex(c => c.id === 'goblin_barrel');
+          if (barrelIdx !== -1 && playerTowers.length > 0) {
+            cardToPlay = currentHand[barrelIdx];
+            const targetTower = playerTowers[Math.floor(Math.random() * playerTowers.length)];
+            targetX = targetTower.x; targetY = targetTower.y;
           }
         }
       }
 
-      // Priority 2: Counter buildings with building-targeting units
-      const playerBuildings = playerUnits.filter(u => u.type === 'building' && u.hp > 0);
-      if (playerBuildings.length > 0 && !cardToPlay) {
-        const buildingKiller = currentHand.findIndex(c => c.targetType === 'buildings' && c.cost <= currentElixir);
-        if (buildingKiller !== -1) {
-          cardToPlay = currentHand[buildingKiller];
-          cardIndex = buildingKiller;
-          console.log('[Enemy AI] COUNTER: Targeting buildings');
-        }
-      }
-
-      // Priority 3: Save elixir for big pushes in double elixir
-      const shouldSaveForBigPush = isDoubleElixir && currentElixir < 7 && currentHand.some(c => c.cost >= 5);
-      if (!shouldSaveForBigPush && !cardToPlay) {
-        // Priority 4: Tank + support combo (if we have many units)
-        if (enemyUnits.length >= 2 && currentElixir >= 5) {
-          const bigCard = currentHand.findIndex(c => c.cost >= 4 && c.cost <= currentElixir && (c.hp > 1000 || c.damage > 150));
-          if (bigCard !== -1) {
-            cardToPlay = currentHand[bigCard];
-            cardIndex = bigCard;
-            console.log('[Enemy AI] COMBO: Adding to push');
-          }
-        }
-
-        // Priority 5: Play best affordable card based on game state
-        if (!cardToPlay) {
-          const affordableCards = currentHand.map((card, idx) => ({ card, idx, priority: 0 }))
-            .filter(({ card }) => card.cost <= currentElixir);
-
-          if (affordableCards.length > 0) {
-            // Score each card
-            affordableCards.forEach(({ card, idx }) => {
-              // Prefer high HP tanks when we have few units
-              if (enemyUnits.length < 2 && card.hp > 1000) card.priority += 50;
-
-              // Prefer splash damage when player has many units
-              if (playerUnits.length >= 2 && card.splash) card.priority += 40;
-
-              // Prefer high damage units when player has low HP units
-              if (playerUnits.some(u => u.hp < 300) && card.damage > 100) card.priority += 30;
-
-              // Prefer ranged units when we're ahead on units
-              if (enemyUnits.length > playerUnits.length && card.range > 50) card.priority += 20;
-
-              // Prefer expensive cards in double elixir
-              if (isDoubleElixir && card.cost >= 5) card.priority += 25;
-
-              // Random factor for variety
-              card.priority += Math.random() * 10;
-            });
-
-            // Sort by priority and pick best
-            affordableCards.sort((a, b) => b.priority - a.priority);
-            cardToPlay = affordableCards[0].card;
-            cardIndex = affordableCards[0].idx;
-            console.log('[Enemy AI] BEST CARD:', cardToPlay.name, 'priority:', Math.floor(affordableCards[0].priority));
-          }
-        }
-      }
-
-      if (cardToPlay && cardIndex !== -1) {
-        const card = cardToPlay;
-
-        // SMART POSITIONING
-        let targetX, targetY;
-        const lane = Math.random() < 0.5 ? 'LEFT' : 'RIGHT';
-
-        if (card.type === 'spell') {
-          // Cast spell strategically
-          if (swarmUnits.length >= 3 && card.id !== 'poison') {
-            // Target spell at swarm center
-            const avgX = swarmUnits.reduce((sum, u) => sum + u.x, 0) / swarmUnits.length;
-            const avgY = swarmUnits.reduce((sum, u) => sum + u.y, 0) / swarmUnits.length;
-            targetX = avgX;
-            targetY = avgY;
-            console.log('[Enemy AI] SPELL: Targeting swarm at', targetX, targetY);
-          } else if (card.id === 'poison' && playerUnits.length > 0) {
-            // Poison targets unit clusters
-            const avgX = playerUnits.reduce((sum, u) => sum + u.x, 0) / playerUnits.length;
-            const avgY = playerUnits.reduce((sum, u) => sum + u.y, 0) / playerUnits.length;
-            targetX = avgX;
-            targetY = avgY;
-            console.log('[Enemy AI] SPELL: Poisoning cluster');
-          } else if (playerBuildings.length > 0) {
-            // Target buildings
-            const target = playerBuildings[0];
-            targetX = target.x;
-            targetY = target.y;
-            console.log('[Enemy AI] SPELL: Targeting building');
+      // 3. Fallback: Defend or Cycle
+      if (!cardToPlay) {
+        // Find best affordable card
+        const affordable = currentHand.filter(c => c.cost <= currentElixir);
+        if (affordable.length > 0) {
+          // Sort: prefer cheap cards if defending, expensive if building push
+          affordable.sort((a, b) => isUnderAttack ? (a.cost - b.cost) : (b.cost - a.cost));
+          cardToPlay = affordable[0];
+          
+          if (isUnderAttack) {
+            // Deploy defensively
+            targetX = playerUnits[0].x + (Math.random() * 20 - 10);
+            targetY = 150; // In front of towers
           } else {
-            // Random spell placement
-            targetX = Math.random() * (width - 100) + 50;
-            targetY = height - 100 - Math.random() * 150;
+            // Deploy at bridge or back based on type
+            const isTank = cardToPlay.hp > 1500;
+            targetX = Math.random() < 0.5 ? 70 : width - 70;
+            targetY = isTank ? 50 : 120;
           }
-
-          const spellType = card.id === 'zap' ? 'zap_spell' :
-            card.id === 'arrows' ? 'arrows_spell' :
-              card.id === 'poison' ? 'poison_spell' : 'fireball_spell';
-
-          setProjectiles(prev => [...prev, {
-            id: Date.now(),
-            x: card.id === 'poison' ? targetX : width / 2,
-            y: card.id === 'poison' ? targetY : 0,
-            targetX: targetX,
-            targetY: targetY,
-            speed: card.id === 'zap' ? 100 : card.id === 'poison' ? 100 : 15,
-            damage: card.damage,
-            radius: card.radius,
-            type: spellType,
-            isSpell: true,
-            stun: card.stun || 0,
-            duration: card.duration || 0,
-            hit: card.id === 'poison',
-            spawnTime: Date.now(),
-            isPoison: card.id === 'poison'
-          }]);
-        } else {
-          // Smart unit deployment
-          const spawnX = lane === 'LEFT' ? 70 : width - 70;
-          let spawnY = 100;
-
-          // Position based on card type
-          if (card.targetType === 'buildings') {
-            // Target buildings - spawn closer to action
-            if (playerBuildings.length > 0) {
-              spawnY = playerBuildings[0].y - 80;
-            }
-          } else if (card.type === 'flying') {
-            // Flying units - spawn ahead
-            spawnY = 80;
-          } else if (card.hp > 1500) {
-            // Tanks - spawn in front
-            spawnY = 120;
-          } else if (card.range > 50) {
-            // Ranged - spawn behind
-            spawnY = 60;
-          }
-
-          console.log('[Enemy AI] DEPLOYING', card.name, 'at lane:', lane);
-
-          // Spawn enemy unit(s)
-          const count = card.count || 1;
-          const newUnits = [];
-
-          for (let i = 0; i < count; i++) {
-            const offsetX = count > 1 ? (Math.random() * 40 - 20) : 0;
-            const offsetY = count > 1 ? (Math.random() * 40 - 20) : 0;
-
-            const newUnit = {
-              id: Date.now() + i,
-              x: spawnX + offsetX,
-              y: spawnY + offsetY,
-              hp: card.hp,
-              maxHp: card.hp,
-              isOpponent: true,
-              speed: card.speed,
-              lane: lane,
-              lastAttack: 0,
-              spriteId: card.id,
-              type: card.type,
-              range: card.range,
-              damage: card.damage,
-              attackSpeed: card.attackSpeed,
-              projectile: card.projectile,
-              // Special properties
-              charge: card.charge ? {
-                active: false,
-                distance: 0,
-                threshold: 2
-              } : undefined,
-              hidden: card.hidden ? { active: true, visibleHp: card.hp } : undefined,
-              splash: card.splash || false,
-              spawns: card.spawns,
-              spawnRate: card.spawnRate,
-              lastSpawn: 0,
-              lifetime: card.lifetime ? Date.now() + card.lifetime * 1000 : undefined,
-              stunUntil: 0,
-              baseDamage: card.damage,
-              targetType: card.targetType,
-              lockedTarget: null,
-              wasPushed: false,
-              wasStunned: false
-            };
-            newUnits.push(newUnit);
-          }
-          setUnits(prev => [...prev, ...newUnits]);
         }
-
-        // Deduct elixir
-        setEnemyElixir(prev => prev - card.cost);
-
-        // Cycle enemy cards
-        setEnemyHand(prevHand => {
-          const newHand = [...prevHand];
-          newHand.splice(cardIndex, 1);
-          newHand.push(enemyNextCardRef.current);
-          return newHand;
-        });
-
-        setEnemyDeckQueue(prevQueue => {
-          const newQueue = [...prevQueue];
-          const newNext = newQueue.shift();
-          newQueue.push(card);
-          setEnemyNextCard(newNext);
-          return newQueue;
-        });
-      } else {
-        console.log('[Enemy AI] Saving elixir for better play...');
       }
-    }, 2400); // Faster AI thinking (2.4 seconds)
+
+      if (cardToPlay) {
+        spawnCard(cardToPlay, targetX, targetY, true);
+      }
+    }, 1800); // Faster decision making (1.8s)
 
     return () => clearInterval(aiInterval);
-  }, [inGame, gameOver]);
+  }, [inGame, gameOver, enemyDeckIndex]);
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -8858,35 +8483,35 @@ export default function App() {
 
   return (
     <>
-      <GameBoard
-        towers={towers}
-        units={units}
-        projectiles={projectiles}
-        visualEffects={visualEffects}
-        setVisualEffects={setVisualEffects}
-        screenShake={screenShake}
-        setScreenShake={setScreenShake}
-        timeLeft={timeLeft}
-        gameOver={gameOver}
-        elixir={elixir}
-        hand={hand}
-        nextCard={nextCard}
-        draggingCard={draggingCard}
-        dragPosition={dragPosition}
-        handleDragStart={handleDragStart}
-        handleDragMove={handleDragMove}
-        handleDragEnd={handleDragEnd}
-        spawnTestEnemy={spawnTestEnemy}
-        formatTime={formatTime}
-        onRestart={(dest) => resetGame(dest)}
-        score={score}
-        isDoubleElixir={isDoubleElixir}
-        showDoubleElixirAlert={showDoubleElixirAlert}
-        audioEnabled={audioEnabled}
-        setAudioEnabled={setAudioEnabled}
-        onConcede={concedeGame}
-      />
-      {globalDraggingCard && (
+          <GameBoard
+            towers={towers}
+            units={units}
+            projectiles={projectiles}
+            visualEffects={visualEffects}
+            setVisualEffects={setVisualEffects}
+            screenShake={screenShake}
+            setScreenShake={setScreenShake}
+            timeLeft={timeLeft}
+            gameOver={gameOver}
+            elixir={elixir}
+            enemyElixir={enemyElixir}
+            hand={hand}
+            nextCard={nextCard}
+            draggingCard={draggingCard}
+            dragPosition={dragPosition}
+            handleDragStart={handleDragStart}
+            handleDragMove={handleDragMove}
+            handleDragEnd={handleDragEnd}
+            spawnTestEnemy={spawnTestEnemy}
+            formatTime={formatTime}
+            onRestart={(dest) => resetGame(dest)}
+            score={score}
+            isDoubleElixir={isDoubleElixir}
+            showDoubleElixirAlert={showDoubleElixirAlert}
+            audioEnabled={audioEnabled}
+            setAudioEnabled={setAudioEnabled}
+            onConcede={concedeGame}
+          />      {globalDraggingCard && (
         <View style={[styles.dragProxy, {
           position: 'absolute',
           left: globalDragPosition.x - 30,
@@ -8906,6 +8531,455 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  // --- New Battle Tab Styles ---
+  crownChestBar: {
+    width: '95%',
+    height: 45,
+    backgroundColor: '#34495e',
+    borderRadius: 22.5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 5,
+    marginTop: 10,
+    marginBottom: 15,
+    borderWidth: 2,
+    borderColor: '#2c3e50',
+    elevation: 5,
+  },
+  passRoyaleIcon: {
+    width: 35,
+    height: 35,
+    backgroundColor: '#f1c40f',
+    borderRadius: 17.5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  crownProgressContainer: {
+    flex: 1,
+    paddingHorizontal: 10,
+    alignItems: 'center',
+  },
+  crownProgressBar: {
+    width: '100%',
+    height: 12,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 6,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#444',
+  },
+  crownProgressFill: {
+    height: '100%',
+    backgroundColor: '#f1c40f',
+  },
+  crownProgressText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
+    marginTop: 2,
+  },
+  crownChestReward: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  arenaMainView: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  trophyRoadContainer: {
+    width: '80%',
+    height: 20,
+    marginTop: 10,
+  },
+  trophyRoadTrack: {
+    width: '100%',
+    height: 8,
+    backgroundColor: '#2c3e50',
+    borderRadius: 4,
+    position: 'relative',
+  },
+  trophyRoadFill: {
+    height: '100%',
+    backgroundColor: '#3498db',
+    borderRadius: 4,
+  },
+  trophyMarker: {
+    position: 'absolute',
+    top: -15,
+    alignItems: 'center',
+  },
+  trophyMarkerText: {
+    color: '#f1c40f',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  arenaVisualContainer: {
+    marginVertical: 20,
+    elevation: 10,
+  },
+  battleActionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 15,
+    marginBottom: 20,
+  },
+  smallBlueButton: {
+    width: 50,
+    height: 50,
+    backgroundColor: '#3498db',
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#2980b9',
+    borderBottomWidth: 5,
+    borderBottomColor: '#1f618d',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  smallButtonIcon: {
+    fontSize: 24,
+  },
+  battleButtonTrophyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: -5,
+  },
+  battleButtonTrophyText: {
+    color: '#5D4037',
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginRight: 2,
+  },
+
+  // --- New Deck Tab Styles ---
+  deckGridContainer: {
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    borderRadius: 15,
+    padding: 10,
+    marginBottom: 15,
+    borderWidth: 2,
+    borderColor: '#f1c40f',
+  },
+  deckSelectorMini: {
+    flexDirection: 'row',
+    gap: 5,
+  },
+  deckDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#555',
+  },
+  deckDotActive: {
+    backgroundColor: '#f1c40f',
+  },
+  deckCardGrid: {
+    marginVertical: 10,
+  },
+  cardRowCompact: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  deckCardCompact: {
+    width: '23%',
+    aspectRatio: 0.8,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    borderWidth: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  cardCostSmall: {
+    position: 'absolute',
+    top: -5,
+    left: -5,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#D442F5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#fff',
+  },
+  cardCostSmallText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  deckFooterRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 5,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.1)',
+  },
+  towerTroopSlot: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  towerTroopText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  avgElixirText: {
+    color: '#f1c40f',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  collectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  collectionTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  filterButtonMini: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: '#34495e',
+    borderRadius: 5,
+  },
+
+  // --- New Shop Styles ---
+  specialOfferBanner: {
+    width: '100%',
+    height: 180,
+    borderRadius: 15,
+    overflow: 'hidden',
+    marginBottom: 20,
+    elevation: 8,
+  },
+  specialOfferGradient: {
+    flex: 1,
+    padding: 15,
+  },
+  offerTag: {
+    backgroundColor: '#e74c3c',
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 5,
+    alignSelf: 'flex-start',
+    marginBottom: 5,
+  },
+  offerTitle: {
+    color: '#fff',
+    fontSize: 22,
+    fontWeight: '900',
+    textShadowColor: 'black',
+    textShadowRadius: 2,
+  },
+  offerImageRow: {
+    flexDirection: 'row',
+    gap: 20,
+    marginVertical: 15,
+  },
+  offerButton: {
+    backgroundColor: '#2ecc71',
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    borderRadius: 20,
+    alignSelf: 'center',
+    borderBottomWidth: 4,
+    borderBottomColor: '#27ae60',
+  },
+  offerButtonText: {
+    color: '#fff',
+    fontWeight: '900',
+    fontSize: 18,
+  },
+  dealRarityBar: {
+    width: '100%',
+    height: 4,
+    position: 'absolute',
+    top: 0,
+    borderTopLeftRadius: 6,
+    borderTopRightRadius: 6,
+  },
+  chestShopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  shopChestCard: {
+    flex: 1,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 15,
+    alignItems: 'center',
+    elevation: 5,
+  },
+  shopChestName: {
+    fontWeight: 'bold',
+    marginVertical: 5,
+  },
+  shopChestPrice: {
+    backgroundColor: '#34495e',
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+    borderRadius: 15,
+  },
+  shopChestPriceText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+
+  // --- New Social Styles ---
+  socialHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 15,
+    backgroundColor: '#2c3e50',
+    borderBottomWidth: 3,
+    borderBottomColor: '#f1c40f',
+  },
+  clanMainInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 15,
+  },
+  clanBadgeLarge: {
+    width: 50,
+    height: 55,
+    backgroundColor: '#3498db',
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  clanNameText: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: '900',
+  },
+  clanStatusText: {
+    color: '#bdc3c7',
+    fontSize: 12,
+  },
+  requestBanner: {
+    backgroundColor: '#27ae60',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+  },
+  requestText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  requestButton: {
+    backgroundColor: '#f1c40f',
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+    borderRadius: 5,
+  },
+  requestButtonText: {
+    fontWeight: '900',
+    fontSize: 12,
+  },
+
+  // --- New Events Tab Styles ---
+  eventsContainer: {
+    flex: 1,
+    padding: 10,
+  },
+  eventCard: {
+    width: '100%',
+    borderRadius: 15,
+    overflow: 'hidden',
+    marginBottom: 15,
+    elevation: 5,
+  },
+  eventGradient: {
+    padding: 20,
+  },
+  eventBadge: {
+    backgroundColor: '#f1c40f',
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 5,
+    alignSelf: 'flex-start',
+    marginBottom: 10,
+  },
+  eventBadgeText: {
+    fontWeight: '900',
+    fontSize: 10,
+  },
+  eventTitle: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: '900',
+    textShadowColor: 'black',
+    textShadowRadius: 2,
+  },
+  eventSubtitle: {
+    color: '#ccc',
+    fontSize: 14,
+    marginBottom: 15,
+  },
+  eventRewards: {
+    flexDirection: 'row',
+    gap: 15,
+    marginBottom: 20,
+  },
+  rewardItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 15,
+  },
+  rewardValue: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  eventButton: {
+    backgroundColor: '#2ecc71',
+    paddingVertical: 12,
+    borderRadius: 25,
+    alignItems: 'center',
+    borderBottomWidth: 4,
+    borderBottomColor: '#27ae60',
+  },
+  eventButtonText: {
+    color: '#fff',
+    fontWeight: '900',
+    fontSize: 16,
+  },
+  eventStatsRow: {
+    flexDirection: 'row',
+    gap: 20,
+    marginBottom: 20,
+  },
+  eventStat: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+
+  // --- Existing Styles (Optimized) ---
   container: {
     flex: 1,
     backgroundColor: '#333',
