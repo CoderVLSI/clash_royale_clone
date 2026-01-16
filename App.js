@@ -1710,9 +1710,7 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Circle cx="50" cy="45" r="15" fill="none" stroke="#f39c12" strokeWidth="3" opacity="0.6" />
           {/* Electric sparks */}
           <Path d="M30 35 L40 30 M70 35 L60 30 M35 60 L40 55 M65 60 L60 55" stroke="#f1c40f" strokeWidth="2" />
-          <Circle cx="50" cy="45" r="8" fill="#f39c12">
-            <Animate attributeName="opacity" values="0.5;1;0.5" dur="0.5s" repeatCount="indefinite" />
-          </Circle>
+          <Circle cx="50" cy="45" r="8" fill="#f39c12" opacity="0.8" />
         </Svg>
       );
     case 'mother_witch':
@@ -1725,10 +1723,7 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           {/* Hat buckle */}
           <Rect x="45" y="35" width="10" height="8" fill="#f1c40f" rx="1" />
           {/* Pig magic glow */}
-          <Circle cx="75" cy="30" r="10" fill="#f39c12" opacity="0.5">
-            <Animate attributeName="r" values="8;12;8" dur="1s" repeatCount="indefinite" />
-            <Animate attributeName="opacity" values="0.3;0.7;0.3" dur="1s" repeatCount="indefinite" />
-          </Circle>
+          <Circle cx="75" cy="30" r="10" fill="#f39c12" opacity="0.5" />
           <Circle cx="75" cy="30" r="5" fill="white" />
         </Svg>
       );
@@ -1745,9 +1740,7 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Path d="M50 60 L50 90" stroke="#1a1a1a" strokeWidth="2" />
           <Path d="M35 75 L65 75 M40 65 L60 85 M60 65 L40 85" stroke="#e74c3c" strokeWidth="2" />
           {/* Fuse spark */}
-          <Circle cx="80" cy="65" r="3" fill="#f1c40f">
-            <Animate attributeName="opacity" values="0;1;0" dur="0.3s" repeatCount="indefinite" />
-          </Circle>
+          <Circle cx="80" cy="65" r="3" fill="#f1c40f" opacity="1" />
         </Svg>
       );
     case 'mortar':
