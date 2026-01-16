@@ -3615,7 +3615,57 @@ const Unit = ({ unit }) => {
           </Svg>
         </View>
       )}
-      
+
+      {/* Sparky Charge Indicator */}
+      {unit.chargeState && (
+        <View style={{
+          position: 'absolute',
+          top: -6, left: -6, right: -6, bottom: -6,
+          zIndex: 7
+        }}>
+          <Svg width={unitSize + 12} height={unitSize + 12} viewBox="0 0 50 50">
+            {/* Charge progress ring */}
+            <Circle
+              cx="25"
+              cy="25"
+              r="23"
+              fill="none"
+              stroke={unit.chargeState.isCharged ? "#00BFFF" : "#f1c40f"}
+              strokeWidth="3"
+              strokeDasharray={unit.chargeState.isCharged ? "144" : `${Math.min(144, ((Date.now() - unit.chargeState.startTime) / unit.chargeState.duration) * 144)}`}
+              opacity={unit.chargeState.isCharged ? 1 : 0.8}
+            />
+            {/* Electric sparks when charging */}
+            {!unit.chargeState.isCharged && (
+              <>
+                <Circle cx="10" cy="15" r="2" fill="#f1c40f" opacity="0.9" />
+                <Circle cx="40" cy="15" r="2" fill="#f1c40f" opacity="0.9" />
+                <Circle cx="10" cy="35" r="2" fill="#f1c40f" opacity="0.9" />
+                <Circle cx="40" cy="35" r="2" fill="#f1c40f" opacity="0.9" />
+              </>
+            )}
+            {/* Charged indicator - bright glow */}
+            {unit.chargeState.isCharged && (
+              <Circle
+                cx="25"
+                cy="25"
+                r="18"
+                fill="#00BFFF"
+                opacity="0.4"
+              />
+            )}
+          </Svg>
+          {/* Ready indicator when fully charged */}
+          {unit.chargeState.isCharged && (
+            <Text style={{
+              position: 'absolute',
+              top: -8,
+              fontSize: 12
+            }}>⚡</Text>
+          )}
+        </View>
+      )}
+
       {/* Health Bars */}
       <View style={{ position: 'absolute', top: -12, width: unitSize, alignItems: 'center', zIndex: 10 }}>
         {/* Shield Bar (if active) */}
@@ -5651,6 +5701,8 @@ export default function App() {
 
               charge: actualCard.charge ? { active: false, distance: 0, threshold: 2 } : undefined,
 
+              chargeState: actualCard.chargeTime ? { startTime: Date.now(), duration: actualCard.chargeTime, isCharged: false } : undefined,
+
               hidden: actualCard.hidden ? { active: true, visibleHp: actualCard.hp } : undefined,
 
               splash: actualCard.splash || false,
@@ -6649,9 +6701,27 @@ export default function App() {
             currentAttackSpeed = u.attackSpeed / 1.35; // 35% faster attack speed
           }
 
-          if (now - u.lastAttack > currentAttackSpeed && !isWakingUp) {
+          // Sparky charge check - must be fully charged before attacking
+          let canAttackNow = true;
+          if (u.chargeState) {
+            const timeCharging = now - u.chargeState.startTime;
+            if (timeCharging < u.chargeState.duration) {
+              canAttackNow = false; // Still charging
+            } else if (!u.chargeState.isCharged) {
+              // Just finished charging
+              u.chargeState.isCharged = true;
+            }
+          }
+
+          if (now - u.lastAttack > currentAttackSpeed && !isWakingUp && canAttackNow) {
             // Mark that this unit attacked this frame (for recoil mechanic)
             u.justAttacked = true;
+
+            // Reset Sparky charge state after attacking
+            if (u.chargeState && u.chargeState.isCharged) {
+              u.chargeState.isCharged = false;
+              u.chargeState.startTime = now;
+            }
 
             // Calculate damage to deal
             let damageToDeal = actualDamage;
