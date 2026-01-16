@@ -129,7 +129,7 @@ const CARDS = [
   { id: 'hunter', name: 'Hunter', cost: 4, color: '#2c3e50', hp: 700, speed: 2, type: 'ground', range: 80, damage: 700, attackSpeed: 2200, projectile: 'shotgun_blast', count: 1, rarity: 'epic', shotgunSpread: true },
 
   // 5 NEW REQUESTED CARDS
-  { id: 'sparky', name: 'Sparky', cost: 6, color: '#e74c3c', hp: 1750, speed: 0.7, type: 'ground', range: 55, damage: 1135, attackSpeed: 5000, projectile: 'electric_blast', count: 1, splash: true, splashRadius: 50, chargeTime: 5000, rarity: 'legendary' },
+  { id: 'sparky', name: 'Sparky', cost: 6, color: '#e74c3c', hp: 1750, speed: 0.7, type: 'ground', range: 55, damage: 1135, attackSpeed: 5000, projectile: 'electric_blast', count: 1, splash: true, splashRadius: 50, chargeTime: 5000, recoil: 40, stopsToAttack: true, rarity: 'legendary' },
   { id: 'mother_witch', name: 'Mother Witch', cost: 4, color: '#9b59b6', hp: 720, speed: 1.5, type: 'ground', range: 55, damage: 159, attackSpeed: 1400, projectile: 'witch_projectile', count: 1, splash: true, turnsToPig: true, pigDuration: 5000, rarity: 'legendary' },
   { id: 'bomb_tower', name: 'Bomb Tower', cost: 4, color: '#7f8c8d', hp: 1400, speed: 0, type: 'building', range: 55, damage: 200, attackSpeed: 1500, projectile: 'bomb', count: 1, lifetime: 40, deathDamage: 500, deathRadius: 60, rarity: 'rare' },
   { id: 'mortar', name: 'Mortar', cost: 4, color: '#95a5a6', hp: 340, speed: 0, type: 'building', range: 200, damage: 228, attackSpeed: 3000, projectile: 'mortar_shell', count: 1, lifetime: 25, rarity: 'common', splashRadius: 45 },
@@ -5769,6 +5769,10 @@ export default function App() {
 
               dashRange: actualCard.dashRange || 80,
 
+              recoil: actualCard.recoil || 0,
+
+              stopsToAttack: actualCard.stopsToAttack || false,
+
               isDashing: false, dashEndTime: 0,
 
               damageRamp: actualCard.damageRamp || false,
@@ -7171,6 +7175,15 @@ export default function App() {
             // Apply slow effect
             if (u.slowUntil > now) {
               effectiveSpeed *= (1 - (u.slowAmount || 0.35));
+            }
+
+            // Stop to attack - units like Sparky stop moving when in range
+            if (u.stopsToAttack && closestTarget) {
+              const distToTarget = Math.sqrt(Math.pow(closestTarget.x - u.x, 2) + Math.pow(closestTarget.y - u.y, 2));
+              const attackRange = (u.range || 25) + 15; // Add buffer
+              if (distToTarget <= attackRange) {
+                effectiveSpeed = 0; // Stop moving to attack
+              }
             }
 
             // Movement Calculation
