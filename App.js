@@ -2923,6 +2923,27 @@ const VisualEffects = ({ effects, setEffects }) => {
           );
         }
 
+        if (effect.type === 'curse') {
+          // Mother Witch curse - purple magical mark
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - 15,
+              top: effect.y - 15,
+              width: 30,
+              height: 30,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width="30" height="30" viewBox="0 0 30 30">
+                <Circle cx="15" cy="15" r="12" fill="#9b59b6" opacity={0.5} stroke="#8e44ad" strokeWidth="2" />
+                <Circle cx="15" cy="15" r="6" fill="#e74c3c" opacity={0.8} />
+              </Svg>
+            </View>
+          );
+        }
+
         return null;
       })}
     </>
@@ -5727,7 +5748,7 @@ export default function App() {
               type: 'clone_spell',
               x, y,
               radius: cloneRadius,
-              spawnTime: Date.now(),
+              startTime: Date.now(),
               duration: 1000
             }]);
 
