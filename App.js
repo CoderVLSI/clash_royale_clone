@@ -3143,12 +3143,11 @@ const Projectile = ({ type, position }) => {
       <View style={{ position: 'absolute', left: position.x - spellRadius, top: position.y - spellRadius, width: diameter, height: diameter }}>
         <Svg width={diameter} height={diameter} viewBox={`0 0 ${diameter} ${diameter}`}>
           <Circle cx={spellRadius} cy={spellRadius} r={spellRadius - 2} fill={mainColor} stroke={strokeColor} strokeWidth="2" />
-          
+
           {isRage ? (
              // Rage Spell Visuals - Anger symbol / Energy
              <>
                 <Circle cx={spellRadius} cy={spellRadius} r={spellRadius * 0.7} fill="none" stroke="#9b59b6" strokeWidth="2" strokeDasharray="5 5" opacity="0.6" />
-                <SvgText x={spellRadius} y={spellRadius + 10} fontSize={spellRadius * 0.6} textAnchor="middle" fill="#8e44ad" opacity="0.8">😡</SvgText>
              </>
           ) : (
              // Poison Spell Visuals - Skulls/Bubbles (scaled positions)
@@ -3167,6 +3166,17 @@ const Projectile = ({ type, position }) => {
              </>
           )}
         </Svg>
+        {isRage && (
+          <Text style={{
+            position: 'absolute',
+            left: spellRadius * 0.5,
+            top: spellRadius * 0.4,
+            fontSize: spellRadius * 0.6,
+            color: '#8e44ad',
+            opacity: 0.8,
+            textAlign: 'center'
+          }}>😡</Text>
+        )}
       </View>
     );
   }
