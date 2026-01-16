@@ -116,8 +116,8 @@ const CARDS = [
   { id: 'electro_giant', name: 'Electro Giant', cost: 7, color: '#3498db', hp: 2800, speed: 1, type: 'ground', range: 25, damage: 200, attackSpeed: 1400, projectile: null, count: 1, shockOnHit: true, shockRadius: 50, shockDamage: 100, shockStun: 0.5, rarity: 'epic' },
   { id: 'night_witch', name: 'Night Witch', cost: 4, color: '#2c3e50', hp: 750, speed: 2, type: 'ground', range: 25, damage: 220, attackSpeed: 1500, projectile: null, count: 1, spawns: 'bats', spawnRate: 5, spawnCount: 2, rarity: 'legendary', deathSpawns: 'bats', deathSpawnCount: 3 },
   { id: 'inferno_dragon', name: 'Inferno Dragon', cost: 4, color: '#e74c3c', hp: 950, speed: 2.5, type: 'flying', range: 40, damage: 30, attackSpeed: 100, projectile: null, count: 1, damageRamp: true, rarity: 'epic' },
-  { id: 'elixir_golem', name: 'Elixir Golem', cost: 3, color: '#D442F5', hp: 1600, speed: 1.5, type: 'ground', range: 25, damage: 100, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', deathSpawns: 'elixir_golemite', deathSpawnCount: 2, rarity: 'epic' },
-  { id: 'elixir_golemite', name: 'Elixir Golemite', cost: 0, color: '#D442F5', hp: 800, speed: 1.5, type: 'ground', range: 25, damage: 50, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', deathSpawns: 'elixir_blob', deathSpawnCount: 2, rarity: 'rare', isToken: true },
+  { id: 'elixir_golem', name: 'Elixir Golem', cost: 3, color: '#D442F5', hp: 1600, speed: 1.5, type: 'ground', range: 25, damage: 100, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', deathSpawns: 'elixir_golemite', deathSpawnCount: 2, givesOpponentElixir: true, rarity: 'epic' },
+  { id: 'elixir_golemite', name: 'Elixir Golemite', cost: 0, color: '#D442F5', hp: 800, speed: 1.5, type: 'ground', range: 25, damage: 50, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', deathSpawns: 'elixir_blob', deathSpawnCount: 2, givesOpponentElixir: true, rarity: 'rare', isToken: true },
   { id: 'elixir_blob', name: 'Elixir Blob', cost: 0, color: '#D442F5', hp: 400, speed: 1.5, type: 'ground', range: 25, damage: 25, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', givesOpponentElixir: true, rarity: 'common', isToken: true },
   { id: 'firecracker', name: 'Firecracker', cost: 3, color: '#e67e22', hp: 240, speed: 3, type: 'ground', range: 100, damage: 180, attackSpeed: 2500, projectile: 'firecracker_burst', count: 1, splash: true, stun: 0.5, recoil: 60, spreadCount: 8, spreadArc: 0.5, rarity: 'common' },
 
@@ -2047,6 +2047,54 @@ const VisualEffects = ({ effects, setEffects }) => {
               }}>
                 <Text style={{ fontSize: 24 }}>❄️</Text>
               </View>
+            </View>
+          );
+        }
+
+        if (effect.type === 'ice_nova') {
+          // Ice Golem death - dramatic ice nova explosion
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Outer ice blast ring */}
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * (0.3 + progress * 0.7)}
+                  fill="rgba(135, 206, 250, 0.3)"
+                  stroke="#87CEEB"
+                  strokeWidth="4"
+                  opacity={0.8}
+                />
+                {/* Inner frost core */}
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * 0.4}
+                  fill="white"
+                  opacity={0.6}
+                />
+                {/* Ice crystals */}
+                <Path d={`M${effect.radius * 0.5} ${effect.radius * 0.2} L${effect.radius * 0.5} ${effect.radius * 0.8}`} stroke="#E0FFFF" strokeWidth="3" opacity={0.9} />
+                <Path d={`M${effect.radius * 0.2} ${effect.radius * 0.5} L${effect.radius * 0.8} ${effect.radius * 0.5}`} stroke="#E0FFFF" strokeWidth="3" opacity={0.9} />
+                <Path d={`M${effect.radius * 0.3} ${effect.radius * 0.3} L${effect.radius * 0.7} ${effect.radius * 0.7}`} stroke="#E0FFFF" strokeWidth="2" opacity={0.7} />
+                <Path d={`M${effect.radius * 0.7} ${effect.radius * 0.3} L${effect.radius * 0.3} ${effect.radius * 0.7}`} stroke="#E0FFFF" strokeWidth="2" opacity={0.7} />
+              </Svg>
+              {/* Snowflake emoji overlay */}
+              <Text style={{
+                position: 'absolute',
+                fontSize: effect.radius * 0.8,
+                opacity: 0.9
+              }}>❄️</Text>
             </View>
           );
         }
@@ -7762,14 +7810,14 @@ export default function App() {
                      damage: cardDef.deathDamage || 0,
                      slow: cardDef.deathSlow // Pass slow effect
                    });
-                   
+
                    // Visual Effect
                    let effectType = 'fire_explosion';
                    let effectRadius = cardDef.deathRadius || 40;
-                   
+
                    if (deadUnit.spriteId === 'ice_golem') {
-                      effectType = 'ice_freeze';
-                      effectRadius = 60; // Ice Golem has larger slow radius
+                      effectType = 'ice_nova'; // Special ice nova effect for Ice Golem
+                      effectRadius = 80; // Ice Golem has larger slow radius
                    }
 
                    setVisualEffects(prev => [...prev, {
@@ -7779,7 +7827,7 @@ export default function App() {
                      y: deadUnit.y,
                      radius: effectRadius,
                      startTime: Date.now(),
-                     duration: 600
+                     duration: 800
                    }]);
                 }
              }
