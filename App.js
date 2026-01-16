@@ -7214,28 +7214,6 @@ export default function App() {
         }
       });
 
-      // Handle pig reversion before filtering
-      currentUnits = currentUnits.map(u => {
-        if (u.isPig && u.pigEndTime && Date.now() >= u.pigEndTime && u.originalSpriteId) {
-          const originalCard = CARDS.find(c => c.id === u.originalSpriteId);
-          if (originalCard) {
-            const hpPercent = u.hp / u.maxHp;
-            return {
-              ...u,
-              spriteId: u.originalSpriteId,
-              isPig: false,
-              pigEndTime: null,
-              hp: originalCard.hp * hpPercent,
-              maxHp: originalCard.hp,
-              damage: originalCard.damage,
-              range: originalCard.range,
-              speed: originalCard.speed
-            };
-          }
-        }
-        return u;
-      });
-
       // Filter out dead units - but handle death spawns first
       const beforeFilter = currentUnits.length;
       const unitsThatDied = [];
@@ -7531,6 +7509,45 @@ export default function App() {
                 duration: 800
              }]);
           }
+
+          // Mother Witch: If cursed unit dies, spawn Hog for the attacker
+          if (deadUnit.cursedUntil && Date.now() < deadUnit.cursedUntil && deadUnit.type !== 'building') {
+             const hogCard = CARDS.find(c => c.id === 'hog_rider');
+             if (hogCard) {
+                // The Hog spawns for the side that attacked (Mother Witch owner)
+                // cursedByAttackerSide is true if opponent's Mother Witch cursed this unit
+                // So the Hog should be on the same side as the attacker
+                const hogIsOpponent = deadUnit.cursedByAttackerSide;
+
+                setUnits(prevUnits => [...prevUnits, {
+                  id: 'hog_' + Date.now() + '_' + Math.random(),
+                  spriteId: 'hog_rider',
+                  x: deadUnit.x,
+                  y: deadUnit.y,
+                  hp: hogCard.hp * 0.5, // Spawned hogs have 50% HP
+                  maxHp: hogCard.hp * 0.5,
+                  damage: hogCard.damage,
+                  speed: hogCard.speed,
+                  range: hogCard.range,
+                  attackSpeed: hogCard.attackSpeed,
+                  lastAttackTime: 0,
+                  type: 'ground',
+                  targetable: true,
+                  isOpponent: hogIsOpponent,
+                  spawnedPig: true // Mark as spawned pig (optional, for tracking)
+                }]);
+
+                // Transformation visual
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now(),
+                  type: 'transformation',
+                  x: deadUnit.x,
+                  y: deadUnit.y,
+                  spawnTime: Date.now(),
+                  duration: 500
+                }]);
+             }
+          }
         });
       }
 
@@ -7617,30 +7634,18 @@ export default function App() {
                 updatedUnit.wasPushed = true;
               }
 
-              // Mother Witch pig transformation
+              // Mother Witch curse - marks enemy for 5 seconds
               if (event.turnsToPig && !unit.isPig && unit.type !== 'building') {
-                const pigCard = CARDS.find(c => c.id === 'hog_rider');
-                if (pigCard) {
-                  updatedUnit = {
-                    ...updatedUnit,
-                    spriteId: 'hog_rider',
-                    isPig: true,
-                    pigEndTime: Date.now() + 5000,
-                    originalSpriteId: unit.spriteId,
-                    maxHp: pigCard.hp * 0.5,
-                    damage: pigCard.damage,
-                    range: pigCard.range,
-                    speed: pigCard.speed
-                  };
-                  setVisualEffects(prev => [...prev, {
-                    id: Date.now(),
-                    type: 'transformation',
-                    x: unit.x,
-                    y: unit.y,
-                    spawnTime: Date.now(),
-                    duration: 500
-                  }]);
-                }
+                updatedUnit.cursedUntil = Date.now() + 5000;
+                updatedUnit.cursedByAttackerSide = event.attacker.isOpponent; // Track which side cursed them
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'curse',
+                  x: unit.x,
+                  y: unit.y,
+                  startTime: Date.now(),
+                  duration: 500
+                }]);
               }
               return updatedUnit;
             }
