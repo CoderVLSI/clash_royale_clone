@@ -131,7 +131,7 @@ const CARDS = [
   // 5 NEW REQUESTED CARDS
   { id: 'sparky', name: 'Sparky', cost: 6, color: '#e74c3c', hp: 1750, speed: 0.7, type: 'ground', range: 55, damage: 1135, attackSpeed: 5000, projectile: 'electric_blast', count: 1, splash: true, splashRadius: 50, chargeTime: 5000, recoil: 40, stopsToAttack: true, rarity: 'legendary' },
   { id: 'mother_witch', name: 'Mother Witch', cost: 4, color: '#9b59b6', hp: 720, speed: 1.5, type: 'ground', range: 55, damage: 159, attackSpeed: 1400, projectile: 'witch_projectile', count: 1, splash: true, turnsToPig: true, pigDuration: 5000, rarity: 'legendary' },
-  { id: 'bomb_tower', name: 'Bomb Tower', cost: 4, color: '#7f8c8d', hp: 1400, speed: 0, type: 'building', range: 55, damage: 200, attackSpeed: 1500, projectile: 'bomb', count: 1, lifetime: 40, deathDamage: 500, deathRadius: 60, rarity: 'rare' },
+  { id: 'bomb_tower', name: 'Bomb Tower', cost: 4, color: '#7f8c8d', hp: 1400, speed: 0, type: 'building', range: 55, damage: 200, attackSpeed: 1500, projectile: 'bomb', count: 1, lifetime: 40, deathDamage: 500, deathRadius: 60, deathBombDelay: 1000, rarity: 'rare' },
   { id: 'mortar', name: 'Mortar', cost: 4, color: '#95a5a6', hp: 340, speed: 0, type: 'building', range: 200, damage: 228, attackSpeed: 3000, projectile: 'mortar_shell', count: 1, lifetime: 25, chargeTime: 3000, stopsToAttack: true, rarity: 'common', splashRadius: 45 },
   { id: 'clone', name: 'Clone', cost: 3, color: '#3498db', type: 'spell', damage: 0, radius: 35, count: 1, cloneUnits: true, cloneDuration: 10, rarity: 'epic' }
 ];
@@ -2096,6 +2096,42 @@ const VisualEffects = ({ effects, setEffects }) => {
                   fill="#2980b9"
                   opacity={0.9}
                 />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'zap_aura') {
+          // Zap aura - blue flash with electric feel
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * (0.2 + progress * 0.8)}
+                  fill="rgba(52, 152, 219, 0.4)"
+                  stroke="#3498db"
+                  strokeWidth="3"
+                />
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * 0.4}
+                  fill="rgba(236, 240, 241, 0.6)"
+                />
+                {/* Electric sparks */}
+                <Circle cx={effect.radius * 0.5} cy={effect.radius * 0.5} r={4} fill="#f1c40f" opacity={0.8} />
+                <Circle cx={effect.radius * 1.5} cy={effect.radius * 1.5} r={4} fill="#f1c40f" opacity={0.8} />
               </Svg>
             </View>
           );
@@ -4773,8 +4809,8 @@ const GameBoard = ({
               width: (draggingCard.radius || draggingCard.range) * 2,
               height: (draggingCard.radius || draggingCard.range) * 2,
               borderRadius: (draggingCard.radius || draggingCard.range),
-              backgroundColor: draggingCard.type === 'spell' ? 'rgba(255, 255, 0, 0.2)' : 'rgba(255, 255, 255, 0.1)',
-              borderColor: draggingCard.type === 'spell' ? '#FFFF00' : 'white',
+              backgroundColor: (draggingCard.id === 'zap' || draggingCard.id === 'clone') ? 'rgba(52, 152, 219, 0.3)' : (draggingCard.type === 'spell' ? 'rgba(255, 255, 0, 0.2)' : 'rgba(255, 255, 255, 0.1)'),
+              borderColor: (draggingCard.id === 'zap' || draggingCard.id === 'clone') ? '#3498db' : (draggingCard.type === 'spell' ? '#FFFF00' : 'white'),
               borderWidth: 2,
               borderStyle: draggingCard.type === 'spell' ? 'solid' : 'dashed'
             }} />
@@ -5501,7 +5537,77 @@ export default function App() {
 
             spellType = 'zap_spell';
 
-            spellSpeed = 100;
+            const zapRadius = actualCard.radius || 35;
+
+            const zapDamage = actualCard.damage;
+
+            const zapStun = (actualCard.stun || 0.5) * 1000;
+
+
+
+            // Apply damage and stun immediately
+
+            setUnits(prev => prev.map(u => {
+
+              if (u.isOpponent !== isOpponent) {
+
+                const dist = Math.sqrt(Math.pow(u.x - x, 2) + Math.pow(u.y - y, 2));
+
+                if (dist <= zapRadius) {
+
+                  return { ...u, hp: u.hp - zapDamage, stunUntil: Date.now() + zapStun, wasStunned: true };
+
+                }
+
+              }
+
+              return u;
+
+            }));
+
+
+
+            setTowers(prev => prev.map(t => {
+
+              if (t.isOpponent !== isOpponent && t.hp > 0) {
+
+                const dist = Math.sqrt(Math.pow(t.x - x, 2) + Math.pow(t.y - y, 2));
+
+                if (dist <= zapRadius) {
+
+                  const towerDamage = Math.floor(zapDamage * 0.3);
+
+                  return { ...t, hp: t.hp - towerDamage, stunUntil: Date.now() + zapStun, wasStunned: true };
+
+                }
+
+              }
+
+              return t;
+
+            }));
+
+
+
+            // Add visual effect
+
+            setVisualEffects(prev => [...prev, {
+
+              id: Date.now(),
+
+              type: 'zap_aura',
+
+              x, y,
+
+              radius: zapRadius,
+
+              startTime: Date.now(),
+
+              duration: 500
+
+            }]);
+
+
 
           } else if (actualCard.id === 'arrows') {
 
@@ -5631,7 +5737,7 @@ export default function App() {
 
           const isPoison = actualCard.id === 'poison';
 
-          if (actualCard.id !== 'lightning' && actualCard.id !== 'goblin_barrel' && actualCard.id !== 'graveyard' && actualCard.id !== 'earthquake') {
+          if (actualCard.id !== 'lightning' && actualCard.id !== 'goblin_barrel' && actualCard.id !== 'graveyard' && actualCard.id !== 'earthquake' && actualCard.id !== 'zap' && actualCard.id !== 'clone') {
 
             setProjectiles(prev => [...prev, {
 
@@ -5828,17 +5934,25 @@ export default function App() {
                 let newX = u.x; let newY = u.y;
 
                 if (knockbackForce > 0) {
-
                   const angle = Math.atan2(u.y - y, u.x - x);
+                  let nX = u.x + Math.cos(angle) * knockbackForce;
+                  let nY = u.y + Math.sin(angle) * knockbackForce;
 
-                  newX += Math.cos(angle) * knockbackForce;
+                  // River collision during knockback
+                  const rY = height / 2;
+                  const distR = Math.abs(nY - rY);
+                  const bW = 60;
+                  const lBX = 95;
+                  const rBX = width - 95;
+                  const onB = (Math.abs(nX - lBX) < bW / 2) || (Math.abs(nX - rBX) < bW / 2);
+                  
+                  const isFlyingOrJumping = u.jumps || u.type === 'flying';
+                  if (distR < 25 && !onB && !isFlyingOrJumping) {
+                     nY = rY + (u.y < rY ? -25 : 25);
+                  }
 
-                  newY += Math.sin(angle) * knockbackForce;
-
-                  newX = Math.max(10, Math.min(width - 10, newX));
-
-                  newY = Math.max(10, Math.min(height - 10, newY));
-
+                  newX = Math.max(10, Math.min(width - 10, nX));
+                  newY = Math.max(10, Math.min(height - 10, nY));
                 }
 
                 return { ...u, x: newX, y: newY, hp: u.hp - spawnZapDamage, stunUntil: stunDuration > 0 ? Date.now() + (stunDuration * 1000) : u.stunUntil, wasStunned: stunDuration > 0, wasPushed: knockbackForce > 0 };
@@ -6856,8 +6970,25 @@ export default function App() {
             if (u.recoil && u.justAttacked && closestTarget) {
               const angle = Math.atan2(u.y - closestTarget.y, u.x - closestTarget.x); // Opposite direction
               const recoilDistance = u.recoil || 60;
-              u.x += Math.cos(angle) * recoilDistance;
-              u.y += Math.sin(angle) * recoilDistance;
+              let nextRX = u.x + Math.cos(angle) * recoilDistance;
+              let nextRY = u.y + Math.sin(angle) * recoilDistance;
+
+              // River collision during recoil
+              const rY = height / 2;
+              const distR = Math.abs(nextRY - rY);
+              const bW = 60;
+              const lBX = 95;
+              const rBX = width - 95;
+              const onB = (Math.abs(nextRX - lBX) < bW / 2) || (Math.abs(nextRX - rBX) < bW / 2);
+              
+              const isFlyingOrJumping = u.jumps || u.type === 'flying';
+              if (distR < 25 && !onB && !isFlyingOrJumping) {
+                 // Recoil would put unit into river - stop at edge
+                 nextRY = rY + (u.y < rY ? -25 : 25);
+              }
+
+              u.x = Math.max(10, Math.min(width - 10, nextRX));
+              u.y = Math.max(10, Math.min(height - 10, nextRY));
 
               // Recoil visual
               setVisualEffects(prev => [...prev, {
@@ -7287,13 +7418,16 @@ export default function App() {
 
               if (distToRiver < 30 && !onBridge) {
                  // BLOCKED BY RIVER
-                 // Stop vertical movement
-                 nextY = u.y;
+                 // Allow moving AWAY from the river, but not towards it
+                 const isMovingTowardsRiver = (u.y < riverY && nextY > u.y) || (u.y > riverY && nextY < u.y);
+                 if (isMovingTowardsRiver) {
+                   nextY = u.y;
+                 }
                  
                  // Slide towards nearest bridge
                  const bridgeCenterX = u.lane === 'LEFT' ? leftBridgeX : rightBridgeX;
                  const diffX = bridgeCenterX - nextX;
-                 // Move faster sideways to find bridge
+                 // Move sideways to find bridge - slightly faster than normal speed
                  nextX += Math.sign(diffX) * Math.min(Math.abs(diffX), effectiveSpeed * 1.5);
               } else if (distToRiver < 120 && !onBridge) {
                 // Approaching river - steer towards bridge
@@ -7375,7 +7509,6 @@ export default function App() {
       });
 
       // Handle death spawns (Goblin Hut spawns 3 goblins when destroyed)
-      if (unitsThatDied.length > 0) {
         unitsThatDied.forEach(deadUnit => {
           // Goblin Hut death spawn - 3 Spear Goblins
           if (deadUnit.spriteId === 'goblin_hut' && deadUnit.isOpponent === false) {
@@ -7682,7 +7815,6 @@ export default function App() {
              }
           }
         });
-      }
 
       const afterFilter = currentUnits.length;
       if (beforeFilter !== afterFilter) {
@@ -7759,11 +7891,25 @@ export default function App() {
               // Handle Knockback
               if (event.knockback) {
                 const angle = Math.atan2(unit.y - event.targetY, unit.x - event.targetX);
-                updatedUnit.x += Math.cos(angle) * event.knockback;
-                updatedUnit.y += Math.sin(angle) * event.knockback;
-                // Keep bounds
-                updatedUnit.x = Math.max(10, Math.min(width - 10, updatedUnit.x));
-                updatedUnit.y = Math.max(10, Math.min(height - 10, updatedUnit.y));
+                let knockX = updatedUnit.x + Math.cos(angle) * event.knockback;
+                let knockY = updatedUnit.y + Math.sin(angle) * event.knockback;
+                
+                // River collision during knockback
+                const rY = height / 2;
+                const distR = Math.abs(knockY - rY);
+                const bW = 60;
+                const lBX = 95;
+                const rBX = width - 95;
+                const onB = (Math.abs(knockX - lBX) < bW / 2) || (Math.abs(knockX - rBX) < bW / 2);
+                
+                const isFlyingOrJumping = unit.jumps || unit.type === 'flying';
+                if (distR < 25 && !onB && !isFlyingOrJumping) {
+                   // Pushed into river - stop at edge
+                   knockY = rY + (unit.y < rY ? -25 : 25);
+                }
+
+                updatedUnit.x = Math.max(10, Math.min(width - 10, knockX));
+                updatedUnit.y = Math.max(10, Math.min(height - 10, knockY));
                 updatedUnit.wasPushed = true;
               }
 
