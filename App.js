@@ -126,7 +126,14 @@ const CARDS = [
   { id: 'electro_dragon', name: 'Electro D', cost: 5, color: '#3498db', hp: 1000, speed: 2, type: 'flying', range: 70, damage: 160, attackSpeed: 2100, projectile: 'electric_bolt', count: 1, rarity: 'epic', chain: 3, stun: 0.5 },
   { id: 'magic_archer', name: 'Magic Arch', cost: 4, color: '#27ae60', hp: 440, speed: 2, type: 'ground', range: 140, damage: 111, attackSpeed: 1100, projectile: 'magic_arrow', count: 1, rarity: 'legendary', pierce: true },
   { id: 'royal_ghost', name: 'Royal Ghost', cost: 3, color: '#ecf0f1', hp: 1000, speed: 2, type: 'ground', range: 25, damage: 216, attackSpeed: 1800, projectile: null, count: 1, rarity: 'legendary', splash: true, hidden: true },
-  { id: 'hunter', name: 'Hunter', cost: 4, color: '#2c3e50', hp: 700, speed: 2, type: 'ground', range: 80, damage: 700, attackSpeed: 2200, projectile: 'shotgun_blast', count: 1, rarity: 'epic', shotgunSpread: true }
+  { id: 'hunter', name: 'Hunter', cost: 4, color: '#2c3e50', hp: 700, speed: 2, type: 'ground', range: 80, damage: 700, attackSpeed: 2200, projectile: 'shotgun_blast', count: 1, rarity: 'epic', shotgunSpread: true },
+
+  // 5 NEW REQUESTED CARDS
+  { id: 'sparky', name: 'Sparky', cost: 6, color: '#e74c3c', hp: 1750, speed: 0.7, type: 'ground', range: 55, damage: 1135, attackSpeed: 5000, projectile: 'electric_blast', count: 1, splash: true, splashRadius: 50, chargeTime: 5000, rarity: 'legendary' },
+  { id: 'mother_witch', name: 'Mother Witch', cost: 4, color: '#9b59b6', hp: 720, speed: 1.5, type: 'ground', range: 55, damage: 159, attackSpeed: 1400, projectile: 'witch_projectile', count: 1, splash: true, turnsToPig: true, pigDuration: 5000, rarity: 'legendary' },
+  { id: 'bomb_tower', name: 'Bomb Tower', cost: 4, color: '#7f8c8d', hp: 1400, speed: 0, type: 'building', range: 55, damage: 200, attackSpeed: 1500, projectile: 'bomb', count: 1, lifetime: 40, deathDamage: 500, deathRadius: 60, rarity: 'rare' },
+  { id: 'mortar', name: 'Mortar', cost: 4, color: '#95a5a6', hp: 340, speed: 0, type: 'building', range: 200, damage: 228, attackSpeed: 3000, projectile: 'mortar_shell', count: 1, lifetime: 25, rarity: 'common', splashRadius: 45 },
+  { id: 'clone', name: 'Clone', cost: 3, color: '#3498db', type: 'spell', damage: 0, radius: 35, count: 1, cloneUnits: true, cloneDuration: 10, rarity: 'epic' }
 ];
 
 const RARITY_COLORS = {
@@ -1690,6 +1697,79 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Path d="M40 20 L50 10 L60 20 Z" fill="#f1c40f" />
           {/* Ghostly Sword */}
           <Path d="M70 50 L90 30" stroke="#bdc3c7" strokeWidth="4" opacity="0.7" />
+        </Svg>
+      );
+    case 'sparky':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          {/* Large Tesla coil */}
+          <Rect x="35" y="20" width="30" height="50" fill="#7f8c8d" stroke="#2c3e50" strokeWidth="2" />
+          {/* Electric rings */}
+          <Circle cx="50" cy="45" r="25" fill="none" stroke="#f1c40f" strokeWidth="4" opacity="0.8" />
+          <Circle cx="50" cy="45" r="15" fill="none" stroke="#f39c12" strokeWidth="3" opacity="0.6" />
+          {/* Electric sparks */}
+          <Path d="M30 35 L40 30 M70 35 L60 30 M35 60 L40 55 M65 60 L60 55" stroke="#f1c40f" strokeWidth="2" />
+          <Circle cx="50" cy="45" r="8" fill="#f39c12">
+            <Animate attributeName="opacity" values="0.5;1;0.5" dur="0.5s" repeatCount="indefinite" />
+          </Circle>
+        </Svg>
+      );
+    case 'mother_witch':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          {/* Witch hat */}
+          <Path d="M30 35 L50 10 L70 35 Z" fill="#2c3e50" stroke="#1a1a1a" strokeWidth="2" />
+          <Ellipse cx="50" cy="38" rx="22" ry="5" fill="#2c3e50" />
+          {/* Hat buckle */}
+          <Rect x="45" y="35" width="10" height="8" fill="#f1c40f" rx="1" />
+          {/* Pig magic glow */}
+          <Circle cx="75" cy="30" r="10" fill="#f39c12" opacity="0.5">
+            <Animate attributeName="r" values="8;12;8" dur="1s" repeatCount="indefinite" />
+            <Animate attributeName="opacity" values="0.3;0.7;0.3" dur="1s" repeatCount="indefinite" />
+          </Circle>
+          <Circle cx="75" cy="30" r="5" fill="white" />
+        </Svg>
+      );
+    case 'bomb_tower':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Tower base */}
+          <Rect x="25" y="30" width="50" height="55" fill="#7f8c8d" stroke="#2c3e50" strokeWidth="2" />
+          {/* Cannon opening */}
+          <Circle cx="50" cy="35" r="12" fill="#2c3e50" stroke="#1a1a1a" strokeWidth="2" />
+          <Circle cx="50" cy="35" r="8" fill="#000" />
+          {/* Bomb on top */}
+          <Circle cx="50" cy="75" r="15" fill="#2c3e50" stroke="#1a1a1a" strokeWidth="2" />
+          <Path d="M50 60 L50 90" stroke="#1a1a1a" strokeWidth="2" />
+          <Path d="M35 75 L65 75 M40 65 L60 85 M60 65 L40 85" stroke="#e74c3c" strokeWidth="2" />
+          {/* Fuse spark */}
+          <Circle cx="80" cy="65" r="3" fill="#f1c40f">
+            <Animate attributeName="opacity" values="0;1;0" dur="0.3s" repeatCount="indefinite" />
+          </Circle>
+        </Svg>
+      );
+    case 'mortar':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Rect x="20" y="40" width="60" height="50" fill="#95a5a6" stroke="#7f8c8d" strokeWidth="2" />
+          {/* Mortar tube */}
+          <Rect x="35" y="20" width="30" height="30" fill="#7f8c8d" stroke="#2c3e50" strokeWidth="2" rx="5" />
+          <Circle cx="50" cy="20" r="10" fill="#2c3e50" stroke="#1a1a1a" strokeWidth="2" />
+          {/* Base */}
+          <Rect x="30" y="75" width="40" height="15" fill="#7f8c8d" rx="2" />
+        </Svg>
+      );
+    case 'clone':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" opacity="0.5" />
+          {/* Clone icon - two overlapping figures */}
+          <Circle cx="35" cy="45" r="18" fill="#3498db" stroke="#2980b9" strokeWidth="2" opacity="0.7" />
+          <Circle cx="65" cy="45" r="18" fill="#3498db" stroke="#2980b9" strokeWidth="2" opacity="0.9" />
+          {/* Clone symbol */}
+          <Path d="M30 70 L50 50 L70 70" fill="none" stroke="white" strokeWidth="3" />
         </Svg>
       );
     default:
@@ -5418,9 +5498,43 @@ export default function App() {
 
             }]);
 
+          } else if (actualCard.id === 'clone') {
+
+            // Clone spell - duplicate all units in radius
+            const cloneRadius = actualCard.radius || 35;
+
+            setUnits(prevUnits => {
+              const newClones = prevUnits.filter(unit => {
+                const dx = unit.x - x;
+                const dy = unit.y - y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                return distance <= cloneRadius && !unit.isOpponent && unit.type !== 'building';
+              }).map(unit => ({
+                ...unit,
+                id: 'clone_' + Date.now() + '_' + Math.random(),
+                x: unit.x + (Math.random() * 20 - 10),
+                y: unit.y + (Math.random() * 20 - 10),
+                hp: unit.hp * 0.5, // Clones have 50% HP
+                maxHp: unit.maxHp * 0.5,
+                isClone: true,
+                cloneEndTime: Date.now() + (actualCard.cloneDuration || 10) * 1000
+              }));
+              return [...prevUnits, ...newClones];
+            });
+
+            // Add visual effect
+            setVisualEffects(prev => [...prev, {
+              id: Date.now(),
+              type: 'clone_spell',
+              x, y,
+              radius: cloneRadius,
+              spawnTime: Date.now(),
+              duration: 1000
+            }]);
+
           }
 
-  
+
 
           const isPoison = actualCard.id === 'poison';
 
@@ -6691,7 +6805,8 @@ export default function App() {
                   targetX: closestTarget.x,
                   targetY: closestTarget.y,
                   damage: damageToDeal,
-                  frontalSplash: u.frontalSplash || false
+                  frontalSplash: u.frontalSplash || false,
+                  turnsToPig: u.turnsToPig || false
                 });
               }
 
@@ -7106,11 +7221,37 @@ export default function App() {
         }
       });
 
+      // Handle pig reversion before filtering
+      currentUnits = currentUnits.map(u => {
+        if (u.isPig && u.pigEndTime && Date.now() >= u.pigEndTime && u.originalSpriteId) {
+          const originalCard = CARDS.find(c => c.id === u.originalSpriteId);
+          if (originalCard) {
+            const hpPercent = u.hp / u.maxHp;
+            return {
+              ...u,
+              spriteId: u.originalSpriteId,
+              isPig: false,
+              pigEndTime: null,
+              hp: originalCard.hp * hpPercent,
+              maxHp: originalCard.hp,
+              damage: originalCard.damage,
+              range: originalCard.range,
+              speed: originalCard.speed
+            };
+          }
+        }
+        return u;
+      });
+
       // Filter out dead units - but handle death spawns first
       const beforeFilter = currentUnits.length;
       const unitsThatDied = [];
 
       currentUnits = currentUnits.filter(u => {
+        // Check if clone has expired
+        if (u.isClone && u.cloneEndTime && Date.now() >= u.cloneEndTime) {
+          return false;
+        }
         if (u.hp <= 0) {
           // Track units that died this frame for death spawn handling
           unitsThatDied.push(u);
@@ -7481,6 +7622,32 @@ export default function App() {
                 updatedUnit.x = Math.max(10, Math.min(width - 10, updatedUnit.x));
                 updatedUnit.y = Math.max(10, Math.min(height - 10, updatedUnit.y));
                 updatedUnit.wasPushed = true;
+              }
+
+              // Mother Witch pig transformation
+              if (event.turnsToPig && !unit.isPig && unit.type !== 'building') {
+                const pigCard = CARDS.find(c => c.id === 'hog_rider');
+                if (pigCard) {
+                  updatedUnit = {
+                    ...updatedUnit,
+                    spriteId: 'hog_rider',
+                    isPig: true,
+                    pigEndTime: Date.now() + 5000,
+                    originalSpriteId: unit.spriteId,
+                    maxHp: pigCard.hp * 0.5,
+                    damage: pigCard.damage,
+                    range: pigCard.range,
+                    speed: pigCard.speed
+                  };
+                  setVisualEffects(prev => [...prev, {
+                    id: Date.now(),
+                    type: 'transformation',
+                    x: unit.x,
+                    y: unit.y,
+                    spawnTime: Date.now(),
+                    duration: 500
+                  }]);
+                }
               }
               return updatedUnit;
             }
