@@ -2051,6 +2051,56 @@ const VisualEffects = ({ effects, setEffects }) => {
           );
         }
 
+        if (effect.type === 'clone_spell') {
+          // Clone spell - blue aura radius circle
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Blue expanding aura */}
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * (0.5 + progress * 0.5)}
+                  fill="#3498db"
+                  opacity={0.4}
+                />
+                {/* Inner brighter circle */}
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * 0.6}
+                  fill="white"
+                  opacity={0.3}
+                />
+                {/* Clone symbol - two overlapping figures */}
+                <Circle
+                  cx={effect.radius - 10}
+                  cy={effect.radius}
+                  r={8}
+                  fill="#3498db"
+                  opacity={0.8}
+                />
+                <Circle
+                  cx={effect.radius + 10}
+                  cy={effect.radius}
+                  r={8}
+                  fill="#2980b9"
+                  opacity={0.9}
+                />
+              </Svg>
+            </View>
+          );
+        }
+
         if (effect.type === 'heal_glow') {
           // Heal glow - green expanding circle with + symbols
           return (
