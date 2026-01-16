@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Text, Dimensions, TouchableOpacity, PanResponder, Animated, Image, ImageBackground, ScrollView, Modal, TextInput, KeyboardAvoidingView, FlatList, ActivityIndicator } from 'react-native';
 import { useState, useEffect, useRef, memo, useMemo, useCallback } from 'react';
-import Svg, { Circle, Rect, Path, G, Defs, LinearGradient, Stop, Polygon, Text as SvgText } from 'react-native-svg';
+import Svg, { Circle, Rect, Path, G, Defs, LinearGradient, Stop, Polygon, Ellipse, Text as SvgText } from 'react-native-svg';
 import { io } from "socket.io-client";
 
 const { width, height } = Dimensions.get('window');
@@ -35,8 +35,8 @@ const CARDS = [
   // New cards
   { id: 'cannon', name: 'Cannon', cost: 3, color: '#8B4513', hp: 380, speed: 0, type: 'building', range: 90, damage: 60, attackSpeed: 1000, projectile: 'cannonball', count: 1, lifetime: 30, rarity: 'common' },
   { id: 'barbarians', name: 'Barbarians', cost: 5, color: '#CD853F', hp: 300, speed: 1.5, type: 'ground', range: 30, damage: 75, attackSpeed: 1500, projectile: null, count: 5, rarity: 'common' },
-  { id: 'arrows', name: 'Arrows', cost: 3, color: '#2ecc71', type: 'spell', damage: 115, radius: 40, count: 1, rarity: 'common' },
-  { id: 'zap', name: 'Zap', cost: 2, color: '#3498db', type: 'spell', damage: 140, radius: 35, count: 1, stun: 0.5, rarity: 'common' },
+  { id: 'arrows', name: 'Arrows', cost: 3, color: '#2ecc71', type: 'spell', damage: 366, radius: 40, count: 1, rarity: 'common' },
+  { id: 'zap', name: 'Zap', cost: 2, color: '#3498db', type: 'spell', damage: 192, radius: 35, count: 1, stun: 0.5, rarity: 'common' },
   { id: 'minions', name: 'Minions', cost: 3, color: '#9b59b6', hp: 90, speed: 3, type: 'flying', range: 50, damage: 80, attackSpeed: 1000, projectile: 'dark_ball', count: 3, rarity: 'common' },
   { id: 'skeleton_army', name: 'Skeleton Army', cost: 3, color: '#ecf0f1', hp: 40, speed: 2, type: 'ground', range: 25, damage: 40, attackSpeed: 1000, projectile: null, count: 15, rarity: 'epic' },
   { id: 'skeletons', name: 'Skelly', cost: 1, color: '#bdc3c7', hp: 40, speed: 2, type: 'ground', range: 25, damage: 40, attackSpeed: 1000, projectile: null, count: 3, rarity: 'common' },
@@ -47,7 +47,7 @@ const CARDS = [
   { id: 'hog_rider', name: 'Hog', cost: 4, color: '#e67e22', hp: 1600, speed: 3.5, type: 'ground', range: 25, damage: 180, attackSpeed: 1600, projectile: null, count: 1, targetType: 'buildings', jumps: true, rarity: 'rare' },
   { id: 'prince', name: 'Prince', cost: 5, color: '#f39c12', hp: 1100, speed: 2, type: 'ground', range: 30, damage: 245, attackSpeed: 1500, projectile: null, count: 1, charge: true, rarity: 'epic' },
   { id: 'tesla', name: 'Tesla', cost: 4, color: '#f1c40f', hp: 600, speed: 0, type: 'building', range: 55, damage: 100, attackSpeed: 800, projectile: 'tesla_lightning', count: 1, lifetime: 35, hidden: true, rarity: 'common' },
-  { id: 'wizard', name: 'Wizard', cost: 5, color: '#9b59b6', hp: 600, speed: 1.5, type: 'ground', range: 60, damage: 170, attackSpeed: 1400, projectile: 'fireball_small', count: 1, splash: true, rarity: 'rare' },
+  { id: 'wizard', name: 'Wizard', cost: 5, color: '#9b59b6', hp: 600, speed: 1.5, type: 'ground', range: 60, damage: 390, attackSpeed: 1400, projectile: 'fireball_small', count: 1, splash: true, rarity: 'rare' },
   { id: 'tombstone', name: 'Tombstone', cost: 3, color: '#95a5a6', hp: 450, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 40, spawns: 'skeletons', spawnRate: 3.1, spawnCount: 2, deathSpawnCount: 4, rarity: 'rare' },
   { id: 'sword_goblins', name: 'Sword Gobs', cost: 3, color: '#2ecc71', hp: 162, speed: 3, type: 'ground', range: 25, damage: 100, attackSpeed: 900, projectile: null, count: 3, rarity: 'common' },
   { id: 'ice_wizard', name: 'Ice Wiz', cost: 3, color: '#3498db', hp: 590, speed: 1.5, type: 'ground', range: 55, damage: 75, attackSpeed: 1700, projectile: 'ice_shard', count: 1, splash: true, rarity: 'legendary', slow: 0.35, spawnDamage: 75 },
@@ -101,9 +101,32 @@ const CARDS = [
   // New Cards (Ice Golem, Mega Minion, Dart Goblin, Princess, Barbarian Hut)
   { id: 'ice_golem', name: 'Ice Golem', cost: 2, color: '#E8F4F8', hp: 1197, speed: 1.5, type: 'ground', range: 20, damage: 84, attackSpeed: 2500, projectile: null, count: 1, targetType: 'buildings', rarity: 'rare', deathDamage: 84, deathRadius: 60, deathSlow: 1.0 },
   { id: 'mega_minion', name: 'Mega Minion', cost: 3, color: '#8e44ad', hp: 830, speed: 2, type: 'flying', range: 45, damage: 300, attackSpeed: 1600, projectile: 'dark_ball_big', count: 1, rarity: 'rare' },
-  { id: 'dart_goblin', name: 'Dart Goblin', cost: 3, color: '#2ecc71', hp: 260, speed: 6, type: 'ground', range: 130, damage: 131, attackSpeed: 400, projectile: 'dart', count: 1, rarity: 'rare' },
-  { id: 'princess', name: 'Princess', cost: 3, color: '#e67e22', hp: 261, speed: 2, type: 'ground', range: 180, damage: 169, attackSpeed: 3000, projectile: 'fire_arrows', count: 1, splash: true, rarity: 'legendary' },
-  { id: 'barbarian_hut', name: 'Barb Hut', cost: 7, color: '#e67e22', hp: 1300, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 40, spawns: 'barbarians', spawnRate: 12, spawnCount: 2, deathSpawns: 'barbarians', deathSpawnCount: 2, rarity: 'rare' },
+  { id: 'dart_goblin', name: 'Dart Goblin', cost: 3, color: '#2ecc71', hp: 260, speed: 3.5, type: 'ground', range: 100, damage: 131, attackSpeed: 700, projectile: 'dart', count: 1, rarity: 'rare' },
+  { id: 'princess', name: 'Princess', cost: 3, color: '#e67e22', hp: 261, speed: 2, type: 'ground', range: 180, damage: 250, attackSpeed: 3000, projectile: 'fire_arrows', count: 1, splash: true, rarity: 'legendary' },
+  { id: 'barbarian_hut', name: 'Barb Hut', cost: 7, color: '#e67e22', hp: 1300, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 40, spawns: 'barbarians', spawnRate: 8, spawnCount: 2, deathSpawns: 'barbarians', deathSpawnCount: 2, rarity: 'rare' },
+
+  // 5 New Cards
+  { id: 'bandit', name: 'Bandit', cost: 3, color: '#e67e22', hp: 600, speed: 4, type: 'ground', range: 25, damage: 320, attackSpeed: 1100, projectile: null, count: 1, rarity: 'legendary', dashInvincible: true, dashRange: 80 },
+  { id: 'battle_ram', name: 'Battle Ram', cost: 4, color: '#e67e22', hp: 756, speed: 4, type: 'ground', range: 25, damage: 246, attackSpeed: 100, projectile: null, count: 1, targetType: 'buildings', charge: true, rarity: 'rare', deathSpawns: 'barbarians', deathSpawnCount: 2, kamikaze: true },
+  { id: 'inferno_tower', name: 'Inferno', cost: 5, color: '#e74c3c', hp: 1100, speed: 0, type: 'building', range: 70, damage: 30, attackSpeed: 400, projectile: null, count: 1, lifetime: 35, rarity: 'rare', damageRamp: true },
+  { id: 'balloon', name: 'Balloon', cost: 5, color: '#e74c3c', hp: 1500, speed: 2, type: 'flying', range: 5, damage: 400, attackSpeed: 2000, projectile: null, count: 1, targetType: 'buildings', rarity: 'epic', bombDrops: true, deathDamage: 400, deathRadius: 60, deathBombDelay: 3000 },
+  { id: 'hunter', name: 'Hunter', cost: 4, color: '#95a5a6', hp: 1050, speed: 2, type: 'ground', range: 75, damage: 180, attackSpeed: 1500, projectile: 'shotgun_blast', count: 1, splash: true, shotgunSpread: true, rarity: 'epic' },
+
+  // 5 More NEW Cards (not duplicates!)
+  { id: 'electro_giant', name: 'Electro Giant', cost: 7, color: '#3498db', hp: 2800, speed: 1, type: 'ground', range: 25, damage: 200, attackSpeed: 1400, projectile: null, count: 1, shockOnHit: true, shockRadius: 50, shockDamage: 100, shockStun: 0.5, rarity: 'epic' },
+  { id: 'night_witch', name: 'Night Witch', cost: 4, color: '#2c3e50', hp: 750, speed: 2, type: 'ground', range: 25, damage: 220, attackSpeed: 1500, projectile: null, count: 1, spawns: 'bats', spawnRate: 5, spawnCount: 2, rarity: 'legendary', deathSpawns: 'bats', deathSpawnCount: 3 },
+  { id: 'inferno_dragon', name: 'Inferno Dragon', cost: 4, color: '#e74c3c', hp: 950, speed: 2.5, type: 'flying', range: 40, damage: 30, attackSpeed: 100, projectile: null, count: 1, damageRamp: true, rarity: 'epic' },
+  { id: 'elixir_golem', name: 'Elixir Golem', cost: 3, color: '#D442F5', hp: 1600, speed: 1.5, type: 'ground', range: 25, damage: 100, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', deathSpawns: 'elixir_golemite', deathSpawnCount: 2, rarity: 'epic' },
+  { id: 'elixir_golemite', name: 'Elixir Golemite', cost: 0, color: '#D442F5', hp: 800, speed: 1.5, type: 'ground', range: 25, damage: 50, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', deathSpawns: 'elixir_blob', deathSpawnCount: 2, rarity: 'rare', isToken: true },
+  { id: 'elixir_blob', name: 'Elixir Blob', cost: 0, color: '#D442F5', hp: 400, speed: 1.5, type: 'ground', range: 25, damage: 25, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', givesOpponentElixir: true, rarity: 'common', isToken: true },
+  { id: 'firecracker', name: 'Firecracker', cost: 3, color: '#e67e22', hp: 240, speed: 3, type: 'ground', range: 100, damage: 180, attackSpeed: 2500, projectile: 'firecracker_burst', count: 1, splash: true, stun: 0.5, recoil: 60, spreadCount: 8, spreadArc: 0.5, rarity: 'common' },
+
+  // 5 More NEW Cards
+  { id: 'giant_skeleton', name: 'Giant Skel', cost: 6, color: '#bdc3c7', hp: 2800, speed: 1.5, type: 'ground', range: 25, damage: 170, attackSpeed: 1500, projectile: null, count: 1, rarity: 'epic', deathDamage: 1000, deathRadius: 100, deathBombDelay: 3000 },
+  { id: 'electro_dragon', name: 'Electro D', cost: 5, color: '#3498db', hp: 1000, speed: 2, type: 'flying', range: 70, damage: 160, attackSpeed: 2100, projectile: 'electric_bolt', count: 1, rarity: 'epic', chain: 3, stun: 0.5 },
+  { id: 'magic_archer', name: 'Magic Arch', cost: 4, color: '#27ae60', hp: 440, speed: 2, type: 'ground', range: 140, damage: 111, attackSpeed: 1100, projectile: 'magic_arrow', count: 1, rarity: 'legendary', pierce: true },
+  { id: 'royal_ghost', name: 'Royal Ghost', cost: 3, color: '#ecf0f1', hp: 1000, speed: 2, type: 'ground', range: 25, damage: 216, attackSpeed: 1800, projectile: null, count: 1, rarity: 'legendary', splash: true, hidden: true },
+  { id: 'hunter', name: 'Hunter', cost: 4, color: '#2c3e50', hp: 700, speed: 2, type: 'ground', range: 80, damage: 700, attackSpeed: 2200, projectile: 'shotgun_blast', count: 1, rarity: 'epic', shotgunSpread: true }
 ];
 
 const RARITY_COLORS = {
@@ -1206,6 +1229,23 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Rect x="78" y="47" width="4" height="10" fill="#95a5a6" opacity="0.7" />
         </Svg>
       );
+    case 'battle_ram':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Barbarian 1 (Rear) */}
+          <Circle cx="30" cy="65" r="10" fill="#f1c40f" />
+          <Circle cx="30" cy="65" r="3" fill="#e67e22" />
+          {/* Ram Log */}
+          <Rect x="20" y="40" width="60" height="20" fill="#8B4513" stroke="#654321" strokeWidth="2" rx="5" />
+          <Rect x="25" y="40" width="5" height="20" fill="#A0522D" />
+          <Rect x="70" y="40" width="5" height="20" fill="#A0522D" />
+          {/* Barbarian 2 (Front - behind log visually but logically holding front) */}
+          {/* Actually draw Front Barb head peaking over or in front? Front barb is mostly hidden by log or in front. */}
+          {/* Let's draw Front Barb at 70, 65 */}
+          <Circle cx="70" cy="65" r="10" fill="#f1c40f" />
+          <Circle cx="70" cy="65" r="3" fill="#e67e22" />
+        </Svg>
+      );
     case 'ice_golem':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
@@ -1273,6 +1313,383 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Rect x="40" y="60" width="20" height="30" fill="#2c3e50" />
           {/* Crossed swords symbol */}
           <Path d="M45 25 L55 35 M55 25 L45 35" stroke="#f1c40f" strokeWidth="3" />
+        </Svg>
+      );
+    case 'bandit':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          <Path d="M20 45 Q50 35 80 45 Q80 65 50 70 Q20 65 20 45 Z" fill="#e74c3c" stroke="#c0392b" strokeWidth="2" />
+          <Circle cx="40" cy="50" r="4" fill="white" />
+          <Circle cx="60" cy="50" r="4" fill="white" />
+          <Circle cx="40" cy="50" r="2" fill="black" />
+          <Circle cx="60" cy="50" r="2" fill="black" />
+          <Rect x="70" y="30" width="6" height="35" fill="#bdc3c7" transform="rotate(45 73 47)" />
+          <Path d="M68 30 L73 22 L78 30 Z" fill="#f1c40f" transform="rotate(45 73 47)" />
+        </Svg>
+      );
+    case 'battle_ram':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Rect x="10" y="40" width="80" height="20" fill="#8B4513" stroke="#654321" strokeWidth="2" rx="10" />
+          <Circle cx="10" cy="50" r="18" fill="#95a5a6" stroke="#7f8c8d" strokeWidth="3" />
+          <Circle cx="10" cy="50" r="12" fill="#bdc3c7" />
+          <Path d="M10 38 L15 25 M10 50 L0 50 M10 62 L15 75" stroke="#7f8c8d" strokeWidth="3" />
+          <Circle cx="30" cy="70" r="8" fill="#7f8c8d" />
+          <Circle cx="70" cy="70" r="8" fill="#7f8c8d" />
+          <Circle cx="40" cy="35" r="10" fill="#e67e22" stroke="#d35400" strokeWidth="1" />
+          <Circle cx="60" cy="35" r="10" fill="#e67e22" stroke="#d35400" strokeWidth="1" />
+        </Svg>
+      );
+    case 'inferno_tower':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Rect x="25" y="30" width="50" height="65" fill="#2c3e50" stroke="#1a1a2e" strokeWidth="2" rx="5" />
+          <Circle cx="50" cy="50" r="18" fill="#1a1a2e" stroke="#000" strokeWidth="2" />
+          <Circle cx="50" cy="50" r="15" fill="#e74c3c" opacity="0.8" />
+          <Circle cx="50" cy="50" r="10" fill="#f39c12" opacity="0.9" />
+          <Path d="M50 35 L45 25 L50 30 L55 25 Z" fill="#e74c3c" />
+          <Path d="M50 65 L45 75 L50 70 L55 75 Z" fill="#e74c3c" />
+          <Path d="M35 50 L25 45 L30 50 L25 55 Z" fill="#e74c3c" />
+          <Path d="M65 50 L75 45 L70 50 L75 55 Z" fill="#e74c3c" />
+          <Rect x="22" y="25" width="56" height="8" fill="#c0392b" rx="2" />
+        </Svg>
+      );
+    case 'balloon':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="35" r="30" fill="#e74c3c" stroke="#c0392b" strokeWidth="2" />
+          <Path d="M30 35 Q50 25 70 35" stroke="#c0392b" strokeWidth="2" fill="none" />
+          <Path d="M25 45 Q50 55 75 45" stroke="#c0392b" strokeWidth="2" fill="none" />
+          <Rect x="40" y="65" width="20" height="15" fill="#8B4513" stroke="#654321" strokeWidth="2" />
+          <Circle cx="50" cy="75" r="8" fill="#2c3e50" />
+          <Circle cx="50" cy="75" r="5" fill="#e74c3c" />
+          <Path d="M50 67 L50 60" stroke="#f1c40f" strokeWidth="2" />
+          <Path d="M40 65 L30 35" stroke="#8B4513" strokeWidth="1" />
+          <Path d="M60 65 L70 35" stroke="#8B4513" strokeWidth="1" />
+        </Svg>
+      );
+    case 'hunter':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          <Path d="M25 45 L50 20 L75 45 Z" fill="#8B4513" stroke="#654321" strokeWidth="2" />
+          <Circle cx="50" cy="45" r="15" fill="#ffe0b2" />
+          <Path d="M35 55 Q50 75 65 55" fill="#8B4513" />
+          <Circle cx="43" cy="43" r="3" fill="black" />
+          <Circle cx="57" cy="43" r="3" fill="black" />
+          <Rect x="65" y="35" width="30" height="8" fill="#2c3e50" rx="2" />
+          <Rect x="85" y="32" width="12" height="14" fill="#5D4E37" />
+          <Rect x="92" y="36" width="8" height="6" fill="#7f8c8d" />
+        </Svg>
+      );
+    // 5 More Cards Sprites
+    case 'mega_minion':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          {/* Wings */}
+          <Path d="M20 50 L5 30 L25 45" fill="#2980b9" stroke="#1a5276" strokeWidth="2" />
+          <Path d="M80 50 L95 30 L75 45" fill="#2980b9" stroke="#1a5276" strokeWidth="2" />
+          {/* Body */}
+          <Circle cx="50" cy="50" r="25" fill="#3498db" />
+          {/* Eyes */}
+          <Circle cx="43" cy="45" r="5" fill="white" />
+          <Circle cx="57" cy="45" r="5" fill="white" />
+          <Circle cx="43" cy="45" r="2.5" fill="black" />
+          <Circle cx="57" cy="45" r="2.5" fill="black" />
+          {/* Angry brows */}
+          <Path d="M38 40 L48 43" stroke="black" strokeWidth="2" />
+          <Path d="M62 40 L52 43" stroke="black" strokeWidth="2" />
+        </Svg>
+      );
+    case 'electro_giant':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="#f1c40f" strokeWidth="3" />
+          {/* Lightning bolts on body */}
+          <Path d="M30 30 L40 40 L35 40 L45 55" stroke="#f1c40f" strokeWidth="3" fill="none" />
+          <Path d="M70 30 L60 40 L65 40 L55 55" stroke="#f1c40f" strokeWidth="3" fill="none" />
+          <Path d="M40 70 L50 60 L45 60 L55 45" stroke="#f1c40f" strokeWidth="3" fill="none" />
+          <Path d="M60 70 L50 60 L55 60 L45 45" stroke="#f1c40f" strokeWidth="3" fill="none" />
+          {/* Face */}
+          <Circle cx="50" cy="50" r="20" fill="#2980b9" />
+          <Circle cx="43" cy="47" r="4" fill="white" />
+          <Circle cx="57" cy="47" r="4" fill="white" />
+          <Circle cx="43" cy="47" r="2" fill="black" />
+          <Circle cx="57" cy="47" r="2" fill="black" />
+          {/* Electric crown */}
+          <Path d="M35 25 L50 15 L65 25 L50 35 Z" fill="#f1c40f" stroke="#f39c12" strokeWidth="2" />
+        </Svg>
+      );
+    case 'royal_giant':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          {/* Royal crown */}
+          <Path d="M30 25 L35 40 L50 30 L65 40 L70 25 L50 35 Z" fill="#f1c40f" stroke="#f39c12" strokeWidth="2" />
+          <Circle cx="50" cy="25" r="5" fill="#e74c3c" />
+          <Circle cx="35" cy="30" r="3" fill="#3498db" />
+          <Circle cx="65" cy="30" r="3" fill="#3498db" />
+          {/* Face */}
+          <Circle cx="50" cy="55" r="20" fill="#ffe0b2" />
+          <Circle cx="43" cy="52" r="4" fill="black" />
+          <Circle cx="57" cy="52" r="4" fill="black" />
+          <Path d="M40 65 Q50 60 60 65" stroke="#8B4513" strokeWidth="2" fill="none" />
+          {/* Cannon on shoulder */}
+          <Rect x="70" y="40" width="25" height="12" fill="#2c3e50" rx="2" />
+          <Circle cx="95" cy="46" r="8" fill="#34495e" />
+        </Svg>
+      );
+    case 'three_musketeers':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Musketeer 1 (Left) */}
+          <G transform="translate(-15, 5) scale(0.85)">
+            <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+            <Path d="M20 20 L50 35 L80 20 Z" fill="#e74c3c" />
+            <Circle cx="50" cy="45" r="15" fill="#ffe0b2" />
+            <Circle cx="43" cy="43" r="3" fill="black" />
+            <Circle cx="57" cy="43" r="3" fill="black" />
+            <Rect x="65" y="42" width="20" height="6" fill="#2c3e50" />
+          </G>
+          {/* Musketeer 2 (Right) */}
+          <G transform="translate(25, 5) scale(0.85)">
+            <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+            <Path d="M20 20 L50 35 L80 20 Z" fill="#e74c3c" />
+            <Circle cx="50" cy="45" r="15" fill="#ffe0b2" />
+            <Circle cx="43" cy="43" r="3" fill="black" />
+            <Circle cx="57" cy="43" r="3" fill="black" />
+            <Rect x="65" y="42" width="20" height="6" fill="#2c3e50" />
+          </G>
+          {/* Musketeer 3 (Center, slightly larger) */}
+          <G transform="translate(5, -5) scale(0.9)">
+            <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+            <Path d="M20 20 L50 35 L80 20 Z" fill="#e74c3c" />
+            <Circle cx="50" cy="45" r="15" fill="#ffe0b2" />
+            <Circle cx="43" cy="43" r="3" fill="black" />
+            <Circle cx="57" cy="43" r="3" fill="black" />
+            <Rect x="65" y="42" width="20" height="6" fill="#2c3e50" />
+          </G>
+        </Svg>
+      );
+    case 'lava_hound':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          {/* Cracked lava shell */}
+          <Path d="M30 30 L40 25 L45 35 L50 25 L55 35 L60 25 L70 30" stroke="#c0392b" strokeWidth="2" fill="none" />
+          <Path d="M25 50 L35 45 L40 55 L50 45 L55 55 L65 45 L75 50" stroke="#c0392b" strokeWidth="2" fill="none" />
+          <Path d="M30 70 L40 65 L45 75 L50 65 L55 75 L60 65 L70 70" stroke="#c0392b" strokeWidth="2" fill="none" />
+          {/* Glowing eyes */}
+          <Circle cx="40" cy="45" r="8" fill="#f39c12" opacity="0.8" />
+          <Circle cx="60" cy="45" r="8" fill="#f39c12" opacity="0.8" />
+          <Circle cx="40" cy="45" r="4" fill="#e74c3c" />
+          <Circle cx="60" cy="45" r="4" fill="#e74c3c" />
+          {/* Mouth */}
+          <Path d="M35 60 Q50 75 65 60" stroke="#c0392b" strokeWidth="3" fill="#7f8c8d" />
+          {/* Lava drips */}
+          <Circle cx="30" cy="80" r="3" fill="#e74c3c" opacity="0.6" />
+          <Circle cx="70" cy="82" r="3" fill="#e74c3c" opacity="0.6" />
+        </Svg>
+      );
+    case 'lava_pups':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="#e74c3c" strokeWidth="2" />
+          {/* Small lava cracks */}
+          <Path d="M35 35 L45 40 L40 45" stroke="#c0392b" strokeWidth="2" fill="none" />
+          <Path d="M65 35 L55 40 L60 45" stroke="#c0392b" strokeWidth="2" fill="none" />
+          {/* Big glowing eyes */}
+          <Circle cx="40" cy="45" r="10" fill="#f39c12" opacity="0.8" />
+          <Circle cx="60" cy="45" r="10" fill="#f39c12" opacity="0.8" />
+          <Circle cx="40" cy="45" r="5" fill="#e74c3c" />
+          <Circle cx="60" cy="45" r="5" fill="#e74c3c" />
+          {/* Cute smile */}
+          <Path d="M38 62 Q50 72 62 62" stroke="#c0392b" strokeWidth="2" fill="none" />
+          {/* Small wings */}
+          <Circle cx="25" cy="45" r="10" fill="#9b59b6" opacity="0.6" />
+          <Circle cx="75" cy="45" r="10" fill="#9b59b6" opacity="0.6" />
+        </Svg>
+      );
+    // NEW Cards Sprites
+    case 'electro_giant':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="#f1c40f" strokeWidth="3" />
+          {/* Lightning bolts on body */}
+          <Path d="M30 30 L40 40 L35 40 L45 55" stroke="#f1c40f" strokeWidth="3" fill="none" />
+          <Path d="M70 30 L60 40 L65 40 L55 55" stroke="#f1c40f" strokeWidth="3" fill="none" />
+          <Path d="M40 70 L50 60 L45 60 L55 45" stroke="#f1c40f" strokeWidth="3" fill="none" />
+          <Path d="M60 70 L50 60 L55 60 L45 45" stroke="#f1c40f" strokeWidth="3" fill="none" />
+          {/* Face */}
+          <Circle cx="50" cy="50" r="20" fill="#2980b9" />
+          <Circle cx="43" cy="47" r="4" fill="white" />
+          <Circle cx="57" cy="47" r="4" fill="white" />
+          <Circle cx="43" cy="47" r="2" fill="black" />
+          <Circle cx="57" cy="47" r="2" fill="black" />
+          {/* Electric crown */}
+          <Path d="M35 25 L50 15 L65 25 L50 35 Z" fill="#f1c40f" stroke="#f39c12" strokeWidth="2" />
+        </Svg>
+      );
+    case 'night_witch':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="#e74c3c" strokeWidth="2" />
+          {/* Witch hat */}
+          <Path d="M30 40 L50 10 L70 40 Z" fill="#2c3e50" />
+          <Ellipse cx="50" cy="40" rx="25" ry="8" fill="#2c3e50" />
+          {/* Face */}
+          <Circle cx="50" cy="55" r="15" fill="#1a1a1a" />
+          <Circle cx="43" cy="52" r="4" fill="#e74c3c" />
+          <Circle cx="57" cy="52" r="4" fill="#e74c3c" />
+          {/* Scythe */}
+          <Path d="M75 30 L85 70" stroke="#8B4513" strokeWidth="3" />
+          <Path d="M75 30 L70 25 L80 25" stroke="#95a5a6" strokeWidth="2" />
+        </Svg>
+      );
+    case 'inferno_dragon':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          {/* Wings */}
+          <Path d="M20 40 L5 20 L25 35" fill="#c0392b" stroke="#922b21" strokeWidth="2" />
+          <Path d="M80 40 L95 20 L75 35" fill="#c0392b" stroke="#922b21" strokeWidth="2" />
+          {/* Body */}
+          <Circle cx="50" cy="50" r="25" fill="#e74c3c" />
+          {/* Glowing eyes */}
+          <Circle cx="42" cy="45" r="6" fill="#f39c12" opacity="0.8" />
+          <Circle cx="58" cy="45" r="6" fill="#f39c12" opacity="0.8" />
+          <Circle cx="42" cy="45" r="3" fill="#e74c3c" />
+          <Circle cx="58" cy="45" r="3" fill="#e74c3c" />
+          {/* Fire breath */}
+          <Path d="M35 60 Q50 75 65 60" fill="#f39c12" />
+          <Circle cx="50" cy="70" r="5" fill="#e74c3c" opacity="0.6" />
+          <Circle cx="45" cy="73" r="3" fill="#f39c12" opacity="0.4" />
+          <Circle cx="55" cy="73" r="3" fill="#f39c12" opacity="0.4" />
+        </Svg>
+      );
+    case 'elixir_golem':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#D442F5" stroke="#f1c40f" strokeWidth="3" />
+          <Circle cx="50" cy="50" r="25" fill="#9b59b6" />
+          <Circle cx="43" cy="47" r="5" fill="#f1c40f" />
+          <Circle cx="57" cy="47" r="5" fill="#f1c40f" />
+          <Path d="M40 62 Q50 68 60 62" stroke="#6c3483" strokeWidth="2" fill="none" />
+        </Svg>
+      );
+    case 'elixir_golemite':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="35" fill="#D442F5" stroke="#fff" strokeWidth="2" />
+          <Circle cx="50" cy="50" r="18" fill="#9b59b6" />
+          <Circle cx="45" cy="48" r="3" fill="#fff" />
+          <Circle cx="55" cy="48" r="3" fill="#fff" />
+        </Svg>
+      );
+    case 'elixir_blob':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="25" fill="#D442F5" opacity="0.8" />
+          <Circle cx="50" cy="50" r="15" fill="#D442F5" opacity="0.6" />
+          <Circle cx="45" cy="45" r="2" fill="#fff" opacity="0.9" />
+        </Svg>
+      );
+    case 'firecracker':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          {/* Firework hat */}
+          <Circle cx="50" cy="20" r="12" fill="#e74c3c" />
+          <Path d="M38 20 L30 10" stroke="#f1c40f" strokeWidth="2" />
+          <Path d="M50 15 L50 5" stroke="#e74c3c" strokeWidth="2" />
+          <Path d="M62 20 L70 10" stroke="#f39c12" strokeWidth="2" />
+          {/* Face */}
+          <Circle cx="50" cy="55" r="15" fill="#ffe0b2" />
+          <Circle cx="43" cy="52" r="4" fill="black" />
+          <Circle cx="57" cy="52" r="4" fill="black" />
+          <Path d="M42 62 Q50 68 58 62" stroke="#e67e22" strokeWidth="2" fill="none" />
+          {/* Gun */}
+          <Rect x="70" y="45" width="25" height="8" fill="#2c3e50" rx="2" />
+          <Circle cx="95" cy="49" r="6" fill="#e74c3c" />
+        </Svg>
+      );
+    case 'giant_skeleton':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#bdc3c7" stroke="white" strokeWidth="2" />
+          {/* Big Skull */}
+          <Circle cx="50" cy="45" r="30" fill="white" stroke="#7f8c8d" strokeWidth="2" />
+          <Circle cx="40" cy="40" r="6" fill="black" />
+          <Circle cx="60" cy="40" r="6" fill="black" />
+          <Rect x="40" y="55" width="20" height="8" fill="#7f8c8d" rx="2" />
+          {/* Bomb on back */}
+          <Circle cx="80" cy="70" r="15" fill="#2c3e50" />
+          <Path d="M80 55 L80 50" stroke="#8B4513" strokeWidth="3" />
+          {/* Fuzzy hat */}
+          <Path d="M20 30 Q50 10 80 30" fill="#8B4513" />
+        </Svg>
+      );
+    case 'electro_dragon':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#3498db" stroke="white" strokeWidth="2" />
+          {/* Dragon snout */}
+          <Path d="M30 60 Q50 85 70 60" fill="#2980b9" />
+          {/* Electric eyes */}
+          <Circle cx="40" cy="45" r="6" fill="#f1c40f" />
+          <Circle cx="60" cy="45" r="6" fill="#f1c40f" />
+          {/* Wings */}
+          <Path d="M15 40 Q5 20 25 30" fill="#f1c40f" opacity="0.6" />
+          <Path d="M85 40 Q95 20 75 30" fill="#f1c40f" opacity="0.6" />
+          {/* Lightning symbol */}
+          <Path d="M45 10 L55 20 L45 20 L55 30" stroke="#f1c40f" strokeWidth="3" fill="none" />
+        </Svg>
+      );
+    case 'hunter':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          {/* Huge eyebrows */}
+          <Path d="M30 35 Q40 25 50 35" stroke="black" strokeWidth="6" fill="none" />
+          <Path d="M50 35 Q60 25 70 35" stroke="black" strokeWidth="6" fill="none" />
+          {/* Mustache */}
+          <Path d="M35 60 Q50 75 65 60" fill="black" />
+          {/* Shotgun */}
+          <Rect x="60" y="50" width="35" height="12" fill="#7f8c8d" rx="2" />
+          <Rect x="65" y="52" width="25" height="4" fill="#2c3e50" />
+        </Svg>
+      );
+    case 'magic_archer':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#27ae60" stroke="white" strokeWidth="2" />
+          {/* Hood */}
+          <Path d="M20 50 Q50 10 80 50 L80 80 L20 80 Z" fill="#1e8449" />
+          {/* Face with white beard */}
+          <Circle cx="50" cy="50" r="25" fill="#ffe0b2" />
+          <Path d="M30 60 Q50 85 70 60" fill="white" />
+          {/* Glowing blue eyes */}
+          <Circle cx="42" cy="48" r="4" fill="#3498db" />
+          <Circle cx="58" cy="48" r="4" fill="#3498db" />
+          {/* Magic Bow */}
+          <Path d="M20 60 Q50 90 80 60" stroke="#f1c40f" strokeWidth="3" fill="none" />
+        </Svg>
+      );
+    case 'royal_ghost':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="rgba(236, 240, 241, 0.6)" stroke="white" strokeWidth="2" />
+          {/* Ghostly hood */}
+          <Path d="M25 40 Q50 10 75 40 Q75 80 50 90 Q25 80 25 40" fill="white" opacity="0.8" />
+          {/* Hollow eyes */}
+          <Circle cx="40" cy="45" r="5" fill="#34495e" />
+          <Circle cx="60" cy="45" r="5" fill="#34495e" />
+          {/* Crown */}
+          <Path d="M40 20 L50 10 L60 20 Z" fill="#f1c40f" />
+          {/* Ghostly Sword */}
+          <Path d="M70 50 L90 30" stroke="#bdc3c7" strokeWidth="4" opacity="0.7" />
         </Svg>
       );
     default:
@@ -1944,6 +2361,29 @@ const VisualEffects = ({ effects, setEffects }) => {
           );
         }
 
+        if (effect.type === 'dust_cloud') {
+          // Recoil dust cloud
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity * 0.8,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * progress} fill="#bdc3c7" opacity={0.5} />
+                <Circle cx={effect.radius * 0.7} cy={effect.radius * 0.6} r={effect.radius * 0.2} fill="#95a5a6" opacity={0.6} />
+                <Circle cx={effect.radius * 1.3} cy={effect.radius * 0.8} r={effect.radius * 0.15} fill="#95a5a6" opacity={0.6} />
+                <Circle cx={effect.radius * 0.8} cy={effect.radius * 1.2} r={effect.radius * 0.18} fill="#7f8c8d" opacity={0.5} />
+              </Svg>
+            </View>
+          );
+        }
+
         if (effect.type === 'earthquake_crack') {
           // Earthquake - cracking ground effect
           return (
@@ -2176,6 +2616,154 @@ const VisualEffects = ({ effects, setEffects }) => {
           );
         }
 
+        if (effect.type === 'dash_trail') {
+          // Bandit dash trail - orange speed lines
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Speed lines radiating outward */}
+                <Path d={`M${effect.radius} ${effect.radius} L${effect.radius * 0.3} ${effect.radius * 0.5}`} stroke="#e67e22" strokeWidth="2" opacity={0.8} />
+                <Path d={`M${effect.radius} ${effect.radius} L${effect.radius * 1.7} ${effect.radius * 0.5}`} stroke="#e67e22" strokeWidth="2" opacity={0.8} />
+                <Path d={`M${effect.radius} ${effect.radius} L${effect.radius * 0.3} ${effect.radius * 1.5}`} stroke="#e67e22" strokeWidth="2" opacity={0.8} />
+                <Path d={`M${effect.radius} ${effect.radius} L${effect.radius * 1.7} ${effect.radius * 1.5}`} stroke="#e67e22" strokeWidth="2" opacity={0.8} />
+                {/* Center glow */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.4} fill="#e67e22" opacity={0.6} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.2} fill="#f39c12" opacity={0.8} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'inferno_beam') {
+          // Inferno Tower fire beam - intensifying flame stream
+          const intensity = effect.intensity || 0; // 0 to 1
+          const beamWidth = 3 + intensity * 5; // 3px to 8px width
+          const coreOpacity = 0.4 + intensity * 0.4; // 0.4 to 0.8 opacity
+          const glowOpacity = 0.2 + intensity * 0.3; // 0.2 to 0.5 opacity
+
+          // Calculate beam position and angle
+          const dx = effect.endX - effect.startX;
+          const dy = effect.endY - effect.startY;
+          const beamLength = Math.sqrt(dx * dx + dy * dy);
+          const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: Math.min(effect.startX, effect.endX),
+              top: Math.min(effect.startY, effect.endY),
+              width: Math.abs(dx),
+              height: Math.abs(dy),
+              alignItems: 'center',
+              justifyContent: 'center',
+              transform: [{ rotate: `${angle}deg` }],
+              zIndex: 50
+            }}>
+              <Svg width={Math.abs(dx)} height={Math.abs(dy)} viewBox={`0 0 ${Math.abs(dx)} ${Math.abs(dy)}`}>
+                {/* Outer glow - widest part */}
+                <Rect
+                  x="0"
+                  y={Math.abs(dy) / 2 - beamWidth * 2}
+                  width={Math.abs(dx)}
+                  height={beamWidth * 4}
+                  fill="#e74c3c"
+                  opacity={glowOpacity * 0.5}
+                />
+                {/* Middle glow */}
+                <Rect
+                  x="0"
+                  y={Math.abs(dy) / 2 - beamWidth * 1.5}
+                  width={Math.abs(dx)}
+                  height={beamWidth * 3}
+                  fill="#f39c12"
+                  opacity={glowOpacity}
+                />
+                {/* Core beam - brightest part */}
+                <Rect
+                  x="0"
+                  y={Math.abs(dy) / 2 - beamWidth}
+                  width={Math.abs(dx)}
+                  height={beamWidth * 2}
+                  fill="#fff"
+                  opacity={coreOpacity * 0.8}
+                />
+                {/* Hot center - white hot at high intensity */}
+                <Rect
+                  x="0"
+                  y={Math.abs(dy) / 2 - beamWidth * 0.3}
+                  width={Math.abs(dx)}
+                  height={beamWidth * 0.6}
+                  fill="#fff5cc"
+                  opacity={coreOpacity * intensity}
+                />
+                {/* Animated flames along beam */}
+                {Array.from({ length: Math.floor(3 + intensity * 5) }).map((_, i) => (
+                  <Circle
+                    key={i}
+                    cx={Math.abs(dx) * (0.2 + (i * 0.15) % 0.8)}
+                    cy={Math.abs(dy) / 2}
+                    r={beamWidth * (0.5 + Math.sin(Date.now() / 100 + i) * 0.3)}
+                    fill="#f39c12"
+                    opacity={0.6 + Math.sin(Date.now() / 80 + i * 2) * 0.3}
+                  />
+                ))}
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'electro_aura') {
+          // Electro Giant shock aura - blue transparent circle
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 5
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Outer glow circle */}
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * 0.95}
+                  fill="none"
+                  stroke="#3498db"
+                  strokeWidth="2"
+                  strokeDasharray="5 5"
+                  opacity={0.4}
+                />
+                {/* Inner fill - transparent blue */}
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * 0.9}
+                  fill="#3498db"
+                  opacity={0.15}
+                />
+                {/* Electric particles */}
+                <Circle cx={effect.radius * 0.3} cy={effect.radius * 0.3} r={3} fill="#f1c40f" opacity={0.6} />
+                <Circle cx={effect.radius * 1.7} cy={effect.radius * 0.3} r={3} fill="#f1c40f" opacity={0.6} />
+                <Circle cx={effect.radius * 0.5} cy={effect.radius * 1.7} r={3} fill="#f1c40f" opacity={0.6} />
+                <Circle cx={effect.radius * 1.5} cy={effect.radius * 1.7} r={3} fill="#f1c40f" opacity={0.6} />
+              </Svg>
+            </View>
+          );
+        }
+
         return null;
       })}
     </>
@@ -2215,6 +2803,36 @@ const Projectile = ({ type, position }) => {
       <View style={[styles.fireballSmall, { left: position.x, top: position.y }]} />
     );
   }
+  if (type === 'magic_arrow') {
+    // Thin green glowing arrow
+    return (
+      <View style={{
+        position: 'absolute',
+        width: 30,
+        height: 4,
+        backgroundColor: '#2ecc71',
+        borderRadius: 2,
+        left: position.x - 15,
+        top: position.y - 2,
+        transform: [{ rotate: `${angleDeg}deg` }],
+        shadowColor: '#2ecc71',
+        shadowOpacity: 0.8,
+        shadowRadius: 5,
+        elevation: 5
+      }}>
+        <View style={{
+          position: 'absolute',
+          right: -5,
+          top: -2,
+          width: 8,
+          height: 8,
+          backgroundColor: '#fff',
+          borderRadius: 4,
+          opacity: 0.8
+        }} />
+      </View>
+    );
+  }
   if (type === 'ice_shard') {
     return (
       <View style={{
@@ -2227,6 +2845,25 @@ const Projectile = ({ type, position }) => {
         left: position.x - 5,
         top: position.y - 5
       }} />
+    );
+  }
+  if (type === 'firecracker') {
+    // Small firecracker rocket - orange with trail
+    return (
+      <View style={{
+        position: 'absolute',
+        left: position.x - 6,
+        top: position.y - 6,
+        width: 12,
+        height: 12,
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <Svg width="12" height="12" viewBox="0 0 12 12">
+          <Circle cx="6" cy="6" r="4" fill="#e67e22" opacity={0.9} />
+          <Circle cx="6" cy="6" r="2" fill="#f39c12" opacity={1} />
+        </Svg>
+      </View>
     );
   }
   if (type === 'fireball_spell') {
@@ -2420,16 +3057,24 @@ const Projectile = ({ type, position }) => {
         left: position.x,
         top: position.y,
         transform: [{ rotate: `${angleDeg}deg` }],
-        width: 30,
-        height: 10
+        width: 40,
+        height: 20
       }}>
-        {/* Main flaming arrow */}
-        <Svg width="30" height="10" viewBox="0 0 30 10">
-          <Path d="M0 5 L25 5" stroke="#8B4513" strokeWidth="2" />
-          <Path d="M25 5 L20 2 L20 8 Z" fill="#e74c3c" />
-          {/* Flame trail */}
-          <Circle cx="22" cy="5" r="3" fill="#f1c40f" opacity="0.8" />
-          <Circle cx="18" cy="5" r="2" fill="#e67e22" opacity="0.6" />
+        <Svg width="40" height="20" viewBox="0 0 40 20">
+          {/* Arrow 1 (Center) */}
+          <Path d="M5 10 L35 10" stroke="#8B4513" strokeWidth="2" />
+          <Path d="M35 10 L30 7 L30 13 Z" fill="#e74c3c" />
+          <Circle cx="32" cy="10" r="3" fill="#f1c40f" opacity="0.8" />
+          
+          {/* Arrow 2 (Top) */}
+          <Path d="M0 5 L30 5" stroke="#8B4513" strokeWidth="2" />
+          <Path d="M30 5 L25 2 L25 8 Z" fill="#e74c3c" />
+          <Circle cx="27" cy="5" r="3" fill="#f1c40f" opacity="0.8" />
+
+          {/* Arrow 3 (Bottom) */}
+          <Path d="M0 15 L30 15" stroke="#8B4513" strokeWidth="2" />
+          <Path d="M30 15 L25 12 L25 18 Z" fill="#e74c3c" />
+          <Circle cx="27" cy="15" r="3" fill="#f1c40f" opacity="0.8" />
         </Svg>
       </View>
     );
@@ -2752,8 +3397,14 @@ const Unit = ({ unit }) => {
     outputRange: ['0deg', '360deg'],
   });
 
+  const isStealthed = unit.hidden && unit.hidden.active;
+
   return (
-    <View style={[styles.unit, { left: unit.x - unitSize / 2, top: unit.y - unitSize / 2, width: unitSize, height: unitSize }]}>
+    <View style={[
+      styles.unit, 
+      { left: unit.x - unitSize / 2, top: unit.y - unitSize / 2, width: unitSize, height: unitSize },
+      isStealthed && { opacity: 0.4 }
+    ]}>
       {/* Range Indicator Circle - Only for Buildings and Units with Spawn Damage (e.g. Mega Knight) */}
       {Boolean(unit.range && unit.range > 0 && (unit.type === 'building' || unit.spawnDamage)) && (
         <View style={{
@@ -2841,15 +3492,20 @@ const Unit = ({ unit }) => {
           </Svg>
         </View>
       )}
-      {/* Health bar for all units */}
-      <HealthBar
-        current={unit.hp}
-        max={unit.maxHp}
-        isOpponent={isEnemy}
-        hasShield={unit.hasShield}
-        shieldHp={unit.currentShieldHp || 0}
-        shieldMax={unit.shieldHp || 0}
-      />
+      
+      {/* Health Bars */}
+      <View style={{ position: 'absolute', top: -12, width: unitSize, alignItems: 'center', zIndex: 10 }}>
+        {/* Shield Bar (if active) */}
+        {unit.currentShieldHp > 0 && (
+          <View style={{ width: '100%', height: 4, backgroundColor: '#333', borderRadius: 2, marginBottom: 1, overflow: 'hidden' }}>
+            <View style={{ width: `${(unit.currentShieldHp / unit.shieldHp) * 100}%`, height: '100%', backgroundColor: '#8e44ad' }} />
+          </View>
+        )}
+        {/* Main HP Bar */}
+        <View style={{ width: '100%', height: 6, backgroundColor: '#333', borderRadius: 3, overflow: 'hidden' }}>
+          <View style={{ width: `${(unit.hp / unit.maxHp) * 100}%`, height: '100%', backgroundColor: '#ff4444' }} />
+        </View>
+      </View>
     </View>
   );
 };
@@ -4556,14 +5212,14 @@ export default function App() {
   }, []);
 
   // Multiple deck slots - 5 decks of 8 cards each
-  // Filter out token cards (golemite, lava_pups, etc.) from deck initialization
-  const playableCards = CARDS.filter(card => !card.isToken);
+  const getDeckByIds = (ids) => ids.map(id => CARDS.find(c => c.id === id)).filter(Boolean);
+  
   const [allDecks, setAllDecks] = useState([
-    playableCards.slice(0, 8),  // Deck 1
-    playableCards.slice(8, 16), // Deck 2
-    playableCards.slice(16, 24), // Deck 3
-    playableCards.slice(24, 32), // Deck 4
-    playableCards.slice(32, 40)  // Deck 5
+    getDeckByIds(['hog_rider', 'musketeer', 'ice_golem', 'ice_spirit', 'skeletons', 'fireball', 'zap', 'cannon']), // Hog 2.6
+    getDeckByIds(['goblin_barrel', 'princess', 'knight', 'dart_goblin', 'inferno_tower', 'rocket', 'arrows', 'skeletons']), // Log Bait
+    getDeckByIds(['pekka', 'bandit', 'battle_ram', 'electro_wizard', 'magic_archer', 'zap', 'poison', 'royal_ghost']), // Pekka Bridge Spam
+    getDeckByIds(['golem', 'night_witch', 'baby_dragon', 'mega_minion', 'lightning', 'zap', 'elite_barbarians', 'mini_pekka']), // Golem Beatdown
+    getDeckByIds(['giant', 'prince', 'archers', 'spear_goblins', 'fireball', 'zap', 'minions', 'valkyrie']) // Classic Giant
   ]);
   const [selectedDeckIndex, setSelectedDeckIndex] = useState(0);
 
@@ -4575,9 +5231,9 @@ export default function App() {
   const [globalDragPosition, setGlobalDragPosition] = useState({ x: 0, y: 0 });
 
   const [elixir, setElixir] = useState(5);
-  const [hand, setHand] = useState([CARDS[0], CARDS[1], CARDS[2], CARDS[3]]);
-  const [nextCard, setNextCard] = useState(CARDS[4]);
-  const [deckQueue, setDeckQueue] = useState([CARDS[5], CARDS[6], CARDS[7]]);
+  const [hand, setHand] = useState([allDecks[0][0], allDecks[0][1], allDecks[0][2], allDecks[0][3]]);
+  const [nextCard, setNextCard] = useState(allDecks[0][4]);
+  const [deckQueue, setDeckQueue] = useState([allDecks[0][5], allDecks[0][6], allDecks[0][7]]);
   const [draggingCard, setDraggingCard] = useState(null);
   const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
   const [screenShake, setScreenShake] = useState(null);
@@ -4624,9 +5280,9 @@ export default function App() {
 
   // Enemy State
   const [enemyElixir, setEnemyElixir] = useState(5);
-  const [enemyHand, setEnemyHand] = useState([CARDS[0], CARDS[3], CARDS[5], CARDS[6]]);
-  const [enemyNextCard, setEnemyNextCard] = useState(CARDS[1]);
-  const [enemyDeckQueue, setEnemyDeckQueue] = useState([CARDS[2], CARDS[4], CARDS[7]]);
+  const [enemyHand, setEnemyHand] = useState([allDecks[4][0], allDecks[4][1], allDecks[4][2], allDecks[4][3]]);
+  const [enemyNextCard, setEnemyNextCard] = useState(allDecks[4][4]);
+  const [enemyDeckQueue, setEnemyDeckQueue] = useState([allDecks[4][5], allDecks[4][6], allDecks[4][7]]);
 
   const [towers, setTowers] = useState([
     { id: 0, type: 'king', isOpponent: true, hp: 4000, maxHp: 4000, x: width / 2, y: 80, range: KING_RANGE, lastShot: 0 },
@@ -4670,13 +5326,23 @@ export default function App() {
     setIsDoubleElixir(false);
     setShowDoubleElixirAlert(false);
     doubleElixirTriggeredRef.current = false;
-    // Use the current user deck and randomize the starting hand
-    const currentDeck = userCards || CARDS;
-    // Shuffle the deck randomly
-    const shuffledDeck = [...currentDeck].sort(() => Math.random() - 0.5);
-    setHand([shuffledDeck[0], shuffledDeck[1], shuffledDeck[2], shuffledDeck[3]]);
-    setNextCard(shuffledDeck[4]);
-    setDeckQueue([shuffledDeck[5], shuffledDeck[6], shuffledDeck[7]]);
+    
+    // Player Deck Randomization
+    const currentDeck = userCards || allDecks[0];
+    const shuffledPlayerDeck = [...currentDeck].sort(() => Math.random() - 0.5);
+    setHand([shuffledPlayerDeck[0], shuffledPlayerDeck[1], shuffledPlayerDeck[2], shuffledPlayerDeck[3]]);
+    setNextCard(shuffledPlayerDeck[4]);
+    setDeckQueue([shuffledPlayerDeck[5], shuffledPlayerDeck[6], shuffledPlayerDeck[7]]);
+
+    // Enemy AI Deck Randomization
+    setEnemyElixir(5);
+    const randomEnemyDeckIndex = Math.floor(Math.random() * allDecks.length);
+    const enemyDeck = allDecks[randomEnemyDeckIndex];
+    const shuffledEnemyDeck = [...enemyDeck].sort(() => Math.random() - 0.5);
+    setEnemyHand([shuffledEnemyDeck[0], shuffledEnemyDeck[1], shuffledEnemyDeck[2], shuffledEnemyDeck[3]]);
+    setEnemyNextCard(shuffledEnemyDeck[4]);
+    setEnemyDeckQueue([shuffledEnemyDeck[5], shuffledEnemyDeck[6], shuffledEnemyDeck[7]]);
+
     setUnits([]);
     setProjectiles([]);
     setTimeLeft(180);
@@ -5106,7 +5772,24 @@ export default function App() {
             // Shield properties (Guards, Dark Prince)
             hasShield: actualCard.hasShield || false,
             currentShieldHp: actualCard.shieldHp || 0,
-            shieldHp: actualCard.shieldHp || 0
+            shieldHp: actualCard.shieldHp || 0,
+            deathDamage: actualCard.deathDamage || 0,
+            deathRadius: actualCard.deathRadius || 0,
+            deathSlow: actualCard.deathSlow || 0,
+            // New card properties
+            dashInvincible: actualCard.dashInvincible || false,  // Bandit dash invincibility
+            dashRange: actualCard.dashRange || 80,  // Bandit dash activation range
+            isDashing: false,  // Track if Bandit is currently dashing
+            dashEndTime: 0,  // When Bandit dash ends
+            damageRamp: actualCard.damageRamp || false,  // Inferno Tower damage ramp
+            currentDamageBonus: 0,  // Track Inferno Tower damage ramp
+            lastDamageRampTime: Date.now(),  // Track when damage ramp started
+            lastTargetId: null,  // Track last target for Inferno Tower damage ramp reset
+            bombDrops: actualCard.bombDrops || false,  // Balloon bomb drops
+            lastBombDrop: Date.now(),  // Track last bomb drop time
+            shotgunSpread: actualCard.shotgunSpread || false,  // Hunter shotgun spread
+            pierce: actualCard.pierce || false,  // Magic Archer pierce
+            givesOpponentElixir: actualCard.givesOpponentElixir || false  // Elixir Golem return
           });
         }
         setUnits(prev => [...(prev || []), ...newUnits]);
@@ -5791,44 +6474,38 @@ export default function App() {
         let actualDamage = u.damage;
         let actualRange = u.range;
         if (u.hidden) {
-          // Check if enemy unit is in detection range (slightly larger than attack range)
-          const detectionRange = u.range * 1.2;
-          const hasEnemyInRange = (unitsRef.current || []).some(enemy =>
-            enemy.isOpponent !== u.isOpponent && enemy.hp > 0 &&
-            Math.sqrt(Math.pow(enemy.x - u.x, 2) + Math.pow(enemy.y - u.y, 2)) <= detectionRange
-          );
+          if (u.spriteId === 'tesla') {
+            // Tesla logic: Uncloak when enemies are near
+            const detectionRange = u.range * 1.2;
+            const hasEnemyInRange = (unitsRef.current || []).some(enemy =>
+              enemy.isOpponent !== u.isOpponent && enemy.hp > 0 &&
+              Math.sqrt(Math.pow(enemy.x - u.x, 2) + Math.pow(enemy.y - u.y, 2)) <= detectionRange
+            );
 
-          // Track when Tesla was last in combat
-          if (!u.hidden.lastCombatTime) {
-            u.hidden.lastCombatTime = now;
-          }
+            if (!u.hidden.lastCombatTime) u.hidden.lastCombatTime = now;
 
-          if (hasEnemyInRange) {
-            // Tesla emerges - visible and can attack with full stats
-            u.hidden.lastCombatTime = now;
-            if (u.hidden.active) {
-              u.hidden.wakeTime = now;
-
-              // Tesla reveal visual effect
-              setVisualEffects(prev => [...prev, {
-                id: Date.now() + Math.random(),
-                type: 'tesla_reveal',
-                x: u.x,
-                y: u.y,
-                radius: 50,
-                startTime: Date.now(),
-                duration: 500
-              }]);
+            if (hasEnemyInRange) {
+              u.hidden.lastCombatTime = now;
+              if (u.hidden.active) {
+                u.hidden.wakeTime = now;
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'tesla_reveal',
+                  x: u.x, y: u.y,
+                  radius: 50, startTime: Date.now(), duration: 500
+                }]);
+              }
+              u.hidden.active = false;
+            } else {
+              const timeSinceCombat = (now - u.hidden.lastCombatTime) / 1000;
+              if (timeSinceCombat > 3) u.hidden.active = true;
             }
-            u.hidden.active = false;
-          } else {
-            // Check if been out of combat for 3+ seconds
-            const timeSinceCombat = (now - u.hidden.lastCombatTime) / 1000;
-            if (timeSinceCombat > 3) {
-              // Go underground - hidden and untargetable
+          } else if (u.spriteId === 'royal_ghost') {
+            // Royal Ghost logic: Re-cloak 3s after last attack
+            const timeSinceAttack = now - (u.hidden.lastAttackTime || 0);
+            if (!u.hidden.active && timeSinceAttack > 3000) {
               u.hidden.active = true;
             }
-            // While visible (just emerged), Tesla can still attack with full stats
           }
         }
 
@@ -5901,7 +6578,7 @@ export default function App() {
           const unitTargets = (unitsRef.current || []).filter(targetUnit =>
             targetUnit.isOpponent !== u.isOpponent &&
             targetUnit.hp > 0 &&
-            !(targetUnit.hidden?.active && targetUnit.spriteId === 'tesla') &&
+            !targetUnit.hidden?.active && // Untargetable if hidden (Royal Ghost, Tesla)
             !targetUnit.isZone && // Cannot target zones (graveyard, etc.)
             // Ground melee units cannot target flying units, but ranged units can
             // EXCEPTION: X-Bow targets ground ONLY despite having projectile
@@ -5962,10 +6639,75 @@ export default function App() {
           });
         }
 
+        // Bandit Dash - activate dash when entering dash range while moving toward target
+        if (u.dashInvincible && u.spriteId === 'bandit' && !u.isDashing && closestTarget && minDist <= (u.dashRange || 80) && minDist > u.range + 10) {
+          // Activate dash when within dash range (but not too close)
+          u.isDashing = true;
+          u.dashEndTime = now + 750; // Dash lasts 750ms
+          u.lockedTarget = closestTarget.id; // Lock onto target
+
+          // Visual effect for dash
+          setVisualEffects(prev => [...prev, {
+            id: Date.now() + Math.random(),
+            type: 'dash_trail',
+            x: u.x,
+            y: u.y,
+            radius: 30,
+            startTime: Date.now(),
+            duration: 750
+          }]);
+        }
+
         if (closestTarget && minDist <= actualRange + 25) {
           // LOCK the target when starting to attack
           if (!u.lockedTarget) {
             u.lockedTarget = closestTarget.id;
+          }
+
+          // Inferno Tower & Inferno Dragon Continuous Beam Visual - show every frame while locked on target
+          if (u.damageRamp && (u.spriteId === 'inferno_tower' || u.spriteId === 'inferno_dragon')) {
+            const beamIntensity = Math.min(1, (u.currentDamageBonus || 0) / 400); // 0 = weak, 1 = max
+
+            setVisualEffects(prev => {
+              // Remove old beam from this tower
+              const filtered = prev.filter(e => e.attackerId !== u.id || e.type !== 'inferno_beam');
+
+              // Add updated beam
+              return [...filtered, {
+                id: Date.now() + Math.random(),
+                type: 'inferno_beam',
+                attackerId: u.id,
+                startX: u.x,
+                startY: u.y,
+                endX: closestTarget.x,
+                endY: closestTarget.y,
+                intensity: beamIntensity,
+                startTime: Date.now(),
+                duration: 100 // Short duration, will be refreshed each frame
+              }];
+            });
+          }
+
+          // Electro Giant Shock Aura - show continuously while alive
+          if (u.shockOnHit && u.spriteId === 'electro_giant') {
+            const shockRadius = u.shockRadius || 50;
+
+            setVisualEffects(prev => {
+              // Remove old aura from this giant
+              const filtered = prev.filter(e => e.attackerId !== u.id || e.type !== 'electro_aura');
+
+              // Add updated aura
+              return [...filtered, {
+                id: Date.now() + Math.random(),
+                type: 'electro_aura',
+                attackerId: u.id,
+                x: u.x,
+                y: u.y,
+                radius: shockRadius,
+                startTime: Date.now(),
+                duration: 100 // Short duration, will be refreshed each frame
+              }];
+            });
           }
 
           const isWakingUp = u.hidden && u.hidden.wakeTime && (now - u.hidden.wakeTime < 500);
@@ -5979,8 +6721,36 @@ export default function App() {
           }
 
           if (now - u.lastAttack > currentAttackSpeed && !isWakingUp) {
+            // Mark that this unit attacked this frame (for recoil mechanic)
+            u.justAttacked = true;
+
             // Calculate damage to deal
             let damageToDeal = actualDamage;
+
+            // Uncloak if hidden (Royal Ghost)
+            if (u.hidden && u.hidden.active) {
+              u.hidden.active = false;
+              u.hidden.lastAttackTime = now;
+            }
+
+            // Bandit Dash - deals 2x damage while dashing
+            if (u.dashInvincible && u.isDashing && u.spriteId === 'bandit') {
+              damageToDeal = actualDamage * 2; // Dash deals 2x damage
+            }
+
+            // Inferno Tower Damage Ramp - increases over time
+            if (u.damageRamp) {
+              const timeRamping = (now - u.lastDamageRampTime) / 1000;
+              u.currentDamageBonus = Math.min(350, timeRamping * 60); // Slower ramp, cap at +350
+              damageToDeal = actualDamage + u.currentDamageBonus;
+            }
+
+            // Hunter Shotgun Spread - damage falls off with distance
+            if (u.shotgunSpread) {
+              const distToTarget = Math.sqrt(Math.pow(closestTarget.x - u.x, 2) + Math.pow(closestTarget.y - u.y, 2));
+              const falloff = Math.max(0.3, 1 - (distToTarget / 150)); // 30% min damage at max range
+              damageToDeal = Math.floor(actualDamage * falloff);
+            }
 
             // Note: Witch spawns skeletons via periodic spawn (spawnRate: 7), not attack spawn
 
@@ -6003,24 +6773,102 @@ export default function App() {
 
               // Fire projectiles at all targets
               targetsToAttack.forEach(target => {
-                nextProjectiles.push({
-                  id: now + Math.random() + target.id,
-                  x: u.x,
-                  y: u.y,
-                  targetId: target.id,
-                  targetX: target.x,
-                  targetY: target.y,
-                  speed: projectileSpeed,
-                  damage: damageToDeal,
-                  type: projectileType,
-                  splash: u.splash,
-                  slow: u.slow,
-                  stun: u.stun,
-                  attackerId: u.id,
-                  isOpponent: u.isOpponent
-                });
+                if (u.shotgunSpread) {
+                  // Hunter fires 10 bullets in a cone
+                  const baseAngle = Math.atan2(target.y - u.y, target.x - u.x);
+                  for (let i = -4; i <= 5; i++) {
+                    const angle = baseAngle + (i * 0.15); // spread
+                    const tX = u.x + Math.cos(angle) * 150;
+                    const tY = u.y + Math.sin(angle) * 150;
+
+                    nextProjectiles.push({
+                      id: now + Math.random() + i,
+                      x: u.x,
+                      y: u.y,
+                      targetId: null, // Shotgun bullets are location based
+                      targetX: tX,
+                      targetY: tY,
+                      speed: 15,
+                      damage: Math.floor(damageToDeal / 10), // Divide total damage by pellet count
+                      type: 'bullet', // pellets
+                      attackerId: u.id,
+                      isOpponent: u.isOpponent
+                    });
+                  }
+                } else if (u.spreadCount && u.spriteId === 'firecracker') {
+                  // Firecracker fires 8 rockets in a forward spread pattern
+                  const baseAngle = Math.atan2(target.y - u.y, target.x - u.x);
+                  const spreadArc = u.spreadArc || 0.5; // Radians of spread
+                  const pelletCount = u.spreadCount || 8;
+
+                  for (let i = 0; i < pelletCount; i++) {
+                    // Distribute pellets evenly across the arc
+                    const angleOffset = -spreadArc / 2 + (spreadArc * i / (pelletCount - 1));
+                    const angle = baseAngle + angleOffset;
+                    const distance = 200; // Firecrackers shoot far forward
+                    const tX = u.x + Math.cos(angle) * distance;
+                    const tY = u.y + Math.sin(angle) * distance;
+
+                    nextProjectiles.push({
+                      id: now + Math.random() + i,
+                      x: u.x,
+                      y: u.y,
+                      targetId: null, // Firecracker rockets are location based
+                      targetX: tX,
+                      targetY: tY,
+                      speed: 12,
+                      damage: Math.floor(damageToDeal / pelletCount), // Divide damage by rocket count
+                      type: 'firecracker',
+                      splash: true,
+                      splashRadius: 25,
+                      stun: u.stun || 0,
+                      attackerId: u.id,
+                      isOpponent: u.isOpponent
+                    });
+                  }
+                } else {
+                  nextProjectiles.push({
+                    id: now + Math.random() + target.id,
+                    x: u.x,
+                    y: u.y,
+                    targetId: target.id,
+                    targetX: target.x,
+                    targetY: target.y,
+                    speed: projectileSpeed,
+                    damage: damageToDeal,
+                    type: projectileType,
+                    splash: u.splash,
+                    slow: u.slow,
+                    stun: u.stun,
+                    attackerId: u.id,
+                    isOpponent: u.isOpponent,
+                    pierce: u.pierce || false,
+                    chain: u.chain || 0
+                  });
+                }
               });
-            } else if (u.kamikaze) {
+            }
+
+            // Firecracker Recoil - push herself back when shooting (after attack logic)
+            if (u.recoil && u.justAttacked && closestTarget) {
+              const angle = Math.atan2(u.y - closestTarget.y, u.x - closestTarget.x); // Opposite direction
+              const recoilDistance = u.recoil || 60;
+              u.x += Math.cos(angle) * recoilDistance;
+              u.y += Math.sin(angle) * recoilDistance;
+
+              // Recoil visual
+              setVisualEffects(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: 'dust_cloud',
+                x: u.x,
+                y: u.y,
+                radius: 25,
+                startTime: Date.now(),
+                duration: 400
+              }]);
+            }
+
+            if (u.kamikaze && u.spriteId !== 'battle_ram') {
               // SPIRIT JUMP ATTACK INITIATION
               return { 
                 ...u, 
@@ -6075,6 +6923,63 @@ export default function App() {
                 });
               }
 
+              // Electro Giant Shock - stun all enemies in radius when attacking
+              if (u.shockOnHit && u.spriteId === 'electro_giant') {
+                const shockRadius = u.shockRadius || 50;
+                const shockStunDuration = (u.shockStun || 0.5) * 1000; // Convert to ms
+
+                // Create stun events for all enemies in radius
+                setUnits(prevUnits => {
+                  return prevUnits.map(enemy => {
+                    // Only affect enemy units within radius
+                    if (enemy.isOpponent !== u.isOpponent && enemy.hp > 0) {
+                      const dist = Math.sqrt(Math.pow(enemy.x - u.x, 2) + Math.pow(enemy.y - u.y, 2));
+                      if (dist <= shockRadius) {
+                        // Create lightning zap visual effect
+                        setVisualEffects(prev => [...prev, {
+                          id: Date.now() + Math.random(),
+                          type: 'lightning_strike',
+                          x: enemy.x,
+                          y: enemy.y,
+                          radius: 30,
+                          startTime: Date.now(),
+                          duration: 300
+                        }]);
+
+                        // Apply stun
+                        return { ...enemy, stunUntil: now + shockStunDuration };
+                      }
+                    }
+                    return enemy;
+                  });
+                });
+
+                // Also stun enemy towers in radius
+                setTowers(prevTowers => {
+                  return prevTowers.map(tower => {
+                    if (tower.isOpponent !== u.isOpponent && tower.hp > 0) {
+                      const dist = Math.sqrt(Math.pow(tower.x - u.x, 2) + Math.pow(tower.y - u.y, 2));
+                      if (dist <= shockRadius) {
+                        // Create lightning zap visual effect
+                        setVisualEffects(prev => [...prev, {
+                          id: Date.now() + Math.random(),
+                          type: 'lightning_strike',
+                          x: tower.x,
+                          y: tower.y,
+                          radius: 30,
+                          startTime: Date.now(),
+                          duration: 300
+                        }]);
+
+                        // Apply stun (towers have stunUntil property)
+                        return { ...tower, stunUntil: now + shockStunDuration };
+                      }
+                    }
+                    return tower;
+                  });
+                });
+              }
+
               // Heal on Attack (Battle Healer & Heal Spirit)
               if (u.healsOnAttack > 0) {
                 healEvents.push({
@@ -6096,7 +7001,7 @@ export default function App() {
                 }]);
               }
 
-              // Spirit Cards special effects
+              // Spirit Cards special effects (AND Battle Ram impact)
               if (u.kamikaze) {
                 // Fire Spirit - explosion visual (has splash: true)
                 if (u.splash) {
@@ -6109,6 +7014,19 @@ export default function App() {
                     startTime: Date.now(),
                     duration: 500
                   }]);
+                }
+
+                // Battle Ram - wood break visual
+                if (u.spriteId === 'battle_ram') {
+                   setVisualEffects(prev => [...prev, {
+                    id: Date.now() + Math.random(),
+                    type: 'goblin_barrel_spawn', // Reuse wood effect
+                    x: u.x,
+                    y: u.y,
+                    radius: 40,
+                    startTime: Date.now(),
+                    duration: 500
+                   }]);
                 }
 
                 // Ice Spirit - freeze visual
@@ -6152,9 +7070,35 @@ export default function App() {
             }
             // Reset charge when Prince attacks (consumes charge)
             const updatedCharge = u.charge ? { ...u.charge, distance: 0, active: false } : u.charge;
-            return { ...u, lastAttack: now, hidden: u.hidden, charge: updatedCharge, lockedTarget: u.lockedTarget, wasPushed: false, wasStunned: u.wasStunned };
+            return {
+              ...u,
+              lastAttack: now,
+              hidden: u.hidden,
+              charge: updatedCharge,
+              lockedTarget: u.lockedTarget,
+              wasPushed: false,
+              wasStunned: u.wasStunned,
+              // Preserve new card properties
+              dashRange: u.dashRange || 80,
+              isDashing: u.isDashing || false,
+              dashEndTime: u.dashEndTime || 0,
+              currentDamageBonus: u.currentDamageBonus || 0,
+              lastBombDrop: u.lastBombDrop || 0
+            };
           }
-          return { ...u, hidden: u.hidden, lockedTarget: u.lockedTarget, wasPushed: false, wasStunned: u.wasStunned };
+          return {
+            ...u,
+            hidden: u.hidden,
+            lockedTarget: u.lockedTarget,
+            wasPushed: false,
+            wasStunned: u.wasStunned,
+            // Preserve new card properties
+            dashRange: u.dashRange || 80,
+            isDashing: u.isDashing || false,
+            dashEndTime: u.dashEndTime || 0,
+            currentDamageBonus: u.currentDamageBonus || 0,
+            lastBombDrop: u.lastBombDrop || 0
+          };
         } else if (u.spriteId === 'mega_knight' && closestTarget && !u.isJumping && minDist > 50 && minDist < 150) {
           // MEGA KNIGHT JUMP START
           // If target is out of melee range but in jump range (50-150)
@@ -6201,6 +7145,26 @@ export default function App() {
             } else {
               // Target died/gone while jumping - cancel jump
               isJumpingNow = false;
+            }
+          } else if (u.isDashing) {
+            // BANDIT DASH MOVEMENT
+            const dashTarget = (u.lockedTarget && targets.find(t => t.id === u.lockedTarget)) || closestTarget;
+            
+            if (dashTarget) {
+               effectiveSpeed = 12; // Dash speed (very fast)
+               const angle = Math.atan2(dashTarget.y - u.y, dashTarget.x - u.x);
+               nextX += Math.cos(angle) * effectiveSpeed;
+               nextY += Math.sin(angle) * effectiveSpeed;
+               
+               const distRemaining = Math.sqrt(Math.pow(dashTarget.x - nextX, 2) + Math.pow(dashTarget.y - nextY, 2));
+               
+               // End dash if close enough (attack range)
+               if (distRemaining < 25) {
+                  u.isDashing = false;
+                  // Damage multiplier handled in attack logic
+               }
+            } else {
+               u.isDashing = false; // Target lost
             }
           } else {
 
@@ -6298,24 +7262,75 @@ export default function App() {
               nextX += avoidX;
               nextY = u.y + (u.isOpponent ? effectiveSpeed * 0.5 : -effectiveSpeed * 0.5);
             } else if (!collision && effectiveSpeed > 0) {
-              // Hog Rider can jump over river - skip bridge logic
-              // Flying units fly over river - skip bridge logic
-              if (u.jumps || u.type === 'flying') {
-                // Jump/fly over river - just continue straight across
-                // No bridge steering needed
-              } else if (distToRiver < 100) {
-                // Other ground units must use bridges
-                const bridgeCenterX = u.lane === 'LEFT' ? 95 : width - 95;
+              // STRICT RIVER BLOCKING
+              // Bridge zones: Left ~95, Right ~Width-95. Width ~40.
+              const bridgeWidth = 50; // generous width
+              const leftBridgeX = 95;
+              const rightBridgeX = width - 95;
+              
+              const onLeftBridge = Math.abs(nextX - leftBridgeX) < bridgeWidth / 2;
+              const onRightBridge = Math.abs(nextX - rightBridgeX) < bridgeWidth / 2;
+              const onBridge = onLeftBridge || onRightBridge;
+
+              if (distToRiver < 30 && !onBridge) {
+                 // BLOCKED BY RIVER
+                 // Stop vertical movement
+                 nextY = u.y;
+                 
+                 // Slide towards nearest bridge
+                 const bridgeCenterX = u.lane === 'LEFT' ? leftBridgeX : rightBridgeX;
+                 const diffX = bridgeCenterX - nextX;
+                 // Move faster sideways to find bridge
+                 nextX += Math.sign(diffX) * Math.min(Math.abs(diffX), effectiveSpeed * 1.5);
+              } else if (distToRiver < 120 && !onBridge) {
+                // Approaching river - steer towards bridge
+                const bridgeCenterX = u.lane === 'LEFT' ? leftBridgeX : rightBridgeX;
                 const diffX = bridgeCenterX - nextX;
                 if (Math.abs(diffX) > 2) {
-                  const steerSpeed = 1.5;
+                  const steerSpeed = 2; // Stronger steering
                   nextX += Math.sign(diffX) * steerSpeed;
                 }
               }
             }
           }
 
-          return { ...u, x: nextX, y: nextY, hidden: u.hidden, charge: u.charge, lockedTarget: u.lockedTarget, wasPushed: u.wasPushed, wasStunned: u.wasStunned, isJumping: isJumpingNow, jumpTargetId: u.jumpTargetId };
+          // Update Bandit dash state - end dash when time is up
+          let isDashingNow = u.isDashing || false;
+          if (isDashingNow && now > (u.dashEndTime || 0)) {
+            isDashingNow = false;
+          }
+
+          // Track Inferno Tower target for damage ramp reset
+          if (u.damageRamp && u.lockedTarget && u.lastTargetId !== u.lockedTarget) {
+            // Target changed, reset damage ramp
+            u.lastDamageRampTime = now;
+            u.currentDamageBonus = 0;
+            u.lastTargetId = u.lockedTarget;
+          } else if (u.damageRamp && !u.lockedTarget) {
+            // No target, reset
+            u.lastDamageRampTime = now;
+            u.currentDamageBonus = 0;
+          }
+
+          return {
+            ...u,
+            x: nextX,
+            y: nextY,
+            hidden: u.hidden,
+            charge: u.charge,
+            lockedTarget: u.lockedTarget,
+            wasPushed: u.wasPushed,
+            wasStunned: u.wasStunned,
+            isJumping: isJumpingNow,
+            jumpTargetId: u.jumpTargetId,
+            // Preserve new card properties
+            dashRange: u.dashRange || 80,
+            isDashing: isDashingNow,
+            dashEndTime: u.dashEndTime || 0,
+            currentDamageBonus: u.currentDamageBonus || 0,
+            lastBombDrop: u.lastBombDrop || 0,
+            lastTargetId: u.lastTargetId
+          };
         }
       });
 
@@ -6516,34 +7531,91 @@ export default function App() {
              // Let's assume it was or fetch from CARDS.
              // Best to fetch from CARDS to be safe if not copied.
              const cardDef = CARDS.find(c => c.id === deadUnit.spriteId);
+             
              if (cardDef && (cardDef.deathDamage || cardDef.deathSlow)) {
-                splashEvents.push({
-                  attacker: deadUnit,
-                  targetX: deadUnit.x,
-                  targetY: deadUnit.y,
-                  damage: cardDef.deathDamage || 0,
-                  slow: cardDef.deathSlow // Pass slow effect
-                });
-                
-                // Visual Effect
-                let effectType = 'fire_explosion';
-                let effectRadius = cardDef.deathRadius || 40;
-                
-                if (deadUnit.spriteId === 'ice_golem') {
-                   effectType = 'ice_freeze';
-                   effectRadius = 60; // Ice Golem has larger slow radius
-                }
+                if (cardDef.deathBombDelay) {
+                   // Delayed Death Bomb (Balloon, Giant Skeleton)
+                   setProjectiles(prev => [...prev, {
+                      id: Date.now() + Math.random(),
+                      x: deadUnit.x,
+                      y: deadUnit.y,
+                      targetX: deadUnit.x,
+                      targetY: deadUnit.y,
+                      speed: 0,
+                      damage: cardDef.deathDamage || 0,
+                      radius: cardDef.deathRadius || 60,
+                      type: 'bomb_delayed',
+                      visualType: 'bomb', // Use bomb visual
+                      isSpell: true, // Treated as a spell/projectile
+                      hit: false,
+                      spawnTime: Date.now(),
+                      delay: cardDef.deathBombDelay,
+                      isOpponent: deadUnit.isOpponent
+                   }]);
+                   
+                   // Visual for dropping the bomb
+                   setVisualEffects(prev => [...prev, {
+                      id: Date.now() + Math.random(),
+                      type: 'bomb_drop', // We can add this visual or just use the projectile
+                      x: deadUnit.x,
+                      y: deadUnit.y,
+                      radius: 20,
+                      startTime: Date.now(),
+                      duration: 500
+                   }]);
 
-                setVisualEffects(prev => [...prev, {
-                  id: Date.now() + Math.random(),
-                  type: effectType,
-                  x: deadUnit.x,
-                  y: deadUnit.y,
-                  radius: effectRadius,
-                  startTime: Date.now(),
-                  duration: 600
-                }]);
+                } else {
+                   // Instant Death Damage (Ice Golem, Golem)
+                   splashEvents.push({
+                     attacker: deadUnit,
+                     targetX: deadUnit.x,
+                     targetY: deadUnit.y,
+                     damage: cardDef.deathDamage || 0,
+                     slow: cardDef.deathSlow // Pass slow effect
+                   });
+                   
+                   // Visual Effect
+                   let effectType = 'fire_explosion';
+                   let effectRadius = cardDef.deathRadius || 40;
+                   
+                   if (deadUnit.spriteId === 'ice_golem') {
+                      effectType = 'ice_freeze';
+                      effectRadius = 60; // Ice Golem has larger slow radius
+                   }
+
+                   setVisualEffects(prev => [...prev, {
+                     id: Date.now() + Math.random(),
+                     type: effectType,
+                     x: deadUnit.x,
+                     y: deadUnit.y,
+                     radius: effectRadius,
+                     startTime: Date.now(),
+                     duration: 600
+                   }]);
+                }
              }
+          }
+
+          // Elixir Return (Elixir Golem Blobs)
+          if (deadUnit.givesOpponentElixir) {
+             if (deadUnit.isOpponent) {
+                // Enemy blob died -> Give player elixir
+                setElixir(prev => Math.min(10, prev + 1));
+             } else {
+                // Player blob died -> Give enemy AI elixir
+                setEnemyElixir(prev => Math.min(10, prev + 1));
+             }
+             
+             // Visual feedback for elixir return
+             setVisualEffects(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: 'elixir_popup',
+                x: deadUnit.x,
+                y: deadUnit.y - 20,
+                value: '+1',
+                startTime: Date.now(),
+                duration: 800
+             }]);
           }
         });
       }
@@ -6581,7 +7653,41 @@ export default function App() {
                 }
               }
 
-              let updatedUnit = { ...unit, hp: unit.hp - Math.floor(event.damage * 0.5) };
+              const damage = Math.floor(event.damage * 0.5);
+              
+              // Handle Shield
+              let remainingDamage = damage;
+              let newShieldHp = unit.currentShieldHp || 0;
+              let shieldBroken = false;
+
+              if (unit.hasShield && newShieldHp > 0) {
+                if (remainingDamage >= newShieldHp) {
+                  remainingDamage -= newShieldHp;
+                  newShieldHp = 0;
+                  shieldBroken = true;
+                } else {
+                  newShieldHp -= remainingDamage;
+                  remainingDamage = 0;
+                }
+              }
+
+              let updatedUnit = { ...unit, hp: unit.hp - remainingDamage, currentShieldHp: newShieldHp };
+              
+              // Shield Break Visual
+              if (shieldBroken) {
+                updatedUnit.hasShield = false;
+                if (unit.spriteId === 'guards') updatedUnit.spriteId = 'skeletons';
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'shield_break',
+                  x: unit.x,
+                  y: unit.y,
+                  radius: 35,
+                  startTime: Date.now(),
+                  duration: 500
+                }]);
+              }
+
               if (event.slow) {
                 updatedUnit.slowUntil = Date.now() + 2000;
                 updatedUnit.slowAmount = event.slow;
@@ -6742,6 +7848,51 @@ export default function App() {
             hit: !p.damageDealt, // Only hit if not yet dealt damage
             keepVisual: true
           };
+        }
+
+        if (p.type === 'bomb_delayed') {
+           if (Date.now() - p.spawnTime >= p.delay) {
+              return { ...p, hit: true };
+           }
+           return p; // Keep waiting
+        }
+
+        // MAGIC ARCHER PIERCE LOGIC
+        if (p.pierce) {
+           const angle = Math.atan2(dy, dx);
+           const nextX = p.x + Math.cos(angle) * p.speed;
+           const nextY = p.y + Math.sin(angle) * p.speed;
+           const hitIds = p.hitIds || [];
+           
+           // Check for collisions
+           const targets = [
+              ...(unitsRef.current || []).filter(u => u.isOpponent !== p.isOpponent && u.hp > 0),
+              ...(nextTowers || []).filter(t => t.isOpponent !== p.isOpponent && t.hp > 0)
+           ];
+           
+           targets.forEach(t => {
+              if (!hitIds.includes(t.id)) {
+                 const distToProj = Math.sqrt(Math.pow(t.x - nextX, 2) + Math.pow(t.y - nextY, 2));
+                 if (distToProj < 30) {
+                    // HIT!
+                    hitIds.push(t.id);
+                    // Apply damage immediately (since we want to hit multiple targets in one frame possibly)
+                    if (t.id < 100) {
+                       const tIndex = nextTowers.findIndex(tow => tow.id === t.id);
+                       if (tIndex !== -1) nextTowers[tIndex].hp -= p.damage;
+                    } else {
+                       damageEvents.push({ targetId: t.id, damage: p.damage, attackerId: p.attackerId });
+                    }
+                 }
+              }
+           });
+
+           // Out of bounds check
+           if (nextX < -50 || nextX > width + 50 || nextY < -50 || nextY > height + 50) {
+              return { ...p, damageDealt: true, hit: true }; // Mark for removal
+           }
+
+           return { ...p, x: nextX, y: nextY, hitIds };
         }
 
         if (dist < p.speed + 10) {
@@ -6907,7 +8058,38 @@ export default function App() {
                     damageToDeal = Math.floor(h.damage * 3.5);
                   }
 
-                  let updatedUnit = { ...u, hp: u.hp - damageToDeal };
+                  // Handle Shield
+                  let remainingDamage = damageToDeal;
+                  let newShieldHp = u.currentShieldHp || 0;
+                  let shieldBroken = false;
+
+                  if (u.hasShield && newShieldHp > 0) {
+                    if (remainingDamage >= newShieldHp) {
+                      remainingDamage -= newShieldHp;
+                      newShieldHp = 0;
+                      shieldBroken = true;
+                    } else {
+                      newShieldHp -= remainingDamage;
+                      remainingDamage = 0;
+                    }
+                  }
+
+                  let updatedUnit = { ...u, hp: u.hp - remainingDamage, currentShieldHp: newShieldHp };
+
+                  // Shield Break Visual
+                  if (shieldBroken) {
+                    updatedUnit.hasShield = false;
+                    if (u.spriteId === 'guards') updatedUnit.spriteId = 'skeletons';
+                    setVisualEffects(prev => [...prev, {
+                      id: Date.now() + Math.random(),
+                      type: 'shield_break',
+                      x: u.x,
+                      y: u.y,
+                      radius: 35,
+                      startTime: Date.now(),
+                      duration: 500
+                    }]);
+                  }
 
                   // Zap stun effect - resets charge ONLY when stunned
                   if (h.stun && h.stun > 0) {
@@ -7015,6 +8197,16 @@ export default function App() {
                   startTime: Date.now(),
                   duration: 500
                 }]);
+              } else if (h.type === 'bomb_delayed') {
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'fire_explosion', // Bomb explosion
+                  x: h.targetX,
+                  y: h.targetY,
+                  radius: h.radius || 60,
+                  startTime: Date.now(),
+                  duration: 600
+                }]);
               }
             }
 
@@ -7023,10 +8215,59 @@ export default function App() {
             const hitX = h.targetX;
             const hitY = h.targetY;
 
+            // ELECTRO DRAGON CHAIN LOGIC
+            if (h.chain > 0) {
+               const target = (unitsRef.current || []).find(u => u.id === h.targetId) || 
+                              (nextTowers || []).find(t => t.id === h.targetId);
+               if (target) {
+                  chainEvents.push({
+                    attackerId: h.attackerId,
+                    primaryTarget: target,
+                    chainCount: Math.min(h.chain - 1, 3), // Max 3 more
+                    damage: h.damage,
+                    stun: h.stun || 0,
+                    isOpponent: h.isOpponent,
+                    startX: h.x,
+                    startY: h.y
+                  });
+               }
+            }
+
             // Damage the primary target
             currentUnits = currentUnits.map(u => {
               if (u.id === h.targetId) {
-                let updatedUnit = { ...u, hp: u.hp - h.damage };
+                // Handle Shield
+                let remainingDamage = h.damage;
+                let newShieldHp = u.currentShieldHp || 0;
+                let shieldBroken = false;
+
+                if (u.hasShield && newShieldHp > 0) {
+                  if (remainingDamage >= newShieldHp) {
+                    remainingDamage -= newShieldHp;
+                    newShieldHp = 0;
+                    shieldBroken = true;
+                  } else {
+                    newShieldHp -= remainingDamage;
+                    remainingDamage = 0;
+                  }
+                }
+
+                let updatedUnit = { ...u, hp: u.hp - remainingDamage, currentShieldHp: newShieldHp };
+
+                // Shield Break Visual
+                if (shieldBroken) {
+                  updatedUnit.hasShield = false;
+                  if (u.spriteId === 'guards') updatedUnit.spriteId = 'skeletons';
+                  setVisualEffects(prev => [...prev, {
+                    id: Date.now() + Math.random(),
+                    type: 'shield_break',
+                    x: u.x,
+                    y: u.y,
+                    radius: 35,
+                    startTime: Date.now(),
+                    duration: 500
+                  }]);
+                }
 
                 // Apply stun effect (Electro Wizard)
                 if (h.stun && h.stun > 0) {
@@ -7049,7 +8290,7 @@ export default function App() {
 
             // Apply splash damage if projectile has splash
             if (h.splash) {
-              const splashRadius = 50;
+              const splashRadius = h.splashRadius || 50; // Use projectile's splashRadius or default 50
               currentUnits = currentUnits.map(u => {
                 if (u.id !== h.targetId && u.hp > 0) {
                   const isEnemy = h.isOpponent !== undefined ? !h.isOpponent : u.isOpponent;
@@ -7112,6 +8353,36 @@ export default function App() {
                 }
 
                 nextTowers[tIndex] = updatedTower;
+              }
+
+              // Apply splash damage to OTHER towers (not primary target)
+              if (h.splash) {
+                const splashRadius = h.splashRadius || 50;
+                nextTowers = nextTowers.map(tower => {
+                  if (tower.id !== h.targetId && tower.hp > 0) {
+                    const isEnemy = h.isOpponent !== undefined ? !h.isOpponent : tower.isOpponent;
+                    if (isEnemy) {
+                      const dist = Math.sqrt(Math.pow(tower.x - hitX, 2) + Math.pow(tower.y - hitY, 2));
+                      if (dist <= splashRadius + 30) { // +30 for tower size
+                        let updatedTower = { ...tower, hp: tower.hp - Math.floor(h.damage * 0.5) };
+
+                        // Apply stun effect to towers
+                        if (h.stun && h.stun > 0) {
+                          updatedTower.stunUntil = now + (h.stun * 1000);
+                        }
+
+                        // Apply slow effect to towers
+                        if (h.slow && h.slow > 0) {
+                          updatedTower.slowUntil = now + 2000;
+                          updatedTower.slowAmount = h.slow;
+                        }
+
+                        return updatedTower;
+                      }
+                    }
+                  }
+                  return tower;
+                });
               }
             }
           }
@@ -7207,6 +8478,11 @@ export default function App() {
                 newShieldHp -= remainingDamage;
                 remainingDamage = 0;
               }
+            }
+
+            // Bandit dash invincibility - no damage while dashing
+            if (u.dashInvincible && u.isDashing) {
+              remainingDamage = 0;
             }
 
             const updatedUnit = {
