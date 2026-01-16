@@ -55,6 +55,7 @@ const CARDS = [
   // Lava Hound & Lava Pups
   { id: 'lava_hound', name: 'Lava Hound', cost: 7, color: '#c0392b', hp: 3664, speed: 1, type: 'flying', range: 25, damage: 53, attackSpeed: 1300, projectile: null, count: 1, targetType: 'buildings', rarity: 'legendary', deathSpawns: 'lava_pups', deathSpawnCount: 6 },
   { id: 'lava_pups', name: 'Lava Pups', cost: 0, color: '#e74c3c', hp: 216, speed: 2, type: 'flying', range: 50, damage: 53, attackSpeed: 1000, projectile: 'lava_shot', count: 1, rarity: 'common', isToken: true },
+  { id: 'cursed_hog', name: 'Cursed Hog', cost: 0, color: '#ff9ff3', hp: 520, speed: 3.5, type: 'ground', range: 25, damage: 52, attackSpeed: 1000, projectile: null, count: 1, targetType: 'buildings', rarity: 'common', isToken: true },
 
   // Super easy additions
   { id: 'three_musketeers', name: '3 Musketeers', cost: 9, color: '#34495e', hp: 720, speed: 1.5, type: 'ground', range: 100, damage: 218, attackSpeed: 1100, projectile: 'bullet', count: 3, rarity: 'rare' },
@@ -116,8 +117,8 @@ const CARDS = [
   { id: 'electro_giant', name: 'Electro Giant', cost: 7, color: '#3498db', hp: 2800, speed: 1, type: 'ground', range: 25, damage: 200, attackSpeed: 1400, projectile: null, count: 1, shockOnHit: true, shockRadius: 50, shockDamage: 100, shockStun: 0.5, rarity: 'epic' },
   { id: 'night_witch', name: 'Night Witch', cost: 4, color: '#2c3e50', hp: 750, speed: 2, type: 'ground', range: 25, damage: 220, attackSpeed: 1500, projectile: null, count: 1, spawns: 'bats', spawnRate: 5, spawnCount: 2, rarity: 'legendary', deathSpawns: 'bats', deathSpawnCount: 3 },
   { id: 'inferno_dragon', name: 'Inferno Dragon', cost: 4, color: '#e74c3c', hp: 950, speed: 2.5, type: 'flying', range: 40, damage: 30, attackSpeed: 100, projectile: null, count: 1, damageRamp: true, rarity: 'epic' },
-  { id: 'elixir_golem', name: 'Elixir Golem', cost: 3, color: '#D442F5', hp: 1600, speed: 1.5, type: 'ground', range: 25, damage: 100, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', deathSpawns: 'elixir_golemite', deathSpawnCount: 2, givesOpponentElixir: true, rarity: 'epic' },
-  { id: 'elixir_golemite', name: 'Elixir Golemite', cost: 0, color: '#D442F5', hp: 800, speed: 1.5, type: 'ground', range: 25, damage: 50, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', deathSpawns: 'elixir_blob', deathSpawnCount: 2, givesOpponentElixir: true, rarity: 'rare', isToken: true },
+  { id: 'elixir_golem', name: 'Elixir Golem', cost: 3, color: '#D442F5', hp: 1600, speed: 1.5, type: 'ground', range: 25, damage: 100, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', deathSpawns: 'elixir_golemite', deathSpawnCount: 2, rarity: 'epic' },
+  { id: 'elixir_golemite', name: 'Elixir Golemite', cost: 0, color: '#D442F5', hp: 800, speed: 1.5, type: 'ground', range: 25, damage: 50, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', deathSpawns: 'elixir_blob', deathSpawnCount: 2, rarity: 'rare', isToken: true },
   { id: 'elixir_blob', name: 'Elixir Blob', cost: 0, color: '#D442F5', hp: 400, speed: 1.5, type: 'ground', range: 25, damage: 25, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', givesOpponentElixir: true, rarity: 'common', isToken: true },
   { id: 'firecracker', name: 'Firecracker', cost: 3, color: '#e67e22', hp: 240, speed: 3, type: 'ground', range: 100, damage: 180, attackSpeed: 2500, projectile: 'firecracker_burst', count: 1, splash: true, stun: 0.5, recoil: 60, spreadCount: 8, spreadArc: 0.5, rarity: 'common' },
 
@@ -130,7 +131,7 @@ const CARDS = [
 
   // 5 NEW REQUESTED CARDS
   { id: 'sparky', name: 'Sparky', cost: 6, color: '#e74c3c', hp: 1750, speed: 0.7, type: 'ground', range: 55, damage: 1135, attackSpeed: 5000, projectile: 'electric_blast', count: 1, splash: true, splashRadius: 50, chargeTime: 5000, recoil: 40, stopsToAttack: true, rarity: 'legendary' },
-  { id: 'mother_witch', name: 'Mother Witch', cost: 4, color: '#9b59b6', hp: 720, speed: 1.5, type: 'ground', range: 55, damage: 159, attackSpeed: 1400, projectile: 'witch_projectile', count: 1, splash: true, turnsToPig: true, pigDuration: 5000, rarity: 'legendary' },
+  { id: 'mother_witch', name: 'Mother Witch', cost: 4, color: '#9b59b6', hp: 720, speed: 1.5, type: 'ground', range: 55, damage: 159, attackSpeed: 1400, projectile: 'witch_projectile', count: 1, splash: false, turnsToPig: true, pigDuration: 5000, rarity: 'legendary' },
   { id: 'bomb_tower', name: 'Bomb Tower', cost: 4, color: '#7f8c8d', hp: 1400, speed: 0, type: 'building', range: 55, damage: 200, attackSpeed: 1500, projectile: 'bomb', count: 1, lifetime: 40, deathDamage: 500, deathRadius: 60, deathBombDelay: 1000, rarity: 'rare' },
   { id: 'mortar', name: 'Mortar', cost: 4, color: '#95a5a6', hp: 340, speed: 0, type: 'building', range: 200, damage: 228, attackSpeed: 3000, projectile: 'mortar_shell', count: 1, lifetime: 25, chargeTime: 3000, stopsToAttack: true, rarity: 'common', splashRadius: 45 },
   { id: 'clone', name: 'Clone', cost: 3, color: '#3498db', type: 'spell', damage: 0, radius: 35, count: 1, cloneUnits: true, cloneDuration: 10, rarity: 'epic' }
@@ -487,6 +488,22 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Circle cx="50" cy="50" r="45" fill={color} />
           <Rect x="40" y="20" width="20" height="30" fill="#34495e" />
           <Rect x="20" y="40" width="60" height="10" fill="#8B4513" />
+        </Svg>
+      );
+    case 'cursed_hog':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="55" r="40" fill="#ff9ff3" stroke="#f368e0" strokeWidth="2" />
+          {/* Snout */}
+          <Ellipse cx="50" cy="65" rx="15" ry="10" fill="#feca57" />
+          <Circle cx="45" cy="65" r="2" fill="#000" />
+          <Circle cx="55" cy="65" r="2" fill="#000" />
+          {/* Eyes */}
+          <Circle cx="35" cy="45" r="4" fill="#000" />
+          <Circle cx="65" cy="45" r="4" fill="#000" />
+          {/* Ears */}
+          <Path d="M20 35 Q15 20 30 25" fill="#ff9ff3" stroke="#f368e0" strokeWidth="1" />
+          <Path d="M80 35 Q85 20 70 25" fill="#ff9ff3" stroke="#f368e0" strokeWidth="1" />
         </Svg>
       );
     case 'prince':
@@ -3566,6 +3583,7 @@ const Unit = ({ unit }) => {
   const isEnemy = unit.isOpponent;
   const isSlowed = unit.slowUntil > Date.now();
   const isRaged = unit.rageUntil > Date.now();
+  const isCursed = unit.cursedUntil > Date.now();
 
   // Use dynamic size for zones (radius * 2) or default to 30 for troops
   const unitSize = unit.radius ? (unit.radius * 2) : 30;
@@ -3778,6 +3796,23 @@ const Unit = ({ unit }) => {
               fontSize: 12
             }}>⚡</Text>
           )}
+        </View>
+      )}
+
+      {isCursed && (
+        <View style={{
+          position: 'absolute',
+          top: -15, right: -15,
+          width: 20, height: 20,
+          backgroundColor: 'rgba(155, 89, 182, 0.6)',
+          borderRadius: 10,
+          borderWidth: 1,
+          borderColor: '#8e44ad',
+          zIndex: 8,
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <Text style={{ fontSize: 10 }}>🔮</Text>
         </View>
       )}
 
@@ -5237,13 +5272,25 @@ export default function App() {
   const getDeckByIds = (ids) => ids.map(id => CARDS.find(c => c.id === id)).filter(Boolean);
   
   const [allDecks, setAllDecks] = useState([
-    getDeckByIds(['hog_rider', 'musketeer', 'ice_golem', 'ice_spirit', 'skeletons', 'fireball', 'zap', 'cannon']), // Hog 2.6
+    getDeckByIds(['mother_witch', 'elixir_golem', 'ice_golem', 'ice_spirit', 'skeletons', 'fireball', 'zap', 'hog_rider']), // Test Deck
     getDeckByIds(['goblin_barrel', 'princess', 'knight', 'dart_goblin', 'inferno_tower', 'rocket', 'arrows', 'skeletons']), // Log Bait
     getDeckByIds(['pekka', 'bandit', 'battle_ram', 'electro_wizard', 'magic_archer', 'zap', 'poison', 'royal_ghost']), // Pekka Bridge Spam
     getDeckByIds(['golem', 'night_witch', 'baby_dragon', 'mega_minion', 'lightning', 'zap', 'elite_barbarians', 'mini_pekka']), // Golem Beatdown
     getDeckByIds(['giant', 'prince', 'archers', 'spear_goblins', 'fireball', 'zap', 'minions', 'valkyrie']) // Classic Giant
   ]);
   const [selectedDeckIndex, setSelectedDeckIndex] = useState(0);
+
+  // Force update Test Deck if Mother Witch is missing (handles HMR/Persistence issues)
+  useEffect(() => {
+    if (!allDecks[0].some(c => c.id === 'mother_witch')) {
+      console.log('[App] Refreshing decks to include new cards...');
+      setAllDecks(prev => {
+        const newDecks = [...prev];
+        newDecks[0] = getDeckByIds(['mother_witch', 'elixir_golem', 'ice_golem', 'ice_spirit', 'skeletons', 'fireball', 'zap', 'hog_rider']);
+        return newDecks;
+      });
+    }
+  }, []);
 
   // Get currently selected deck
   const userCards = allDecks[selectedDeckIndex];
@@ -5974,6 +6021,10 @@ export default function App() {
 
             });
 
+          }
+
+          if (actualCard.id === 'elixir_golem' || actualCard.deathSpawns) {
+            console.log('[SPAWN]', actualCard.id, 'deathSpawns:', actualCard.deathSpawns, 'count:', actualCard.deathSpawnCount);
           }
 
           setUnits(prev => [...(prev || []), ...newUnits]);
@@ -7039,7 +7090,8 @@ export default function App() {
                     attackerId: u.id,
                     isOpponent: u.isOpponent,
                     pierce: u.pierce || false,
-                    chain: u.chain || 0
+                    chain: u.chain || 0,
+                    turnsToPig: u.turnsToPig || false
                   });
                 }
               });
@@ -7667,6 +7719,8 @@ export default function App() {
               spawnId = deadUnit.deathSpawns;
             }
 
+            console.log('[DEATH SPAWN]', deadUnit.spriteId, '→', spawnId, 'x', deadUnit.deathSpawnCount);
+
             const spawnCard = CARDS.find(c => c.id === spawnId);
             if (spawnCard) {
               const deathSpawnCount = deadUnit.deathSpawnCount || 4;
@@ -7857,38 +7911,39 @@ export default function App() {
 
           // Mother Witch: If cursed unit dies, spawn Hog for the attacker
           if (deadUnit.cursedUntil && Date.now() < deadUnit.cursedUntil && deadUnit.type !== 'building') {
-             const hogCard = CARDS.find(c => c.id === 'hog_rider');
+             const hogCard = CARDS.find(c => c.id === 'cursed_hog');
              if (hogCard) {
                 // The Hog spawns for the side that attacked (Mother Witch owner)
                 // cursedByAttackerSide is true if opponent's Mother Witch cursed this unit
                 // So the Hog should be on the same side as the attacker
                 const hogIsOpponent = deadUnit.cursedByAttackerSide;
 
-                setUnits(prevUnits => [...prevUnits, {
+                unitsToSpawn.push({
                   id: 'hog_' + Date.now() + '_' + Math.random(),
-                  spriteId: 'hog_rider',
+                  spriteId: 'cursed_hog',
                   x: deadUnit.x,
                   y: deadUnit.y,
-                  hp: hogCard.hp * 0.5, // Spawned hogs have 50% HP
-                  maxHp: hogCard.hp * 0.5,
+                  hp: hogCard.hp,
+                  maxHp: hogCard.hp,
                   damage: hogCard.damage,
                   speed: hogCard.speed,
                   range: hogCard.range,
                   attackSpeed: hogCard.attackSpeed,
-                  lastAttackTime: 0,
+                  lastAttack: 0,
                   type: 'ground',
                   targetable: true,
                   isOpponent: hogIsOpponent,
-                  spawnedPig: true // Mark as spawned pig (optional, for tracking)
-                }]);
+                  lane: deadUnit.lane,
+                  spawnedPig: true // Mark as spawned pig
+                });
 
                 // Transformation visual
                 setVisualEffects(prev => [...prev, {
-                  id: Date.now(),
+                  id: Date.now() + Math.random(),
                   type: 'transformation',
                   x: deadUnit.x,
                   y: deadUnit.y,
-                  spawnTime: Date.now(),
+                  startTime: Date.now(),
                   duration: 500
                 }]);
              }
@@ -8585,6 +8640,20 @@ export default function App() {
                   updatedUnit.slowUntil = now + 2000;
                   updatedUnit.slowAmount = h.slow;
                 }
+
+                // Mother Witch curse - marks enemy for 5 seconds
+                if (h.turnsToPig && !u.isPig && u.type !== 'building') {
+                  updatedUnit.cursedUntil = now + 5000;
+                  updatedUnit.cursedByAttackerSide = h.isOpponent; // Track which side cursed them
+                  setVisualEffects(prev => [...prev, {
+                    id: Date.now() + Math.random(),
+                    type: 'curse',
+                    x: u.x,
+                    y: u.y,
+                    startTime: Date.now(),
+                    duration: 500
+                  }]);
+                }
                 return updatedUnit;
               }
               return u;
@@ -8614,6 +8683,20 @@ export default function App() {
                       if (h.slow && h.slow > 0) {
                         updatedUnit.slowUntil = now + 2000;
                         updatedUnit.slowAmount = h.slow;
+                      }
+
+                      // Mother Witch curse - marks enemy for 5 seconds
+                      if (h.turnsToPig && !u.isPig && u.type !== 'building') {
+                        updatedUnit.cursedUntil = now + 5000;
+                        updatedUnit.cursedByAttackerSide = h.isOpponent;
+                        setVisualEffects(prev => [...prev, {
+                          id: Date.now() + Math.random(),
+                          type: 'curse',
+                          x: u.x,
+                          y: u.y,
+                          startTime: Date.now(),
+                          duration: 500
+                        }]);
                       }
                       return updatedUnit;
                     }
