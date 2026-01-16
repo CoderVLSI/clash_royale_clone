@@ -1841,20 +1841,16 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => {
-        console.log('[Card] Touch start on', card.name, 'canAfford:', canAffordRef.current, 'isNext:', isNextRef.current);
         return true;
       },
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: (evt, gestureState) => {
         const currentCanAfford = canAffordRef.current;
         const currentIsNext = isNextRef.current;
-        console.log('[Card] PanResponderGrant -', card.name, 'canAfford:', currentCanAfford);
         const { onDragStart } = callbacksRef.current;
         if (!currentIsNext && currentCanAfford && onDragStart) {
-          console.log('[Card] Calling onDragStart for', card.name);
           onDragStart(card, gestureState);
         } else {
-          console.log('[Card] onDragStart blocked - isNext:', currentIsNext, 'canAfford:', currentCanAfford);
         }
       },
       onPanResponderMove: (evt, gestureState) => {
@@ -1864,7 +1860,6 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
         }
       },
       onPanResponderRelease: (evt, gestureState) => {
-        console.log('[Card] PanResponderRelease -', card.name);
         const { onDragEnd } = callbacksRef.current;
         if (!isNextRef.current && canAffordRef.current && onDragEnd) {
           onDragEnd(gestureState);
@@ -4960,7 +4955,6 @@ const GameBoard = ({
 
 // --- Chest Opening Modal Component ---
 const ChestOpeningModal = ({ chest, onClose }) => {
-  console.log('Rendering ChestOpeningModal for:', chest.id);
   const [step, setStep] = useState('CLOSED'); // CLOSED -> OPENING -> REWARDS
   const [rewards, setRewards] = useState([]);
   const [revealedIndex, setRevealedIndex] = useState(-1);
@@ -5251,11 +5245,9 @@ export default function App() {
     socketRef.current = io("http://localhost:3000");
 
     socketRef.current.on("connect", () => {
-      console.log("Connected to server:", socketRef.current.id);
     });
 
     socketRef.current.on("start_game", (data) => {
-      console.log("Game Starting!", data);
       setFriendlyModalVisible(false);
       resetGame();
       setInLobby(false);
@@ -5283,7 +5275,6 @@ export default function App() {
   // Force update Test Deck if Mother Witch is missing (handles HMR/Persistence issues)
   useEffect(() => {
     if (!allDecks[0].some(c => c.id === 'mother_witch')) {
-      console.log('[App] Refreshing decks to include new cards...');
       setAllDecks(prev => {
         const newDecks = [...prev];
         newDecks[0] = getDeckByIds(['mother_witch', 'elixir_golem', 'ice_golem', 'ice_spirit', 'skeletons', 'fireball', 'zap', 'hog_rider']);
@@ -5439,7 +5430,6 @@ export default function App() {
   };
 
   const handleDragStart = (card, gesture) => {
-    console.log('[handleDragStart] Card:', card.name, 'elixir:', elixir, 'cost:', card.cost);
     setDraggingCard(card);
     setDragPosition({ x: gesture.x0, y: gesture.y0 });
   };
@@ -5454,7 +5444,6 @@ export default function App() {
     const dropY = gesture.moveY;
     const card = draggingCard;
 
-    console.log('[handleDragEnd] Card:', card?.name, 'dropX:', dropX, 'dropY:', dropY);
 
     setDraggingCard(null);
 
@@ -5505,19 +5494,15 @@ export default function App() {
       }
 
       if (canDeploy) {
-        console.log('[handleDragEnd] Calling spawnCard for', card.name);
         spawnCard(card, dropX, dropY);
       } else {
-        console.log('[handleDragEnd] Drop blocked - must deploy on your side (or in destroyed tower zone)');
       }
     } else {
-      console.log('[handleDragEnd] Drop blocked - dropped in footer area');
     }
   };
 
     const spawnCard = (card, x, y, isOpponent = false) => {
 
-      console.log(`[spawnCard] ${isOpponent ? 'Opponent' : 'Player'} spawning:`, card.name, 'cost:', card.cost);
 
   
 
@@ -5533,7 +5518,6 @@ export default function App() {
 
         if (!lastCard) {
 
-          console.log('[spawnCard] No card to mirror!');
 
           return;
 
@@ -6222,7 +6206,6 @@ export default function App() {
   };
 
   const handleOpenChest = (chestToOpen) => {
-    console.log('handleOpenChest called with:', chestToOpen);
     setOpeningChest(chestToOpen);
   };
 
@@ -7626,13 +7609,11 @@ export default function App() {
           unitsThatDied.push(u);
 
           if (u.spriteId === 'skeletons') {
-            console.log('[FILTER]', 'skeleton died - hp:', u.hp);
           }
           return false;
         }
         if (u.y <= -50 || u.y >= height + 50) {
           if (u.spriteId === 'skeletons') {
-            console.log('[FILTER]', 'skeleton out of bounds - y:', u.y, 'height:', height);
           }
           return false;
         }
@@ -7952,7 +7933,6 @@ export default function App() {
 
       const afterFilter = currentUnits.length;
       if (beforeFilter !== afterFilter) {
-        console.log('[FILTER]', 'Removed', beforeFilter - afterFilter, 'units');
       }
 
       // Apply collected splash damage events
@@ -8352,7 +8332,6 @@ export default function App() {
               const spawnCard = CARDS.find(c => c.id === spawnCardId);
               const spawnCount = h.spawnCount || 3;
 
-              console.log(`[Projectile] Goblin Barrel Hit! Spawning ${spawnCount} ${spawnCardId}s. isOpponent: ${h.isOpponent}`);
 
               if (spawnCard) {
                 const newGoblins = [];
