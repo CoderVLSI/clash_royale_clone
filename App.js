@@ -132,7 +132,7 @@ const CARDS = [
   { id: 'sparky', name: 'Sparky', cost: 6, color: '#e74c3c', hp: 1750, speed: 0.7, type: 'ground', range: 55, damage: 1135, attackSpeed: 5000, projectile: 'electric_blast', count: 1, splash: true, splashRadius: 50, chargeTime: 5000, recoil: 40, stopsToAttack: true, rarity: 'legendary' },
   { id: 'mother_witch', name: 'Mother Witch', cost: 4, color: '#9b59b6', hp: 720, speed: 1.5, type: 'ground', range: 55, damage: 159, attackSpeed: 1400, projectile: 'witch_projectile', count: 1, splash: true, turnsToPig: true, pigDuration: 5000, rarity: 'legendary' },
   { id: 'bomb_tower', name: 'Bomb Tower', cost: 4, color: '#7f8c8d', hp: 1400, speed: 0, type: 'building', range: 55, damage: 200, attackSpeed: 1500, projectile: 'bomb', count: 1, lifetime: 40, deathDamage: 500, deathRadius: 60, rarity: 'rare' },
-  { id: 'mortar', name: 'Mortar', cost: 4, color: '#95a5a6', hp: 340, speed: 0, type: 'building', range: 200, damage: 228, attackSpeed: 3000, projectile: 'mortar_shell', count: 1, lifetime: 25, rarity: 'common', splashRadius: 45 },
+  { id: 'mortar', name: 'Mortar', cost: 4, color: '#95a5a6', hp: 340, speed: 0, type: 'building', range: 200, damage: 228, attackSpeed: 3000, projectile: 'mortar_shell', count: 1, lifetime: 25, chargeTime: 3000, stopsToAttack: true, rarity: 'common', splashRadius: 45 },
   { id: 'clone', name: 'Clone', cost: 3, color: '#3498db', type: 'spell', damage: 0, radius: 35, count: 1, cloneUnits: true, cloneDuration: 10, rarity: 'epic' }
 ];
 
@@ -5316,14 +5316,14 @@ export default function App() {
 
         const isLeftSide = dropX < width / 2;
 
-        // Deployment tolerance - allow placing slightly into the river area
+        // Deployment tolerance - allow placing almost at the bridge
         // Standard river Y is height / 2.
-        // We allow slightly higher (smaller Y) for better UX.
-        let deploymentBoundary = riverY - 15; // Basic tolerance
+        // We allow much higher (smaller Y) for better UX - can deploy near bridges
+        let deploymentBoundary = riverY - 100; // Generous tolerance - almost touching bridge
 
         // Hog Rider (jumps) and Flying units can be deployed further forward (over river/bridge)
         if (card.id === 'hog_rider' || card.type === 'flying') {
-          deploymentBoundary = riverY - 50;
+          deploymentBoundary = riverY - 120;
         }
 
         // Allow deployment on own side (player's side)
