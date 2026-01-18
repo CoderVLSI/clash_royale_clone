@@ -7784,7 +7784,6 @@ export default function App() {
 
               // Mother Witch curse - marks enemy for 5 seconds
               if (event.turnsToPig && !unit.isPig && unit.type !== 'building') {
-                console.log('[CURSE APPLIED] To:', unit.spriteId, 'until:', Date.now() + 5000);
                 updatedUnit.cursedUntil = Date.now() + 5000;
                 updatedUnit.cursedByAttackerSide = event.attacker.isOpponent; // Track which side cursed them
                 setVisualEffects(prev => [...prev, {
@@ -8397,9 +8396,7 @@ export default function App() {
                 }
 
                 // Mother Witch curse - marks enemy for 5 seconds
-                console.log('[PROJECTILE HIT] u.spriteId:', u.spriteId, 'h.turnsToPig:', h.turnsToPig, 'h.type:', h.type);
                 if (h.turnsToPig && !u.isPig && u.type !== 'building') {
-                  console.log('[CURSE APPLYING] To:', u.spriteId, 'until:', now + 5000);
                   updatedUnit.cursedUntil = now + 5000;
                   updatedUnit.cursedByAttackerSide = h.isOpponent; // Track which side cursed them
                   setVisualEffects(prev => [...prev, {
@@ -8940,9 +8937,7 @@ export default function App() {
         }
 
         // Mother Witch: If cursed unit dies, spawn Hog for the attacker
-        console.log('[DEATH] Unit:', deadUnit.spriteId, 'cursedUntil:', deadUnit.cursedUntil, 'now:', Date.now(), 'isCursed:', !!(deadUnit.cursedUntil && Date.now() < deadUnit.cursedUntil));
         if (deadUnit.cursedUntil && Date.now() < deadUnit.cursedUntil && deadUnit.type !== 'building') {
-          console.log('[CURSE DEATH] Spawning pig for:', deadUnit.spriteId);
           const hogCard = CARDS.find(c => c.id === 'cursed_hog');
           if (hogCard) {
             const hogIsOpponent = deadUnit.cursedByAttackerSide;
