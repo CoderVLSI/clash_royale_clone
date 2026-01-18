@@ -6433,15 +6433,17 @@ export default function App() {
                   damage: damage,
                   stun: u.stun || 0
                 });
-                // Visual
+                // Visual - different for Ice Spirit vs Fire Spirit
+                const visualType = u.spriteId === 'ice_spirit' ? 'ice_freeze' : 'fire_explosion';
+                const visualRadius = u.spriteId === 'ice_spirit' ? 40 : 50;
                 setVisualEffects(prev => [...prev, {
                     id: Date.now() + Math.random(),
-                    type: 'fire_explosion',
+                    type: visualType,
                     x: hitX,
                     y: hitY,
-                    radius: 50,
+                    radius: visualRadius,
                     startTime: Date.now(),
-                    duration: 500
+                    duration: 600
                 }]);
              } else if (target) {
                 // Single target damage if not splash (though most spirits are splash or special)
@@ -7780,6 +7782,7 @@ export default function App() {
 
               // Mother Witch curse - marks enemy for 5 seconds
               if (event.turnsToPig && !unit.isPig && unit.type !== 'building') {
+                console.log('[CURSE APPLIED] To:', unit.spriteId, 'until:', Date.now() + 5000);
                 updatedUnit.cursedUntil = Date.now() + 5000;
                 updatedUnit.cursedByAttackerSide = event.attacker.isOpponent; // Track which side cursed them
                 setVisualEffects(prev => [...prev, {
@@ -8932,7 +8935,9 @@ export default function App() {
         }
 
         // Mother Witch: If cursed unit dies, spawn Hog for the attacker
+        console.log('[DEATH] Unit:', deadUnit.spriteId, 'cursedUntil:', deadUnit.cursedUntil, 'now:', Date.now(), 'isCursed:', !!(deadUnit.cursedUntil && Date.now() < deadUnit.cursedUntil));
         if (deadUnit.cursedUntil && Date.now() < deadUnit.cursedUntil && deadUnit.type !== 'building') {
+          console.log('[CURSE DEATH] Spawning pig for:', deadUnit.spriteId);
           const hogCard = CARDS.find(c => c.id === 'cursed_hog');
           if (hogCard) {
             const hogIsOpponent = deadUnit.cursedByAttackerSide;
