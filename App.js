@@ -8395,7 +8395,9 @@ export default function App() {
                 }
 
                 // Mother Witch curse - marks enemy for 5 seconds
+                console.log('[PROJECTILE HIT] u.spriteId:', u.spriteId, 'h.turnsToPig:', h.turnsToPig, 'h.type:', h.type);
                 if (h.turnsToPig && !u.isPig && u.type !== 'building') {
+                  console.log('[CURSE APPLYING] To:', u.spriteId, 'until:', now + 5000);
                   updatedUnit.cursedUntil = now + 5000;
                   updatedUnit.cursedByAttackerSide = h.isOpponent; // Track which side cursed them
                   setVisualEffects(prev => [...prev, {
