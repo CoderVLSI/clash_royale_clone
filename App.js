@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Text, Dimensions, TouchableOpacity, PanResponder, Animated, Image, ImageBackground, ScrollView, Modal, TextInput, KeyboardAvoidingView, FlatList, ActivityIndicator } from 'react-native';
 import { useState, useEffect, useRef, memo, useMemo, useCallback } from 'react';
-import Svg, { Circle, Rect, Path, G, Defs, LinearGradient, Stop, Polygon, Ellipse, Text as SvgText } from 'react-native-svg';
+import Svg, { Circle, Rect, Path, G, Defs, LinearGradient, Stop, Polygon, Ellipse, Text as SvgText, Line } from 'react-native-svg';
 import { io } from "socket.io-client";
 
 const { width, height } = Dimensions.get('window');
@@ -30,7 +30,8 @@ const CARDS = [
   { id: 'spear_goblins', name: 'Spear Gobs', cost: 2, color: '#2ecc71', hp: 133, speed: 3, type: 'ground', range: 110, damage: 81, attackSpeed: 1700, projectile: 'spear', count: 3, rarity: 'common' },
   { id: 'musketeer', name: 'Musket', cost: 4, color: '#34495e', hp: 720, speed: 1.5, type: 'ground', range: 100, damage: 218, attackSpeed: 1100, projectile: 'bullet', count: 1, rarity: 'rare' },
   { id: 'baby_dragon', name: 'Baby D', cost: 4, color: '#27ae60', hp: 1152, speed: 2, type: 'flying', range: 80, damage: 160, attackSpeed: 1500, projectile: 'dragon_fire', count: 1, splash: true, rarity: 'epic' },
-  { id: 'fireball', name: 'Fireball', cost: 4, color: '#ff4500', type: 'spell', damage: 689, radius: 60, count: 1, rarity: 'rare' },
+  { id: 'fireball', name: 'Fireball', cost: 4, color: '#ff4500', type: 'spell', damage: 689, radius: 60, count: 1, rarity: 'rare', knockback: 30 },
+  { id: 'the_log', name: 'The Log', cost: 2, color: '#8B4513', type: 'spell', damage: 240, radius: 40, count: 1, rarity: 'legendary', knockback: 20 },
 
   // New cards
   { id: 'cannon', name: 'Cannon', cost: 3, color: '#8B4513', hp: 896, speed: 0, type: 'building', range: 90, damage: 212, attackSpeed: 900, projectile: 'cannonball', count: 1, lifetime: 30, rarity: 'common' },
@@ -88,7 +89,7 @@ const CARDS = [
   { id: 'fire_spirit', name: 'Fire Spirit', cost: 1, color: '#e74c3c', hp: 230, speed: 4, type: 'ground', range: 25, damage: 207, attackSpeed: 1000, projectile: null, count: 1, splash: true, rarity: 'common', kamikaze: true },
   { id: 'ice_spirit', name: 'Ice Spirit', cost: 1, color: '#E8F4F8', hp: 230, speed: 4, type: 'ground', range: 25, damage: 110, attackSpeed: 1000, projectile: null, count: 1, splash: true, stun: 0.5, rarity: 'common', kamikaze: true },
   { id: 'electro_spirit', name: 'Electro Spirit', cost: 1, color: '#9b59b6', hp: 230, speed: 4, type: 'ground', range: 25, damage: 99, attackSpeed: 1000, projectile: null, count: 1, chain: 9, stun: 0.5, rarity: 'common', kamikaze: true },
-  { id: 'heal_spirit', name: 'Heal Spirit', cost: 1, color: '#F1C40F', hp: 230, speed: 4, type: 'ground', range: 25, damage: 0, attackSpeed: 1000, projectile: null, count: 1, splash: true, rarity: 'rare', kamikaze: true, healsOnAttack: 432, healRadius: 50 },
+  { id: 'heal_spirit', name: 'Heal Spirit', cost: 1, color: '#FFD700', hp: 450, speed: 5, type: 'ground', range: 25, damage: 0, attackSpeed: 1000, projectile: null, count: 1, splash: true, rarity: 'rare', kamikaze: true, healsOnAttack: 700, healRadius: 60 },
 
   // Additional cards for new decks
   { id: 'bomber', name: 'Bomber', cost: 2, color: '#e67e22', hp: 398, speed: 2, type: 'ground', range: 55, damage: 222, attackSpeed: 1800, projectile: 'bomb', count: 1, splash: true, rarity: 'common' },
@@ -530,7 +531,7 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
         </Svg>
       );
     case 'miner':
-      const minerOpacity = unit?.burrowing ? 0.3 : 1;
+      const minerOpacity = unit?.burrowing?.active ? 0.3 : 1;
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100" opacity={minerOpacity}>
           <Circle cx="50" cy="50" r="45" fill={color} />
@@ -1082,23 +1083,26 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
     case 'heal_spirit':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
-          {/* Lemon/lime body */}
-          <Rect x="32" y="32" width="36" height="36" rx="6" fill="#2ecc71" stroke="#27ae60" strokeWidth="2" />
-          {/* Glowing eyes */}
+          {/* Gold/yellow glowing body */}
+          <Rect x="32" y="32" width="36" height="36" rx="8" fill="#FFD700" stroke="#FFA500" strokeWidth="3" />
+          {/* Glowing white eyes */}
           <Circle cx="43" cy="45" r="4" fill="white" />
           <Circle cx="57" cy="45" r="4" fill="white" />
-          <Circle cx="43" cy="45" r="2" fill="#27ae60" />
-          <Circle cx="57" cy="45" r="2" fill="#27ae60" />
-          {/* Small hands and feet */}
-          <Circle cx="25" cy="50" r="5" fill="#2ecc71" stroke="#27ae60" strokeWidth="1" />
-          <Circle cx="75" cy="50" r="5" fill="#2ecc71" stroke="#27ae60" strokeWidth="1" />
-          <Circle cx="40" cy="75" r="5" fill="#2ecc71" stroke="#27ae60" strokeWidth="1" />
-          <Circle cx="60" cy="75" r="5" fill="#2ecc71" stroke="#27ae60" strokeWidth="1" />
-          {/* Healing cross symbol */}
+          <Circle cx="43" cy="45" r="2" fill="#FFA500" />
+          <Circle cx="57" cy="45" r="2" fill="#FFA500" />
+          {/* Small hands and feet - gold */}
+          <Circle cx="25" cy="50" r="5" fill="#FFD700" stroke="#FFA500" strokeWidth="1" />
+          <Circle cx="75" cy="50" r="5" fill="#FFD700" stroke="#FFA500" strokeWidth="1" />
+          <Circle cx="40" cy="75" r="5" fill="#FFD700" stroke="#FFA500" strokeWidth="1" />
+          <Circle cx="60" cy="75" r="5" fill="#FFD700" stroke="#FFA500" strokeWidth="1" />
+          {/* Healing cross symbol - white with gold glow */}
           <Rect x="47" y="35" width="6" height="14" fill="white" rx="1" />
           <Rect x="43" y="39" width="14" height="6" fill="white" rx="1" />
-          {/* Healing aura */}
-          <Circle cx="50" cy="50" r="45" fill="none" stroke="#2ecc71" strokeWidth="1" strokeDasharray="3 3" opacity="0.5" />
+          {/* Strong golden healing aura */}
+          <Circle cx="50" cy="50" r="45" fill="none" stroke="#FFD700" strokeWidth="2" strokeDasharray="5 5" opacity="0.8" />
+          <Circle cx="50" cy="50" r="48" fill="none" stroke="#FFA500" strokeWidth="1" opacity="0.5" />
+          {/* Inner glow */}
+          <Circle cx="50" cy="50" r="38" fill="rgba(255, 215, 0, 0.2)" />
         </Svg>
       );
     case 'bomber':
@@ -1521,22 +1525,37 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
       );
     case 'electro_giant':
       return (
-        <Svg width={size} height={size} viewBox="0 0 100 100">
-          <Circle cx="50" cy="50" r="45" fill={color} stroke="#f1c40f" strokeWidth="3" />
-          {/* Lightning bolts on body */}
-          <Path d="M30 30 L40 40 L35 40 L45 55" stroke="#f1c40f" strokeWidth="3" fill="none" />
-          <Path d="M70 30 L60 40 L65 40 L55 55" stroke="#f1c40f" strokeWidth="3" fill="none" />
-          <Path d="M40 70 L50 60 L45 60 L55 45" stroke="#f1c40f" strokeWidth="3" fill="none" />
-          <Path d="M60 70 L50 60 L55 60 L45 45" stroke="#f1c40f" strokeWidth="3" fill="none" />
-          {/* Face */}
-          <Circle cx="50" cy="50" r="20" fill="#2980b9" />
-          <Circle cx="43" cy="47" r="4" fill="white" />
-          <Circle cx="57" cy="47" r="4" fill="white" />
-          <Circle cx="43" cy="47" r="2" fill="black" />
-          <Circle cx="57" cy="47" r="2" fill="black" />
-          {/* Electric crown */}
-          <Path d="M35 25 L50 15 L65 25 L50 35 Z" fill="#f1c40f" stroke="#f39c12" strokeWidth="2" />
-        </Svg>
+        <View style={{ position: 'relative' }}>
+          {/* Constant blue aura around Electro Giant - BIGGER */}
+          <View style={{
+            position: 'absolute',
+            left: -size * 0.8,
+            top: -size * 0.8,
+            width: size * 2.6,
+            height: size * 2.6,
+            borderRadius: size * 1.3,
+            backgroundColor: 'rgba(52, 152, 219, 0.25)',
+            borderWidth: 3,
+            borderColor: 'rgba(52, 152, 219, 0.5)',
+            zIndex: -1
+          }} />
+          <Svg width={size} height={size} viewBox="0 0 100 100">
+            <Circle cx="50" cy="50" r="45" fill={color} stroke="#f1c40f" strokeWidth="3" />
+            {/* Lightning bolts on body */}
+            <Path d="M30 30 L40 40 L35 40 L45 55" stroke="#f1c40f" strokeWidth="3" fill="none" />
+            <Path d="M70 30 L60 40 L65 40 L55 55" stroke="#f1c40f" strokeWidth="3" fill="none" />
+            <Path d="M40 70 L50 60 L45 60 L55 45" stroke="#f1c40f" strokeWidth="3" fill="none" />
+            <Path d="M60 70 L50 60 L55 60 L45 45" stroke="#f1c40f" strokeWidth="3" fill="none" />
+            {/* Face */}
+            <Circle cx="50" cy="50" r="20" fill="#2980b9" />
+            <Circle cx="43" cy="47" r="4" fill="white" />
+            <Circle cx="57" cy="47" r="4" fill="white" />
+            <Circle cx="43" cy="47" r="2" fill="black" />
+            <Circle cx="57" cy="47" r="2" fill="black" />
+            {/* Electric crown */}
+            <Path d="M35 25 L50 15 L65 25 L50 35 Z" fill="#f1c40f" stroke="#f39c12" strokeWidth="2" />
+          </Svg>
+        </View>
       );
     case 'royal_giant':
       return (
@@ -1631,22 +1650,37 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
     // NEW Cards Sprites
     case 'electro_giant':
       return (
-        <Svg width={size} height={size} viewBox="0 0 100 100">
-          <Circle cx="50" cy="50" r="45" fill={color} stroke="#f1c40f" strokeWidth="3" />
-          {/* Lightning bolts on body */}
-          <Path d="M30 30 L40 40 L35 40 L45 55" stroke="#f1c40f" strokeWidth="3" fill="none" />
-          <Path d="M70 30 L60 40 L65 40 L55 55" stroke="#f1c40f" strokeWidth="3" fill="none" />
-          <Path d="M40 70 L50 60 L45 60 L55 45" stroke="#f1c40f" strokeWidth="3" fill="none" />
-          <Path d="M60 70 L50 60 L55 60 L45 45" stroke="#f1c40f" strokeWidth="3" fill="none" />
-          {/* Face */}
-          <Circle cx="50" cy="50" r="20" fill="#2980b9" />
-          <Circle cx="43" cy="47" r="4" fill="white" />
-          <Circle cx="57" cy="47" r="4" fill="white" />
-          <Circle cx="43" cy="47" r="2" fill="black" />
-          <Circle cx="57" cy="47" r="2" fill="black" />
-          {/* Electric crown */}
-          <Path d="M35 25 L50 15 L65 25 L50 35 Z" fill="#f1c40f" stroke="#f39c12" strokeWidth="2" />
-        </Svg>
+        <View style={{ position: 'relative' }}>
+          {/* Constant blue aura around Electro Giant - BIGGER */}
+          <View style={{
+            position: 'absolute',
+            left: -size * 0.8,
+            top: -size * 0.8,
+            width: size * 2.6,
+            height: size * 2.6,
+            borderRadius: size * 1.3,
+            backgroundColor: 'rgba(52, 152, 219, 0.25)',
+            borderWidth: 3,
+            borderColor: 'rgba(52, 152, 219, 0.5)',
+            zIndex: -1
+          }} />
+          <Svg width={size} height={size} viewBox="0 0 100 100">
+            <Circle cx="50" cy="50" r="45" fill={color} stroke="#f1c40f" strokeWidth="3" />
+            {/* Lightning bolts on body */}
+            <Path d="M30 30 L40 40 L35 40 L45 55" stroke="#f1c40f" strokeWidth="3" fill="none" />
+            <Path d="M70 30 L60 40 L65 40 L55 55" stroke="#f1c40f" strokeWidth="3" fill="none" />
+            <Path d="M40 70 L50 60 L45 60 L55 45" stroke="#f1c40f" strokeWidth="3" fill="none" />
+            <Path d="M60 70 L50 60 L55 60 L45 45" stroke="#f1c40f" strokeWidth="3" fill="none" />
+            {/* Face */}
+            <Circle cx="50" cy="50" r="20" fill="#2980b9" />
+            <Circle cx="43" cy="47" r="4" fill="white" />
+            <Circle cx="57" cy="47" r="4" fill="white" />
+            <Circle cx="43" cy="47" r="2" fill="black" />
+            <Circle cx="57" cy="47" r="2" fill="black" />
+            {/* Electric crown */}
+            <Path d="M35 25 L50 15 L65 25 L50 35 Z" fill="#f1c40f" stroke="#f39c12" strokeWidth="2" />
+          </Svg>
+        </View>
       );
     case 'night_witch':
       return (
@@ -1863,6 +1897,73 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Rect x="30" y="75" width="40" height="15" fill="#7f8c8d" rx="2" />
         </Svg>
       );
+    case 'royal_hogs':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="55" r="40" fill={color} />
+          {/* Crown */}
+          <Rect x="35" y="10" width="30" height="15" fill="#f1c40f" />
+          <Circle cx="40" cy="10" r="5" fill="#e74c3c" />
+          <Circle cx="50" cy="8" r="5" fill="#e74c3c" />
+          <Circle cx="60" cy="10" r="5" fill="#e74c3c" />
+          {/* Snout */}
+          <Ellipse cx="50" cy="65" rx="15" ry="10" fill="#feca57" />
+          <Circle cx="45" cy="63" r="2" fill="#000" />
+          <Circle cx="55" cy="63" r="2" fill="#000" />
+        </Svg>
+      );
+    case 'miner':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} />
+          {/* Helmet with light */}
+          <Rect x="35" y="25" width="30" height="20" fill="#f39c12" rx="5" />
+          <Circle cx="50" cy="35" r="8" fill="#fff9c4" />
+          {/* Pickaxe */}
+          <Path d="M70 30 L90 60" stroke="#8B4513" strokeWidth="4" />
+          <Path d="M88 30 L90 60" stroke="#8B4513" strokeWidth="3" />
+          <Rect x="85" y="25" width="10" height="8" fill="#7f8c8d" />
+        </Svg>
+      );
+    case 'goblin_cage':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Cage structure */}
+          <Rect x="20" y="30" width="60" height="55" fill="none" stroke={color} strokeWidth="4" rx="5" />
+          {/* Bars */}
+          <Path d="M25 30 L25 85" stroke={color} strokeWidth="3" />
+          <Path d="M35 30 L35 85" stroke={color} strokeWidth="3" />
+          <Path d="M45 30 L45 85" stroke={color} strokeWidth="3" />
+          <Path d="M55 30 L55 85" stroke={color} strokeWidth="3" />
+          <Path d="M65 30 L65 85" stroke={color} strokeWidth="3" />
+          <Path d="M75 30 L75 85" stroke={color} strokeWidth="3" />
+          {/* Roof */}
+          <Path d="M15 30 L50 5 L85 30" fill={color} />
+          {/* Goblin silhouette inside */}
+          <Circle cx="50" cy="60" r="15" fill="#2ecc71" opacity="0.5" />
+        </Svg>
+      );
+    case 'goblin_giant':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Giant body */}
+          <Circle cx="50" cy="55" r="45" fill={color} stroke="#1e8449" strokeWidth="4" />
+          {/* Belt */}
+          <Rect x="20" y="75" width="60" height="10" fill="#8B4513" />
+          {/* Spear goblins on back */}
+          <Circle cx="25" cy="30" r="12" fill="#2ecc71" stroke="#27ae60" strokeWidth="2" />
+          <Circle cx="75" cy="30" r="12" fill="#2ecc71" stroke="#27ae60" strokeWidth="2" />
+          {/* Their spears */}
+          <Path d="M25 30 L10 10" stroke="#8B4513" strokeWidth="2" />
+          <Path d="M75 30 L90 10" stroke="#8B4513" strokeWidth="2" />
+          {/* Giant face */}
+          <Circle cx="50" cy="50" r="15" fill="#1e8449" />
+          <Circle cx="42" cy="48" r="4" fill="#fff" />
+          <Circle cx="58" cy="48" r="4" fill="#fff" />
+          <Circle cx="42" cy="48" r="2" fill="#000" />
+          <Circle cx="58" cy="48" r="2" fill="#000" />
+        </Svg>
+      );
     case 'clone':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
@@ -1872,6 +1973,37 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Circle cx="65" cy="45" r="18" fill="#3498db" stroke="#2980b9" strokeWidth="2" opacity="0.9" />
           {/* Clone symbol */}
           <Path d="M30 70 L50 50 L70 70" fill="none" stroke="white" strokeWidth="3" />
+        </Svg>
+      );
+    case 'the_log':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Wooden log trunk - horizontal */}
+          <Rect x="5" y="35" width="90" height="30" rx="15" fill="#8B4513" stroke="#5D3A1A" strokeWidth="3" />
+          {/* Wood grain lines */}
+          <Line x1="20" y1="38" x2="20" y2="62" stroke="#654321" strokeWidth="2" opacity="0.6" />
+          <Line x1="35" y1="36" x2="35" y2="64" stroke="#654321" strokeWidth="2" opacity="0.6" />
+          <Line x1="50" y1="38" x2="50" y2="62" stroke="#654321" strokeWidth="2" opacity="0.6" />
+          <Line x1="65" y1="36" x2="65" y2="64" stroke="#654321" strokeWidth="2" opacity="0.6" />
+          <Line x1="80" y1="38" x2="80" y2="62" stroke="#654321" strokeWidth="2" opacity="0.6" />
+          {/* Log end with tree rings (left side) */}
+          <Circle cx="12" cy="50" r="13" fill="#A0522D" stroke="#654321" strokeWidth="2" />
+          <Circle cx="12" cy="50" r="9" fill="none" stroke="#8B4513" strokeWidth="1.5" opacity="0.8" />
+          <Circle cx="12" cy="50" r="5" fill="none" stroke="#8B4513" strokeWidth="1" opacity="0.6" />
+          <Circle cx="12" cy="50" r="2" fill="#D2691E" />
+          {/* Log end with tree rings (right side) */}
+          <Circle cx="88" cy="50" r="13" fill="#A0522D" stroke="#654321" strokeWidth="2" />
+          <Circle cx="88" cy="50" r="9" fill="none" stroke="#8B4513" strokeWidth="1.5" opacity="0.8" />
+          <Circle cx="88" cy="50" r="5" fill="none" stroke="#8B4513" strokeWidth="1" opacity="0.6" />
+          <Circle cx="88" cy="50" r="2" fill="#D2691E" />
+          {/* Bark texture spots */}
+          <Circle cx="28" cy="42" r="2" fill="#5D3A1A" opacity="0.5" />
+          <Circle cx="45" cy="58" r="2" fill="#5D3A1A" opacity="0.5" />
+          <Circle cx="58" cy="41" r="2" fill="#5D3A1A" opacity="0.5" />
+          <Circle cx="72" cy="56" r="2" fill="#5D3A1A" opacity="0.5" />
+          {/* Direction arrows showing it rolls */}
+          <Path d="M40 75 L45 82 L50 75" fill="#f1c40f" opacity="0.8" />
+          <Path d="M55 75 L60 82 L65 75" fill="#f1c40f" opacity="0.8" />
         </Svg>
       );
     default:
@@ -2290,7 +2422,7 @@ const VisualEffects = ({ effects, setEffects }) => {
         }
 
         if (effect.type === 'heal_glow') {
-          // Heal glow - green expanding circle with + symbols
+          // Heal glow - GOLD/YELLOW expanding circle with + symbols (Heal Spirit)
           return (
             <View key={effect.id} style={{
               position: 'absolute',
@@ -2303,19 +2435,33 @@ const VisualEffects = ({ effects, setEffects }) => {
               justifyContent: 'center'
             }}>
               <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Outer gold ring - expanding */}
                 <Circle
                   cx={effect.radius}
                   cy={effect.radius}
-                  r={effect.radius * (0.2 + progress * 0.8)}
-                  fill="#2ecc71"
-                  opacity={0.4}
+                  r={effect.radius * (0.3 + progress * 0.7)}
+                  fill="none"
+                  stroke="#FFD700"
+                  strokeWidth="4"
+                  opacity={0.8}
                 />
+                {/* Inner gold glow */}
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * (0.2 + progress * 0.5)}
+                  fill="#FFD700"
+                  opacity={0.3}
+                />
+                {/* Orange accent */}
                 <Circle
                   cx={effect.radius}
                   cy={effect.radius}
                   r={effect.radius * 0.6}
-                  fill="#27ae60"
-                  opacity={0.2}
+                  fill="none"
+                  stroke="#FFA500"
+                  strokeWidth="2"
+                  opacity={0.5}
                 />
               </Svg>
               {/* Plus symbol - outside SVG */}
@@ -2324,11 +2470,11 @@ const VisualEffects = ({ effects, setEffects }) => {
                 opacity: opacity
               }}>
                 <Text style={{
-                  fontSize: 28,
-                  color: '#2ecc71',
+                  fontSize: 32,
+                  color: '#FFD700',
                   fontWeight: 'bold',
-                  textShadowColor: 'white',
-                  textShadowRadius: 5
+                  textShadowColor: '#FFA500',
+                  textShadowRadius: 8
                 }}>+</Text>
               </View>
             </View>
@@ -2448,7 +2594,7 @@ const VisualEffects = ({ effects, setEffects }) => {
         }
 
         if (effect.type === 'heal_pulse') {
-          // Heal pulse (Battle Healer attack) - yellow/gold aura
+          // Heal pulse (Battle Healer & Heal Spirit attack) - STRONG gold/yellow aura
           return (
             <View key={effect.id} style={{
               position: 'absolute',
@@ -2461,21 +2607,40 @@ const VisualEffects = ({ effects, setEffects }) => {
               justifyContent: 'center'
             }}>
               <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Outer expanding ring */}
                 <Circle
                   cx={effect.radius}
                   cy={effect.radius}
                   r={effect.radius * (0.4 + progress * 0.6)}
-                  fill="rgba(241, 196, 15, 0.3)"
-                  stroke="#F1C40F"
-                  strokeWidth="2"
-                  opacity={0.5}
+                  fill="none"
+                  stroke="#FFD700"
+                  strokeWidth="3"
+                  opacity={0.8}
                 />
+                {/* Inner gold glow */}
                 <Circle
                   cx={effect.radius}
                   cy={effect.radius}
-                  r={effect.radius * 0.3}
+                  r={effect.radius * (0.3 + progress * 0.4)}
+                  fill="rgba(255, 215, 0, 0.4)"
+                />
+                {/* Orange accent ring */}
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * (0.2 + progress * 0.3)}
+                  fill="none"
+                  stroke="#FFA500"
+                  strokeWidth="2"
+                  opacity={0.6}
+                />
+                {/* Bright center */}
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * 0.2}
                   fill="#FFF176"
-                  opacity={0.2}
+                  opacity={0.8 - progress * 0.3}
                 />
               </Svg>
             </View>
@@ -3149,6 +3314,155 @@ const VisualEffects = ({ effects, setEffects }) => {
           );
         }
 
+        if (effect.type === 'miner_burrow') {
+          // Miner going underground - dirt effect going down
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Dirt cloud expanding as he goes down */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.3 * progress} fill="#8B4513" opacity={0.8 - progress * 0.5} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.5 * progress} fill="#A0522D" opacity={0.6 - progress * 0.4} />
+                {/* Dirt particles flying up */}
+                {[0, 1, 2].map(i => {
+                  const angle = (i / 3) * Math.PI * 2;
+                  const x = effect.radius + Math.cos(angle) * effect.radius * 0.4 * progress;
+                  const y = effect.radius - Math.sin(angle) * effect.radius * 0.3 * progress; // Upward movement
+                  return (
+                    <Circle key={i} cx={x} cy={y} r={3} fill="#8B4513" opacity={0.7} />
+                  );
+                })}
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'miner_popup') {
+          // Miner popping up from ground - debris flying
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Expanding ring of dirt */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.8 * progress} fill="none" stroke="#8B4513" strokeWidth="3" opacity={1 - progress} />
+                {/* Debris flying outward */}
+                {[0, 1, 2, 3, 4, 5, 6, 7].map(i => {
+                  const angle = (i / 8) * Math.PI * 2;
+                  const dist = effect.radius * 0.3 + effect.radius * 0.5 * progress;
+                  const x = effect.radius + Math.cos(angle) * dist;
+                  const y = effect.radius + Math.sin(angle) * dist;
+                  const size = 2 + progress * 2;
+                  return (
+                    <Circle key={i} cx={x} cy={y} r={size} fill="#A0522D" opacity={1 - progress} />
+                  );
+                })}
+                {/* Center glow where miner emerges */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.3} fill="#f39c12" opacity={0.5 * (1 - progress)} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'electro_giant_shock') {
+          // Electro Giant shocking an attacker - electric burst
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Electric burst */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.8 * progress} fill="none" stroke="#3498db" strokeWidth="3" opacity={0.9} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.5 * progress} fill="none" stroke="#f1c40f" strokeWidth="2" opacity={0.8} />
+                {/* Lightning bolts radiating */}
+                {[0, 1, 2, 3].map(i => {
+                  const angle = (i / 4) * Math.PI * 2 + progress * Math.PI;
+                  const x1 = effect.radius + Math.cos(angle) * effect.radius * 0.2;
+                  const y1 = effect.radius + Math.sin(angle) * effect.radius * 0.2;
+                  const x2 = effect.radius + Math.cos(angle) * effect.radius * 0.7;
+                  const y2 = effect.radius + Math.sin(angle) * effect.radius * 0.7;
+                  return (
+                    <Path key={i} d={`M${x1} ${y1} L${x2} ${y2}`} stroke="#f1c40f" strokeWidth="2" opacity={0.9} />
+                  );
+                })}
+                {/* Center glow */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.3} fill="#3498db" opacity={1 - progress * 0.5} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.15} fill="#f1c40f" opacity={1} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'log_impact') {
+          // The Log hitting - rectangular dirt trail
+          const logWidth = 40;
+          const trailLength = 150;
+
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - logWidth / 2,
+              top: Math.min(effect.y, effect.y - trailLength),
+              width: logWidth,
+              height: trailLength,
+              opacity: opacity,
+            }}>
+              <Svg width={logWidth} height={trailLength} viewBox={`0 0 ${logWidth} ${trailLength}`}>
+                {/* Rectangular dirt trail */}
+                <Rect
+                  x="0"
+                  y="0"
+                  width={logWidth}
+                  height={trailLength}
+                  fill="#8B4513"
+                  opacity={0.4 * (1 - progress)}
+                />
+                {/* Dirt particles along the trail - fixed positions */}
+                {[0, 1, 2, 3, 4, 5, 6, 7].map(i => {
+                  const y = (i / 8) * trailLength + 10;
+                  const offsets = [-8, -4, 4, 8, -6, 6, -3, 3];
+                  const sizes = [4, 3, 5, 4, 3, 4, 5, 3];
+                  return (
+                    <Circle
+                      key={i}
+                      cx={logWidth / 2 + offsets[i]}
+                      cy={y}
+                      r={sizes[i] * (1 - progress * 0.5)}
+                      fill="#A0522D"
+                      opacity={1 - progress}
+                    />
+                  );
+                })}
+                {/* Motion lines showing direction */}
+                <Line x1={logWidth * 0.3} y1="10" x2={logWidth * 0.3} y2={trailLength - 10} stroke="#5D3A1A" strokeWidth="2" opacity={0.3 * (1 - progress)} strokeDasharray="5,5" />
+                <Line x1={logWidth * 0.7} y1="10" x2={logWidth * 0.7} y2={trailLength - 10} stroke="#5D3A1A" strokeWidth="2" opacity={0.3 * (1 - progress)} strokeDasharray="5,5" />
+              </Svg>
+            </View>
+          );
+        }
+
         return null;
       })}
     </>
@@ -3247,6 +3561,49 @@ const Projectile = ({ type, position }) => {
         <Svg width="12" height="12" viewBox="0 0 12 12">
           <Circle cx="6" cy="6" r="4" fill="#e67e22" opacity={0.9} />
           <Circle cx="6" cy="6" r="2" fill="#f39c12" opacity={1} />
+        </Svg>
+      </View>
+    );
+  }
+  if (type === 'the_log') {
+    // The Log - wooden trunk rolling forward
+    const rotation = (Date.now() / 10) % 360; // Rolling animation
+
+    return (
+      <View style={{
+        position: 'absolute',
+        left: position.x - 20,
+        top: position.y - 15,
+        width: 40,
+        height: 30,
+        transform: [{ rotate: `${rotation}deg` }]
+      }}>
+        <Svg width="40" height="30" viewBox="0 0 40 30">
+          {/* Main wooden log trunk */}
+          <Rect
+            x="0"
+            y="5"
+            width="40"
+            height="20"
+            rx="10"
+            fill="#8B4513"
+            stroke="#5D3A1A"
+            strokeWidth="2"
+          />
+          {/* Wood grain texture - darker lines */}
+          <Line x1="8" y1="8" x2="8" y2="22" stroke="#654321" strokeWidth="1.5" opacity="0.6" />
+          <Line x1="16" y1="6" x2="16" y2="24" stroke="#654321" strokeWidth="1.5" opacity="0.6" />
+          <Line x1="24" y1="8" x2="24" y2="22" stroke="#654321" strokeWidth="1.5" opacity="0.6" />
+          <Line x1="32" y1="6" x2="32" y2="24" stroke="#654321" strokeWidth="1.5" opacity="0.6" />
+          {/* Log end rings - tree rings */}
+          <Circle cx="5" cy="15" r="8" fill="#A0522D" opacity="0.9" stroke="#654321" strokeWidth="1" />
+          <Circle cx="5" cy="15" r="5" fill="none" stroke="#8B4513" strokeWidth="1" opacity="0.7" />
+          <Circle cx="5" cy="15" r="2" fill="#D2691E" opacity="0.8" />
+          {/* Bark texture - small darker spots */}
+          <Circle cx="12" cy="12" r="1.5" fill="#5D3A1A" opacity="0.5" />
+          <Circle cx="20" cy="18" r="1.5" fill="#5D3A1A" opacity="0.5" />
+          <Circle cx="28" cy="10" r="1.5" fill="#5D3A1A" opacity="0.5" />
+          <Circle cx="35" cy="16" r="1.5" fill="#5D3A1A" opacity="0.5" />
         </Svg>
       </View>
     );
@@ -3818,7 +4175,29 @@ const Unit = ({ unit }) => {
       )}
 
       <Animated.View style={{ transform: [{ translateY: verticalOffset }] }}>
-        <UnitSprite id={spriteId} isOpponent={isEnemy} size={unitSize} unit={unit} />
+        <View style={unit.isClone ? {
+          position: 'relative',
+          width: unitSize,
+          height: unitSize
+        } : undefined}>
+          {/* Clone blue tint overlay */}
+          {unit.isClone && (
+            <View style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: unitSize,
+              height: unitSize,
+              backgroundColor: 'rgba(52, 152, 219, 0.4)',
+              borderRadius: unitSize / 2,
+              zIndex: 1,
+              opacity: 0.6
+            }} />
+          )}
+          <View style={{ opacity: unit.isClone ? 0.7 : 1 }}>
+            <UnitSprite id={spriteId} isOpponent={isEnemy} size={unitSize} unit={unit} />
+          </View>
+        </View>
       </Animated.View>
       
       {/* Spawn Delay Indicator (rotating swirl) */}
@@ -4437,12 +4816,19 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
   const [localDraggingCard, setLocalDraggingCard] = useState(null);
   const [scrollEnabled, setScrollEnabled] = useState(true);
 
+  const [searchQuery, setSearchQuery] = useState('');
+
   const filteredCards = useMemo(() => {
     return CARDS.filter(card => !card.isToken).filter(card => {
       if (filterRarity === 'all') return true;
       return card.rarity === filterRarity;
+    }).filter(card => {
+      // Filter by search query (search in card name)
+      if (!searchQuery || searchQuery.trim() === '') return true;
+      const query = searchQuery.toLowerCase().trim();
+      return card.name.toLowerCase().includes(query);
     }).sort((a, b) => sortByElixir ? a.cost - b.cost : 0);
-  }, [filterRarity, sortByElixir]);
+  }, [filterRarity, sortByElixir, searchQuery]);
 
   const handleCollectionCardTap = useCallback((card) => setCardMenuCard(card), []);
   const handleDeckCardTap = useCallback((card) => setSelectedCard(card), []);
@@ -4527,7 +4913,14 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
         <View style={styles.deckCardGrid}>
           <View style={styles.cardRowCompact}>
             {cards.slice(0, 4).map((card, i) => (
-              <TouchableOpacity key={card.id} ref={el => deckSlotRefs.current[i] = el} onPress={() => handleDeckCardTap(card)} style={[styles.deckCardCompact, {borderColor: RARITY_COLORS[card.rarity]}]}>
+              <TouchableOpacity key={card.id} ref={el => deckSlotRefs.current[i] = el} onPress={() => handleDeckCardTap(card)} style={[
+                styles.deckCardCompact,
+                {
+                  borderColor: RARITY_COLORS[card.rarity],
+                  borderWidth: card.rarity === 'legendary' ? 4 : 2,
+                  borderRadius: card.rarity === 'legendary' ? 15 : 5,
+                }
+              ]}>
                 <UnitSprite id={card.id} size={35} />
                 <View style={styles.cardCostSmall}><Text style={styles.cardCostSmallText}>{card.cost}</Text></View>
               </TouchableOpacity>
@@ -4535,7 +4928,14 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
           </View>
           <View style={styles.cardRowCompact}>
             {cards.slice(4, 8).map((card, i) => (
-              <TouchableOpacity key={card.id} ref={el => deckSlotRefs.current[i+4] = el} onPress={() => handleDeckCardTap(card)} style={[styles.deckCardCompact, {borderColor: RARITY_COLORS[card.rarity]}]}>
+              <TouchableOpacity key={card.id} ref={el => deckSlotRefs.current[i+4] = el} onPress={() => handleDeckCardTap(card)} style={[
+                styles.deckCardCompact,
+                {
+                  borderColor: RARITY_COLORS[card.rarity],
+                  borderWidth: card.rarity === 'legendary' ? 4 : 2,
+                  borderRadius: card.rarity === 'legendary' ? 15 : 5,
+                }
+              ]}>
                 <UnitSprite id={card.id} size={35} />
                 <View style={styles.cardCostSmall}><Text style={styles.cardCostSmallText}>{card.cost}</Text></View>
               </TouchableOpacity>
@@ -4560,6 +4960,22 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
         <TouchableOpacity style={styles.filterButtonMini} onPress={() => setShowFilterModal(true)}>
           <Text style={styles.filterButtonText}>Sort By ▾</Text>
         </TouchableOpacity>
+      </View>
+
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="🔍 Search cards..."
+          placeholderTextColor="#999"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        {searchQuery.length > 0 && (
+          <TouchableOpacity style={styles.searchClearButton} onPress={() => setSearchQuery('')}>
+            <Text style={styles.searchClearButtonText}>✕</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <FlatList
@@ -5054,8 +5470,8 @@ const GameBoard = ({
 
       {draggingCard && (
         <View style={{ position: 'absolute', left: dragPosition.x, top: dragPosition.y, zIndex: 9999, elevation: 100 }} pointerEvents="none">
-          {/* Range/Radius Indicator - Only for Spells (radius), Buildings, or Units with Spawn Damage */}
-          {Boolean(draggingCard.radius || (draggingCard.range && (draggingCard.type === 'building' || draggingCard.spawnDamage))) && (
+          {/* Range/Radius Indicator - Only for Spells (radius), Buildings, or Units with Spawn Damage - NOT for The Log */}
+          {Boolean((draggingCard.radius || (draggingCard.range && (draggingCard.type === 'building' || draggingCard.spawnDamage))) && draggingCard.id !== 'the_log') && (
             <View style={{
               position: 'absolute',
               left: -(draggingCard.radius || draggingCard.range),
@@ -5081,6 +5497,68 @@ const GameBoard = ({
               borderColor: '#3498db',
               borderWidth: 1
             }} />
+          )}
+          {/* THE LOG: Show rolling path FORWARD from deployment position */}
+          {draggingCard.id === 'the_log' && (
+            <View style={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              width: width,
+              height: height,
+              pointerEvents: 'none'
+            }}>
+              <Svg width={width} height={height} style={{ position: 'absolute' }}>
+                {(() => {
+                  // Log starts at deployment position and rolls forward 150 pixels
+                  const startY = dragPosition.y + 37.5;
+                  const logDistance = 150;
+                  const endY = draggingCard.isOpponent ? startY + logDistance : startY - logDistance;
+                  const logWidth = 40; // Width of the log's damage area
+
+                  return (
+                    <>
+                      {/* Rectangular damage area showing the log's path */}
+                      <Rect
+                        x={dragPosition.x + 30 - logWidth/2}
+                        y={draggingCard.isOpponent ? startY : endY}
+                        width={logWidth}
+                        height={logDistance}
+                        fill="rgba(139, 69, 19, 0.3)"
+                        stroke="#8B4513"
+                        strokeWidth="2"
+                        strokeDasharray="5,5"
+                      />
+                      {/* Direction arrow */}
+                      <Path
+                        d={`M${dragPosition.x + 30} ${startY + 20} L${dragPosition.x + 30} ${draggingCard.isOpponent ? startY + 60 : startY - 60}`}
+                        stroke="#f1c40f"
+                        strokeWidth="3"
+                        fill="none"
+                        markerEnd="url(#arrowhead)"
+                      />
+                      {/* Start point (deployment position) */}
+                      <Circle
+                        cx={dragPosition.x + 30}
+                        cy={startY}
+                        r="8"
+                        fill="#2ecc71"
+                        opacity="0.9"
+                      />
+                      <SvgText
+                        x={dragPosition.x + 30}
+                        y={startY}
+                        fontSize="10"
+                        fill="white"
+                        textAnchor="middle"
+                        dy="3"
+                        fontWeight="bold"
+                      >▶</SvgText>
+                    </>
+                  );
+                })()}
+              </Svg>
+            </View>
           )}
           <View style={[styles.dragProxy, { position: 'absolute', left: -30, top: -37.5, margin: 0 }]}>
             <UnitSprite id={draggingCard.id} isOpponent={false} size={50} />
@@ -5867,13 +6345,46 @@ export default function App() {
 
 
 
-          } else if (actualCard.id === 'arrows') {
+          } else if (actualCard.id === 'the_log') {
 
-            spellType = 'arrows_spell';
+            spellType = 'the_log';
 
-            startY = isOpponent ? 0 : 0;
+            // The Log starts WHERE you deploy it, then rolls FORWARD
+            // Player (bottom): starts at deploy position, rolls UP (towards Y=0)
+            // Opponent (top): starts at deploy position, rolls DOWN (towards Y=height)
+            startX = x;
+            startY = y;
+            // Store the direction for damage calculation
+            const logDirection = isOpponent ? 1 : -1; // 1 = down, -1 = up
+            const logDistance = 150; // How far the log rolls
 
-            spellSpeed = 20;
+            // Calculate target position based on direction
+            const targetY = y + (logDirection * logDistance);
+
+            setProjectiles(prev => [...prev, {
+
+              id: Date.now(), x: startX, y: startY, targetX: x, targetY: targetY,
+
+              speed: 15, damage: actualCard.damage, radius: actualCard.radius,
+
+              type: spellType, isSpell: true, stun: actualCard.stun || 0,
+
+              duration: actualCard.duration || 0, hit: false, spawnTime: Date.now(),
+
+              isOpponent,
+
+              knockback: actualCard.knockback || 0,
+
+              splash: false, // Not splash, uses rectangular path damage
+
+              isLog: true, // Special flag for log damage
+
+              logStartY: startY,
+              logEndY: targetY,
+
+              y: startY
+
+            }]);
 
           } else if (actualCard.id === 'poison') {
 
@@ -5971,8 +6482,8 @@ export default function App() {
                 id: 'clone_' + Date.now() + '_' + Math.random(),
                 x: unit.x + (Math.random() * 20 - 10),
                 y: unit.y + (Math.random() * 20 - 10),
-                hp: unit.hp * 0.5, // Clones have 50% HP
-                maxHp: unit.maxHp * 0.5,
+                hp: 1, // Clones have only 1 HP
+                maxHp: 1,
                 isClone: true,
                 cloneEndTime: Date.now() + (actualCard.cloneDuration || 10) * 1000
               }));
@@ -6007,7 +6518,13 @@ export default function App() {
 
               duration: actualCard.duration || 0, hit: isPoison, spawnTime: Date.now(),
 
-              isPoison, isOpponent
+              isPoison, isOpponent,
+
+              knockback: actualCard.knockback || 0,
+
+              splash: actualCard.id === 'fireball' || actualCard.id === 'the_log', // These spells do splash damage
+
+              y: startY // Store starting Y for knockback calculation
 
             }]);
 
@@ -6023,15 +6540,31 @@ export default function App() {
 
           for (let i = 0; i < count; i++) {
 
-            const offsetX = count > 1 ? (Math.random() * 40 - 20) : 0;
+            const offsetX = count > 1 ? (Math.random() * 20 - 10) : 0;
 
-            const offsetY = count > 1 ? (Math.random() * 40 - 20) : 0;
+            const offsetY = count > 1 ? (Math.random() * 20 - 10) : 0;
 
             let unitLane = lane;
 
             let spawnX = x + offsetX;
 
             let spawnY = y + offsetY;
+
+            // LANE CENTERING: Pull spawn position towards center of lane
+            const laneCenter = lane === 'LEFT' ? 95 : width - 95;
+            const distFromCenter = spawnX - laneCenter;
+            spawnX -= distFromCenter * 0.3; // Pull 30% towards center
+
+            // MINER: Starts at player's side, travels underground to deployment position
+            let targetX = x + offsetX;
+            let targetY = y + offsetY;
+
+            if (actualCard.id === 'miner') {
+              // Miner starts from behind player's towers
+              spawnY = isOpponent ? height * 0.1 : height * 0.9; // Behind player's towers
+              // Keep X in the same lane as deployment
+              spawnX = x;
+            }
 
             if (actualCard.id === 'three_musketeers' && count === 3) {
 
@@ -6069,7 +6602,7 @@ export default function App() {
 
               hidden: actualCard.hidden ? { active: true, visibleHp: actualCard.hp } : undefined,
 
-              burrowing: actualCard.burrows ? { active: true, startTime: Date.now() } : undefined,
+              burrowing: actualCard.burrows ? { active: true, startTime: Date.now(), targetX, targetY } : undefined,
 
               deployAnywhere: actualCard.deployAnywhere || false,
 
@@ -6168,6 +6701,19 @@ export default function App() {
           }
 
           setUnits(prev => [...(prev || []), ...newUnits]);
+
+          // Miner burrowing visual - dirt going into ground at spawn point (player's bridge)
+          if (actualCard.id === 'miner') {
+            setVisualEffects(prev => [...prev, {
+              id: Date.now() + Math.random(),
+              type: 'miner_burrow',
+              x: spawnX,
+              y: spawnY,
+              radius: 50,
+              startTime: Date.now(),
+              duration: 1000
+            }]);
+          }
 
           if (actualCard.id === 'electro_wizard' || actualCard.id === 'mega_knight') {
 
@@ -6877,12 +7423,6 @@ export default function App() {
             if (!u.hidden.active && timeSinceAttack > 3000) {
               u.hidden.active = true;
             }
-          } else if (u.burrowing) {
-            // Miner: Become visible after 1 second of burrowing
-            const timeBurrowing = now - u.burrowing.startTime;
-            if (u.burrowing.active && timeBurrowing > 1000) {
-              u.burrowing.active = false;
-            }
           }
         }
 
@@ -6905,6 +7445,54 @@ export default function App() {
           if (timeSinceSpawn < u.spawnDelay) {
             // Still in spawn delay - skip all movement and attack logic
             return u;
+          }
+        }
+
+        // GOBLIN GIANT: Independent spear goblin attacks from his back
+        // These attack continuously with their own speed, separate from Giant's melee punch
+        if (u.extraProjectiles > 0 && u.spriteId === 'goblin_giant') {
+          const spearGoblinCard = CARDS.find(c => c.id === 'spear_goblins');
+          if (spearGoblinCard) {
+            const lastSpearAttack = u.lastSpearAttack || 0;
+            const timeSinceSpearAttack = now - lastSpearAttack;
+
+            // Spear goblins attack every 1100ms (their attack speed), independent of Giant
+            if (timeSinceSpearAttack >= spearGoblinCard.attackSpeed) {
+              // Find nearest enemy unit for spear goblins to target
+              const spearTargets = (unitsRef.current || []).filter(t => t.isOpponent !== u.isOpponent && t.hp > 0 && t.type !== 'building');
+              let closestSpearTarget = null;
+              let minSpearDist = Infinity;
+              spearTargets.forEach(t => {
+                const dist = Math.sqrt(Math.pow(t.x - u.x, 2) + Math.pow(t.y - u.y, 2));
+                if (dist < minSpearDist && dist <= spearGoblinCard.range * 2) {
+                  minSpearDist = dist;
+                  closestSpearTarget = t;
+                }
+              });
+
+              // Shoot extra projectiles (spear goblin attacks) - happens even while Giant is walking!
+              if (closestSpearTarget) {
+                const spearTarget = closestSpearTarget;
+                for (let i = 0; i < u.extraProjectiles; i++) {
+                  nextProjectiles.push({
+                    id: now + Math.random() + i + spearTarget.id + 1000,
+                    x: u.x - 20 + (i * 40), // Slightly offset positions
+                    y: u.y - 10,
+                    targetId: spearTarget.id,
+                    targetX: spearTarget.x,
+                    targetY: spearTarget.y,
+                    speed: 12,
+                    damage: spearGoblinCard.damage,
+                    type: 'spear',
+                    splash: false,
+                    attackerId: u.id,
+                    isOpponent: u.isOpponent
+                  });
+                }
+                // Update last spear attack time
+                u.lastSpearAttack = now;
+              }
+            }
           }
         }
 
@@ -7617,183 +8205,217 @@ export default function App() {
             } else {
                u.isDashing = false; // Target lost
             }
-          } else {
+          } else if (u.burrowing && u.burrowing.active && u.burrowing.targetX !== undefined) {
+            // MINER BURROW MOVEMENT - travels underground to target location
+              const targetX = u.burrowing.targetX;
+              const targetY = u.burrowing.targetY;
+              const distToTarget = Math.sqrt(Math.pow(targetX - u.x, 2) + Math.pow(targetY - u.y, 2));
 
-            // Apply slow effect
-            if (u.slowUntil > now) {
-              effectiveSpeed *= (1 - (u.slowAmount || 0.35));
-            }
-
-            // Stop to attack - units like Sparky stop moving when in range
-            if (u.stopsToAttack && closestTarget) {
-              const distToTarget = Math.sqrt(Math.pow(closestTarget.x - u.x, 2) + Math.pow(closestTarget.y - u.y, 2));
-              const attackRange = (u.range || 25) + 15; // Add buffer
-              if (distToTarget <= attackRange) {
-                effectiveSpeed = 0; // Stop moving to attack
-              }
-            }
-
-            // Movement Calculation
-            if ((u.jumps || u.type === 'flying') && closestTarget) {
-              // Direct pathfinding for units that ignore terrain
-              const angle = Math.atan2(closestTarget.y - u.y, closestTarget.x - u.x);
-              nextX += Math.cos(angle) * effectiveSpeed;
-              nextY += Math.sin(angle) * effectiveSpeed;
-
-              // Skeleton Barrel - POP when reaching building!
-              if (u.spriteId === 'skeleton_barrel') {
-                 const distToTarget = Math.sqrt(Math.pow(closestTarget.x - nextX, 2) + Math.pow(closestTarget.y - nextY, 2));
-                 // Pop if touching (30px buffer)
-                 if (distToTarget < 30) {
-                    return { ...u, x: nextX, y: nextY, hp: 0 }; // Die immediately to trigger death spawn
-                 }
+              if (distToTarget > 5) {
+                // Move toward burrow target
+                const angle = Math.atan2(targetY - u.y, targetX - u.x);
+                nextX += Math.cos(angle) * effectiveSpeed;
+                nextY += Math.sin(angle) * effectiveSpeed;
+              } else {
+                // Reached target - stop burrowing and pop up
+                u.burrowing.active = false;
+                // Add popup visual
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'miner_popup',
+                  x: u.x,
+                  y: u.y,
+                  radius: 50,
+                  startTime: Date.now(),
+                  duration: 800
+                }]);
               }
             } else {
-              // Standard vertical movement for ground units (bridges will handle steering)
-              if (u.isOpponent) {
-                nextY += effectiveSpeed;
-              } else {
-                nextY -= effectiveSpeed;
+              // Regular movement for non-miner, non-dashing units
+              // Apply slow effect
+              if (u.slowUntil > now) {
+                effectiveSpeed *= (1 - (u.slowAmount || 0.35));
               }
-            }
 
-            // Track distance for charge
-            if (u.charge && !u.charge.active) {
-              const moveDist = Math.sqrt(Math.pow(nextX - u.x, 2) + Math.pow(nextY - u.y, 2));
-              u.charge.distance = (u.charge.distance || 0) + moveDist;
-            }
-
-            // Defensive check: ensure nextTowers is an array
-            const allTowers = (nextTowers || []).filter(t => t.hp > 0);
-
-            // Find the enemy King tower to redirect to after destroying princess tower
-            const enemyKing = (nextTowers || []).find(t => t.type === 'king' && t.isOpponent !== u.isOpponent && t.hp > 0);
-            const kingCenterX = enemyKing ? enemyKing.x : width / 2;
-
-            // Check if unit's lane princess tower is destroyed
-            const lanePrincess = (nextTowers || []).find(t =>
-              t.type === 'princess' &&
-              t.isOpponent !== u.isOpponent &&
-              ((u.lane === 'LEFT' && t.x < width / 2) || (u.lane === 'RIGHT' && t.x > width / 2))
-            );
-            const princessDestroyed = !lanePrincess || lanePrincess.hp <= 0;
-
-            // If princess tower is destroyed and unit is past the princess tower zone, steer toward King
-            const princessY = u.isOpponent ? (height - 230) : 150;
-            const pastPrincess = u.isOpponent ? (nextY > princessY + 30) : (nextY < princessY - 30);
-
-            if (princessDestroyed && pastPrincess && enemyKing) {
-              // Steer toward King tower center
-              const diffX = kingCenterX - nextX;
-              if (Math.abs(diffX) > 5) {
-                const steerSpeed = Math.min(2, Math.abs(diffX) * 0.1);
-                nextX += Math.sign(diffX) * steerSpeed;
-              }
-            }
-
-            let collision = false;
-            let avoidX = 0;
-
-            for (let t of allTowers) {
-              const distToTower = Math.sqrt(Math.pow(t.x - nextX, 2) + Math.pow(t.y - nextY, 2));
-              const minDistance = (t.type === 'king' ? 45 : 35);
-
-              if (distToTower < minDistance) {
-                collision = true;
-                if (nextX < t.x) {
-                  avoidX = -2;
-                } else {
-                  avoidX = 2;
+              // Stop to attack - units like Sparky stop moving when in range
+              if (u.stopsToAttack && closestTarget) {
+                const distToTarget = Math.sqrt(Math.pow(closestTarget.x - u.x, 2) + Math.pow(closestTarget.y - u.y, 2));
+                const attackRange = (u.range || 25) + 15; // Add buffer
+                if (distToTarget <= attackRange) {
+                  effectiveSpeed = 0; // Stop moving to attack
                 }
-                break;
               }
-            }
 
-            const riverY = height / 2;
-            const distToRiver = Math.abs(nextY - riverY);
+              // Movement Calculation
+              if ((u.jumps || u.type === 'flying') && closestTarget) {
+                // Direct pathfinding for units that ignore terrain
+                const angle = Math.atan2(closestTarget.y - u.y, closestTarget.x - u.x);
+                nextX += Math.cos(angle) * effectiveSpeed;
+                nextY += Math.sin(angle) * effectiveSpeed;
 
-            // Flying units and jumpers move differently - they skip tower collision avoidance AND bridge logic
-            const isFlyingOrJumping = u.jumps || u.type === 'flying';
+                // Skeleton Barrel - POP when reaching building!
+                if (u.spriteId === 'skeleton_barrel') {
+                   const distToTarget = Math.sqrt(Math.pow(closestTarget.x - nextX, 2) + Math.pow(closestTarget.y - nextY, 2));
+                   // Pop if touching (30px buffer)
+                   if (distToTarget < 30) {
+                      return { ...u, x: nextX, y: nextY, hp: 0 }; // Die immediately to trigger death spawn
+                   }
+                }
+              } else {
+                // Standard vertical movement for ground units (bridges will handle steering)
+                if (u.isOpponent) {
+                  nextY += effectiveSpeed;
+                } else {
+                  nextY -= effectiveSpeed;
+                }
+              }
 
-            if (isFlyingOrJumping && effectiveSpeed > 0) {
-              // Flying/jumping units just move straight toward target, no special avoidance
-              // Movement already calculated above, do nothing extra
-            } else if (collision && effectiveSpeed > 0) {
-              nextX += avoidX;
-              nextY = u.y + (u.isOpponent ? effectiveSpeed * 0.5 : -effectiveSpeed * 0.5);
-            } else if (!collision && effectiveSpeed > 0) {
-              // STRICT RIVER BLOCKING
-              // Bridge zones: Left ~95, Right ~Width-95. Width ~40.
-              const bridgeWidth = 50; // generous width
-              const leftBridgeX = 95;
-              const rightBridgeX = width - 95;
-              
-              const onLeftBridge = Math.abs(nextX - leftBridgeX) < bridgeWidth / 2;
-              const onRightBridge = Math.abs(nextX - rightBridgeX) < bridgeWidth / 2;
-              const onBridge = onLeftBridge || onRightBridge;
+              // Track distance for charge
+              if (u.charge && !u.charge.active) {
+                const moveDist = Math.sqrt(Math.pow(nextX - u.x, 2) + Math.pow(nextY - u.y, 2));
+                u.charge.distance = (u.charge.distance || 0) + moveDist;
+              }
 
-              if (distToRiver < 30 && !onBridge) {
-                 // BLOCKED BY RIVER
-                 // Allow moving AWAY from the river, but not towards it
-                 const isMovingTowardsRiver = (u.y < riverY && nextY > u.y) || (u.y > riverY && nextY < u.y);
-                 if (isMovingTowardsRiver) {
-                   nextY = u.y;
-                 }
-                 
-                 // Slide towards nearest bridge
-                 const bridgeCenterX = u.lane === 'LEFT' ? leftBridgeX : rightBridgeX;
-                 const diffX = bridgeCenterX - nextX;
-                 // Move sideways to find bridge - slightly faster than normal speed
-                 nextX += Math.sign(diffX) * Math.min(Math.abs(diffX), effectiveSpeed * 1.5);
-              } else if (distToRiver < 120 && !onBridge) {
-                // Approaching river - steer towards bridge
-                const bridgeCenterX = u.lane === 'LEFT' ? leftBridgeX : rightBridgeX;
-                const diffX = bridgeCenterX - nextX;
-                if (Math.abs(diffX) > 2) {
-                  const steerSpeed = 2; // Stronger steering
+              // Defensive check: ensure nextTowers is an array
+              const allTowers = (towersRef.current || []).filter(t => t.hp > 0);
+
+              // Find the enemy King tower to redirect to after destroying princess tower
+              const enemyKing = (towersRef.current || []).find(t => t.type === 'king' && t.isOpponent !== u.isOpponent && t.hp > 0);
+              const kingCenterX = enemyKing ? enemyKing.x : width / 2;
+
+              // Check if unit's lane princess tower is destroyed
+              const lanePrincess = (towersRef.current || []).find(t =>
+                t.type === 'princess' &&
+                t.isOpponent !== u.isOpponent &&
+                ((u.lane === 'LEFT' && t.x < width / 2) || (u.lane === 'RIGHT' && t.x > width / 2))
+              );
+              const princessDestroyed = !lanePrincess || lanePrincess.hp <= 0;
+
+              // If princess tower is destroyed and unit is past the princess tower zone, steer toward King
+              const princessY = u.isOpponent ? (height - 230) : 150;
+              const pastPrincess = u.isOpponent ? (nextY > princessY + 30) : (nextY < princessY - 30);
+
+              if (princessDestroyed && pastPrincess && enemyKing) {
+                // Steer toward King tower center
+                const diffX = kingCenterX - nextX;
+                if (Math.abs(diffX) > 5) {
+                  const steerSpeed = Math.min(2, Math.abs(diffX) * 0.1);
                   nextX += Math.sign(diffX) * steerSpeed;
                 }
               }
+
+              let collision = false;
+              let avoidX = 0;
+
+              // LANE CENTERING: Make units bunch up more in the center of their lane
+              const laneCenterX = u.lane === 'LEFT' ? 95 : width - 95;
+              const distToLaneCenter = Math.abs(nextX - laneCenterX);
+              if (distToLaneCenter > 20 && effectiveSpeed > 0) {
+                // Steer toward lane center
+                const steerStrength = 2; // Strong steering to center
+                avoidX += Math.sign(laneCenterX - nextX) * steerStrength;
+              }
+
+              for (let t of allTowers) {
+                const distToTower = Math.sqrt(Math.pow(t.x - nextX, 2) + Math.pow(t.y - nextY, 2));
+                const minDistance = (t.type === 'king' ? 45 : 35);
+
+                if (distToTower < minDistance) {
+                  collision = true;
+                  if (nextX < t.x) {
+                    avoidX += -2;
+                  } else {
+                    avoidX += 2;
+                  }
+                  break;
+                }
+              }
+
+              const riverY = height / 2;
+              const distToRiver = Math.abs(nextY - riverY);
+
+              // Flying units and jumpers move differently - they skip tower collision avoidance AND bridge logic
+              const isFlyingOrJumping = u.jumps || u.type === 'flying';
+
+              if (isFlyingOrJumping && effectiveSpeed > 0) {
+                // Flying/jumping units just move straight toward target, no special avoidance
+                // Movement already calculated above, do nothing extra
+              } else if (collision && effectiveSpeed > 0) {
+                nextX += avoidX;
+                nextY = u.y + (u.isOpponent ? effectiveSpeed * 0.5 : -effectiveSpeed * 0.5);
+              } else if (!collision && effectiveSpeed > 0) {
+                // STRICT RIVER BLOCKING
+                // Bridge zones: Left ~95, Right ~Width-95. Width ~40.
+                const bridgeWidth = 50; // generous width
+                const leftBridgeX = 95;
+                const rightBridgeX = width - 95;
+
+                const onLeftBridge = Math.abs(nextX - leftBridgeX) < bridgeWidth / 2;
+                const onRightBridge = Math.abs(nextX - rightBridgeX) < bridgeWidth / 2;
+                const onBridge = onLeftBridge || onRightBridge;
+
+                if (distToRiver < 30 && !onBridge) {
+                   // BLOCKED BY RIVER
+                   // Allow moving AWAY from the river, but not towards it
+                   const isMovingTowardsRiver = (u.y < riverY && nextY > u.y) || (u.y > riverY && nextY < u.y);
+                   if (isMovingTowardsRiver) {
+                     nextY = u.y;
+                   }
+
+                   // Slide towards nearest bridge
+                   const bridgeCenterX = u.lane === 'LEFT' ? leftBridgeX : rightBridgeX;
+                   const diffX = bridgeCenterX - nextX;
+                   // Move sideways to find bridge - slightly faster than normal speed
+                   nextX += Math.sign(diffX) * Math.min(Math.abs(diffX), effectiveSpeed * 1.5);
+                } else if (distToRiver < 120 && !onBridge) {
+                  // Approaching river - steer towards bridge
+                  const bridgeCenterX = u.lane === 'LEFT' ? leftBridgeX : rightBridgeX;
+                  const diffX = bridgeCenterX - nextX;
+                  if (Math.abs(diffX) > 2) {
+                    const steerSpeed = 2; // Stronger steering
+                    nextX += Math.sign(diffX) * steerSpeed;
+                  }
+                }
+              }
             }
-          }
 
-          // Update Bandit dash state - end dash when time is up
-          let isDashingNow = u.isDashing || false;
-          if (isDashingNow && now > (u.dashEndTime || 0)) {
-            isDashingNow = false;
-          }
+            // Update Bandit dash state - end dash when time is up
+            let isDashingNow = u.isDashing || false;
+            if (isDashingNow && now > (u.dashEndTime || 0)) {
+              isDashingNow = false;
+            }
 
-          // Track Inferno Tower target for damage ramp reset
-          if (u.damageRamp && u.lockedTarget && u.lastTargetId !== u.lockedTarget) {
-            // Target changed, reset damage ramp
-            u.lastDamageRampTime = now;
-            u.currentDamageBonus = 0;
-            u.lastTargetId = u.lockedTarget;
-          } else if (u.damageRamp && !u.lockedTarget) {
-            // No target, reset
-            u.lastDamageRampTime = now;
-            u.currentDamageBonus = 0;
-          }
+            // Track Inferno Tower target for damage ramp reset
+            if (u.damageRamp && u.lockedTarget && u.lastTargetId !== u.lockedTarget) {
+              // Target changed, reset damage ramp
+              u.lastDamageRampTime = now;
+              u.currentDamageBonus = 0;
+              u.lastTargetId = u.lockedTarget;
+            } else if (u.damageRamp && !u.lockedTarget) {
+              // No target, reset
+              u.lastDamageRampTime = now;
+              u.currentDamageBonus = 0;
+            }
 
-          return {
-            ...u,
-            x: nextX,
-            y: nextY,
-            hidden: u.hidden,
-            charge: u.charge,
-            lockedTarget: u.lockedTarget,
-            wasPushed: u.wasPushed,
-            wasStunned: u.wasStunned,
-            isJumping: isJumpingNow,
-            jumpTargetId: u.jumpTargetId,
-            // Preserve new card properties
-            dashRange: u.dashRange || 80,
-            isDashing: isDashingNow,
-            dashEndTime: u.dashEndTime || 0,
-            currentDamageBonus: u.currentDamageBonus || 0,
-            lastBombDrop: u.lastBombDrop || 0,
-            lastTargetId: u.lastTargetId
-          };
+            return {
+              ...u,
+              x: nextX,
+              y: nextY,
+              hidden: u.hidden,
+              charge: u.charge,
+              lockedTarget: u.lockedTarget,
+              wasPushed: u.wasPushed,
+              wasStunned: u.wasStunned,
+              isJumping: isJumpingNow,
+              jumpTargetId: u.jumpTargetId,
+              // Preserve new card properties
+              dashRange: u.dashRange || 80,
+              isDashing: isDashingNow,
+              dashEndTime: u.dashEndTime || 0,
+              currentDamageBonus: u.currentDamageBonus || 0,
+              lastBombDrop: u.lastBombDrop || 0,
+              lastTargetId: u.lastTargetId
+            };
         }
       });
 
@@ -8120,13 +8742,19 @@ export default function App() {
            const nextX = p.x + Math.cos(angle) * p.speed;
            const nextY = p.y + Math.sin(angle) * p.speed;
            const hitIds = p.hitIds || [];
-           
+           const maxHits = 5; // Maximum number of targets to pierce through
+
+           // Check if projectile has traveled past its target by significant distance
+           const distTraveled = Math.sqrt(Math.pow(nextX - p.x, 2) + Math.pow(nextY - p.y, 2));
+           const totalDistTraveled = (p.totalDistTraveled || 0) + distTraveled;
+           const distToTarget = Math.sqrt(Math.pow(p.targetX - p.x, 2) + Math.pow(p.targetY - p.y, 2));
+
            // Check for collisions
            const targets = [
               ...(unitsRef.current || []).filter(u => u.isOpponent !== p.isOpponent && u.hp > 0),
               ...(nextTowers || []).filter(t => t.isOpponent !== p.isOpponent && t.hp > 0)
            ];
-           
+
            targets.forEach(t => {
               if (!hitIds.includes(t.id)) {
                  const distToProj = Math.sqrt(Math.pow(t.x - nextX, 2) + Math.pow(t.y - nextY, 2));
@@ -8144,12 +8772,16 @@ export default function App() {
               }
            });
 
-           // Out of bounds check
-           if (nextX < -50 || nextX > width + 50 || nextY < -50 || nextY > height + 50) {
+           // Remove projectile if:
+           // 1. Hit max number of targets
+           // 2. Traveled 100 pixels past target
+           // 3. Out of bounds
+           if (hitIds.length >= maxHits || (distToTarget < 100 && totalDistTraveled > distToTarget + 100) ||
+               nextX < -50 || nextX > width + 50 || nextY < -50 || nextY > height + 50) {
               return { ...p, damageDealt: true, hit: true }; // Mark for removal
            }
 
-           return { ...p, x: nextX, y: nextY, hitIds };
+           return { ...p, x: nextX, y: nextY, hitIds, totalDistTraveled };
         }
 
         if (dist < p.speed + 10) {
@@ -8462,6 +9094,17 @@ export default function App() {
                   startTime: Date.now(),
                   duration: 600
                 }]);
+              } else if (h.type === 'the_log') {
+                // The Log impact - dirt trail and impact effect
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'log_impact',
+                  x: h.targetX,
+                  y: h.targetY,
+                  radius: 40,
+                  startTime: Date.now(),
+                  duration: 600
+                }]);
               }
             }
 
@@ -8486,6 +9129,42 @@ export default function App() {
                     startY: h.y
                   });
                }
+            }
+
+            // THE LOG: Special rectangular damage along the path
+            if (h.isLog) {
+              const logWidth = 40; // Width of the log's damage area
+              const logStartY = h.logStartY || h.y;
+              const logEndY = h.logEndY || h.targetY;
+              const minX = h.x - logWidth / 2;
+              const maxX = h.x + logWidth / 2;
+              const minY = Math.min(logStartY, logEndY);
+              const maxY = Math.max(logStartY, logEndY);
+
+              // Damage all units in the rectangular path
+              currentUnits = currentUnits.map(u => {
+                if (u.hp > 0) {
+                  const isEnemy = h.isOpponent !== undefined ? !h.isOpponent : u.isOpponent;
+                  if (isEnemy) {
+                    // Check if unit is in the rectangular path
+                    if (u.x >= minX && u.x <= maxX && u.y >= minY && u.y <= maxY) {
+                      let updatedUnit = { ...u, hp: u.hp - h.damage };
+
+                      // Apply knockback
+                      if (h.knockback && h.knockback > 0 && u.type !== 'building') {
+                        // Knockback in the direction the log is rolling
+                        const logDirection = logEndY > logStartY ? 1 : -1;
+                        updatedUnit.y = u.y + (h.knockback * logDirection);
+                        updatedUnit.y = Math.max(10, Math.min(height - 10, updatedUnit.y));
+                        updatedUnit.wasPushed = true;
+                      }
+
+                      return updatedUnit;
+                    }
+                  }
+                }
+                return u;
+              });
             }
 
             // Damage the primary target
@@ -8539,6 +9218,43 @@ export default function App() {
                   updatedUnit.slowAmount = h.slow;
                 }
 
+                // Electro Giant Shock Aura - if attacker is in Electro Giant's aura, shock them
+                if (h.attackerId) {
+                  // Find all Electro Giants and check if attacker is in their aura
+                  const electroGiants = currentUnits.filter(eg =>
+                    eg.spriteId === 'electro_giant' &&
+                    eg.hp > 0 &&
+                    eg.isOpponent !== u.isOpponent // Enemy Electro Giant
+                  );
+
+                  electroGiants.forEach(eg => {
+                    const distToGiant = Math.sqrt(Math.pow(u.x - eg.x, 2) + Math.pow(u.y - eg.y, 2));
+                    const shockRadius = eg.shockRadius || 50;
+
+                    if (distToGiant <= shockRadius) {
+                      // Attacker is in Electro Giant's aura - shock them!
+                      updatedUnit.hp -= (eg.shockDamage || 100);
+                      updatedUnit.stunUntil = now + ((eg.shockStun || 0.5) * 1000);
+
+                      // Reset charge if Prince gets shocked
+                      if (u.charge) {
+                        updatedUnit.charge = { ...u.charge, distance: 0, active: false };
+                      }
+
+                      // Sparking visual effect
+                      setVisualEffects(prev => [...prev, {
+                        id: Date.now() + Math.random(),
+                        type: 'electro_giant_shock',
+                        x: u.x,
+                        y: u.y,
+                        radius: 40,
+                        startTime: Date.now(),
+                        duration: 500
+                      }]);
+                    }
+                  });
+                }
+
                 // Mother Witch curse - marks enemy for 5 seconds
                 if (h.turnsToPig && !u.isPig && u.type !== 'building') {
                   updatedUnit.cursedUntil = now + 5000;
@@ -8567,6 +9283,30 @@ export default function App() {
                     const dist = Math.sqrt(Math.pow(u.x - hitX, 2) + Math.pow(u.y - hitY, 2));
                     if (dist <= splashRadius) {
                       let updatedUnit = { ...u, hp: u.hp - Math.floor(h.damage * 0.5) };
+
+                      // Apply knockback (Fireball)
+                      if (h.knockback && h.knockback > 0 && u.type !== 'building') {
+                        const angle = Math.atan2(u.y - h.y || hitY, u.x - h.x || hitX);
+                        let newX = u.x + Math.cos(angle) * h.knockback;
+                        let newY = u.y + Math.sin(angle) * h.knockback;
+
+                        // River collision during knockback
+                        const rY = height / 2;
+                        const distR = Math.abs(newY - rY);
+                        const bW = 60;
+                        const lBX = 95;
+                        const rBX = width - 95;
+                        const onB = (Math.abs(newX - lBX) < bW / 2) || (Math.abs(newX - rBX) < bW / 2);
+
+                        const isFlyingOrJumping = u.jumps || u.type === 'flying';
+                        if (distR < 25 && !onB && !isFlyingOrJumping) {
+                          newY = rY + (u.y < rY ? -25 : 25);
+                        }
+
+                        updatedUnit.x = Math.max(10, Math.min(width - 10, newX));
+                        updatedUnit.y = Math.max(10, Math.min(height - 10, newY));
+                        updatedUnit.wasPushed = true;
+                      }
 
                       // Apply stun effect (Electro Wizard)
                       if (h.stun && h.stun > 0) {
@@ -9601,6 +10341,31 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     backgroundColor: '#34495e',
     borderRadius: 5,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#2c3e50',
+    borderRadius: 8,
+    marginBottom: 10,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#34495e',
+  },
+  searchInput: {
+    flex: 1,
+    padding: 10,
+    color: '#fff',
+    fontSize: 14,
+    minHeight: 40,
+  },
+  searchClearButton: {
+    padding: 8,
+    marginRight: 5,
+  },
+  searchClearButtonText: {
+    color: '#999',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 
   // --- New Shop Styles ---
