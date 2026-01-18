@@ -78,7 +78,7 @@ const CARDS = [
 
   // Spirit Cards - All cost 1 Elixir and die when they attack
   { id: 'fire_spirit', name: 'Fire Spirit', cost: 1, color: '#e74c3c', hp: 230, speed: 4, type: 'ground', range: 25, damage: 207, attackSpeed: 1000, projectile: null, count: 1, splash: true, rarity: 'common', kamikaze: true },
-  { id: 'ice_spirit', name: 'Ice Spirit', cost: 1, color: '#E8F4F8', hp: 230, speed: 4, type: 'ground', range: 25, damage: 110, attackSpeed: 1000, projectile: null, count: 1, splash: true, stun: 0.5, rarity: 'common', kamikaze: true }, freezeVisual: true },
+  { id: 'ice_spirit', name: 'Ice Spirit', cost: 1, color: '#E8F4F8', hp: 230, speed: 4, type: 'ground', range: 25, damage: 110, attackSpeed: 1000, projectile: null, count: 1, splash: true, stun: 0.5, rarity: 'common', kamikaze: true },
   { id: 'electro_spirit', name: 'Electro Spirit', cost: 1, color: '#9b59b6', hp: 230, speed: 4, type: 'ground', range: 25, damage: 99, attackSpeed: 1000, projectile: null, count: 1, chain: 9, stun: 0.5, rarity: 'common', kamikaze: true },
   { id: 'heal_spirit', name: 'Heal Spirit', cost: 1, color: '#F1C40F', hp: 230, speed: 4, type: 'ground', range: 25, damage: 0, attackSpeed: 1000, projectile: null, count: 1, splash: true, rarity: 'rare', kamikaze: true, healsOnAttack: 432, healRadius: 50 },
 
