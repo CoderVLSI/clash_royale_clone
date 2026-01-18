@@ -7599,12 +7599,19 @@ export default function App() {
       const beforeFilter = currentUnits.length;
       const unitsThatDied = [];
 
+      // Debug: check HP of all units
+      const lowHpUnits = currentUnits.filter(u => u.hp < 100);
+      if (lowHpUnits.length > 0) {
+        console.log('[LOW HP]', lowHpUnits.map(u => `${u.spriteId}:${u.hp}`).join(', '));
+      }
+
       currentUnits = currentUnits.filter(u => {
         // Check if clone has expired
         if (u.isClone && u.cloneEndTime && Date.now() >= u.cloneEndTime) {
           return false;
         }
         if (u.hp <= 0) {
+          console.log('[UNIT DIED]', u.spriteId, 'hp:', u.hp);
           // Track units that died this frame for death spawn handling
           unitsThatDied.push(u);
 
