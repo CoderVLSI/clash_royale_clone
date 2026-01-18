@@ -4913,32 +4913,128 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
         <View style={styles.deckCardGrid}>
           <View style={styles.cardRowCompact}>
             {cards.slice(0, 4).map((card, i) => (
-              <TouchableOpacity key={card.id} ref={el => deckSlotRefs.current[i] = el} onPress={() => handleDeckCardTap(card)} style={[
-                styles.deckCardCompact,
-                {
-                  borderColor: RARITY_COLORS[card.rarity],
-                  borderWidth: card.rarity === 'legendary' ? 4 : 2,
-                  borderRadius: card.rarity === 'legendary' ? 15 : 5,
-                }
-              ]}>
-                <UnitSprite id={card.id} size={35} />
-                <View style={styles.cardCostSmall}><Text style={styles.cardCostSmallText}>{card.cost}</Text></View>
-              </TouchableOpacity>
+              <View key={card.id} ref={el => deckSlotRefs.current[i] = el} style={{ width: '23%', aspectRatio: 0.8 }}>
+                {card.rarity === 'legendary' ? (
+                  // Legendary hexagonal with rainbow border
+                  <View style={{ width: '100%', height: '100%', position: 'relative' }}>
+                    {/* Rainbow hexagon border */}
+                    <Svg width="100%" height="100%" viewBox="0 0 100 80" style={{ position: 'absolute' }}>
+                      <Defs>
+                        <LinearGradient id="rainbowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <Stop offset="0%" stopColor="#ff0000" stopColor="#ff0000" />
+                          <Stop offset="20%" stopColor="#ff7f00" stopColor="#ff7f00" />
+                          <Stop offset="40%" stopColor="#ffff00" stopColor="#ffff00" />
+                          <Stop offset="60%" stopColor="#00ff00" stopColor="#00ff00" />
+                          <Stop offset="80%" stopColor="#0000ff" stopColor="#0000ff" />
+                          <Stop offset="100%" stopColor="#8b00ff" stopColor="#8b00ff" />
+                        </LinearGradient>
+                      </Defs>
+                      {/* Hexagon shape - more angular like Clash Royale */}
+                      <Polygon
+                        points="20,2 80,2 98,40 80,78 20,78 2,40"
+                        fill="white"
+                        stroke="url(#rainbowGrad)"
+                        strokeWidth="4"
+                      />
+                      {/* Inner glow */}
+                      <Polygon
+                        points="22,4 78,4 96,40 78,76 22,76 4,40"
+                        fill="rgba(139, 0, 255, 0.1)"
+                      />
+                    </Svg>
+                    {/* Card content */}
+                    <TouchableOpacity
+                      onPress={() => handleDeckCardTap(card)}
+                      style={{
+                        position: 'absolute',
+                        width: '100%',
+                        height: '100%',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <UnitSprite id={card.id} size={35} />
+                      <View style={styles.cardCostSmall}><Text style={styles.cardCostSmallText}>{card.cost}</Text></View>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  // Normal card
+                  <TouchableOpacity
+                    onPress={() => handleDeckCardTap(card)}
+                    style={[
+                      styles.deckCardCompact,
+                      { borderColor: RARITY_COLORS[card.rarity] },
+                      { width: '100%', height: '100%' }
+                    ]}
+                  >
+                    <UnitSprite id={card.id} size={35} />
+                    <View style={styles.cardCostSmall}><Text style={styles.cardCostSmallText}>{card.cost}</Text></View>
+                  </TouchableOpacity>
+                )}
+              </View>
             ))}
           </View>
           <View style={styles.cardRowCompact}>
             {cards.slice(4, 8).map((card, i) => (
-              <TouchableOpacity key={card.id} ref={el => deckSlotRefs.current[i+4] = el} onPress={() => handleDeckCardTap(card)} style={[
-                styles.deckCardCompact,
-                {
-                  borderColor: RARITY_COLORS[card.rarity],
-                  borderWidth: card.rarity === 'legendary' ? 4 : 2,
-                  borderRadius: card.rarity === 'legendary' ? 15 : 5,
-                }
-              ]}>
-                <UnitSprite id={card.id} size={35} />
-                <View style={styles.cardCostSmall}><Text style={styles.cardCostSmallText}>{card.cost}</Text></View>
-              </TouchableOpacity>
+              <View key={card.id} ref={el => deckSlotRefs.current[i+4] = el} style={{ width: '23%', aspectRatio: 0.8 }}>
+                {card.rarity === 'legendary' ? (
+                  // Legendary hexagonal with rainbow border
+                  <View style={{ width: '100%', height: '100%', position: 'relative' }}>
+                    {/* Rainbow hexagon border */}
+                    <Svg width="100%" height="100%" viewBox="0 0 100 80" style={{ position: 'absolute' }}>
+                      <Defs>
+                        <LinearGradient id="rainbowGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <Stop offset="0%" stopColor="#ff0000" stopColor="#ff0000" />
+                          <Stop offset="20%" stopColor="#ff7f00" stopColor="#ff7f00" />
+                          <Stop offset="40%" stopColor="#ffff00" stopColor="#ffff00" />
+                          <Stop offset="60%" stopColor="#00ff00" stopColor="#00ff00" />
+                          <Stop offset="80%" stopColor="#0000ff" stopColor="#0000ff" />
+                          <Stop offset="100%" stopColor="#8b00ff" stopColor="#8b00ff" />
+                        </LinearGradient>
+                      </Defs>
+                      {/* Hexagon shape */}
+                      <Polygon
+                        points="12,3 88,3 97,40 88,77 12,77 3,40"
+                        fill="white"
+                        stroke="url(#rainbowGrad2)"
+                        strokeWidth="4"
+                      />
+                      {/* Inner glow */}
+                      <Polygon
+                        points="15,6 85,6 94,40 85,74 15,74 6,40"
+                        fill="rgba(139, 0, 255, 0.1)"
+                      />
+                    </Svg>
+                    {/* Card content */}
+                    <TouchableOpacity
+                      onPress={() => handleDeckCardTap(card)}
+                      style={{
+                        position: 'absolute',
+                        width: '100%',
+                        height: '100%',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <UnitSprite id={card.id} size={35} />
+                      <View style={styles.cardCostSmall}><Text style={styles.cardCostSmallText}>{card.cost}</Text></View>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  // Normal card
+                  <TouchableOpacity
+                    onPress={() => handleDeckCardTap(card)}
+                    style={[
+                      styles.deckCardCompact,
+                      { borderColor: RARITY_COLORS[card.rarity] },
+                      { width: '100%', height: '100%' }
+                    ]}
+                  >
+                    <UnitSprite id={card.id} size={35} />
+                    <View style={styles.cardCostSmall}><Text style={styles.cardCostSmallText}>{card.cost}</Text></View>
+                  </TouchableOpacity>
+                )}
+              </View>
             ))}
           </View>
         </View>
