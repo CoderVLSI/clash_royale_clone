@@ -3004,6 +3004,59 @@ const VisualEffects = ({ effects, setEffects }) => {
           );
         }
 
+        if (effect.type === 'curse_purple') {
+          // Continuous purple circle above cursed units
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: 0.8
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Purple glowing circle */}
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * 0.8}
+                  fill="none"
+                  stroke="#9b59b6"
+                  strokeWidth="3"
+                  opacity={0.8}
+                />
+                {/* Inner glow */}
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * 0.6}
+                  fill="#9b59b6"
+                  opacity={0.2}
+                />
+                {/* Purple particles/sparkles */}
+                {[0, 1, 2, 3].map(i => {
+                  const angle = (i / 4) * Math.PI * 2 + progress * Math.PI * 2;
+                  const x = effect.radius + Math.cos(angle) * effect.radius * 0.7;
+                  const y = effect.radius + Math.sin(angle) * effect.radius * 0.7;
+                  return (
+                    <Circle
+                      key={i}
+                      cx={x}
+                      cy={y}
+                      r={3}
+                      fill="#e056fd"
+                      opacity={0.9}
+                    />
+                  );
+                })}
+              </Svg>
+            </View>
+          );
+        }
+
         return null;
       })}
     </>
@@ -8572,6 +8625,11 @@ export default function App() {
               remainingDamage = 0;
             }
 
+            // Royal Ghost hidden invincibility - no damage while invisible
+            if (u.hidden && u.hidden.active) {
+              remainingDamage = 0;
+            }
+
             const updatedUnit = {
               ...u,
               hp: u.hp - remainingDamage,
@@ -8907,6 +8965,30 @@ export default function App() {
               duration: 500
             }]);
           }
+        }
+      });
+
+      // Show purple circle visual above all currently cursed units
+      currentUnits.forEach(unit => {
+        if (unit.cursedUntil && Date.now() < unit.cursedUntil && !unit.isPig && unit.type !== 'building') {
+          // Create/update purple circle visual for this cursed unit
+          // We use a unique ID based on unit ID to avoid duplicates
+          const curseVisualId = `curse_${unit.id}`;
+          // Only add if not already present (check existing visuals)
+          setVisualEffects(prev => {
+            // Filter out old curse visuals for this unit
+            const filtered = prev.filter(v => v.id !== curseVisualId);
+            // Add new curse visual that will last 100ms (refreshed each frame)
+            return [...filtered, {
+              id: curseVisualId,
+              type: 'curse_purple',
+              x: unit.x,
+              y: unit.y - 20,
+              radius: 25,
+              startTime: Date.now(),
+              duration: 100
+            }];
+          });
         }
       });
 
