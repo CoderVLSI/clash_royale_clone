@@ -538,8 +538,8 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Rect x="35" y="25" width="30" height="20" fill="#f39c12" rx="5" />
           <Circle cx="50" cy="35" r="8" fill="#fff9c4" />
           {/* Pickaxe */}
-          <Line x1="70" y1="30" x2="90" y2="60" stroke="#8B4513" strokeWidth="4" />
-          <Line x1="88" y1="30" x2="90" y2="60" stroke="#8B4513" strokeWidth="3" />
+          <Path d="M70 30 L90 60" stroke="#8B4513" strokeWidth="4" />
+          <Path d="M88 30 L90 60" stroke="#8B4513" strokeWidth="3" />
           <Rect x="85" y="25" width="10" height="8" fill="#7f8c8d" />
         </Svg>
       );
@@ -549,12 +549,12 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           {/* Cage structure */}
           <Rect x="20" y="30" width="60" height="55" fill="none" stroke={color} strokeWidth="4" rx="5" />
           {/* Bars */}
-          <Line x1="25" y1="30" x2="25" y2="85" stroke={color} strokeWidth="3" />
-          <Line x1="35" y1="30" x2="35" y2="85" stroke={color} strokeWidth="3" />
-          <Line x1="45" y1="30" x2="45" y2="85" stroke={color} strokeWidth="3" />
-          <Line x1="55" y1="30" x2="55" y2="85" stroke={color} strokeWidth="3" />
-          <Line x1="65" y1="30" x2="65" y2="85" stroke={color} strokeWidth="3" />
-          <Line x1="75" y1="30" x2="75" y2="85" stroke={color} strokeWidth="3" />
+          <Path d="M25 30 L25 85" stroke={color} strokeWidth="3" />
+          <Path d="M35 30 L35 85" stroke={color} strokeWidth="3" />
+          <Path d="M45 30 L45 85" stroke={color} strokeWidth="3" />
+          <Path d="M55 30 L55 85" stroke={color} strokeWidth="3" />
+          <Path d="M65 30 L65 85" stroke={color} strokeWidth="3" />
+          <Path d="M75 30 L75 85" stroke={color} strokeWidth="3" />
           {/* Roof */}
           <Path d="M15 30 L50 5 L85 30" fill={color} />
           {/* Goblin silhouette inside */}
@@ -588,8 +588,8 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Circle cx="25" cy="30" r="12" fill="#2ecc71" stroke="#27ae60" strokeWidth="2" />
           <Circle cx="75" cy="30" r="12" fill="#2ecc71" stroke="#27ae60" strokeWidth="2" />
           {/* Their spears */}
-          <Line x1="25" y1="30" x2="10" y2="10" stroke="#8B4513" strokeWidth="2" />
-          <Line x1="75" y1="30" x2="90" y2="10" stroke="#8B4513" strokeWidth="2" />
+          <Path d="M25 30 L10 10" stroke="#8B4513" strokeWidth="2" />
+          <Path d="M75 30 L90 10" stroke="#8B4513" strokeWidth="2" />
           {/* Giant face */}
           <Circle cx="50" cy="50" r="15" fill="#1e8449" />
           <Circle cx="42" cy="48" r="4" fill="#fff" />
