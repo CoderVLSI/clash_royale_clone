@@ -57,6 +57,13 @@ const CARDS = [
   { id: 'lava_pups', name: 'Lava Pups', cost: 0, color: '#e74c3c', hp: 216, speed: 2, type: 'flying', range: 50, damage: 53, attackSpeed: 1000, projectile: 'lava_shot', count: 1, rarity: 'common', isToken: true },
   { id: 'cursed_hog', name: 'Cursed Hog', cost: 0, color: '#ff9ff3', hp: 520, speed: 3.5, type: 'ground', range: 25, damage: 52, attackSpeed: 1000, projectile: null, count: 1, targetType: 'buildings', rarity: 'common', isToken: true },
 
+  // New cards to implement
+  { id: 'royal_hogs', name: 'Royal Hogs', cost: 5, color: '#e67e22', hp: 1260, speed: 3.5, type: 'ground', range: 25, damage: 240, attackSpeed: 1600, projectile: null, count: 4, targetType: 'buildings', jumps: true, rarity: 'common' },
+  { id: 'miner', name: 'Miner', cost: 3, color: '#f39c12', hp: 1600, speed: 1.5, type: 'ground', range: 25, damage: 160, attackSpeed: 1100, projectile: null, count: 1, targetType: 'buildings', rarity: 'legendary', burrows: true },
+  { id: 'goblin_cage', name: 'Goblin Cage', cost: 5, color: '#95a5a6', hp: 880, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 30, spawns: 'goblin_bruteth', spawnRate: 10, spawnCount: 1, rarity: 'rare' },
+  { id: 'goblin_bruteth', name: 'Goblin B', cost: 0, color: '#c0392b', hp: 660, speed: 2, type: 'ground', range: 25, damage: 158, attackSpeed: 1300, projectile: null, count: 1, rarity: 'common', isToken: true },
+  { id: 'goblin_giant', name: 'Goblin Giant', cost: 6, color: '#27ae60', hp: 2628, speed: 1, type: 'ground', range: 25, damage: 211, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', rarity: 'epic', goblinGiant: true },
+
   // Super easy additions
   { id: 'three_musketeers', name: '3 Musketeers', cost: 9, color: '#34495e', hp: 720, speed: 1.5, type: 'ground', range: 100, damage: 218, attackSpeed: 1100, projectile: 'bullet', count: 3, rarity: 'rare' },
   { id: 'royal_giant', name: 'Royal Giant', cost: 6, color: '#e67e22', hp: 3072, speed: 1.2, type: 'ground', range: 90, damage: 307, attackSpeed: 1700, projectile: 'cannonball', count: 1, targetType: 'buildings', rarity: 'rare' },
@@ -504,6 +511,90 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           {/* Ears */}
           <Path d="M20 35 Q15 20 30 25" fill="#ff9ff3" stroke="#f368e0" strokeWidth="1" />
           <Path d="M80 35 Q85 20 70 25" fill="#ff9ff3" stroke="#f368e0" strokeWidth="1" />
+        </Svg>
+      );
+    case 'royal_hogs':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="55" r="40" fill={color} />
+          {/* Crown */}
+          <Rect x="35" y="10" width="30" height="15" fill="#f1c40f" />
+          <Circle cx="40" cy="10" r="5" fill="#e74c3c" />
+          <Circle cx="50" cy="8" r="5" fill="#e74c3c" />
+          <Circle cx="60" cy="10" r="5" fill="#e74c3c" />
+          {/* Snout */}
+          <Ellipse cx="50" cy="65" rx="15" ry="10" fill="#feca57" />
+          <Circle cx="45" cy="63" r="2" fill="#000" />
+          <Circle cx="55" cy="63" r="2" fill="#000" />
+        </Svg>
+      );
+    case 'miner':
+      const minerOpacity = unit?.burrowing ? 0.3 : 1;
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100" opacity={minerOpacity}>
+          <Circle cx="50" cy="50" r="45" fill={color} />
+          {/* Helmet with light */}
+          <Rect x="35" y="25" width="30" height="20" fill="#f39c12" rx="5" />
+          <Circle cx="50" cy="35" r="8" fill="#fff9c4" />
+          {/* Pickaxe */}
+          <Line x1="70" y1="30" x2="90" y2="60" stroke="#8B4513" strokeWidth="4" />
+          <Line x1="88" y1="30" x2="90" y2="60" stroke="#8B4513" strokeWidth="3" />
+          <Rect x="85" y="25" width="10" height="8" fill="#7f8c8d" />
+        </Svg>
+      );
+    case 'goblin_cage':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Cage structure */}
+          <Rect x="20" y="30" width="60" height="55" fill="none" stroke={color} strokeWidth="4" rx="5" />
+          {/* Bars */}
+          <Line x1="25" y1="30" x2="25" y2="85" stroke={color} strokeWidth="3" />
+          <Line x1="35" y1="30" x2="35" y2="85" stroke={color} strokeWidth="3" />
+          <Line x1="45" y1="30" x2="45" y2="85" stroke={color} strokeWidth="3" />
+          <Line x1="55" y1="30" x2="55" y2="85" stroke={color} strokeWidth="3" />
+          <Line x1="65" y1="30" x2="65" y2="85" stroke={color} strokeWidth="3" />
+          <Line x1="75" y1="30" x2="75" y2="85" stroke={color} strokeWidth="3" />
+          {/* Roof */}
+          <Path d="M15 30 L50 5 L85 30" fill={color} />
+          {/* Goblin silhouette inside */}
+          <Circle cx="50" cy="60" r="15" fill="#2ecc71" opacity="0.5" />
+        </Svg>
+      );
+    case 'goblin_bruteth':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="55" r="43" fill={color} stroke="#c0392b" strokeWidth="3" />
+          {/* Angry eyebrows */}
+          <Path d="M30 40 L40 35" stroke="#c0392b" strokeWidth="3" />
+          <Path d="M70 40 L60 35" stroke="#c0392b" strokeWidth="3" />
+          {/* Eyes */}
+          <Circle cx="38" cy="45" r="5" fill="#fff" />
+          <Circle cx="62" cy="45" r="5" fill="#fff" />
+          <Circle cx="38" cy="45" r="3" fill="#000" />
+          <Circle cx="62" cy="45" r="3" fill="#000" />
+          {/* Snout ring */}
+          <Circle cx="50" cy="65" r="12" fill="none" stroke="#f39c12" strokeWidth="2" />
+        </Svg>
+      );
+    case 'goblin_giant':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Giant body */}
+          <Circle cx="50" cy="55" r="45" fill={color} stroke="#1e8449" strokeWidth="4" />
+          {/* Belt */}
+          <Rect x="20" y="75" width="60" height="10" fill="#8B4513" />
+          {/* Spear goblins on back */}
+          <Circle cx="25" cy="30" r="12" fill="#2ecc71" stroke="#27ae60" strokeWidth="2" />
+          <Circle cx="75" cy="30" r="12" fill="#2ecc71" stroke="#27ae60" strokeWidth="2" />
+          {/* Their spears */}
+          <Line x1="25" y1="30" x2="10" y2="10" stroke="#8B4513" strokeWidth="2" />
+          <Line x1="75" y1="30" x2="90" y2="10" stroke="#8B4513" strokeWidth="2" />
+          {/* Giant face */}
+          <Circle cx="50" cy="50" r="15" fill="#1e8449" />
+          <Circle cx="42" cy="48" r="4" fill="#fff" />
+          <Circle cx="58" cy="48" r="4" fill="#fff" />
+          <Circle cx="42" cy="48" r="2" fill="#000" />
+          <Circle cx="58" cy="48" r="2" fill="#000" />
         </Svg>
       );
     case 'prince':
@@ -5974,6 +6065,8 @@ export default function App() {
 
               hidden: actualCard.hidden ? { active: true, visibleHp: actualCard.hp } : undefined,
 
+              burrowing: actualCard.burrows ? { active: true, startTime: Date.now() } : undefined,
+
               splash: actualCard.splash || false,
 
               frontalSplash: actualCard.frontalSplash || false,
@@ -6043,6 +6136,8 @@ export default function App() {
               stopsToAttack: actualCard.stopsToAttack || false,
 
               turnsToPig: actualCard.turnsToPig || false,
+
+              goblinGiant: actualCard.goblinGiant || false,
 
               isDashing: false, dashEndTime: 0,
 
@@ -6775,6 +6870,12 @@ export default function App() {
             const timeSinceAttack = now - (u.hidden.lastAttackTime || 0);
             if (!u.hidden.active && timeSinceAttack > 3000) {
               u.hidden.active = true;
+            }
+          } else if (u.burrowing) {
+            // Miner: Become visible after 1 second of burrowing
+            const timeBurrowing = now - u.burrowing.startTime;
+            if (u.burrowing.active && timeBurrowing > 1000) {
+              u.burrowing.active = false;
             }
           }
         }
@@ -8632,6 +8733,11 @@ export default function App() {
             // Royal Ghost hidden invincibility - no damage while invisible
             if (u.hidden && u.hidden.active) {
               remainingDamage = 0;
+            }
+
+            // Miner burrowing invincibility - reduced damage while burrowing
+            if (u.burrowing && u.burrowing.active) {
+              remainingDamage = Math.floor(remainingDamage * 0.5); // Take 50% damage while burrowing
             }
 
             const updatedUnit = {
