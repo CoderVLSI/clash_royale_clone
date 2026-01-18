@@ -61,7 +61,7 @@ const CARDS = [
   // New cards to implement
   { id: 'royal_hogs', name: 'Royal Hogs', cost: 5, color: '#e67e22', hp: 1260, speed: 3.5, type: 'ground', range: 25, damage: 240, attackSpeed: 1600, projectile: null, count: 4, targetType: 'buildings', jumps: true, rarity: 'common' },
   { id: 'miner', name: 'Miner', cost: 3, color: '#f39c12', hp: 1600, speed: 1.5, type: 'ground', range: 25, damage: 160, attackSpeed: 1100, projectile: null, count: 1, rarity: 'legendary', burrows: true, deployAnywhere: true },
-  { id: 'goblin_cage', name: 'Goblin Cage', cost: 5, color: '#95a5a6', hp: 880, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 30, spawns: 'goblin_bruteth', spawnRate: 10, spawnCount: 1, rarity: 'rare' },
+  { id: 'goblin_cage', name: 'Goblin Cage', cost: 5, color: '#95a5a6', hp: 880, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 30, spawns: null, spawnRate: 0, spawnCount: 0, rarity: 'rare', deathSpawns: 'goblin_bruteth', deathSpawnCount: 1 },
   { id: 'goblin_bruteth', name: 'Goblin B', cost: 0, color: '#c0392b', hp: 660, speed: 2, type: 'ground', range: 25, damage: 158, attackSpeed: 1300, projectile: null, count: 1, rarity: 'common', isToken: true },
   { id: 'goblin_giant', name: 'Goblin Giant', cost: 6, color: '#27ae60', hp: 2628, speed: 1, type: 'ground', range: 25, damage: 211, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', rarity: 'epic', deathSpawns: 'spear_goblins', deathSpawnCount: 2, extraProjectiles: 2 },
 
