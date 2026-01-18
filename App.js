@@ -6042,6 +6042,8 @@ export default function App() {
 
               stopsToAttack: actualCard.stopsToAttack || false,
 
+              turnsToPig: actualCard.turnsToPig || false,
+
               isDashing: false, dashEndTime: 0,
 
               damageRamp: actualCard.damageRamp || false,
@@ -8803,7 +8805,8 @@ export default function App() {
                 deathRadius: spawnCard.deathRadius,
                 deathSlow: spawnCard.deathSlow,
                 givesOpponentElixir: spawnCard.givesOpponentElixir || false,
-                bombDrops: spawnCard.bombDrops || false
+                bombDrops: spawnCard.bombDrops || false,
+                turnsToPig: spawnCard.turnsToPig || false
               });
             }
           }
