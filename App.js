@@ -7621,8 +7621,10 @@ export default function App() {
       });
 
       // Handle death spawns (Goblin Hut spawns 3 goblins when destroyed)
-        unitsThatDied.forEach(deadUnit => {
-          // Goblin Hut death spawn - 3 Spear Goblins
+      console.log('[DEATH HANDLING]', 'unitsThatDied:', unitsThatDied.length);
+      unitsThatDied.forEach(deadUnit => {
+        console.log('[DEAD UNIT]', deadUnit.spriteId, 'deathSpawns:', deadUnit.deathSpawns);
+        // Goblin Hut death spawn - 3 Spear Goblins
           if (deadUnit.spriteId === 'goblin_hut' && deadUnit.isOpponent === false) {
             const spawnCard = CARDS.find(c => c.id === 'spear_goblins');
             if (spawnCard) {
