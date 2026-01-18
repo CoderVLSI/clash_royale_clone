@@ -7694,6 +7694,9 @@ export default function App() {
           }
 
           // Generic Death Spawns (Skeleton Barrel, Tombstone, Lava Hound, Golem)
+          if (deadUnit.spriteId === 'golem' || deadUnit.spriteId === 'elixir_golem' || deadUnit.spriteId === 'lava_hound') {
+            console.log('[DEATH CHECK]', deadUnit.spriteId, 'deathSpawns:', deadUnit.deathSpawns, 'deathSpawnCount:', deadUnit.deathSpawnCount);
+          }
           if (deadUnit.spriteId === 'tombstone' || deadUnit.deathSpawns) {
             let spawnId = 'skeletons'; // Default for Tombstone
             if (deadUnit.deathSpawns) {
