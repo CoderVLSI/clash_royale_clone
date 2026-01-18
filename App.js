@@ -7595,357 +7595,19 @@ export default function App() {
         }
       });
 
-      // Filter out dead units - but handle death spawns first
-      const beforeFilter = currentUnits.length;
-      const unitsThatDied = [];
-
-      // Debug: check HP of all units
-      const lowHpUnits = currentUnits.filter(u => u.hp < 100);
-      if (lowHpUnits.length > 0) {
-        console.log('[LOW HP]', lowHpUnits.map(u => `${u.spriteId}:${u.hp}`).join(', '));
-      }
-
+      // Filter out expired clones and out-of-bounds units
+      // (Death filter and spawn processing moved to after all damage is applied)
       currentUnits = currentUnits.filter(u => {
         // Check if clone has expired
         if (u.isClone && u.cloneEndTime && Date.now() >= u.cloneEndTime) {
           return false;
         }
-        if (u.hp <= 0) {
-          console.log('[UNIT DIED]', u.spriteId, 'hp:', u.hp);
-          // Track units that died this frame for death spawn handling
-          unitsThatDied.push(u);
-
-          if (u.spriteId === 'skeletons') {
-          }
-          return false;
-        }
+        // Remove out-of-bounds units
         if (u.y <= -50 || u.y >= height + 50) {
-          if (u.spriteId === 'skeletons') {
-          }
           return false;
         }
         return true;
       });
-
-      // Handle death spawns (Goblin Hut spawns 3 goblins when destroyed)
-      console.log('[DEATH HANDLING]', 'unitsThatDied:', unitsThatDied.length);
-      unitsThatDied.forEach(deadUnit => {
-        console.log('[DEAD UNIT]', deadUnit.spriteId, 'deathSpawns:', deadUnit.deathSpawns);
-        // Goblin Hut death spawn - 3 Spear Goblins
-          if (deadUnit.spriteId === 'goblin_hut' && deadUnit.isOpponent === false) {
-            const spawnCard = CARDS.find(c => c.id === 'spear_goblins');
-            if (spawnCard) {
-              const newGoblins = [];
-              for (let i = 0; i < 3; i++) {
-                const angle = (i / 3) * Math.PI * 2;
-                const distance = 30 + Math.random() * 20;
-                const offsetX = Math.cos(angle) * distance;
-                const offsetY = Math.sin(angle) * distance;
-
-                newGoblins.push({
-                  id: Date.now() + Math.random() * 1000 + i,
-                  x: deadUnit.x + offsetX,
-                  y: deadUnit.y + offsetY,
-                  hp: spawnCard.hp,
-                  maxHp: spawnCard.hp,
-                  isOpponent: deadUnit.isOpponent,
-                  speed: spawnCard.speed,
-                  lane: deadUnit.lane,
-                  lastAttack: now,
-                  spriteId: spawnCard.id,
-                  type: spawnCard.type,
-                  range: spawnCard.range,
-                  damage: spawnCard.damage,
-                  attackSpeed: spawnCard.attackSpeed,
-                  projectile: spawnCard.projectile,
-                  lockedTarget: null,
-                  wasPushed: false,
-                  wasStunned: false,
-                  stunUntil: 0,
-                  baseDamage: spawnCard.damage
-                });
-              }
-              unitsToSpawn.push(...newGoblins);
-
-              // Goblin Hut destruction visual effect
-              setVisualEffects(prev => [...prev, {
-                id: Date.now() + Math.random(),
-                type: 'building_destruction',
-                x: deadUnit.x,
-                y: deadUnit.y,
-                radius: 60,
-                startTime: Date.now(),
-                duration: 800
-              }]);
-            }
-          }
-
-          // Lumberjack death - drops Rage spell
-          if (deadUnit.deathRage && deadUnit.spriteId === 'lumberjack') {
-            // Create Rage effect at Lumberjack's death location
-            setProjectiles(prev => [...prev, {
-              id: Date.now() + Math.random(),
-              x: deadUnit.x,
-              y: deadUnit.y,
-              targetX: deadUnit.x,
-              targetY: deadUnit.y,
-              speed: 0,
-              damage: 0,
-              radius: 50, // Rage spell radius (2.5 tiles = 50 pixels)
-              type: 'rage_spell',
-              isSpell: true,
-              isRage: true,
-              hit: true,
-              spawnTime: now,
-              duration: 6, // Rage lasts 6 seconds
-              isOpponent: deadUnit.isOpponent
-            }]);
-          }
-
-          // Generic Death Spawns (Skeleton Barrel, Tombstone, Lava Hound, Golem)
-          if (deadUnit.spriteId === 'golem' || deadUnit.spriteId === 'elixir_golem' || deadUnit.spriteId === 'lava_hound') {
-            console.log('[DEATH CHECK]', deadUnit.spriteId, 'deathSpawns:', deadUnit.deathSpawns, 'deathSpawnCount:', deadUnit.deathSpawnCount);
-          }
-          if (deadUnit.spriteId === 'tombstone' || deadUnit.deathSpawns) {
-            let spawnId = 'skeletons'; // Default for Tombstone
-            if (deadUnit.deathSpawns) {
-              spawnId = deadUnit.deathSpawns;
-            }
-
-            console.log('[DEATH SPAWN]', deadUnit.spriteId, '→', spawnId, 'x', deadUnit.deathSpawnCount);
-
-            const spawnCard = CARDS.find(c => c.id === spawnId);
-            if (spawnCard) {
-              const deathSpawnCount = deadUnit.deathSpawnCount || 4;
-              for (let i = 0; i < deathSpawnCount; i++) {
-                // Clumped spawn (15-35px)
-                const angle = (i / deathSpawnCount) * Math.PI * 2 + Math.random() * 0.5;
-                const distance = 15 + Math.random() * 20;
-                const offsetX = Math.cos(angle) * distance;
-                const offsetY = Math.sin(angle) * distance;
-                
-                unitsToSpawn.push({
-                  id: Date.now() + Math.random() * 1000 + i,
-                  x: deadUnit.x + offsetX,
-                  y: deadUnit.y + offsetY,
-                  hp: spawnCard.hp,
-                  maxHp: spawnCard.hp,
-                  isOpponent: deadUnit.isOpponent,
-                  speed: spawnCard.speed,
-                  lane: deadUnit.lane,
-                  lastAttack: 0, // Ready to attack immediately (or add small delay)
-                  spriteId: spawnCard.id,
-                  type: spawnCard.type,
-                  range: spawnCard.range,
-                  damage: spawnCard.damage,
-                  attackSpeed: spawnCard.attackSpeed,
-                  projectile: spawnCard.projectile,
-                  targetType: spawnCard.targetType,
-                  lockedTarget: null,
-                  wasPushed: false,
-                  wasStunned: false,
-                  stunUntil: 0,
-                  baseDamage: spawnCard.damage,
-                  spawnTime: Date.now(),
-                  spawnDelay: spawnCard.spawnDelay || 0,
-                  splash: spawnCard.splash || false,
-                  frontalSplash: spawnCard.frontalSplash || false,
-                  hasShield: spawnCard.hasShield || false,
-                  currentShieldHp: spawnCard.shieldHp || 0,
-                  shieldHp: spawnCard.shieldHp || 0,
-                  deathSpawns: spawnCard.deathSpawns,
-                  deathSpawnCount: spawnCard.deathSpawnCount,
-                  deathDamage: spawnCard.deathDamage,
-                  deathRadius: spawnCard.deathRadius,
-                  deathSlow: spawnCard.deathSlow,
-                  givesOpponentElixir: spawnCard.givesOpponentElixir || false,
-                  bombDrops: spawnCard.bombDrops || false
-                });
-              }
-            }
-          }
-
-          // Add death visual effects based on unit type
-          if (deadUnit.spriteId === 'golem' || deadUnit.spriteId === 'golemite' || deadUnit.spriteId === 'elixir_golem' || deadUnit.spriteId === 'elixir_golemite') {
-            setVisualEffects(prev => [...prev, {
-              id: Date.now() + Math.random(),
-              type: 'golem_death',
-              x: deadUnit.x,
-              y: deadUnit.y,
-              radius: deadUnit.spriteId.includes('elixir') ? 60 : 80,
-              startTime: Date.now(),
-              duration: 1000
-            }]);
-          } else if (deadUnit.spriteId === 'lava_hound') {
-            setVisualEffects(prev => [...prev, {
-              id: Date.now() + Math.random(),
-              type: 'lava_hound_death',
-              x: deadUnit.x,
-              y: deadUnit.y,
-              radius: 100,
-              startTime: Date.now(),
-              duration: 1500
-            }]);
-          } else if (deadUnit.spriteId === 'tombstone') {
-            setVisualEffects(prev => [...prev, {
-              id: Date.now() + Math.random(),
-              type: 'building_destruction',
-              x: deadUnit.x,
-              y: deadUnit.y,
-              radius: 50,
-              startTime: Date.now(),
-              duration: 800
-            }]);
-          } else if (deadUnit.spriteId === 'skeleton_barrel') {
-            setVisualEffects(prev => [...prev, {
-              id: Date.now() + Math.random(),
-              type: 'goblin_barrel_spawn', // Reuse wood effect
-              x: deadUnit.x,
-              y: deadUnit.y,
-              radius: 40,
-              startTime: Date.now(),
-              duration: 500
-            }]);
-          }
-
-          // Death Damage (Skeleton Barrel, Golem, Balloon, Ice Golem)
-          if (deadUnit.deathDamage || deadUnit.spriteId === 'ice_golem') { // Check card definition for deathDamage
-             // Note: deadUnit is the unit instance. Its properties come from spawnCard.
-             // We need to ensure deathDamage was copied to the unit.
-             // Let's assume it was or fetch from CARDS.
-             // Best to fetch from CARDS to be safe if not copied.
-             const cardDef = CARDS.find(c => c.id === deadUnit.spriteId);
-             
-             if (cardDef && (cardDef.deathDamage || cardDef.deathSlow)) {
-                if (cardDef.deathBombDelay) {
-                   // Delayed Death Bomb (Balloon, Giant Skeleton)
-                   setProjectiles(prev => [...prev, {
-                      id: Date.now() + Math.random(),
-                      x: deadUnit.x,
-                      y: deadUnit.y,
-                      targetX: deadUnit.x,
-                      targetY: deadUnit.y,
-                      speed: 0,
-                      damage: cardDef.deathDamage || 0,
-                      radius: cardDef.deathRadius || 60,
-                      type: 'bomb_delayed',
-                      visualType: 'bomb', // Use bomb visual
-                      isSpell: true, // Treated as a spell/projectile
-                      hit: false,
-                      spawnTime: Date.now(),
-                      delay: cardDef.deathBombDelay,
-                      isOpponent: deadUnit.isOpponent
-                   }]);
-                   
-                   // Visual for dropping the bomb
-                   setVisualEffects(prev => [...prev, {
-                      id: Date.now() + Math.random(),
-                      type: 'bomb_drop', // We can add this visual or just use the projectile
-                      x: deadUnit.x,
-                      y: deadUnit.y,
-                      radius: 20,
-                      startTime: Date.now(),
-                      duration: 500
-                   }]);
-
-                } else {
-                   // Instant Death Damage (Ice Golem, Golem)
-                   splashEvents.push({
-                     attacker: deadUnit,
-                     targetX: deadUnit.x,
-                     targetY: deadUnit.y,
-                     damage: cardDef.deathDamage || 0,
-                     slow: cardDef.deathSlow // Pass slow effect
-                   });
-
-                   // Visual Effect
-                   let effectType = 'fire_explosion';
-                   let effectRadius = cardDef.deathRadius || 40;
-
-                   if (deadUnit.spriteId === 'ice_golem') {
-                      effectType = 'ice_nova'; // Special ice nova effect for Ice Golem
-                      effectRadius = 80; // Ice Golem has larger slow radius
-                   }
-
-                   setVisualEffects(prev => [...prev, {
-                     id: Date.now() + Math.random(),
-                     type: effectType,
-                     x: deadUnit.x,
-                     y: deadUnit.y,
-                     radius: effectRadius,
-                     startTime: Date.now(),
-                     duration: 800
-                   }]);
-                }
-             }
-          }
-
-          // Elixir Return (Elixir Golem Blobs)
-          if (deadUnit.givesOpponentElixir) {
-             if (deadUnit.isOpponent) {
-                // Enemy blob died -> Give player elixir
-                setElixir(prev => Math.min(10, prev + 1));
-             } else {
-                // Player blob died -> Give enemy AI elixir
-                setEnemyElixir(prev => Math.min(10, prev + 1));
-             }
-             
-             // Visual feedback for elixir return
-             setVisualEffects(prev => [...prev, {
-                id: Date.now() + Math.random(),
-                type: 'elixir_popup',
-                x: deadUnit.x,
-                y: deadUnit.y - 20,
-                value: '+1',
-                startTime: Date.now(),
-                duration: 800
-             }]);
-          }
-
-          // Mother Witch: If cursed unit dies, spawn Hog for the attacker
-          if (deadUnit.cursedUntil && Date.now() < deadUnit.cursedUntil && deadUnit.type !== 'building') {
-             const hogCard = CARDS.find(c => c.id === 'cursed_hog');
-             if (hogCard) {
-                // The Hog spawns for the side that attacked (Mother Witch owner)
-                // cursedByAttackerSide is true if opponent's Mother Witch cursed this unit
-                // So the Hog should be on the same side as the attacker
-                const hogIsOpponent = deadUnit.cursedByAttackerSide;
-
-                unitsToSpawn.push({
-                  id: 'hog_' + Date.now() + '_' + Math.random(),
-                  spriteId: 'cursed_hog',
-                  x: deadUnit.x,
-                  y: deadUnit.y,
-                  hp: hogCard.hp,
-                  maxHp: hogCard.hp,
-                  damage: hogCard.damage,
-                  speed: hogCard.speed,
-                  range: hogCard.range,
-                  attackSpeed: hogCard.attackSpeed,
-                  lastAttack: 0,
-                  type: 'ground',
-                  targetable: true,
-                  isOpponent: hogIsOpponent,
-                  lane: deadUnit.lane,
-                  spawnedPig: true // Mark as spawned pig
-                });
-
-                // Transformation visual
-                setVisualEffects(prev => [...prev, {
-                  id: Date.now() + Math.random(),
-                  type: 'transformation',
-                  x: deadUnit.x,
-                  y: deadUnit.y,
-                  startTime: Date.now(),
-                  duration: 500
-                }]);
-             }
-          }
-        });
-
-      const afterFilter = currentUnits.length;
-      if (beforeFilter !== afterFilter) {
-      }
 
       // Apply collected splash damage events
       splashEvents.forEach(event => {
@@ -8900,11 +8562,309 @@ export default function App() {
         });
       }
 
-      // Check for death spawns (Tombstone -> skeletons, Lava Hound -> lava pups)
-      // (Logic moved to unitsThatDied loop above)
+      // Filter dead units and process death spawns (after ALL damage has been applied)
+      const unitsThatDied = [];
+      currentUnits = currentUnits.filter(u => {
+        if (u.hp <= 0) {
+          unitsThatDied.push(u);
+          return false;
+        }
+        return true;
+      });
 
-      // Filter dead units
-      currentUnits = currentUnits.filter(u => u.hp > 0);
+      // Handle death spawns
+      unitsThatDied.forEach(deadUnit => {
+        console.log('[DEATH]', deadUnit.spriteId, 'deathSpawns:', deadUnit.deathSpawns);
+
+        // Goblin Hut death spawn - 3 Spear Goblins
+        if (deadUnit.spriteId === 'goblin_hut' && deadUnit.isOpponent === false) {
+          const spawnCard = CARDS.find(c => c.id === 'spear_goblins');
+          if (spawnCard) {
+            const newGoblins = [];
+            for (let i = 0; i < 3; i++) {
+              const angle = (i / 3) * Math.PI * 2;
+              const distance = 30 + Math.random() * 20;
+              const offsetX = Math.cos(angle) * distance;
+              const offsetY = Math.sin(angle) * distance;
+
+              newGoblins.push({
+                id: Date.now() + Math.random() * 1000 + i,
+                x: deadUnit.x + offsetX,
+                y: deadUnit.y + offsetY,
+                hp: spawnCard.hp,
+                maxHp: spawnCard.hp,
+                isOpponent: deadUnit.isOpponent,
+                speed: spawnCard.speed,
+                lane: deadUnit.lane,
+                lastAttack: now,
+                spriteId: spawnCard.id,
+                type: spawnCard.type,
+                range: spawnCard.range,
+                damage: spawnCard.damage,
+                attackSpeed: spawnCard.attackSpeed,
+                projectile: spawnCard.projectile,
+                lockedTarget: null,
+                wasPushed: false,
+                wasStunned: false,
+                stunUntil: 0,
+                baseDamage: spawnCard.damage
+              });
+            }
+            unitsToSpawn.push(...newGoblins);
+
+            // Goblin Hut destruction visual effect
+            setVisualEffects(prev => [...prev, {
+              id: Date.now() + Math.random(),
+              type: 'building_destruction',
+              x: deadUnit.x,
+              y: deadUnit.y,
+              radius: 60,
+              startTime: Date.now(),
+              duration: 800
+            }]);
+          }
+        }
+
+        // Lumberjack death - drops Rage spell
+        if (deadUnit.deathRage && deadUnit.spriteId === 'lumberjack') {
+          setProjectiles(prev => [...prev, {
+            id: Date.now() + Math.random(),
+            x: deadUnit.x,
+            y: deadUnit.y,
+            targetX: deadUnit.x,
+            targetY: deadUnit.y,
+            speed: 0,
+            damage: 0,
+            radius: 50,
+            type: 'rage_spell',
+            isSpell: true,
+            isRage: true,
+            hit: true,
+            spawnTime: now,
+            duration: 6,
+            isOpponent: deadUnit.isOpponent
+          }]);
+        }
+
+        // Generic Death Spawns (Skeleton Barrel, Tombstone, Lava Hound, Golem, Elixir Golem)
+        if (deadUnit.spriteId === 'tombstone' || deadUnit.deathSpawns) {
+          let spawnId = deadUnit.deathSpawns || 'skeletons';
+          const spawnCard = CARDS.find(c => c.id === spawnId);
+
+          console.log('[DEATH SPAWN]', deadUnit.spriteId, '→', spawnId, 'x', deadUnit.deathSpawnCount);
+
+          if (spawnCard) {
+            const deathSpawnCount = deadUnit.deathSpawnCount || 4;
+            for (let i = 0; i < deathSpawnCount; i++) {
+              const angle = (i / deathSpawnCount) * Math.PI * 2 + Math.random() * 0.5;
+              const distance = 15 + Math.random() * 20;
+              const offsetX = Math.cos(angle) * distance;
+              const offsetY = Math.sin(angle) * distance;
+
+              unitsToSpawn.push({
+                id: Date.now() + Math.random() * 1000 + i,
+                x: deadUnit.x + offsetX,
+                y: deadUnit.y + offsetY,
+                hp: spawnCard.hp,
+                maxHp: spawnCard.hp,
+                isOpponent: deadUnit.isOpponent,
+                speed: spawnCard.speed,
+                lane: deadUnit.lane,
+                lastAttack: 0,
+                spriteId: spawnCard.id,
+                type: spawnCard.type,
+                range: spawnCard.range,
+                damage: spawnCard.damage,
+                attackSpeed: spawnCard.attackSpeed,
+                projectile: spawnCard.projectile,
+                targetType: spawnCard.targetType,
+                lockedTarget: null,
+                wasPushed: false,
+                wasStunned: false,
+                stunUntil: 0,
+                baseDamage: spawnCard.damage,
+                spawnTime: Date.now(),
+                spawnDelay: spawnCard.spawnDelay || 0,
+                splash: spawnCard.splash || false,
+                frontalSplash: spawnCard.frontalSplash || false,
+                hasShield: spawnCard.hasShield || false,
+                currentShieldHp: spawnCard.shieldHp || 0,
+                shieldHp: spawnCard.shieldHp || 0,
+                deathSpawns: spawnCard.deathSpawns,
+                deathSpawnCount: spawnCard.deathSpawnCount,
+                deathDamage: spawnCard.deathDamage,
+                deathRadius: spawnCard.deathRadius,
+                deathSlow: spawnCard.deathSlow,
+                givesOpponentElixir: spawnCard.givesOpponentElixir || false,
+                bombDrops: spawnCard.bombDrops || false
+              });
+            }
+          }
+        }
+
+        // Death visual effects
+        if (deadUnit.spriteId === 'golem' || deadUnit.spriteId === 'golemite' || deadUnit.spriteId === 'elixir_golem' || deadUnit.spriteId === 'elixir_golemite') {
+          setVisualEffects(prev => [...prev, {
+            id: Date.now() + Math.random(),
+            type: 'golem_death',
+            x: deadUnit.x,
+            y: deadUnit.y,
+            radius: deadUnit.spriteId.includes('elixir') ? 60 : 80,
+            startTime: Date.now(),
+            duration: 1000
+          }]);
+        } else if (deadUnit.spriteId === 'lava_hound') {
+          setVisualEffects(prev => [...prev, {
+            id: Date.now() + Math.random(),
+            type: 'lava_hound_death',
+            x: deadUnit.x,
+            y: deadUnit.y,
+            radius: 100,
+            startTime: Date.now(),
+            duration: 1500
+          }]);
+        } else if (deadUnit.spriteId === 'tombstone') {
+          setVisualEffects(prev => [...prev, {
+            id: Date.now() + Math.random(),
+            type: 'building_destruction',
+            x: deadUnit.x,
+            y: deadUnit.y,
+            radius: 50,
+            startTime: Date.now(),
+            duration: 800
+          }]);
+        } else if (deadUnit.spriteId === 'skeleton_barrel') {
+          setVisualEffects(prev => [...prev, {
+            id: Date.now() + Math.random(),
+            type: 'goblin_barrel_spawn',
+            x: deadUnit.x,
+            y: deadUnit.y,
+            radius: 40,
+            startTime: Date.now(),
+            duration: 500
+          }]);
+        }
+
+        // Death Damage (Ice Golem, Golem)
+        if (deadUnit.deathDamage || deadUnit.spriteId === 'ice_golem') {
+          const cardDef = CARDS.find(c => c.id === deadUnit.spriteId);
+
+          if (cardDef && (cardDef.deathDamage || cardDef.deathSlow)) {
+            if (cardDef.deathBombDelay) {
+              // Delayed Death Bomb (Balloon, Giant Skeleton)
+              setProjectiles(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                x: deadUnit.x,
+                y: deadUnit.y,
+                targetX: deadUnit.x,
+                targetY: deadUnit.y,
+                speed: 0,
+                damage: cardDef.deathDamage || 0,
+                radius: cardDef.deathRadius || 60,
+                type: 'bomb_delayed',
+                visualType: 'bomb',
+                isSpell: true,
+                hit: false,
+                spawnTime: Date.now(),
+                delay: cardDef.deathBombDelay,
+                isOpponent: deadUnit.isOpponent
+              }]);
+
+              setVisualEffects(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: 'bomb_drop',
+                x: deadUnit.x,
+                y: deadUnit.y,
+                radius: 20,
+                startTime: Date.now(),
+                duration: 500
+              }]);
+            } else {
+              // Instant Death Damage (Ice Golem, Golem)
+              splashEvents.push({
+                attacker: deadUnit,
+                targetX: deadUnit.x,
+                targetY: deadUnit.y,
+                damage: cardDef.deathDamage || 0,
+                slow: cardDef.deathSlow
+              });
+
+              let effectType = 'fire_explosion';
+              let effectRadius = cardDef.deathRadius || 40;
+
+              if (deadUnit.spriteId === 'ice_golem') {
+                effectType = 'ice_nova';
+                effectRadius = 80;
+              }
+
+              setVisualEffects(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: effectType,
+                x: deadUnit.x,
+                y: deadUnit.y,
+                radius: effectRadius,
+                startTime: Date.now(),
+                duration: 800
+              }]);
+            }
+          }
+        }
+
+        // Elixir Return (Elixir Golem chain)
+        if (deadUnit.givesOpponentElixir) {
+          if (deadUnit.isOpponent) {
+            setElixir(prev => Math.min(10, prev + 1));
+          } else {
+            setEnemyElixir(prev => Math.min(10, prev + 1));
+          }
+
+          setVisualEffects(prev => [...prev, {
+            id: Date.now() + Math.random(),
+            type: 'elixir_popup',
+            x: deadUnit.x,
+            y: deadUnit.y - 20,
+            value: '+1',
+            startTime: Date.now(),
+            duration: 800
+          }]);
+        }
+
+        // Mother Witch: If cursed unit dies, spawn Hog for the attacker
+        if (deadUnit.cursedUntil && Date.now() < deadUnit.cursedUntil && deadUnit.type !== 'building') {
+          const hogCard = CARDS.find(c => c.id === 'cursed_hog');
+          if (hogCard) {
+            const hogIsOpponent = deadUnit.cursedByAttackerSide;
+
+            unitsToSpawn.push({
+              id: 'hog_' + Date.now() + '_' + Math.random(),
+              spriteId: 'cursed_hog',
+              x: deadUnit.x,
+              y: deadUnit.y,
+              hp: hogCard.hp,
+              maxHp: hogCard.hp,
+              damage: hogCard.damage,
+              speed: hogCard.speed,
+              range: hogCard.range,
+              attackSpeed: hogCard.attackSpeed,
+              lastAttack: 0,
+              type: 'ground',
+              targetable: true,
+              isOpponent: hogIsOpponent,
+              lane: deadUnit.lane,
+              spawnedPig: true
+            });
+
+            setVisualEffects(prev => [...prev, {
+              id: Date.now() + Math.random(),
+              type: 'transformation',
+              x: deadUnit.x,
+              y: deadUnit.y,
+              startTime: Date.now(),
+              duration: 500
+            }]);
+          }
+        }
+      });
 
       // Update state
       const allUnits = [...currentUnits, ...unitsToSpawn];
