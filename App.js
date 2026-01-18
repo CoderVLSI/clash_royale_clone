@@ -50,6 +50,7 @@ const CARDS = [
   { id: 'wizard', name: 'Wizard', cost: 5, color: '#9b59b6', hp: 720, speed: 1.5, type: 'ground', range: 60, damage: 281, attackSpeed: 1400, projectile: 'fireball_small', count: 1, splash: true, rarity: 'rare' },
   { id: 'tombstone', name: 'Tombstone', cost: 3, color: '#95a5a6', hp: 534, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 40, spawns: 'skeletons', spawnRate: 3.1, spawnCount: 2, deathSpawnCount: 4, rarity: 'rare' },
   { id: 'sword_goblins', name: 'Sword Gobs', cost: 3, color: '#2ecc71', hp: 202, speed: 3, type: 'ground', range: 25, damage: 120, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common' },
+  { id: 'spear_goblins', name: 'Spear Gobs', cost: 3, color: '#2ecc71', hp: 180, speed: 3, type: 'ground', range: 50, damage: 62, attackSpeed: 1100, projectile: 'spear', count: 3, rarity: 'rare' },
   { id: 'ice_wizard', name: 'Ice Wiz', cost: 3, color: '#3498db', hp: 688, speed: 1.5, type: 'ground', range: 55, damage: 91, attackSpeed: 1700, projectile: 'ice_shard', count: 1, splash: true, rarity: 'legendary', slow: 0.35, spawnDamage: 91 },
 
   // Lava Hound & Lava Pups
@@ -59,10 +60,10 @@ const CARDS = [
 
   // New cards to implement
   { id: 'royal_hogs', name: 'Royal Hogs', cost: 5, color: '#e67e22', hp: 1260, speed: 3.5, type: 'ground', range: 25, damage: 240, attackSpeed: 1600, projectile: null, count: 4, targetType: 'buildings', jumps: true, rarity: 'common' },
-  { id: 'miner', name: 'Miner', cost: 3, color: '#f39c12', hp: 1600, speed: 1.5, type: 'ground', range: 25, damage: 160, attackSpeed: 1100, projectile: null, count: 1, targetType: 'buildings', rarity: 'legendary', burrows: true },
+  { id: 'miner', name: 'Miner', cost: 3, color: '#f39c12', hp: 1600, speed: 1.5, type: 'ground', range: 25, damage: 160, attackSpeed: 1100, projectile: null, count: 1, targetType: 'buildings', rarity: 'legendary', burrows: true, deployAnywhere: true },
   { id: 'goblin_cage', name: 'Goblin Cage', cost: 5, color: '#95a5a6', hp: 880, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 30, spawns: 'goblin_bruteth', spawnRate: 10, spawnCount: 1, rarity: 'rare' },
   { id: 'goblin_bruteth', name: 'Goblin B', cost: 0, color: '#c0392b', hp: 660, speed: 2, type: 'ground', range: 25, damage: 158, attackSpeed: 1300, projectile: null, count: 1, rarity: 'common', isToken: true },
-  { id: 'goblin_giant', name: 'Goblin Giant', cost: 6, color: '#27ae60', hp: 2628, speed: 1, type: 'ground', range: 25, damage: 211, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', rarity: 'epic', goblinGiant: true },
+  { id: 'goblin_giant', name: 'Goblin Giant', cost: 6, color: '#27ae60', hp: 2628, speed: 1, type: 'ground', range: 25, damage: 211, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', rarity: 'epic', deathSpawns: 'spear_goblins', deathSpawnCount: 2, extraProjectiles: 2 },
 
   // Super easy additions
   { id: 'three_musketeers', name: '3 Musketeers', cost: 9, color: '#34495e', hp: 720, speed: 1.5, type: 'ground', range: 100, damage: 218, attackSpeed: 1100, projectile: 'bullet', count: 3, rarity: 'rare' },
@@ -5604,6 +5605,9 @@ export default function App() {
       if (card.type === 'spell') {
         // Spells can be deployed anywhere
         canDeploy = true;
+      } else if (card.deployAnywhere) {
+        // Miner can be deployed anywhere (even on enemy towers)
+        canDeploy = true;
       } else {
         // For non-spells: check if opponent's princess tower on that side is destroyed
         const leftOpponentPrincess = towers.find(t => t.id === 1 && t.hp > 0);
@@ -6067,6 +6071,8 @@ export default function App() {
 
               burrowing: actualCard.burrows ? { active: true, startTime: Date.now() } : undefined,
 
+              deployAnywhere: actualCard.deployAnywhere || false,
+
               splash: actualCard.splash || false,
 
               frontalSplash: actualCard.frontalSplash || false,
@@ -6137,7 +6143,7 @@ export default function App() {
 
               turnsToPig: actualCard.turnsToPig || false,
 
-              goblinGiant: actualCard.goblinGiant || false,
+              extraProjectiles: actualCard.extraProjectiles || 0,
 
               isDashing: false, dashEndTime: 0,
 
@@ -7235,6 +7241,43 @@ export default function App() {
                     chain: u.chain || 0,
                     turnsToPig: u.turnsToPig || false
                   });
+
+                  // Goblin Giant: Extra spear goblin attacks from his back
+                  if (u.extraProjectiles > 0) {
+                    const spearGoblinCard = CARDS.find(c => c.id === 'spear_goblins');
+                    if (spearGoblinCard) {
+                      // Find nearest enemy unit for spear goblins to target
+                      const spearTargets = currentUnits.filter(t => t.isOpponent !== u.isOpponent && t.hp > 0 && t.type !== 'building');
+                      let closestSpearTarget = null;
+                      let minSpearDist = Infinity;
+                      spearTargets.forEach(t => {
+                        const dist = Math.sqrt(Math.pow(t.x - u.x, 2) + Math.pow(t.y - u.y, 2));
+                        if (dist < minSpearDist && dist <= spearGoblinCard.range * 2) {
+                          minSpearDist = dist;
+                          closestSpearTarget = t;
+                        }
+                      });
+
+                      // Shoot extra projectiles (spear goblin attacks)
+                      for (let i = 0; i < u.extraProjectiles; i++) {
+                        const spearTarget = closestSpearTarget || target;
+                        nextProjectiles.push({
+                          id: now + Math.random() + i + target.id + 1000,
+                          x: u.x - 20 + (i * 40), // Slightly offset positions
+                          y: u.y - 10,
+                          targetId: spearTarget.id,
+                          targetX: spearTarget.x,
+                          targetY: spearTarget.y,
+                          speed: 12,
+                          damage: spearGoblinCard.damage,
+                          type: 'spear',
+                          splash: false,
+                          attackerId: u.id,
+                          isOpponent: u.isOpponent
+                        });
+                      }
+                    }
+                  }
                 }
               });
             }
@@ -8735,9 +8778,9 @@ export default function App() {
               remainingDamage = 0;
             }
 
-            // Miner burrowing invincibility - reduced damage while burrowing
+            // Miner burrowing invincibility - no damage while burrowing
             if (u.burrowing && u.burrowing.active) {
-              remainingDamage = Math.floor(remainingDamage * 0.5); // Take 50% damage while burrowing
+              remainingDamage = 0;
             }
 
             const updatedUnit = {
