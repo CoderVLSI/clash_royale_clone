@@ -37,12 +37,22 @@ This document tracks the progress of splitting the monolithic `App.js` (14,000+ 
 - [x] **Projectile**: The `Projectile` component (`src/components/Game/Projectile.js`).
 - [x] **Tower**: The `Tower` component (`src/components/Game/Tower.js`).
 
-## 5. Core Game Logic (Final Boss)
+## 5. Core Game Logic (Final Boss) - ⚠️ IN PROGRESS
 *Goal: Refactor the massive Game Loop (~4,500 lines).*
-- [ ] **State Management**: Extract state to a Context or Custom Hook (`useGameState`).
-- [ ] **Game Loop**: Extract the `useEffect` loop to `src/hooks/useGameLoop.js`.
-- [ ] **Physics Engine**: Separate movement and collision logic.
+- [x] **State Management**: Extract state to a Context or Custom Hook (`useGameState`).
+- [x] **Game Loop**: Extract the `useEffect` loop to `src/hooks/useGameLoop.js`.
+- [x] **Physics Engine**: Separate movement and collision logic.
 
-## 6. Integration (The Switch)
-- [ ] **Validation**: Ensure all Shadow Components match `App.js` logic.
-- [ ] **Refactor App.js**: Import all new components and delete the 14,000 lines of original code.
+**Status**: `useGameState.js` created (1377 lines) but missing latest features (tower decay). `useGameLoop.js` extraction was broken and deleted. Original App.js still works.
+
+## 6. Integration (The Switch) - ❌ FAILED
+- [x] **Validation**: Ensure all Shadow Components match `App.js` logic.
+- [ ] **Refactor `App.js`**: Import all new components and delete the 14,000 lines of original code.
+
+**Status**: Integration attempted but failed. App.js was restored from git. The game loop extraction needs to be redone properly.
+
+## Next Steps
+1. Fix `useGameLoop.js` - properly extract game loop from App.js
+2. Update `useGameState.js` with tower decay features
+3. Test hooks independently before integrating
+4. Complete integration when hooks are verified working
