@@ -171,7 +171,7 @@ const CARDS = [
 
   // Troops/Buildings - Hard
   { id: 'cannon_cart', name: 'Cannon Cart', cost: 5, color: '#7f8c8d', hp: 696, shieldHp: 590, speed: 2.5, type: 'ground', range: 70, damage: 202, attackSpeed: 1200, projectile: 'cannonball', count: 1, rarity: 'epic', hasShield: true, transformsToBuilding: true },
-  { id: 'goblin_drill', name: 'Goblin Drill', cost: 4, color: '#2ecc71', hp: 1200, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 9, spawns: 'sword_goblins', spawnRate: 1.1, spawnCount: 1, rarity: 'epic', deployAnywhere: true },
+  { id: 'goblin_drill', name: 'Goblin Drill', cost: 4, color: '#2ecc71', hp: 1200, speed: 2, type: 'ground', range: 25, damage: 100, attackSpeed: 1000, projectile: null, count: 1, lifetime: 20, targetType: 'buildings', spawns: 'sword_goblins', spawnRate: 1.1, spawnCount: 1, rarity: 'epic', deployAnywhere: true, deathSpawns: 'sword_goblins', deathSpawnCount: 3, burrows: true },
   { id: 'phoenix', name: 'Phoenix', cost: 4, color: '#e74c3c', hp: 1000, speed: 2.5, type: 'flying', range: 50, damage: 200, attackSpeed: 1600, projectile: 'phoenix_fire', count: 1, splash: true, rarity: 'legendary', revivesAsEgg: true, eggHp: 800, eggDuration: 3000 },
   { id: 'phoenix_egg', name: 'Phoenix Egg', cost: 0, color: '#f39c12', hp: 800, speed: 0, type: 'ground', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, rarity: 'legendary', isToken: true, hatchesInto: 'phoenix', hatchDuration: 3000 }
 ];
@@ -4635,6 +4635,8 @@ const Projectile = ({ type, position }) => {
 };
 
 const Unit = ({ unit }) => {
+  if (!unit) return null;
+
   const spriteId = unit.spriteId || 'knight';
   const isEnemy = unit.isOpponent;
   const isSlowed = unit.slowUntil > Date.now();
@@ -6084,7 +6086,7 @@ const GameBoard = ({
           <View style={[styles.bridge, { right: 65 }]} />
         </View>
 
-        {(units || []).filter(u => u !== null).map(u => <Unit key={u.id} unit={u} />)}
+        {(units || []).filter(u => u != null).map(u => <Unit key={u.id} unit={u} />)}
         {(projectiles || []).map(p => <Projectile key={p.id} type={p.type} position={p} />)}
         <VisualEffects effects={visualEffects} setEffects={setVisualEffects} />
 
@@ -7396,6 +7398,13 @@ export default function App() {
             spawnX = x;
           }
 
+          // GOBLIN DRILL: Burrows from player's side to target building like Miner
+          if (actualCard.id === 'goblin_drill') {
+            // Goblin Drill starts from behind player's towers (like Miner)
+            spawnY = isOpponent ? height * 0.1 : height * 0.9; // Behind player's towers
+            spawnX = x; // Keep X in the same lane as deployment
+          }
+
           if (actualCard.id === 'three_musketeers' && count === 3) {
 
             if (i < 2) unitLane = lane;
@@ -7585,6 +7594,19 @@ export default function App() {
 
         // Miner burrowing visual - dirt going into ground at spawn point (player's bridge)
         if (actualCard.id === 'miner') {
+          setVisualEffects(prev => [...prev, {
+            id: Date.now() + Math.random(),
+            type: 'miner_burrow',
+            x: spawnX,
+            y: spawnY,
+            radius: 50,
+            startTime: Date.now(),
+            duration: 1000
+          }]);
+        }
+
+        // Goblin Drill burrowing visual - same as Miner
+        if (actualCard.id === 'goblin_drill') {
           setVisualEffects(prev => [...prev, {
             id: Date.now() + Math.random(),
             type: 'miner_burrow',
@@ -8213,10 +8235,14 @@ export default function App() {
                   const spawnX = u.x + offsetX;
                   const spawnY = u.y + offsetY;
 
+                  // Clamp spawn position to map bounds to prevent spawned units from going off-map
+                  const clampedSpawnX = Math.max(20, Math.min(width - 20, spawnX));
+                  const clampedSpawnY = Math.max(20, Math.min(height - 20, spawnY));
+
                   newSpawns.push({
                     id: Date.now() + Math.random() * 1000 + i,
-                    x: spawnX,
-                    y: spawnY,
+                    x: clampedSpawnX,
+                    y: clampedSpawnY,
                     hp: spawnCard.hp,
                     maxHp: spawnCard.hp,
                     isOpponent: u.isOpponent,
@@ -10873,10 +10899,14 @@ export default function App() {
               const offsetX = Math.cos(angle) * distance;
               const offsetY = Math.sin(angle) * distance;
 
+              // Clamp spawn position to map bounds to prevent spawned units from going off-map
+              const spawnX = Math.max(20, Math.min(width - 20, deadUnit.x + offsetX));
+              const spawnY = Math.max(20, Math.min(height - 20, deadUnit.y + offsetY));
+
               unitsToSpawn.push({
                 id: Date.now() + Math.random() * 1000 + i,
-                x: deadUnit.x + offsetX,
-                y: deadUnit.y + offsetY,
+                x: spawnX,
+                y: spawnY,
                 hp: spawnCard.hp,
                 maxHp: spawnCard.hp,
                 isOpponent: deadUnit.isOpponent,
