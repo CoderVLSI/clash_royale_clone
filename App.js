@@ -7522,6 +7522,8 @@ export default function App() {
 
             givesOpponentElixir: actualCard.givesOpponentElixir || false,
 
+            transformsToBuilding: actualCard.transformsToBuilding || false,
+
             spawnsExtra: actualCard.spawnsExtra || undefined,
 
             extraCount: actualCard.extraCount || 0,
@@ -8326,6 +8328,30 @@ export default function App() {
           }
           // Remove the egg (whether it hatched or died)
           return null;
+        }
+
+        // Handle Cannon Cart transform to building
+        if (u.transformsToBuilding && !u.hasTransformed) {
+          // Find nearest building
+          const targetBuilding = (towersRef.current || []).find(t => t.isOpponent !== u.isOpponent && t.hp > 0 && t.type === 'princess');
+          if (targetBuilding) {
+            const dist = Math.sqrt(Math.pow(u.x - targetBuilding.x, 2) + Math.pow(u.y - targetBuilding.y, 2));
+            // Transform when close to target building (within attack range)
+            if (dist <= u.range + 20) {
+              // Transform into stationary cannon building
+              return {
+                ...u,
+                hasTransformed: true,
+                speed: 0,
+                type: 'building',
+                hp: u.hp + u.shieldHp, // Add shield HP to total HP when transformed
+                maxHp: u.hp + u.shieldHp,
+                currentShieldHp: 0,
+                hasShield: false,
+                transformTime: Date.now()
+              };
+            }
+          }
         }
 
         // Handle Tesla hidden mechanic
