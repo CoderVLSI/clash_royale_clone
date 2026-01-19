@@ -7238,20 +7238,31 @@ export default function App() {
           }]);
 
         } else if (actualCard.id === 'royal_delivery') {
-          // Royal Delivery - Delayed falling box, then damage + spawn
+          // Royal Delivery - Delayed falling box from King Tower
           const spawnDelay = actualCard.spawnDelay || 3000;
 
-          // Create falling visual projectile
+          // Start from King Tower
+          const startX = width / 2;
+          const startY = isOpponent ? 60 : height - 60;
+
+          // Create projectile launching from King Tower
           setProjectiles(prev => [...prev, {
-            id: Date.now(), x: x, y: y - 300, targetX: x, targetY: y, // Start high up
-            speed: 0, // Speed handled by gravity/duration
-            damage: actualCard.damage, radius: actualCard.radius || 45,
+            id: Date.now(),
+            x: startX,
+            y: startY,
+            startX: startX,
+            startY: startY,
+            targetX: x,
+            targetY: y,
+            speed: 0, // Custom movement logic
+            damage: actualCard.damage,
+            radius: actualCard.radius || 45,
             type: 'royal_delivery_box', isSpell: true,
             duration: spawnDelay / 1000,
             hit: false, spawnTime: Date.now(), isOpponent,
-            isDelivery: true, // Flag for delivery logic
+            isDelivery: true,
             spawns: 'royal_recruit_single',
-            knockback: 15 // Knockback on impact
+            knockback: 15
           }]);
 
         }
@@ -9517,17 +9528,32 @@ export default function App() {
         }
 
         // ROYAL DELIVERY: Handle falling movement and hit time
+        // ROYAL DELIVERY: Handle arcing movement from King Tower
         if (p.isDelivery) {
           const progress = (Date.now() - p.spawnTime) / (p.duration * 1000);
           if (progress >= 1) {
             return { ...p, hit: true, x: p.targetX, y: p.targetY };
           }
-          // Interpolate Y position (falling from 300px above target)
-          // newY = Target - (Difference * (1 - progress))
-          // Using quadratic easing for "gravity" feel: progress * progress
-          const fallDistance = 300;
-          const currentY = p.targetY - (fallDistance * (1 - (progress * progress)));
-          return { ...p, y: currentY, x: p.targetX };
+
+          // Interpolate Ground Position (startX -> targetX, startY -> targetY)
+          const startX = p.startX || p.targetX;
+          const startY = p.startY || (p.targetY - 300);
+
+          const currentGroundX = startX + (p.targetX - startX) * progress;
+          const currentGroundY = startY + (p.targetY - startY) * progress;
+
+          // Arc Height (Parabola): Peaks in middle
+          // Height offset (visual Y) = -1 * (4 * maxHeight * progress * (1 - progress))
+          // But Royal Delivery goes High and drops. Let's stick to standard arc.
+          const arcHeight = 350; // Higher arc for delivery
+          const heightOffset = 4 * arcHeight * progress * (1 - progress);
+
+          // Visual Y = GroundY - HeightOffset
+          return {
+            ...p,
+            x: currentGroundX,
+            y: currentGroundY - heightOffset
+          };
         }
 
         // MAGIC ARCHER PIERCE LOGIC
@@ -9599,7 +9625,58 @@ export default function App() {
           if (!h.isPoison) {
             h.damageDealt = true;
           }
-          if (h.isSpell) {
+
+          // Handle Log-type projectiles (The Log, Barb Barrel) BEFORE spell split
+          if (h.isLog) {
+            const logWidth = 40;
+            const logStartY = h.logStartY || h.y;
+            const logEndY = h.logEndY || h.targetY;
+            const minX = h.x - logWidth / 2;
+            const maxX = h.x + logWidth / 2;
+            const minY = Math.min(logStartY, logEndY);
+            const maxY = Math.max(logStartY, logEndY);
+
+            currentUnits = currentUnits.map(u => {
+              if (u.hp > 0) {
+                const isEnemy = h.isOpponent !== undefined ? !h.isOpponent : u.isOpponent;
+                if (isEnemy && u.x >= minX && u.x <= maxX && u.y >= minY && u.y <= maxY) {
+                  let updatedUnit = { ...u, hp: u.hp - h.damage };
+                  if (h.knockback && h.knockback > 0 && u.type !== 'building') {
+                    const logDirection = logEndY > logStartY ? 1 : -1;
+                    updatedUnit.y = u.y + (h.knockback * logDirection);
+                    updatedUnit.y = Math.max(10, Math.min(height - 10, updatedUnit.y));
+                    updatedUnit.wasPushed = true;
+                  }
+                  return updatedUnit;
+                }
+              }
+              return u;
+            });
+
+            // Barb Barrel: spawn barbarian
+            if (h.isBarrel && h.spawns) {
+              const barbCard = CARDS.find(c => c.id === h.spawns);
+              if (barbCard) {
+                unitsToSpawn.push({
+                  id: 'barb_from_barrel_' + Date.now(),
+                  x: h.targetX,
+                  y: h.targetY,
+                  hp: barbCard.hp,
+                  maxHp: barbCard.hp,
+                  isOpponent: h.isOpponent,
+                  speed: barbCard.speed,
+                  lane: h.targetX < width / 2 ? 'LEFT' : 'RIGHT',
+                  lastAttack: 0,
+                  spriteId: barbCard.id,
+                  type: barbCard.type,
+                  range: barbCard.range,
+                  damage: barbCard.damage,
+                  attackSpeed: barbCard.attackSpeed,
+                  spawnTime: Date.now()
+                });
+              }
+            }
+          } else if (h.isSpell) {
             // Handle spell effects (Fireball, Arrows, Zap, Poison)
             if (h.isPoison) {
               // Poison is special - stays on battlefield and ticks continuously
@@ -9899,6 +9976,81 @@ export default function App() {
                   startTime: Date.now(),
                   duration: 600
                 }]);
+              } else if (h.isDelivery) {
+                // ROYAL DELIVERY: Splash damage (hits AIR too) + Spawn Recruit
+                // Deal splash damage to all enemies in radius
+                currentUnits = currentUnits.map(u => {
+                  if (u.isOpponent !== h.isOpponent && u.hp > 0) {
+                    const dist = Math.sqrt(Math.pow(u.x - h.x, 2) + Math.pow(u.y - h.y, 2));
+                    if (dist <= (h.radius || 45)) {
+                      // Knockback away from impact center
+                      let newX = u.x;
+                      let newY = u.y;
+                      if (h.knockback && u.type !== 'building') {
+                        const angle = Math.atan2(u.y - h.y, u.x - h.x);
+                        newX = u.x + Math.cos(angle) * h.knockback;
+                        newY = u.y + Math.sin(angle) * h.knockback;
+                      }
+                      return {
+                        ...u,
+                        hp: u.hp - h.damage,
+                        x: newX,
+                        y: newY,
+                        wasPushed: true
+                      };
+                    }
+                  }
+                  return u;
+                });
+
+                // Apply damage to towers
+                nextTowers = nextTowers.map(t => {
+                  if (t.isOpponent !== h.isOpponent && t.hp > 0) {
+                    const dist = Math.sqrt(Math.pow(t.x - h.x, 2) + Math.pow(t.y - h.y, 2));
+                    if (dist <= (h.radius || 45)) {
+                      return { ...t, hp: t.hp - h.damage };
+                    }
+                  }
+                  return t;
+                });
+
+                // Visual effect for impact
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'royal_delivery',
+                  x: h.x,
+                  y: h.y,
+                  radius: h.radius || 45,
+                  startTime: Date.now(),
+                  duration: 500
+                }]);
+
+                // Spawn Royal Recruit
+                if (h.spawns) {
+                  const recruitCard = CARDS.find(c => c.id === h.spawns) || CARDS.find(c => c.id === 'knight');
+                  if (recruitCard) {
+                    unitsToSpawn.push({
+                      id: 'royal_recruit_' + Date.now() + '_' + Math.random(),
+                      x: h.x,
+                      y: h.y,
+                      hp: recruitCard.hp,
+                      maxHp: recruitCard.hp,
+                      shieldHp: recruitCard.shieldHp,
+                      maxShieldHp: recruitCard.shieldHp,
+                      isOpponent: h.isOpponent,
+                      speed: recruitCard.speed,
+                      lane: h.x < width / 2 ? 'LEFT' : 'RIGHT',
+                      lastAttack: 0,
+                      spriteId: h.spawns,
+                      type: recruitCard.type,
+                      range: recruitCard.range,
+                      damage: recruitCard.damage,
+                      attackSpeed: recruitCard.attackSpeed,
+                      hasShield: recruitCard.hasShield,
+                      spawnTime: Date.now() - 2000
+                    });
+                  }
+                }
               }
             }
 
@@ -9925,143 +10077,6 @@ export default function App() {
               }
             }
 
-            // THE LOG: Special rectangular damage along the path
-            if (h.isLog) {
-              const logWidth = 40; // Width of the log's damage area
-              const logStartY = h.logStartY || h.y;
-              const logEndY = h.logEndY || h.targetY;
-              const minX = h.x - logWidth / 2;
-              const maxX = h.x + logWidth / 2;
-              const minY = Math.min(logStartY, logEndY);
-              const maxY = Math.max(logStartY, logEndY);
-
-              // Damage all units in the rectangular path
-              currentUnits = currentUnits.map(u => {
-                if (u.hp > 0) {
-                  const isEnemy = h.isOpponent !== undefined ? !h.isOpponent : u.isOpponent;
-                  if (isEnemy) {
-                    // Check if unit is in the rectangular path
-                    if (u.x >= minX && u.x <= maxX && u.y >= minY && u.y <= maxY) {
-                      let updatedUnit = { ...u, hp: u.hp - h.damage };
-
-                      // Apply knockback
-                      if (h.knockback && h.knockback > 0 && u.type !== 'building') {
-                        // Knockback in the direction the log is rolling
-                        const logDirection = logEndY > logStartY ? 1 : -1;
-                        updatedUnit.y = u.y + (h.knockback * logDirection);
-                        updatedUnit.y = Math.max(10, Math.min(height - 10, updatedUnit.y));
-                        updatedUnit.wasPushed = true;
-                      }
-
-                      return updatedUnit;
-                    }
-                  }
-                }
-                return u;
-              });
-
-              // BARB BARREL: Spawn barbarian at end position
-              if (h.isBarrel && h.spawns) {
-                const barbCard = CARDS.find(c => c.id === h.spawns);
-                if (barbCard) {
-                  unitsToSpawn.push({
-                    id: 'barb_from_barrel_' + Date.now(),
-                    x: h.targetX,
-                    y: h.targetY,
-                    hp: barbCard.hp,
-                    maxHp: barbCard.hp,
-                    isOpponent: h.isOpponent,
-                    speed: barbCard.speed,
-                    lane: h.targetX < width / 2 ? 'LEFT' : 'RIGHT',
-                    lastAttack: 0,
-                    spriteId: barbCard.id,
-                    type: barbCard.type,
-                    range: barbCard.range,
-                    damage: barbCard.damage,
-                    attackSpeed: barbCard.attackSpeed,
-                    spawnTime: Date.now()
-                  });
-                }
-              }
-            }
-
-
-            // ROYAL DELIVERY: Splash damage (hits AIR too) + Spawn Recruit
-            if (h.isDelivery) {
-              // Deal splash damage to all enemies in radius
-              currentUnits = currentUnits.map(u => {
-                if (u.isOpponent !== h.isOpponent && u.hp > 0) {
-                  const dist = Math.sqrt(Math.pow(u.x - h.x, 2) + Math.pow(u.y - h.y, 2));
-                  if (dist <= (h.radius || 45)) {
-                    // Knockback away from impact center
-                    let newX = u.x;
-                    let newY = u.y;
-                    if (h.knockback && u.type !== 'building') {
-                      const angle = Math.atan2(u.y - h.y, u.x - h.x);
-                      newX = u.x + Math.cos(angle) * h.knockback;
-                      newY = u.y + Math.sin(angle) * h.knockback;
-                    }
-                    return {
-                      ...u,
-                      hp: u.hp - h.damage,
-                      x: newX,
-                      y: newY,
-                      wasPushed: true
-                    };
-                  }
-                }
-                return u;
-              });
-
-              // Apply damage to towers
-              nextTowers = nextTowers.map(t => {
-                if (t.isOpponent !== h.isOpponent && t.hp > 0) {
-                  const dist = Math.sqrt(Math.pow(t.x - h.x, 2) + Math.pow(t.y - h.y, 2));
-                  if (dist <= (h.radius || 45)) {
-                    return { ...t, hp: t.hp - h.damage };
-                  }
-                }
-                return t;
-              });
-
-              // Visual effect for impact
-              setVisualEffects(prev => [...prev, {
-                id: Date.now() + Math.random(),
-                type: 'royal_delivery', // Splash impact visual
-                x: h.x,
-                y: h.y,
-                radius: h.radius || 45,
-                startTime: Date.now(),
-                duration: 500
-              }]);
-
-              // Spawn Royal Recruit
-              if (h.spawns) {
-                const recruitCard = CARDS.find(c => c.id === h.spawns);
-                if (recruitCard) {
-                  unitsToSpawn.push({
-                    id: 'royal_recruit_' + Date.now(),
-                    x: h.x,
-                    y: h.y,
-                    hp: recruitCard.hp,
-                    maxHp: recruitCard.hp,
-                    shieldHp: recruitCard.shieldHp,
-                    maxShieldHp: recruitCard.shieldHp,
-                    isOpponent: h.isOpponent,
-                    speed: recruitCard.speed,
-                    lane: h.x < width / 2 ? 'LEFT' : 'RIGHT',
-                    lastAttack: 0,
-                    spriteId: recruitCard.id,
-                    type: recruitCard.type,
-                    range: recruitCard.range,
-                    damage: recruitCard.damage,
-                    attackSpeed: recruitCard.attackSpeed,
-                    hasShield: recruitCard.hasShield,
-                    spawnTime: Date.now()
-                  });
-                }
-              }
-            }
 
             // Damage the primary target
             currentUnits = currentUnits.map(u => {
