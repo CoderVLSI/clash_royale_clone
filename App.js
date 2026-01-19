@@ -97,7 +97,8 @@ const CARDS = [
   { id: 'elixir_collector', name: 'Elixir G', cost: 6, color: '#9b59b6', hp: 1070, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 70, rarity: 'rare', generatesElixir: true },
   { id: 'goblin_hut', name: 'Goblin Hut', cost: 5, color: '#2ecc71', hp: 1293, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 60, spawns: 'spear_goblins', spawnRate: 4.5, spawnCount: 1, rarity: 'rare' },
   { id: 'furnace', name: 'Furnace', cost: 4, color: '#e74c3c', hp: 1003, speed: 1.5, type: 'ground', range: 50, damage: 120, attackSpeed: 1200, projectile: 'flame', count: 1, spawns: 'fire_spirit', spawnRate: 5, spawnCount: 1, rarity: 'rare' },
-  { id: 'spirit_empress', name: 'Spirit Empress', cost: 6, color: '#9b59b6', hp: 1400, speed: 2, type: 'ground', range: 55, damage: 180, attackSpeed: 1400, projectile: 'spirit_bolt', count: 1, rarity: 'legendary', spawns: 'random_spirit', spawnRate: 4, spawnCount: 1 },
+  { id: 'spirit_empress', name: 'Spirit Empress', cost: 3, color: '#9b59b6', hp: 1028, speed: 1.5, type: 'ground', range: 25, damage: 279, attackSpeed: 1000, projectile: null, count: 1, rarity: 'champion', dualForm: true },
+  { id: 'spirit_empress_flying', name: 'Spirit Empress (Air)', cost: 6, color: '#9b59b6', hp: 1400, speed: 2, type: 'flying', range: 120, damage: 219, attackSpeed: 1200, projectile: 'spirit_bolt', count: 1, rarity: 'champion', isToken: true },
   { id: 'earthquake', name: 'Earthquake', cost: 3, color: '#7f8c8d', type: 'spell', damage: 81, radius: 70, count: 1, slow: 0.35, rarity: 'rare' },
   { id: 'graveyard', name: 'Graveyard', cost: 5, color: '#2c3e50', type: 'spell', damage: 0, radius: 80, count: 20, spawns: 'skeletons', spawnCount: 20, rarity: 'legendary' },
   { id: 'lumberjack', name: 'Lumberjack', cost: 4, color: '#e67e22', hp: 1232, speed: 2.5, type: 'ground', range: 25, damage: 240, attackSpeed: 800, projectile: null, count: 1, splash: true, deathRage: true, rarity: 'legendary' },
@@ -186,15 +187,18 @@ const CARDS = [
   { id: 'vines', name: 'Vines', cost: 2, color: '#27ae60', type: 'spell', damage: 0, radius: 45, count: 1, duration: 4, rarity: 'rare', isRoot: true },
   { id: 'goblin_demolisher', name: 'Gob Demolisher', cost: 4, color: '#e74c3c', hp: 600, speed: 2, type: 'ground', range: 25, damage: 300, attackSpeed: 1500, projectile: 'bomb', count: 1, rarity: 'epic', deathDamage: 500, deathRadius: 50 },
   { id: 'goblin_machine', name: 'Gob Machine', cost: 5, color: '#95a5a6', hp: 1200, speed: 1.5, type: 'ground', range: 25, damage: 200, attackSpeed: 1200, projectile: null, count: 1, rarity: 'legendary', rocketAbility: true, rocketInterval: 3000, rocketDamage: 250, rocketRange: 120 },
-  { id: 'rune_giant', name: 'Rune Giant', cost: 6, color: '#8B4513', hp: 3200, speed: 1, type: 'ground', range: 30, damage: 200, attackSpeed: 1800, projectile: null, count: 1, rarity: 'epic', runeEnhancer: true, enhanceInterval: 3, enhanceBonus: 0.5, enhanceRadius: 100, enhanceDuration: 5000 },
+  { id: 'rune_giant', name: 'Rune Giant', cost: 4, color: '#8B4513', hp: 3500, speed: 1, type: 'ground', range: 25, damage: 100, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', rarity: 'epic', enchantAbility: true, enchantCount: 2 },
   { id: 'suspicious_bush', name: 'Suspicious Bush', cost: 2, color: '#2ecc71', hp: 400, speed: 3, type: 'ground', range: 20, damage: 100, attackSpeed: 1000, projectile: null, count: 1, rarity: 'rare', hidden: true, deathSpawns: 'sword_goblins', deathSpawnCount: 2 },
   { id: 'berserker', name: 'Berserker', cost: 4, color: '#c0392b', hp: 900, speed: 3.5, type: 'ground', range: 25, damage: 350, attackSpeed: 1000, projectile: null, count: 1, rarity: 'epic', permRage: true },
 
   // CHAMPIONS
-  { id: 'golden_knight', name: 'Golden Knight', cost: 4, color: '#f1c40f', hp: 1800, speed: 2, type: 'ground', range: 25, damage: 160, attackSpeed: 1000, projectile: null, count: 1, rarity: 'champion', dashChain: true, abilityCooldown: 6000 },
-  { id: 'skeleton_king', name: 'Skeleton King', cost: 4, color: '#2c3e50', hp: 2000, speed: 1.5, type: 'ground', range: 25, damage: 180, attackSpeed: 1400, projectile: null, count: 1, rarity: 'champion', splash: true, collectsSouls: true, abilityCooldown: 8000 },
-  { id: 'archer_queen', name: 'Archer Queen', cost: 5, color: '#9b59b6', hp: 1000, speed: 1.5, type: 'ground', range: 120, damage: 225, attackSpeed: 1200, projectile: 'arrow', count: 1, rarity: 'champion', stealthAbility: true, abilityCooldown: 7000 },
-  { id: 'monk', name: 'Monk', cost: 5, color: '#ecf0f1', hp: 2000, speed: 1.5, type: 'ground', range: 25, damage: 140, attackSpeed: 900, projectile: null, count: 1, rarity: 'champion', pushback: 40, reflectAbility: true, abilityCooldown: 9000 }
+  { id: 'golden_knight', name: 'Golden Knight', cost: 4, color: '#f1c40f', hp: 1800, speed: 2, type: 'ground', range: 25, damage: 160, attackSpeed: 1000, projectile: null, count: 1, rarity: 'champion', dashChain: true, abilityCooldown: 8000, abilityCost: 1 },
+  { id: 'skeleton_king', name: 'Skeleton King', cost: 4, color: '#2c3e50', hp: 2000, speed: 1.5, type: 'ground', range: 25, damage: 180, attackSpeed: 1400, projectile: null, count: 1, rarity: 'champion', splash: true, collectsSouls: true, abilityCooldown: 8000, abilityCost: 2 },
+  { id: 'archer_queen', name: 'Archer Queen', cost: 5, color: '#9b59b6', hp: 1000, speed: 1.5, type: 'ground', range: 120, damage: 225, attackSpeed: 1200, projectile: 'arrow', count: 1, rarity: 'champion', stealthAbility: true, abilityCooldown: 17000, abilityCost: 1 },
+  { id: 'monk', name: 'Monk', cost: 5, color: '#ecf0f1', hp: 2000, speed: 1.5, type: 'ground', range: 25, damage: 140, attackSpeed: 900, projectile: null, count: 1, rarity: 'champion', pushback: 40, reflectAbility: true, abilityCooldown: 15000, abilityCost: 1 },
+  { id: 'mighty_miner', name: 'Mighty Miner', cost: 4, color: '#e67e22', hp: 2400, speed: 2, type: 'ground', range: 25, damage: 40, attackSpeed: 100, projectile: null, count: 1, rarity: 'champion', damageRamp: true, escapeAbility: true, abilityCooldown: 10000, abilityCost: 1 },
+  { id: 'little_prince', name: 'Little Prince', cost: 3, color: '#f1c40f', hp: 700, speed: 2, type: 'ground', range: 110, damage: 110, attackSpeed: 1000, projectile: 'arrow', count: 1, rarity: 'champion', damageRamp: true, guardianAbility: true, abilityCooldown: 15000, abilityCost: 3 },
+  { id: 'guardian', name: 'Guardian', cost: 0, color: '#f1c40f', hp: 1800, speed: 3, type: 'ground', range: 30, damage: 200, attackSpeed: 1200, count: 1, rarity: 'champion', isToken: true, knockback: 50, spawnDamage: 200 }
 ];
 
 const RARITY_COLORS = {
@@ -276,16 +280,206 @@ const MainMenu = ({ onStart }) => {
 };
 
 // --- Game Over Component ---
-const GameOverScreen = ({ result, onRestart }) => {
+const GameOverScreen = ({ result, onRestart, score = [0, 0] }) => {
   const isVictory = result === 'VICTORY';
+  const playerCrowns = score[0];
+  const opponentCrowns = score[1];
+
   return (
-    <View style={styles.gameOverContainer}>
-      <Text style={[styles.gameOverTitle, { color: isVictory ? '#F1C40F' : '#E74C3C' }]}>
-        {result}!
-      </Text>
-      <TouchableOpacity style={styles.restartButton} onPress={() => onRestart('lobby')}>
-        <Text style={styles.restartButtonText}>RETURN TO LOBBY</Text>
-      </TouchableOpacity>
+    <View style={{
+      position: 'absolute',
+      top: 0, left: 0, right: 0, bottom: 0,
+      backgroundColor: 'rgba(0,0,0,0.8)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 10000
+    }}>
+      <View style={{ alignItems: 'center', width: '90%' }}>
+        <Text style={{
+          fontSize: 48,
+          fontWeight: 'bold',
+          color: 'white',
+          textShadowColor: 'rgba(0, 0, 0, 0.75)',
+          textShadowOffset: { width: -1, height: 1 },
+          textShadowRadius: 10,
+          marginBottom: 30,
+          fontFamily: 'monospace'
+        }}>
+          {isVictory ? 'WINNER!' : 'DEFEAT'}
+        </Text>
+
+        {/* Winner Section */}
+        <View style={{ alignItems: 'center', width: '100%', marginBottom: 10 }}>
+          <View style={{ flexDirection: 'row', marginBottom: -10, zIndex: 5 }}>
+            {[1, 2, 3].map(i => (
+              <View key={i} style={{
+                width: 60, height: 40,
+                backgroundColor: '#c0392b',
+                borderRadius: 20,
+                marginHorizontal: 5,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderWidth: 2,
+                borderColor: '#e74c3c'
+              }}>
+                {(isVictory ? playerCrowns : opponentCrowns) >= i && <Text style={{ fontSize: 24 }}>👑</Text>}
+              </View>
+            ))}
+          </View>
+          <View style={{
+            backgroundColor: '#e74c3c',
+            width: '100%',
+            padding: 10,
+            borderRadius: 5,
+            alignItems: 'center',
+            borderWidth: 2,
+            borderColor: '#c0392b'
+          }}>
+            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 20 }}>{isVictory ? 'YOU' : 'OPPONENT'}</Text>
+            <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 12 }}>{isVictory ? 'Maestro' : 'Training Camp'}</Text>
+          </View>
+        </View>
+
+        <Text style={{ color: 'white', fontSize: 24, fontWeight: 'bold', marginVertical: 10 }}>VS</Text>
+
+        {/* Loser Section */}
+        <View style={{ alignItems: 'center', width: '100%', marginTop: 10 }}>
+          <View style={{
+            backgroundColor: '#3498db',
+            width: '100%',
+            padding: 10,
+            borderRadius: 5,
+            alignItems: 'center',
+            borderWidth: 2,
+            borderColor: '#2980b9'
+          }}>
+            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 20 }}>{!isVictory ? 'YOU' : 'OPPONENT'}</Text>
+            <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 12 }}>{!isVictory ? 'Maestro' : 'Training Camp'}</Text>
+          </View>
+          <View style={{ flexDirection: 'row', marginTop: -10, zIndex: 5 }}>
+            {[1, 2, 3].map(i => (
+              <View key={i} style={{
+                width: 60, height: 40,
+                backgroundColor: '#2980b9',
+                borderRadius: 20,
+                marginHorizontal: 5,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderWidth: 2,
+                borderColor: '#3498db'
+              }}>
+                {(!isVictory ? playerCrowns : opponentCrowns) >= i && <Text style={{ fontSize: 24 }}>👑</Text>}
+              </View>
+            ))}
+          </View>
+        </View>
+
+        {/* Reward Box */}
+        {isVictory && (
+          <View style={{
+            backgroundColor: '#f1c40f',
+            padding: 15,
+            borderRadius: 10,
+            marginTop: 40,
+            width: '70%',
+            alignItems: 'center',
+            borderWidth: 3,
+            borderColor: '#f39c12'
+          }}>
+            <Text style={{ fontWeight: 'bold', color: '#8e44ad', marginBottom: 5 }}>REWARD</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={{ fontSize: 24 }}>🏆</Text>
+              <Text style={{ fontSize: 24, fontWeight: 'bold', marginLeft: 10 }}>+30</Text>
+            </View>
+          </View>
+        )}
+
+        <TouchableOpacity 
+          style={{
+            backgroundColor: '#2ecc71',
+            paddingVertical: 15,
+            paddingHorizontal: 60,
+            borderRadius: 10,
+            marginTop: 30,
+            borderBottomWidth: 4,
+            borderBottomColor: '#27ae60'
+          }} 
+          onPress={() => onRestart('lobby')}
+        >
+          <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 20 }}>OK</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
+// --- Battle Start Component ---
+const BattleStartScreen = ({ playerName, opponentName }) => {
+  return (
+    <View style={{
+      position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+      backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 20000,
+      justifyContent: 'center', alignItems: 'center'
+    }}>
+      {/* Top Section (Opponent) */}
+      <View style={{ width: '100%', alignItems: 'center', marginBottom: 20 }}>
+         <View style={{ position: 'absolute', top: -100 }}>
+            <Text style={{ fontSize: 120 }}>👻</Text> 
+         </View>
+         <View style={{
+            width: '120%', height: 80, backgroundColor: '#4834d4', 
+            transform: [{ rotate: '-5deg' }],
+            justifyContent: 'center', alignItems: 'center',
+            borderBottomWidth: 4, borderBottomColor: '#2c2c54'
+         }}>
+            <Text style={{ 
+               color: 'white', fontSize: 32, fontWeight: 'bold', 
+               transform: [{ rotate: '5deg' }] 
+            }}>
+               {opponentName || 'OPPONENT'}
+            </Text>
+         </View>
+         <View style={{
+            position: 'absolute', right: 40, bottom: -20,
+            width: 50, height: 50, backgroundColor: '#9b59b6',
+            borderRadius: 25, borderWidth: 3, borderColor: 'white',
+            justifyContent: 'center', alignItems: 'center', zIndex: 10
+         }}>
+            <Text style={{ color: 'white', fontWeight: 'bold' }}>11</Text>
+         </View>
+      </View>
+
+      {/* VS Shield */}
+      <View style={{
+         width: 80, height: 100, backgroundColor: '#f1c40f',
+         borderWidth: 4, borderColor: '#f39c12',
+         justifyContent: 'center', alignItems: 'center',
+         borderRadius: 10, marginVertical: 40,
+         shadowColor: '#000', shadowOffset: { width: 0, height: 5 },
+         shadowOpacity: 0.5, shadowRadius: 10, elevation: 10
+      }}>
+         <Text style={{ color: 'white', fontSize: 36, fontWeight: 'bold' }}>VS</Text>
+      </View>
+
+      {/* Bottom Section (Player) */}
+      <View style={{ width: '100%', alignItems: 'center', marginTop: 20 }}>
+         <View style={{
+            width: '120%', height: 80, backgroundColor: '#2ecc71', 
+            transform: [{ rotate: '-5deg' }],
+            justifyContent: 'center', alignItems: 'center',
+            borderTopWidth: 4, borderTopColor: '#27ae60'
+         }}>
+            <Text style={{ 
+               color: 'white', fontSize: 32, fontWeight: 'bold', 
+               transform: [{ rotate: '5deg' }] 
+            }}>
+               {playerName || 'YOU'}
+            </Text>
+         </View>
+         <View style={{ position: 'absolute', bottom: -80 }}>
+            <Text style={{ fontSize: 120 }}>🎅</Text>
+         </View>
+      </View>
     </View>
   );
 };
@@ -1237,12 +1431,24 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
           <Circle cx="50" cy="50" r="45" fill={color} stroke="#9b59b6" strokeWidth="2" />
-          {/* Crown */}
+          {/* Warrior Crown */}
           <Path d="M30 30 L40 10 L50 30 L60 10 L70 30" fill="#f1c40f" />
-          {/* Floating Spirits */}
-          <Circle cx="30" cy="50" r="8" fill="#e74c3c" /> {/* Fire */}
-          <Circle cx="70" cy="50" r="8" fill="#3498db" /> {/* Ice */}
-          <Circle cx="50" cy="70" r="8" fill="#9b59b6" /> {/* Electro */}
+          {/* Glowing Sword */}
+          <Path d="M70 55 L90 35" stroke="#00FFFF" strokeWidth="4" />
+          <Circle cx="50" cy="50" r="25" fill="#2c3e50" opacity="0.3" />
+        </Svg>
+      );
+    case 'spirit_empress_flying':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Spirit Dragon */}
+          <Path d="M20 50 Q50 20 80 50 L50 90 Z" fill="#9b59b6" />
+          {/* Wings */}
+          <Path d="M10 40 Q30 10 50 40" fill="#8e44ad" opacity="0.7" />
+          <Path d="M90 40 Q70 10 50 40" fill="#8e44ad" opacity="0.7" />
+          {/* Empress Rider */}
+          <Circle cx="50" cy="45" r="15" fill={color} stroke="white" strokeWidth="1" />
+          <Path d="M40 35 L50 15 L60 35" fill="#f1c40f" />
         </Svg>
       );
     case 'earthquake':
@@ -2055,23 +2261,19 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
           <Circle cx="50" cy="50" r="45" fill="#f1c40f" stroke="#f39c12" strokeWidth="2" />
-          {/* Hair */}
           <Path d="M30 30 Q50 10 70 30 L80 60 Q60 50 30 60 Z" fill="#e67e22" />
-          <Circle cx="50" cy="50" r="25" fill="#f1c40f" /> {/* Face */}
-          <Path d="M40 45 L50 50 M60 45 L50 50" stroke="#c0392b" strokeWidth="2" /> {/* Smile */}
+          <Circle cx="50" cy="50" r="25" fill="#f1c40f" />
+          <Path d="M40 45 L50 50 M60 45 L50 50" stroke="#c0392b" strokeWidth="2" />
         </Svg>
       );
     case 'skeleton_king':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
           <Circle cx="50" cy="50" r="48" fill="#2c3e50" stroke="#95a5a6" strokeWidth="2" />
-          {/* Skull */}
           <Circle cx="50" cy="45" r="20" fill="#ecf0f1" />
           <Circle cx="42" cy="42" r="4" fill="#2c3e50" />
           <Circle cx="58" cy="42" r="4" fill="#2c3e50" />
-          {/* Crown */}
           <Path d="M30 30 L40 10 L50 25 L60 10 L70 30" fill="#f1c40f" />
-          {/* Club */}
           <Rect x="70" y="40" width="10" height="40" fill="#7f8c8d" />
           <Circle cx="75" cy="40" r="12" fill="#2c3e50" />
         </Svg>
@@ -2080,10 +2282,8 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
           <Circle cx="50" cy="50" r="45" fill="#9b59b6" stroke="#8e44ad" strokeWidth="2" />
-          {/* Hood */}
           <Path d="M25 30 Q50 10 75 30 L75 80 L25 80 Z" fill="#8e44ad" />
-          <Circle cx="50" cy="45" r="20" fill="#ffe0b2" /> {/* Face */}
-          {/* Crossbow */}
+          <Circle cx="50" cy="45" r="20" fill="#ffe0b2" />
           <Path d="M20 50 Q50 80 80 50" stroke="#2c3e50" strokeWidth="4" fill="none" />
           <Rect x="48" y="50" width="4" height="30" fill="#2c3e50" />
         </Svg>
@@ -2092,13 +2292,42 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
           <Circle cx="50" cy="50" r="45" fill="#ecf0f1" stroke="#bdc3c7" strokeWidth="2" />
-          {/* Bald Head */}
           <Circle cx="50" cy="40" r="20" fill="#ffe0b2" />
-          <Path d="M30 60 Q50 80 70 60" fill="#f39c12" /> {/* Robe */}
-          {/* Prayer Beads */}
+          <Path d="M30 60 Q50 80 70 60" fill="#f39c12" />
           <Circle cx="50" cy="65" r="5" fill="#e74c3c" />
           <Circle cx="60" cy="62" r="5" fill="#e74c3c" />
           <Circle cx="40" cy="62" r="5" fill="#e74c3c" />
+        </Svg>
+      );
+    case 'mighty_miner':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="#e67e22" strokeWidth="2" />
+          <Path d="M20 40 Q50 10 80 40" fill="#f1c40f" stroke="#e67e22" strokeWidth="2" />
+          <Rect x="45" y="25" width="10" height="15" fill="#f1c40f" />
+          <Path d="M70 60 L90 80 L70 90 L60 70 Z" fill="#7f8c8d" />
+          <Path d="M80 70 L95 85" stroke="#95a5a6" strokeWidth="3" />
+          <Circle cx="50" cy="50" r="20" fill="#ffe0b2" />
+          <Rect x="30" y="55" width="40" height="10" fill="#2c3e50" rx="5" />
+        </Svg>
+      );
+    case 'little_prince':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="#f1c40f" strokeWidth="2" />
+          <Path d="M35 25 L42 15 L50 25 L58 15 L65 25" fill="#f1c40f" />
+          <Circle cx="50" cy="45" r="20" fill="#ffe0b2" />
+          <Path d="M30 65 Q50 85 70 65" fill="#e74c3c" />
+          <Rect x="60" y="40" width="20" height="30" fill="#8B4513" rx="2" />
+        </Svg>
+      );
+    case 'guardian':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="48" fill="#f1c40f" stroke="#e67e22" strokeWidth="3" />
+          <Path d="M25 30 Q50 10 75 30 L75 70 Q50 90 25 70 Z" fill="#95a5a6" />
+          <Path d="M45 30 L55 30 L50 70" fill="black" opacity="0.3" />
+          <Path d="M80 40 L95 20" stroke="#95a5a6" strokeWidth="6" />
         </Svg>
       );
     case 'bomb_tower':
@@ -2633,19 +2862,64 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
   // This prevents the responder from being lost when elixir changes
   const handlers = !isNext ? panResponder.panHandlers : {};
   const isLegendary = cardToDisplay.rarity === 'legendary';
+  const isChampion = cardToDisplay.rarity === 'champion';
 
   return (
     <View
       style={[
         styles.card,
-        !isLegendary && { borderColor: RARITY_COLORS[cardToDisplay.rarity] || '#000' },
-        isLegendary && { backgroundColor: 'transparent', borderWidth: 0 },
+        !isLegendary && !isChampion && { borderColor: RARITY_COLORS[cardToDisplay.rarity] || '#000' },
+        (isLegendary || isChampion) && { backgroundColor: 'transparent', borderWidth: 0 },
         isNext && styles.nextCard,
         (!canAfford && !isNext) && styles.disabledCard,
         isDragging && styles.hiddenCard
       ]}
       {...handlers}
     >
+      {isChampion && (
+        <Svg width={isNext ? "40" : "60"} height={isNext ? "50" : "75"} viewBox="0 0 60 75" style={{ position: 'absolute', top: 0, left: 0 }}>
+           <Defs>
+             <LinearGradient id="goldGradient" x1="0" y1="0" x2="1" y2="1">
+               <Stop offset="0%" stopColor="#FFD700" />
+               <Stop offset="50%" stopColor="#f1c40f" />
+               <Stop offset="100%" stopColor="#d4af37" />
+             </LinearGradient>
+             <LinearGradient id="innerBevel" x1="0" y1="0" x2="0" y2="1">
+               <Stop offset="0%" stopColor="#ffffff" stopOpacity="0.3" />
+               <Stop offset="100%" stopColor="#000000" stopOpacity="0.1" />
+             </LinearGradient>
+           </Defs>
+           {/* Shadow/Outline */}
+           <Path 
+             d="M30,0 L56,12 L56,66 L30,75 L4,66 L4,12 Z" 
+             fill="rgba(0,0,0,0.3)" 
+             transform="translate(2,2)"
+           />
+           {/* Main Body - Champion Shape (Pointed top and bottom, but with rounded ornate sides) */}
+           <Path 
+             d="M30,2 L58,16 L58,62 L30,73 L2,62 L2,16 Z" 
+             fill="#ecf0f1" 
+             stroke="url(#goldGradient)" 
+             strokeWidth="3" 
+           />
+           {/* Inner Bevel Detail */}
+           <Path 
+             d="M30,5 L54,18 L54,60 L30,70 L6,60 L6,18 Z" 
+             fill="none" 
+             stroke="url(#innerBevel)" 
+             strokeWidth="1" 
+           />
+           {/* Top "Crown" Gem - The distinctive champion card feature */}
+           <View style={{ position: 'absolute', top: -10, left: 21 }}>
+             <Svg width="18" height="18" viewBox="0 0 20 20">
+               <Rect x="5" y="5" width="10" height="10" fill="#f1c40f" stroke="#d4af37" strokeWidth="2" transform="rotate(45 10 10)" />
+               <Rect x="8" y="8" width="4" height="4" fill="#ffffff" transform="rotate(45 10 10)" opacity="0.8" />
+             </Svg>
+           </View>
+           {/* Golden corners */}
+           <Path d="M2,16 L12,8 M48,8 L58,16" stroke="#f1c40f" strokeWidth="2" />
+        </Svg>
+      )}
       {isLegendary && (
         <Svg width={isNext ? "40" : "60"} height={isNext ? "50" : "75"} viewBox="0 0 60 75" style={{ position: 'absolute', top: 0, left: 0 }}>
           <Defs>
@@ -6614,7 +6888,8 @@ const GameBoard = ({
   isDoubleElixir, showDoubleElixirAlert,
   isOvertime, showOvertimeAlert,
   isTowerDecay, showTowerDecayAlert,
-  audioEnabled, setAudioEnabled, onConcede
+  audioEnabled, setAudioEnabled, onConcede,
+  onActivateAbility
 }) => {
   const [showSettings, setShowSettings] = useState(false);
   const [spellInfoCard, setSpellInfoCard] = useState(null);
@@ -6667,16 +6942,15 @@ const GameBoard = ({
           transform: [{ translateX: shakeAnim }]
         }
       ]}>
-        {/* Top Info Bar (Opponent) */}
         <View style={styles.topInfoBar}>
           <View style={styles.playerInfoContainer}>
             <Text style={styles.playerName}>Trainer Cheddar</Text>
             <Text style={styles.clanName}>Training Camp</Text>
           </View>
-          {/* AI Elixir Bar - Small and subtle */}
           <View style={{ width: 80, height: 10, backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: 5, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }}>
             <View style={{ width: `${(enemyElixir / 10) * 100}%`, height: '100%', backgroundColor: '#D442F5', opacity: 0.7 }} />
-          </View>            </View>
+          </View>
+        </View>
         {/* Score & Time Board */}
         <View style={styles.scoreBoard}>
           <View style={styles.crownContainer}>
@@ -6868,6 +7142,58 @@ const GameBoard = ({
 
       <View style={styles.footerContainer}>
         <View style={styles.deckContainer}>
+        {/* Champion Ability Button */}
+        {(units || []).map(u => {
+           if (!u.isOpponent && u.rarity === 'champion') {
+              const cooldownReady = (Date.now() - (u.lastAbilityTime || 0)) >= u.abilityCooldown;
+              const cost = u.abilityCost || 1;
+              const canAfford = elixir >= cost;
+              const opacity = (cooldownReady && canAfford) ? 1 : 0.5;
+              
+              return (
+                 <TouchableOpacity 
+                    key={`ability-${u.id}`}
+                    style={{
+                       position: 'absolute',
+                       right: 20,
+                       top: -60,
+                       width: 50,
+                       height: 50,
+                       backgroundColor: 'rgba(0,0,0,0.7)',
+                       borderRadius: 25,
+                       justifyContent: 'center',
+                       alignItems: 'center',
+                       borderWidth: 2,
+                       borderColor: '#f1c40f',
+                       opacity: opacity,
+                       zIndex: 20
+                    }}
+                    onPress={() => onActivateAbility(u.id)}
+                    disabled={!cooldownReady || !canAfford}
+                 >
+                    <Text style={{fontSize: 24}}>
+                       {u.spriteId === 'golden_knight' ? '✨' : 
+                        u.spriteId === 'skeleton_king' ? '💀' :
+                        u.spriteId === 'archer_queen' ? '🏹' :
+                        u.spriteId === 'monk' ? '🛡️' :
+                        u.spriteId === 'mighty_miner' ? '💣' :
+                        u.spriteId === 'little_prince' ? '💂' : '⚡'}
+                    </Text>
+                    <View style={{
+                       position: 'absolute',
+                       top: -5, right: -5,
+                       backgroundColor: '#f1c40f',
+                       borderRadius: 10,
+                       width: 20, height: 20,
+                       justifyContent: 'center', alignItems: 'center'
+                    }}>
+                       <Text style={{fontSize: 12, fontWeight: 'bold'}}>{cost}</Text>
+                    </View>
+                 </TouchableOpacity>
+              );
+           }
+           return null;
+        })}
           <View style={styles.nextCardContainer}>
             <Text style={styles.nextLabel}>NEXT</Text>
             {nextCard && <Card card={nextCard} isNext={true} />}
@@ -7021,7 +7347,7 @@ const GameBoard = ({
         onClose={() => setSpellInfoCard(null)}
       />
 
-      {gameOver && <GameOverScreen result={gameOver} onRestart={onRestart} />}
+      {gameOver && <GameOverScreen result={gameOver} onRestart={onRestart} score={score} />}
 
       <StatusBar style="auto" hidden />
     </View>
@@ -7302,7 +7628,8 @@ const FriendlyBattleModal = ({ visible, onClose, socket }) => {
 export default function App() {
   // Main App Entry Point
   const [inGame, setInGame] = useState(false);
-  const [inLobby, setInLobby] = useState(false);
+  const [showBattleStart, setShowBattleStart] = useState(false);
+  const [inLobby, setInLobby] = useState(true);
   const [openingChest, setOpeningChest] = useState(null); // Track chest being opened
   const [friendlyModalVisible, setFriendlyModalVisible] = useState(false); // Friendly battle modal
   const [activeTab, setActiveTab] = useState(2); // Default to Battle tab
@@ -7318,8 +7645,16 @@ export default function App() {
   const [audioEnabled, setAudioEnabled] = useState(true);
   const doubleElixirTriggeredRef = useRef(false);
   const overtimeStartedRef = useRef(false);
-  const towerDecayStartedRef = useRef(false);
-  const socketRef = useRef(null);
+    const towerDecayStartedRef = useRef(false);
+  
+    const triggerBattleStart = () => {
+      setShowBattleStart(true);
+      setTimeout(() => {
+        setShowBattleStart(false);
+      }, 3000);
+    };
+  
+    const socketRef = useRef(null);
 
   // Initialize Socket
   useEffect(() => {
@@ -7333,6 +7668,7 @@ export default function App() {
       resetGame();
       setInLobby(false);
       setInGame(true);
+      triggerBattleStart();
       // Here you would use data.startingPlayer to determine host/client
     });
 
@@ -7444,6 +7780,7 @@ export default function App() {
   const towersRef = useRef(towers);
   const unitsRef = useRef(units);
   const projectilesRef = useRef(projectiles);
+  const elixirRef = useRef(elixir);
   const enemyElixirRef = useRef(enemyElixir);
   const enemyHandRef = useRef(enemyHand);
   const enemyNextCardRef = useRef(enemyNextCard);
@@ -7456,6 +7793,7 @@ export default function App() {
   useEffect(() => { unitsRef.current = units; }, [units]);
   useEffect(() => { projectilesRef.current = projectiles; }, [projectiles]);
   useEffect(() => { scoreRef.current = score; }, [score]);
+  useEffect(() => { elixirRef.current = elixir; }, [elixir]);
   useEffect(() => { enemyElixirRef.current = enemyElixir; }, [enemyElixir]);
   useEffect(() => { enemyHandRef.current = enemyHand; }, [enemyHand]);
   useEffect(() => { enemyNextCardRef.current = enemyNextCard; }, [enemyNextCard]);
@@ -7465,6 +7803,15 @@ export default function App() {
 
   const concedeGame = () => {
     setGameOver('LOSE');
+  };
+
+  const activateChampionAbility = (unitId) => {
+    setUnits(prev => prev.map(u => {
+      if (u.id === unitId) {
+        return { ...u, abilityActiveRequest: true };
+      }
+      return u;
+    }));
   };
 
   const resetGame = (destination = 'game') => {
@@ -7647,7 +7994,18 @@ export default function App() {
 
     setTargetElixir(currentElixir => {
 
-      const costToUse = actualCard.cost;
+      let costToUse = actualCard.cost;
+
+      // Dual Form Logic (Spirit Empress)
+      if (actualCard.dualForm) {
+         if (currentElixir >= 6) {
+            costToUse = 6;
+            const flyingForm = CARDS.find(c => c.id === 'spirit_empress_flying');
+            if (flyingForm) actualCard = flyingForm;
+         } else {
+            costToUse = 3;
+         }
+      }
 
       if (currentElixir < costToUse) return currentElixir;
 
@@ -8241,11 +8599,18 @@ export default function App() {
             attackSpeed: actualCard.attackSpeed, projectile: actualCard.projectile,
 
             targetType: actualCard.targetType,
+            rarity: actualCard.rarity,
+            abilityCost: actualCard.abilityCost,
 
             charge: actualCard.charge ? { active: false, distance: 0, threshold: 2 } : undefined,
             // Champion Properties
             dashChain: actualCard.dashChain || false,
             collectsSouls: actualCard.collectsSouls || false,
+            enchantAbility: actualCard.enchantAbility || false,
+            guardianAbility: actualCard.guardianAbility || false,
+            escapeAbility: actualCard.escapeAbility || false,
+            enchantedUnits: [],
+            attackCount: 0,
             stealthAbility: actualCard.stealthAbility || false,
             reflectAbility: actualCard.reflectAbility || false,
             abilityCooldown: actualCard.abilityCooldown || 0,
@@ -8650,6 +9015,7 @@ export default function App() {
     resetGame();
     setInLobby(false);
     setInGame(true);
+    triggerBattleStart();
     // In a real app, we would set a flag for friendly mode here
   };
 
@@ -8837,6 +9203,7 @@ export default function App() {
       // Collect units to spawn (will be added at the end)
       let unitsToSpawn = [];
       let damageEvents = [];
+      let enchantEvents = [];
       // Spirit card effects
       let healEvents = [];
       let chainEvents = [];
@@ -9018,75 +9385,133 @@ export default function App() {
 
         // CHAMPION ABILITIES
         if (now - (u.lastAbilityTime || 0) >= u.abilityCooldown && u.abilityCooldown > 0) {
-           // Skeleton King
-           if (u.collectsSouls && u.souls > 0) {
-              const spawnCount = u.souls;
-              const spawnCard = CARDS.find(c => c.id === 'skeletons');
-              if (spawnCard) {
-                 const newSkeletons = [];
-                 for(let i=0; i<spawnCount; i++) {
-                    const angle = (i / spawnCount) * Math.PI * 2;
-                    const dist = 30;
-                    newSkeletons.push({
-                        id: Date.now() + i + 20000 + Math.random(),
-                        x: u.x + Math.cos(angle)*dist,
-                        y: u.y + Math.sin(angle)*dist,
-                        hp: spawnCard.hp, maxHp: spawnCard.hp,
-                        isOpponent: u.isOpponent,
-                        speed: spawnCard.speed,
-                        lane: u.lane,
-                        lastAttack: 0,
-                        spriteId: 'skeletons', type: 'ground',
-                        range: spawnCard.range, damage: spawnCard.damage,
-                        attackSpeed: spawnCard.attackSpeed, projectile: null,
-                        spawnTime: now
-                    });
-                 }
-                 unitsToSpawn.push(...newSkeletons);
-                 u.souls = 0; 
-                 u.lastAbilityTime = now;
-                 setVisualEffects(prev => [...prev, {
-                    id: Date.now() + Math.random(),
-                    type: 'skeleton_king_ability',
-                    x: u.x, y: u.y, radius: 60, startTime: now, duration: 1000
-                 }]);
-              }
-           }
-
-           // Archer Queen
-           if (u.stealthAbility && u.lockedTarget) { 
-              u.hidden = { active: true, visibleHp: u.hp };
-              u.rageUntil = now + 3000; 
-              u.lastAbilityTime = now;
-              setVisualEffects(prev => [...prev, {
-                 id: Date.now() + Math.random(),
-                 type: 'queen_cloak',
-                 x: u.x, y: u.y, radius: 40, startTime: now, duration: 500
-              }]);
-           }
-
-           // Monk
-           if (u.reflectAbility && u.lockedTarget) {
-              u.isReflecting = true;
-              u.reflectEndTime = now + 4000;
-              u.lastAbilityTime = now;
-              setVisualEffects(prev => [...prev, {
-                 id: Date.now() + Math.random(),
-                 type: 'monk_protect',
-                 x: u.x, y: u.y, radius: 50, startTime: now, duration: 4000
-              }]);
-           }
+           const cost = u.abilityCost || 0;
+           const currentElixir = u.isOpponent ? enemyElixirRef.current : elixirRef.current;
            
-           // Golden Knight
-           if (u.dashChain && u.lockedTarget) {
-              u.isDashing = true; 
-              u.dashEndTime = now + 500;
-              u.lastAbilityTime = now;
-              setVisualEffects(prev => [...prev, {
-                 id: Date.now() + Math.random(),
-                 type: 'golden_dash',
-                 x: u.x, y: u.y, radius: 40, startTime: now, duration: 500
-              }]);
+           const shouldTrigger = u.isOpponent ? true : u.abilityActiveRequest;
+
+           if (shouldTrigger && currentElixir >= cost) {
+               let abilityUsed = false;
+
+               // Skeleton King
+               if (u.collectsSouls && u.souls > 0) {
+                  const spawnCount = u.souls;
+                  const spawnCard = CARDS.find(c => c.id === 'skeletons');
+                  if (spawnCard) {
+                     const newSkeletons = [];
+                     for(let i=0; i<spawnCount; i++) {
+                        const angle = (i / spawnCount) * Math.PI * 2;
+                        const dist = 30;
+                        newSkeletons.push({
+                            id: Date.now() + i + 20000 + Math.random(),
+                            x: u.x + Math.cos(angle)*dist,
+                            y: u.y + Math.sin(angle)*dist,
+                            hp: spawnCard.hp, maxHp: spawnCard.hp,
+                            isOpponent: u.isOpponent,
+                            speed: spawnCard.speed,
+                            lane: u.lane,
+                            lastAttack: 0,
+                            spriteId: 'skeletons', type: 'ground',
+                            rarity: spawnCard.rarity || 'common',
+                            range: spawnCard.range, damage: spawnCard.damage,
+                            attackSpeed: spawnCard.attackSpeed, projectile: null,
+                            spawnTime: now
+                        });
+                     }
+                     unitsToSpawn.push(...newSkeletons);
+                     u.souls = 0; 
+                     abilityUsed = true;
+                     setVisualEffects(prev => [...prev, {
+                        id: Date.now() + Math.random(),
+                        type: 'skeleton_king_ability',
+                        x: u.x, y: u.y, radius: 60, startTime: now, duration: 1000
+                     }]);
+                  }
+               }
+
+               // Archer Queen
+               else if (u.stealthAbility) { 
+                  u.hidden = { active: true, visibleHp: u.hp };
+                  u.rageUntil = now + 3000; 
+                  abilityUsed = true;
+                  setVisualEffects(prev => [...prev, {
+                     id: Date.now() + Math.random(),
+                     type: 'queen_cloak',
+                     x: u.x, y: u.y, radius: 40, startTime: now, duration: 500
+                  }]);
+               }
+
+               // Monk
+               else if (u.reflectAbility) {
+                  u.isReflecting = true;
+                  u.reflectEndTime = now + 4000;
+                  abilityUsed = true;
+                  setVisualEffects(prev => [...prev, {
+                     id: Date.now() + Math.random(),
+                     type: 'monk_protect',
+                     x: u.x, y: u.y, radius: 50, startTime: now, duration: 4000
+                  }]);
+               }
+               
+               // Golden Knight
+               else if (u.dashChain && u.lockedTarget) {
+                  u.isDashing = true; 
+                  u.dashEndTime = now + 500;
+                  abilityUsed = true;
+                  setVisualEffects(prev => [...prev, {
+                     id: Date.now() + Math.random(),
+                     type: 'golden_dash',
+                     x: u.x, y: u.y, radius: 40, startTime: now, duration: 500
+                  }]);
+               }
+
+               // Mighty Miner
+               else if (u.escapeAbility) {
+                  setVisualEffects(prev => [...prev, {
+                      id: Date.now() + Math.random(),
+                      type: 'fire_explosion',
+                      x: u.x, y: u.y, radius: 60, startTime: now, duration: 1000
+                  }]);
+                  u.x = width - u.x; 
+                  u.lane = u.lane === 'LEFT' ? 'RIGHT' : 'LEFT';
+                  u.lockedTarget = null;
+                  abilityUsed = true;
+               }
+
+               // Little Prince
+               else if (u.guardianAbility) {
+                  const guardianCard = CARDS.find(c => c.id === 'guardian');
+                  if (guardianCard) {
+                      const spawnOffset = u.isOpponent ? 40 : -40;
+                      unitsToSpawn.push({
+                          id: Date.now() + Math.random(),
+                          x: u.x,
+                          y: u.y + spawnOffset,
+                          hp: guardianCard.hp, maxHp: guardianCard.hp,
+                          isOpponent: u.isOpponent,
+                          speed: guardianCard.speed,
+                          lane: u.lane,
+                          spriteId: 'guardian', type: 'ground',
+                          rarity: guardianCard.rarity || 'champion',
+                          range: guardianCard.range, damage: guardianCard.damage,
+                          attackSpeed: guardianCard.attackSpeed,
+                          spawnTime: now,
+                          spawnDamage: guardianCard.spawnDamage,
+                          knockback: 50
+                      });
+                      abilityUsed = true;
+                  }
+               }
+
+               if (abilityUsed) {
+                   u.lastAbilityTime = now;
+                   u.abilityActiveRequest = false;
+                   if (u.isOpponent) {
+                       setEnemyElixir(prev => Math.max(0, prev - cost));
+                   } else {
+                       setElixir(prev => Math.max(0, prev - cost));
+                   }
+               }
            }
         }
 
@@ -9435,6 +9860,29 @@ export default function App() {
               type: 'rage_aura',
               x: u.x, y: u.y, radius: 30, startTime: now, duration: 1000
            }]);
+        }
+
+        // RUNE GIANT: Enchantment Ability
+        if (u.enchantAbility && u.hp > 0) {
+           const sourceUnits = unitsRef.current || [];
+           u.enchantedUnits = (u.enchantedUnits || []).filter(id => sourceUnits.some(unit => unit.id === id && unit.hp > 0));
+           if (u.enchantedUnits.length < 2) {
+              const potentialTargets = sourceUnits.filter(unit => 
+                 unit.isOpponent === u.isOpponent && unit.id !== u.id && unit.hp > 0 &&
+                 unit.type !== 'building' && !unit.isEnchanted
+              );
+              if (potentialTargets.length > 0) {
+                 const target = potentialTargets[0];
+                 enchantEvents.push({ targetId: target.id, enchanterId: u.id });
+                 u.enchantedUnits.push(target.id);
+                 setVisualEffects(prev => [...prev, {
+                    id: Date.now() + Math.random(),
+                    type: 'rune_enchant',
+                    x: u.x, y: u.y, targetId: target.id, targetX: target.x, targetY: target.y,
+                    startTime: now, duration: 600
+                 }]);
+              }
+           }
         }
 
         // GOBLIN MACHINE: Rocket Ability
@@ -9792,27 +10240,24 @@ export default function App() {
               damageToDeal = actualDamage * 2; // Dash deals 2x damage
             }
 
-            // Rune Giant Enhancement - enhanced allies deal bonus damage on every 3rd hit
-            if (u.runeEnhanced && u.runeEnhancedUntil && now < u.runeEnhancedUntil) {
-              const enhancedHits = (u.runeEnhancedHits || 0) + 1;
-              if (enhancedHits % 3 === 0) {
-                // Every 3rd hit deals bonus damage
-                const bonusMultiplier = 1 + (u.runeEnhanceBonus || 0.5);
-                damageToDeal = Math.floor(damageToDeal * bonusMultiplier);
-
-                // Visual effect for bonus hit
-                setVisualEffects(prev => [...prev, {
-                  id: Date.now() + Math.random(),
-                  type: 'rune_enhance',
-                  x: u.x,
-                  y: u.y,
-                  radius: 25,
-                  startTime: Date.now(),
-                  duration: 400
-                }]);
-              }
-              // Update hit counter (will be preserved in return statement)
-              u.runeEnhancedHits = enhancedHits;
+            // Rune Giant Enchantment - bonus damage every 3rd attack
+            if (u.isEnchanted) {
+               // Check if enchanter still alive
+               const enchanter = currentUnits.find(unit => unit.id === u.enchanterId && unit.hp > 0);
+               if (!enchanter) {
+                  u.isEnchanted = false;
+                  u.enchanterId = null;
+               } else {
+                  u.attackCount = (u.attackCount || 0) + 1;
+                  if (u.attackCount % 3 === 0) {
+                     damageToDeal += 220; 
+                     setVisualEffects(prev => [...prev, {
+                        id: Date.now() + Math.random(),
+                        type: 'rune_crit',
+                        x: u.x, y: u.y, radius: 20, startTime: now, duration: 400
+                     }]);
+                  }
+               }
             }
 
             // Inferno Tower Damage Ramp - increases over time
@@ -10747,6 +11192,16 @@ export default function App() {
       });
 
       // Apply collected splash damage events
+      // Apply Rune Giant Enchantments
+      enchantEvents.forEach(event => {
+         currentUnits = currentUnits.map(unit => {
+            if (unit.id === event.targetId) {
+               return { ...unit, isEnchanted: true, enchanterId: event.enchanterId };
+            }
+            return unit;
+         });
+      });
+
       splashEvents.forEach(event => {
         const splashRadius = event.radius || 50;
 
@@ -12748,6 +13203,7 @@ export default function App() {
     resetGame();
     setInLobby(false);
     setInGame(true);
+    triggerBattleStart();
   };
 
   // Render based on navigation state
@@ -12822,6 +13278,7 @@ export default function App() {
         audioEnabled={audioEnabled}
         setAudioEnabled={setAudioEnabled}
         onConcede={concedeGame}
+        onActivateAbility={activateChampionAbility}
       />      {globalDraggingCard && (
         <View style={[styles.dragProxy, {
           position: 'absolute',
@@ -12836,6 +13293,13 @@ export default function App() {
             <Text style={styles.cardName}>{globalDraggingCard.name}</Text>
           </View>
         </View>
+      )}
+
+      {showBattleStart && (
+        <BattleStartScreen 
+          playerName="bigbangsidzrox" 
+          opponentName="HEB" 
+        />
       )}
     </>
   );
