@@ -158,7 +158,7 @@ const CARDS = [
 
   // Troops - Easy
   { id: 'flying_machine', name: 'Flying Machine', cost: 4, color: '#f1c40f', hp: 510, speed: 2, type: 'flying', range: 100, damage: 152, attackSpeed: 1100, projectile: 'bullet', count: 1, rarity: 'rare' },
-  { id: 'wall_breakers', name: 'Wall Breakers', cost: 2, color: '#bdc3c7', hp: 332, speed: 4, type: 'ground', range: 5, damage: 446, attackSpeed: 1000, projectile: null, count: 2, targetType: 'buildings', kamikaze: true, rarity: 'epic' },
+  { id: 'wall_breakers', name: 'Wall Breakers', cost: 2, color: '#bdc3c7', hp: 332, speed: 4, type: 'ground', range: 5, damage: 446, attackSpeed: 1000, projectile: null, count: 2, targetType: 'buildings', kamikaze: true, splash: true, splashRadius: 40, rarity: 'epic' },
   { id: 'skeleton_dragons', name: 'Skel Dragons', cost: 4, color: '#27ae60', hp: 596, speed: 2, type: 'flying', range: 55, damage: 106, attackSpeed: 1800, projectile: 'dragon_fire', count: 2, splash: true, rarity: 'common' },
 
   // Troops - Medium
@@ -7535,38 +7535,38 @@ export default function App() {
 
         setUnits(prev => [...(prev || []), ...newUnits]);
 
-        // Rascals - spawn extra girls after the boy
+        // Rascals - spawn girls instantly behind the boy
         if (actualCard.spawnsExtra && actualCard.extraCount > 0) {
           const extraCard = CARDS.find(c => c.id === actualCard.spawnsExtra);
           if (extraCard) {
-            setTimeout(() => {
-              const extraUnits = [];
-              for (let i = 0; i < actualCard.extraCount; i++) {
-                const angle = (i / actualCard.extraCount) * Math.PI * 2;
-                const distance = 40;
-                const offsetX = Math.cos(angle) * distance;
-                const offsetY = Math.sin(angle) * distance;
-                extraUnits.push({
-                  id: 'rascal_girl_' + Date.now() + '_' + i,
-                  x: x + offsetX,
-                  y: y + offsetY,
-                  hp: extraCard.hp,
-                  maxHp: extraCard.hp,
-                  isOpponent: isOpponent,
-                  speed: extraCard.speed,
-                  lane: x < width / 2 ? 'LEFT' : 'RIGHT',
-                  lastAttack: 0,
-                  spriteId: extraCard.id,
-                  type: extraCard.type,
-                  range: extraCard.range,
-                  damage: extraCard.damage,
-                  attackSpeed: extraCard.attackSpeed,
-                  projectile: extraCard.projectile,
-                  spawnTime: Date.now() - 2000
-                });
-              }
-              setUnits(prev => [...(prev || []), ...extraUnits]);
-            }, 300); // Small delay before girls spawn
+            const extraUnits = [];
+            // Girls spawn behind the boy (towards their own side)
+            // Player's girls spawn below (positive Y offset), opponent's spawn above (negative Y offset)
+            const behindOffset = isOpponent ? -30 : 30;
+
+            for (let i = 0; i < actualCard.extraCount; i++) {
+              // Spread girls horizontally behind the boy
+              const horizontalOffset = (i === 0 ? -20 : 20); // Left girl and right girl
+              extraUnits.push({
+                id: 'rascal_girl_' + Date.now() + '_' + i,
+                x: x + horizontalOffset,
+                y: y + behindOffset,
+                hp: extraCard.hp,
+                maxHp: extraCard.hp,
+                isOpponent: isOpponent,
+                speed: extraCard.speed,
+                lane: x < width / 2 ? 'LEFT' : 'RIGHT',
+                lastAttack: 0,
+                spriteId: extraCard.id,
+                type: extraCard.type,
+                range: extraCard.range,
+                damage: extraCard.damage,
+                attackSpeed: extraCard.attackSpeed,
+                projectile: extraCard.projectile,
+                spawnTime: Date.now() - 2000 // Already ready to attack
+              });
+            }
+            setUnits(prev => [...(prev || []), ...extraUnits]);
           }
         }
 
@@ -8975,6 +8975,17 @@ export default function App() {
 
               // Spirit Cards special effects (AND Battle Ram impact)
               if (u.kamikaze) {
+                // Add splash damage for units with splash (Wall Breakers, Fire Spirits)
+                if (u.splash) {
+                  splashEvents.push({
+                    attacker: u,
+                    targetX: closestTarget.x,
+                    targetY: closestTarget.y,
+                    damage: damageToDeal,
+                    radius: u.splashRadius || 50
+                  });
+                }
+
                 // Fire Spirit - explosion visual (has splash: true)
                 if (u.splash) {
                   setVisualEffects(prev => [...prev, {
@@ -9386,7 +9397,7 @@ export default function App() {
 
       // Apply collected splash damage events
       splashEvents.forEach(event => {
-        const splashRadius = 50;
+        const splashRadius = event.radius || 50;
 
         // For frontal splash (Dark Prince), calculate attack direction angle
         let attackAngle = 0;
