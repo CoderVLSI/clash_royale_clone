@@ -4577,6 +4577,60 @@ const Projectile = ({ type, position }) => {
       </View>
     );
   }
+  if (type === 'boulder') {
+    // Bowler's boulder - large rock
+    const rotation = (Date.now() / 20) % 360;
+    return (
+      <View style={{
+        position: 'absolute',
+        left: position.x - 12,
+        top: position.y - 12,
+        width: 24,
+        height: 24,
+        transform: [{ rotate: `${rotation}deg` }]
+      }}>
+        <Svg width="24" height="24" viewBox="0 0 24 24">
+          {/* Main rock body */}
+          <Circle cx="12" cy="12" r="10" fill="#7f8c8d" stroke="#5d6d7e" strokeWidth="2" />
+          {/* Rock texture - darker patches */}
+          <Circle cx="8" cy="8" r="3" fill="#5d6d7e" opacity="0.7" />
+          <Circle cx="16" cy="14" r="2.5" fill="#5d6d7e" opacity="0.7" />
+          <Circle cx="10" cy="16" r="2" fill="#5d6d7e" opacity="0.7" />
+          {/* Highlight */}
+          <Circle cx="14" cy="8" r="2" fill="#bdc3c7" opacity="0.5" />
+        </Svg>
+      </View>
+    );
+  }
+  if (type === 'axe_boomerang') {
+    // Executioner's axe - double-bladed throwing axe that spins
+    const rotation = (Date.now() / 5) % 360;
+    return (
+      <View style={{
+        position: 'absolute',
+        left: position.x - 15,
+        top: position.y - 15,
+        width: 30,
+        height: 30,
+        transform: [{ rotate: `${rotation}deg` }]
+      }}>
+        <Svg width="30" height="30" viewBox="0 0 30 30">
+          {/* Handle/grip */}
+          <Rect x="13" y="12" width="4" height="6" fill="#8B4513" />
+          {/* Center hub */}
+          <Circle cx="15" cy="15" r="3" fill="#5D4037" stroke="#3E2723" strokeWidth="1" />
+          {/* Left blade */}
+          <Path d="M12 15 Q5 12 3 15 Q5 18 12 15" fill="#9E9E9E" stroke="#616161" strokeWidth="1" />
+          <Path d="M8 13 L6 14 L7 16 Z" fill="#BDBDBD" />
+          {/* Right blade */}
+          <Path d="M18 15 Q25 12 27 15 Q25 18 18 15" fill="#9E9E9E" stroke="#616161" strokeWidth="1" />
+          <Path d="M22 13 L24 14 L23 16 Z" fill="#BDBDBD" />
+          {/* Sharp edges highlight */}
+          <Path d="M3 15 L5 14 M27 15 L25 14" stroke="#E0E0E0" strokeWidth="1" />
+        </Svg>
+      </View>
+    );
+  }
   return <View style={[styles.cannonball, { left: position.x, top: position.y }]} />;
 };
 
@@ -7455,7 +7509,21 @@ export default function App() {
 
             pierce: actualCard.pierce || false,
 
-            givesOpponentElixir: actualCard.givesOpponentElixir || false
+            givesOpponentElixir: actualCard.givesOpponentElixir || false,
+
+            spawnsExtra: actualCard.spawnsExtra || undefined,
+
+            extraCount: actualCard.extraCount || 0,
+
+            revivesAsEgg: actualCard.revivesAsEgg || false,
+
+            eggHp: actualCard.eggHp || 0,
+
+            eggDuration: actualCard.eggDuration || 3000,
+
+            hatchTime: actualCard.hatchDuration ? Date.now() + actualCard.hatchDuration : undefined,
+
+            hatchesInto: actualCard.hatchesInto || undefined
 
           });
 
@@ -7466,6 +7534,41 @@ export default function App() {
         }
 
         setUnits(prev => [...(prev || []), ...newUnits]);
+
+        // Rascals - spawn extra girls after the boy
+        if (actualCard.spawnsExtra && actualCard.extraCount > 0) {
+          const extraCard = CARDS.find(c => c.id === actualCard.spawnsExtra);
+          if (extraCard) {
+            setTimeout(() => {
+              const extraUnits = [];
+              for (let i = 0; i < actualCard.extraCount; i++) {
+                const angle = (i / actualCard.extraCount) * Math.PI * 2;
+                const distance = 40;
+                const offsetX = Math.cos(angle) * distance;
+                const offsetY = Math.sin(angle) * distance;
+                extraUnits.push({
+                  id: 'rascal_girl_' + Date.now() + '_' + i,
+                  x: x + offsetX,
+                  y: y + offsetY,
+                  hp: extraCard.hp,
+                  maxHp: extraCard.hp,
+                  isOpponent: isOpponent,
+                  speed: extraCard.speed,
+                  lane: x < width / 2 ? 'LEFT' : 'RIGHT',
+                  lastAttack: 0,
+                  spriteId: extraCard.id,
+                  type: extraCard.type,
+                  range: extraCard.range,
+                  damage: extraCard.damage,
+                  attackSpeed: extraCard.attackSpeed,
+                  projectile: extraCard.projectile,
+                  spawnTime: Date.now() - 2000
+                });
+              }
+              setUnits(prev => [...(prev || []), ...extraUnits]);
+            }, 300); // Small delay before girls spawn
+          }
+        }
 
         // Miner burrowing visual - dirt going into ground at spawn point (player's bridge)
         if (actualCard.id === 'miner') {
@@ -8170,6 +8273,47 @@ export default function App() {
           }
         }
 
+        // Handle Phoenix Egg hatching
+        if (u.hatchesInto && u.hatchTime && now >= u.hatchTime) {
+          const hatchCard = CARDS.find(c => c.id === u.hatchesInto);
+          if (hatchCard) {
+            unitsToSpawn.push({
+              id: 'phoenix_reborn_' + Date.now(),
+              x: u.x,
+              y: u.y,
+              hp: hatchCard.hp,
+              maxHp: hatchCard.hp,
+              isOpponent: u.isOpponent,
+              speed: hatchCard.speed,
+              type: hatchCard.type,
+              range: hatchCard.range,
+              damage: hatchCard.damage,
+              attackSpeed: hatchCard.attackSpeed,
+              projectile: hatchCard.projectile,
+              lane: u.lane,
+              lastAttack: 0,
+              spriteId: hatchCard.id,
+              spawnTime: Date.now() - 2000,
+              splash: hatchCard.splash,
+              revivesAsEgg: true,
+              eggHp: u.eggHp,
+              eggDuration: u.eggDuration
+            });
+            // Hatch visual effect
+            setVisualEffects(prev => [...prev, {
+              id: Date.now() + Math.random(),
+              type: 'fire_explosion',
+              x: u.x,
+              y: u.y,
+              radius: 60,
+              startTime: Date.now(),
+              duration: 600
+            }]);
+            // Remove the egg
+            return null;
+          }
+        }
+
         // Handle Tesla hidden mechanic
         // In real CR: Tesla has full range/damage at all times
         // When hidden: cannot be targeted by enemies
@@ -8851,6 +8995,19 @@ export default function App() {
                     radius: 40,
                     startTime: Date.now(),
                     duration: 500
+                  }]);
+                }
+
+                // Wall Breakers - building explosion visual
+                if (u.spriteId === 'wall_breakers') {
+                  setVisualEffects(prev => [...prev, {
+                    id: Date.now() + Math.random(),
+                    type: 'fire_explosion', // Building explosion
+                    x: u.x,
+                    y: u.y,
+                    radius: 60,
+                    startTime: Date.now(),
+                    duration: 600
                   }]);
                 }
 
@@ -10662,6 +10819,37 @@ export default function App() {
                 turnsToPig: spawnCard.turnsToPig || false
               });
             }
+          }
+        }
+
+        // Phoenix - revive as egg on death
+        if (deadUnit.revivesAsEgg && deadUnit.eggHp > 0) {
+          const eggCard = CARDS.find(c => c.id === 'phoenix_egg');
+          if (eggCard) {
+            const hatchTime = Date.now() + (deadUnit.eggDuration || 3000);
+            unitsToSpawn.push({
+              id: 'phoenix_egg_' + Date.now(),
+              x: deadUnit.x,
+              y: deadUnit.y,
+              hp: deadUnit.eggHp,
+              maxHp: deadUnit.eggHp,
+              isOpponent: deadUnit.isOpponent,
+              speed: 0,
+              type: 'ground',
+              range: 0,
+              damage: 0,
+              attackSpeed: 0,
+              projectile: null,
+              lane: deadUnit.lane,
+              lastAttack: 0,
+              spriteId: 'phoenix_egg',
+              isToken: true,
+              spawnTime: Date.now(),
+              hatchTime: hatchTime,
+              hatchesInto: 'phoenix',
+              hatchDuration: deadUnit.eggDuration || 3000,
+              revivesAsEgg: false
+            });
           }
         }
 
