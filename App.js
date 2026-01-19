@@ -4455,6 +4455,48 @@ const Projectile = ({ type, position }) => {
       </View>
     );
   }
+  if (type === 'electric_zap') {
+    // Zappies' small electric zap
+    const boltWidth = Math.abs(position.targetX - position.x) + 10;
+    const boltHeight = Math.abs(position.targetY - position.y) + 10;
+    const startX = position.x > position.targetX ? 0 : boltWidth;
+    const startY = 0;
+    const endX = position.x > position.targetX ? boltWidth : 0;
+    const endY = boltHeight;
+
+    // Simple jagged lightning path
+    const segments = 3;
+    let pathD = `M${startX} ${startY}`;
+    for (let i = 1; i < segments; i++) {
+      const x = startX + (endX - startX) * (i / segments) + (Math.random() - 0.5) * 8;
+      const y = startY + (endY - startY) * (i / segments);
+      pathD += ` L${x} ${y}`;
+    }
+    pathD += ` L${endX} ${endY}`;
+
+    return (
+      <View style={{
+        position: 'absolute',
+        left: Math.min(position.x, position.targetX) - 5,
+        top: Math.min(position.y, position.targetY) - 5,
+        width: boltWidth,
+        height: boltHeight,
+      }}>
+        <Svg width="100%" height="100%" viewBox={`0 0 ${boltWidth} ${boltHeight}`}>
+          <Path
+            d={pathD}
+            stroke="#FFFF00"
+            strokeWidth="3"
+            fill="none"
+            opacity="1"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <Circle cx={endX} cy={endY} r="8" fill="#FFFF00" opacity="0.5" />
+        </Svg>
+      </View>
+    );
+  }
   if (type === 'bomb') {
     // Black round bomb for Bomber
     return (
