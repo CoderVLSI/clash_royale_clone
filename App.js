@@ -5951,6 +5951,7 @@ const GameBoard = ({
   spawnTestEnemy, formatTime, onRestart, score,
   isDoubleElixir, showDoubleElixirAlert,
   isOvertime, showOvertimeAlert,
+  isTowerDecay, showTowerDecayAlert,
   audioEnabled, setAudioEnabled, onConcede
 }) => {
   const [showSettings, setShowSettings] = useState(false);
@@ -6156,6 +6157,16 @@ const GameBoard = ({
           <View style={styles.overtimeAlertContent}>
             <Text style={styles.overtimeAlertTitle}>⚔️ OVERTIME! ⚔️</Text>
             <Text style={styles.overtimeAlertSubtitle}>Sudden Death - First tower wins!</Text>
+          </View>
+        </View>
+      )}
+
+      {/* Tower Decay Alert */}
+      {showTowerDecayAlert && (
+        <View style={styles.towerDecayAlert}>
+          <View style={styles.towerDecayAlertContent}>
+            <Text style={styles.towerDecayAlertTitle}>💀 TOWER DECAY! 💀</Text>
+            <Text style={styles.towerDecayAlertSubtitle}>Towers losing HP - First to fall loses!</Text>
           </View>
         </View>
       )}
@@ -6600,9 +6611,12 @@ export default function App() {
   const [showDoubleElixirAlert, setShowDoubleElixirAlert] = useState(false);
   const [isOvertime, setIsOvertime] = useState(false);
   const [showOvertimeAlert, setShowOvertimeAlert] = useState(false);
+  const [isTowerDecay, setIsTowerDecay] = useState(false);
+  const [showTowerDecayAlert, setShowTowerDecayAlert] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(true);
   const doubleElixirTriggeredRef = useRef(false);
   const overtimeStartedRef = useRef(false);
+  const towerDecayStartedRef = useRef(false);
   const socketRef = useRef(null);
 
   // Initialize Socket
@@ -6758,8 +6772,11 @@ export default function App() {
     setShowDoubleElixirAlert(false);
     setIsOvertime(false);
     setShowOvertimeAlert(false);
+    setIsTowerDecay(false);
+    setShowTowerDecayAlert(false);
     doubleElixirTriggeredRef.current = false;
     overtimeStartedRef.current = false;
+    towerDecayStartedRef.current = false;
 
     // Player Deck Randomization
     const currentDeck = userCards || allDecks[0];
@@ -7948,9 +7965,13 @@ export default function App() {
           const currentTowers = towersRef.current || [];
           const playerTowersStanding = currentTowers.filter(t => !t.isOpponent && t.hp > 0).length;
           const opponentTowersStanding = currentTowers.filter(t => t.isOpponent && t.hp > 0).length;
+          const playerTowersDestroyed = currentTowers.filter(t => !t.isOpponent && t.hp <= 0).length;
+          const opponentTowersDestroyed = currentTowers.filter(t => t.isOpponent && t.hp <= 0).length;
 
-          // If tied and overtime hasn't started, enter overtime
-          if (playerTowersStanding === opponentTowersStanding && !overtimeStartedRef.current) {
+          // If tied and no towers destroyed, and neither overtime nor tower decay started
+          if (playerTowersStanding === opponentTowersStanding &&
+              playerTowersDestroyed === 0 && opponentTowersDestroyed === 0 &&
+              !overtimeStartedRef.current && !towerDecayStartedRef.current) {
             overtimeStartedRef.current = true;
             setIsOvertime(true);
             setShowOvertimeAlert(true);
@@ -7958,7 +7979,18 @@ export default function App() {
             return 60; // 60 seconds of overtime
           }
 
-          // Overtime just ended or already was in overtime
+          // If overtime just ended and still tied with no towers destroyed
+          if (overtimeStartedRef.current && !towerDecayStartedRef.current &&
+              playerTowersStanding === opponentTowersStanding &&
+              playerTowersDestroyed === opponentTowersDestroyed) {
+            towerDecayStartedRef.current = true;
+            setIsTowerDecay(true);
+            setShowTowerDecayAlert(true);
+            setTimeout(() => setShowTowerDecayAlert(false), 3000);
+            return -1; // Negative time indicates tower decay phase
+          }
+
+          // Tower decay phase ended or game should end
           clearInterval(timer);
           checkWinner();
           return 0;
@@ -8021,6 +8053,36 @@ export default function App() {
       // best to be safe if we were using refs for score. But here we use functional state updates elsewhere.
       // Actually, we can just update it.
       setScore([destroyedOpponentTowers, destroyedPlayerTowers]);
+
+      // TOWER DECAY PHASE: Towers lose HP automatically at same pace
+      if (towerDecayStartedRef.current) {
+        const TOWER_DECAY_RATE = 50; // HP lost per tick (adjust for balance)
+        let towerDestroyedThisFrame = false;
+
+        nextTowers = nextTowers.map(tower => {
+          if (tower.hp > 0) {
+            const newHp = Math.max(0, tower.hp - TOWER_DECAY_RATE);
+            if (newHp === 0 && tower.hp > 0) {
+              towerDestroyedThisFrame = true;
+              // Tower destroyed - opponent wins
+              if (tower.isOpponent) {
+                setGameOver('VICTORY');
+              } else {
+                setGameOver('DEFEAT');
+              }
+            }
+            return { ...tower, hp: newHp };
+          }
+          return tower;
+        });
+
+        if (towerDestroyedThisFrame) {
+          setTowers(nextTowers);
+          return; // Game over, exit loop
+        }
+
+        setTowers(nextTowers);
+      }
 
       let nextProjectiles = [...projectilesRef.current];
 
@@ -11465,6 +11527,8 @@ export default function App() {
         showDoubleElixirAlert={showDoubleElixirAlert}
         isOvertime={isOvertime}
         showOvertimeAlert={showOvertimeAlert}
+        isTowerDecay={isTowerDecay}
+        showTowerDecayAlert={showTowerDecayAlert}
         audioEnabled={audioEnabled}
         setAudioEnabled={setAudioEnabled}
         onConcede={concedeGame}
@@ -13503,6 +13567,44 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   overtimeAlertSubtitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  // --- Tower Decay Alert Styles ---
+  towerDecayAlert: {
+    position: 'absolute',
+    top: 100,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2000,
+  },
+  towerDecayAlertContent: {
+    backgroundColor: 'rgba(155, 89, 182, 0.95)',
+    paddingHorizontal: 30,
+    paddingVertical: 15,
+    borderRadius: 15,
+    borderWidth: 3,
+    borderColor: '#8e44ad',
+    shadowColor: '#9b59b6',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1,
+    shadowRadius: 15,
+    elevation: 10,
+    alignItems: 'center',
+  },
+  towerDecayAlertTitle: {
+    fontSize: 32,
+    fontWeight: '900',
+    color: '#fff',
+    textShadowColor: '#8e44ad',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 4,
+    marginBottom: 5,
+  },
+  towerDecayAlertSubtitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#fff',
