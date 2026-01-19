@@ -2330,6 +2330,16 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Path d="M80 40 L95 20" stroke="#95a5a6" strokeWidth="6" />
         </Svg>
       );
+    case 'bomb':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="55" r="40" fill="#2c3e50" stroke="#1a1a1a" strokeWidth="2" />
+          <Rect x="45" y="10" width="10" height="15" fill="#1a1a1a" />
+          <Path d="M50 10 Q60 0 70 10" stroke="#f1c40f" strokeWidth="2" fill="none" />
+          <Circle cx="70" cy="10" r="3" fill="#e67e22" />
+          <Circle cx="40" cy="45" r="5" fill="white" opacity="0.2" />
+        </Svg>
+      );
     case 'bomb_tower':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
@@ -9283,7 +9293,7 @@ export default function App() {
               // My data says Ice Spirit splash: true. So handled above.
               // What about non-splash spirits? (None currently).
               // Just in case:
-              if (target.id >= 100) { // Unit
+              if (typeof target.id === 'string' || target.id >= 10) { // Unit
                 damageEvents.push({ targetId: target.id, damage: damage, attackerId: u.id });
               } else { // Tower
                 // Modify tower directly in nextTowers? Can't do that easily here as we are iterating units.
@@ -10511,8 +10521,8 @@ export default function App() {
               };
             } else {
               // Melee attack - apply damage directly
-              // Check if target is a tower (id < 100) or a unit (id >= 100)
-              if (closestTarget.id < 100) {
+              // Check if target is a tower (id < 10) or a unit (id >= 10 or string)
+              if (typeof closestTarget.id !== 'string' && closestTarget.id < 10) {
                 // Target is a tower
                 const targetIndex = nextTowers.findIndex(t => t.id === closestTarget.id);
                 if (targetIndex !== -1) {
@@ -11533,7 +11543,7 @@ export default function App() {
         let targetY = p.targetY;
 
         if (!p.isSpell) {
-          const isTargetTower = p.targetId < 100;
+          const isTargetTower = typeof p.targetId !== 'string' && p.targetId < 10;
           if (isTargetTower) {
             const target = nextTowers.find(t => t.id === p.targetId);
             if (target) {
@@ -11625,7 +11635,7 @@ export default function App() {
                 // HIT!
                 hitIds.push(t.id);
                 // Apply damage immediately (since we want to hit multiple targets in one frame possibly)
-                if (t.id < 100) {
+                if (typeof t.id !== 'string' && t.id < 10) {
                   const tIndex = nextTowers.findIndex(tow => tow.id === t.id);
                   if (tIndex !== -1) nextTowers[tIndex].hp -= p.damage;
                 } else {
@@ -12346,7 +12356,7 @@ export default function App() {
             }
 
             // Also damage towers (primary target)
-            if (h.targetId < 100) {
+            if (typeof h.targetId !== 'string' && h.targetId < 10) {
               const tIndex = nextTowers.findIndex(t => t.id === h.targetId);
               if (tIndex !== -1) {
                 const tower = nextTowers[tIndex];
