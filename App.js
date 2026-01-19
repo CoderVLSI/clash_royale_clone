@@ -87,7 +87,7 @@ const CARDS = [
 
   // Spirit Cards - All cost 1 Elixir and die when they attack
   { id: 'fire_spirit', name: 'Fire Spirit', cost: 1, color: '#e74c3c', hp: 230, speed: 4, type: 'ground', range: 25, damage: 207, attackSpeed: 1000, projectile: null, count: 1, splash: true, rarity: 'common', kamikaze: true },
-  { id: 'ice_spirit', name: 'Ice Spirit', cost: 1, color: '#E8F4F8', hp: 230, speed: 4, type: 'ground', range: 25, damage: 110, attackSpeed: 1000, projectile: null, count: 1, splash: true, stun: 0.5, rarity: 'common', kamikaze: true },
+  { id: 'ice_spirit', name: 'Ice Spirit', cost: 1, color: '#E8F4F8', hp: 230, speed: 4, type: 'ground', range: 25, damage: 110, attackSpeed: 1000, projectile: null, count: 1, splash: true, freezeDuration: 1, rarity: 'common', kamikaze: true },
   { id: 'electro_spirit', name: 'Electro Spirit', cost: 1, color: '#9b59b6', hp: 230, speed: 4, type: 'ground', range: 25, damage: 99, attackSpeed: 1000, projectile: null, count: 1, chain: 9, stun: 0.5, rarity: 'common', kamikaze: true },
   { id: 'heal_spirit', name: 'Heal Spirit', cost: 1, color: '#FFD700', hp: 450, speed: 5, type: 'ground', range: 25, damage: 0, attackSpeed: 1000, projectile: null, count: 1, splash: true, rarity: 'rare', kamikaze: true, healsOnAttack: 700, healRadius: 60 },
 
@@ -173,7 +173,13 @@ const CARDS = [
   { id: 'cannon_cart', name: 'Cannon Cart', cost: 5, color: '#7f8c8d', hp: 696, shieldHp: 590, speed: 2.5, type: 'ground', range: 70, damage: 202, attackSpeed: 1200, projectile: 'cannonball', count: 1, rarity: 'epic', hasShield: true, transformsToBuilding: true },
   { id: 'goblin_drill', name: 'Goblin Drill', cost: 4, color: '#2ecc71', hp: 1200, speed: 2, type: 'ground', range: 25, damage: 100, attackSpeed: 1000, projectile: null, count: 1, lifetime: 20, targetType: 'buildings', spawns: 'sword_goblins', spawnRate: 1.1, spawnCount: 1, rarity: 'epic', deployAnywhere: true, deathSpawns: 'sword_goblins', deathSpawnCount: 3, burrows: true },
   { id: 'phoenix', name: 'Phoenix', cost: 4, color: '#e74c3c', hp: 1000, speed: 2.5, type: 'flying', range: 50, damage: 200, attackSpeed: 1600, projectile: 'phoenix_fire', count: 1, splash: true, rarity: 'legendary', revivesAsEgg: true, eggHp: 800, eggDuration: 3000 },
-  { id: 'phoenix_egg', name: 'Phoenix Egg', cost: 0, color: '#f39c12', hp: 800, speed: 0, type: 'ground', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, rarity: 'legendary', isToken: true, hatchesInto: 'phoenix', hatchDuration: 3000 }
+  { id: 'phoenix_egg', name: 'Phoenix Egg', cost: 0, color: '#f39c12', hp: 800, speed: 0, type: 'ground', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, rarity: 'legendary', isToken: true, hatchesInto: 'phoenix', hatchDuration: 3000 },
+
+  // NEW REQUESTED CARDS
+  { id: 'fisherman', name: 'Fisherman', cost: 3, color: '#3498db', hp: 720, speed: 1.5, type: 'ground', range: 60, damage: 160, attackSpeed: 1300, projectile: 'hook', count: 1, rarity: 'legendary', pull: true, groundOnly: true },
+  { id: 'goblin_curse', name: 'Goblin Curse', cost: 2, color: '#9b59b6', type: 'spell', damage: 25, radius: 50, count: 1, duration: 6, rarity: 'epic', appliesCurse: true },
+  { id: 'void', name: 'Void', cost: 3, color: '#8e44ad', type: 'spell', damage: 0, radius: 50, count: 1, duration: 4, rarity: 'epic', isVoid: true },
+  { id: 'goblin_gang', name: 'Goblin Gang', cost: 3, color: '#2ecc71', hp: 202, speed: 3, type: 'ground', range: 25, damage: 120, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common', spawnsExtra: 'spear_goblins', extraCount: 2, spawnUnitId: 'sword_goblins' }
 ];
 
 const RARITY_COLORS = {
@@ -1900,6 +1906,52 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Circle cx="75" cy="30" r="5" fill="white" />
         </Svg>
       );
+    case 'fisherman':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          {/* Fisherman Hat */}
+          <Path d="M20 40 Q50 10 80 40" fill="#f1c40f" />
+          <Rect x="20" y="40" width="60" height="10" fill="#f1c40f" />
+          {/* Beard */}
+          <Path d="M30 60 Q50 85 70 60" fill="#2c3e50" />
+          {/* Anchor/Hook */}
+          <Path d="M70 50 L90 50 M90 40 L90 60" stroke="#7f8c8d" strokeWidth="4" />
+        </Svg>
+      );
+    case 'goblin_gang':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+           <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+           {/* Three Goblin Heads */}
+           <Circle cx="35" cy="45" r="15" fill="#2ecc71" stroke="#27ae60" strokeWidth="1" />
+           <Circle cx="65" cy="45" r="15" fill="#2ecc71" stroke="#27ae60" strokeWidth="1" />
+           <Circle cx="50" cy="65" r="15" fill="#2ecc71" stroke="#27ae60" strokeWidth="1" />
+           {/* Spears/Knives */}
+           <Path d="M20 30 L30 40 M80 30 L70 40" stroke="#bdc3c7" strokeWidth="2" />
+        </Svg>
+      );
+    case 'goblin_curse':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#9b59b6" stroke="white" strokeWidth="2" />
+          {/* Curse Skull */}
+          <Circle cx="50" cy="50" r="25" fill="#2c3e50" />
+          <Circle cx="40" cy="45" r="5" fill="#9b59b6" />
+          <Circle cx="60" cy="45" r="5" fill="#9b59b6" />
+          <Path d="M40 65 Q50 55 60 65" stroke="#9b59b6" strokeWidth="2" fill="none" />
+        </Svg>
+      );
+    case 'void':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#8e44ad" stroke="white" strokeWidth="2" />
+          {/* Void Swirl */}
+          <Circle cx="50" cy="50" r="30" fill="black" opacity="0.8" />
+          <Circle cx="50" cy="50" r="20" fill="#8e44ad" opacity="0.5" />
+          <Path d="M50 20 L50 80 M20 50 L80 50" stroke="#D442F5" strokeWidth="2" opacity="0.6" />
+        </Svg>
+      );
     case 'bomb_tower':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
@@ -2434,6 +2486,25 @@ const VisualEffects = ({ effects, setEffects }) => {
       {activeEffects.map(effect => {
         const progress = (now - effect.startTime) / effect.duration; // 0 to 1
         const opacity = 1 - progress; // Fade out
+
+        if (effect.type === 'void_hit') {
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * progress} fill="#D442F5" opacity={0.6} />
+              </Svg>
+            </View>
+          );
+        }
 
         if (effect.type === 'fire_explosion') {
           // Fire explosion - expanding orange/red circle
@@ -4196,13 +4267,41 @@ const Projectile = ({ type, position }) => {
       </View>
     );
   }
-  if (type === 'poison_spell' || type === 'rage_spell') {
-    // Orange Graveyard-style spell for Poison, Purple for Rage
+  if (type === 'hook') {
+    return (
+      <View style={{
+        position: 'absolute',
+        left: position.x - 10,
+        top: position.y - 10,
+        width: 20,
+        height: 20,
+        transform: [{ rotate: `${angleDeg}deg` }]
+      }}>
+        <Svg width="20" height="20" viewBox="0 0 20 20">
+           <Path d="M2 10 L18 10 M14 5 L18 10 L14 15" stroke="#95a5a6" strokeWidth="3" fill="none" />
+        </Svg>
+      </View>
+    );
+  }
+  if (type === 'poison_spell' || type === 'rage_spell' || type === 'void_zone' || type === 'goblin_curse_zone') {
     const isRage = type === 'rage_spell';
-    const mainColor = isRage ? "rgba(155, 89, 182, 0.4)" : "rgba(255, 140, 0, 0.4)";
-    const strokeColor = isRage ? "#8e44ad" : "#FF8C00";
+    const isVoid = type === 'void_zone';
+    const isCurse = type === 'goblin_curse_zone';
+    
+    let mainColor = "rgba(255, 140, 0, 0.4)";
+    let strokeColor = "#FF8C00";
+    
+    if (isRage) {
+        mainColor = "rgba(155, 89, 182, 0.4)";
+        strokeColor = "#8e44ad";
+    } else if (isVoid) {
+        mainColor = "rgba(142, 68, 173, 0.6)"; 
+        strokeColor = "#D442F5";
+    } else if (isCurse) {
+        mainColor = "rgba(46, 204, 113, 0.4)"; 
+        strokeColor = "#27ae60";
+    }
 
-    // Use dynamic radius from spell data (default to 50 if undefined)
     const spellRadius = position.radius || 50;
     const diameter = spellRadius * 2;
 
@@ -4212,37 +4311,37 @@ const Projectile = ({ type, position }) => {
           <Circle cx={spellRadius} cy={spellRadius} r={spellRadius - 2} fill={mainColor} stroke={strokeColor} strokeWidth="2" />
 
           {isRage ? (
-            // Rage Spell Visuals - Anger symbol / Energy
-            <>
-              <Circle cx={spellRadius} cy={spellRadius} r={spellRadius * 0.7} fill="none" stroke="#9b59b6" strokeWidth="2" strokeDasharray="5 5" opacity="0.6" />
-            </>
+            <Circle cx={spellRadius} cy={spellRadius} r={spellRadius * 0.7} fill="none" stroke="#9b59b6" strokeWidth="2" strokeDasharray="5 5" opacity="0.6" />
+          ) : isVoid ? (
+             <>
+               {/* Black hole core */}
+               <Circle cx={spellRadius} cy={spellRadius} r={spellRadius * 0.4} fill="black" />
+               {/* Dark purple glow */}
+               <Circle cx={spellRadius} cy={spellRadius} r={spellRadius * 0.6} fill="none" stroke="#4a148c" strokeWidth="4" opacity={0.7} />
+               {/* Outer ripple */}
+               <Circle cx={spellRadius} cy={spellRadius} r={spellRadius * 0.8} fill="none" stroke="#D442F5" strokeWidth="2" strokeDasharray="10 5" opacity={0.4} />
+               {/* Swirl effect */}
+               <Path 
+                 d={`M${spellRadius} ${spellRadius*0.2} Q${spellRadius*1.8} ${spellRadius*0.5} ${spellRadius} ${spellRadius*1.8}`} 
+                 stroke="#D442F5" strokeWidth="2" fill="none" opacity={0.3} 
+               />
+               <Path 
+                 d={`M${spellRadius*0.2} ${spellRadius} Q${spellRadius*0.5} ${spellRadius*1.8} ${spellRadius*1.8} ${spellRadius}`} 
+                 stroke="#D442F5" strokeWidth="2" fill="none" opacity={0.3} 
+               />
+             </>
+          ) : isCurse ? (
+             <Circle cx={spellRadius} cy={spellRadius} r={spellRadius * 0.6} fill="none" stroke="#27ae60" strokeWidth="2" strokeDasharray="4 4" />
           ) : (
-            // Poison Spell Visuals - Skulls/Bubbles (scaled positions)
             <>
               <Circle cx={spellRadius * 0.7} cy={spellRadius * 0.8} r={spellRadius * 0.12} fill="white" opacity="0.8" />
               <Circle cx={spellRadius * 0.66} cy={spellRadius * 0.8} r={spellRadius * 0.03} fill="black" />
               <Circle cx={spellRadius * 0.74} cy={spellRadius * 0.8} r={spellRadius * 0.03} fill="black" />
-
-              <Circle cx={spellRadius * 1.3} cy={spellRadius * 1.2} r={spellRadius * 0.12} fill="white" opacity="0.8" />
-              <Circle cx={spellRadius * 1.26} cy={spellRadius * 1.2} r={spellRadius * 0.03} fill="black" />
-              <Circle cx={spellRadius * 1.34} cy={spellRadius * 1.2} r={spellRadius * 0.03} fill="black" />
-
-              <Circle cx={spellRadius} cy={spellRadius * 0.6} r={spellRadius * 0.1} fill="white" opacity="0.8" />
-              <Circle cx={spellRadius * 0.96} cy={spellRadius * 0.6} r={spellRadius * 0.03} fill="black" />
-              <Circle cx={spellRadius * 1.04} cy={spellRadius * 0.6} r={spellRadius * 0.03} fill="black" />
             </>
           )}
         </Svg>
         {isRage && (
-          <Text style={{
-            position: 'absolute',
-            left: spellRadius * 0.5,
-            top: spellRadius * 0.4,
-            fontSize: spellRadius * 0.6,
-            color: '#8e44ad',
-            opacity: 0.8,
-            textAlign: 'center'
-          }}>😡</Text>
+          <Text style={{ position: 'absolute', left: spellRadius * 0.5, top: spellRadius * 0.4, fontSize: spellRadius * 0.6, color: '#8e44ad', opacity: 0.8, textAlign: 'center' }}>😡</Text>
         )}
       </View>
     );
@@ -7330,6 +7429,25 @@ export default function App() {
           // NOTE: Snowball travels as projectile - damage handled in projectile hit code
           // No instant handler needed here
 
+        } else if (actualCard.id === 'goblin_curse') {
+          // Goblin Curse - applies cursed status
+          setProjectiles(prev => [...prev, {
+            id: Date.now(), x: x, y: y, targetX: x, targetY: y,
+            speed: 0, damage: actualCard.damage, radius: actualCard.radius,
+            type: 'goblin_curse_zone', isSpell: true, hit: true, spawnTime: Date.now(),
+            duration: actualCard.duration || 6, isOpponent, appliesCurse: true
+          }]);
+
+        } else if (actualCard.id === 'void') {
+           // Void - damage scales with fewer targets
+           setProjectiles(prev => [...prev, {
+            id: Date.now(), x: x, y: y, targetX: x, targetY: y,
+            speed: 0, damage: actualCard.damage, radius: actualCard.radius,
+            type: 'void_zone', isSpell: true, hit: true, spawnTime: Date.now(),
+            duration: actualCard.duration || 4, isOpponent, isVoid: true,
+            lastTick: 0
+           }]);
+
         } else if (actualCard.id === 'tornado') {
           // Tornado spell - pull enemies toward center
           const tornadoRadius = actualCard.radius || 60;
@@ -7505,7 +7623,7 @@ export default function App() {
 
             isOpponent, speed: actualCard.speed, lane: unitLane,
 
-            lastAttack: 0, spriteId: actualCard.id, type: actualCard.type,
+            lastAttack: 0, spriteId: actualCard.spawnUnitId || actualCard.id, type: actualCard.type,
 
             range: actualCard.range, damage: actualCard.damage,
 
@@ -8694,8 +8812,8 @@ export default function App() {
             !targetUnit.hidden?.active && // Untargetable if hidden (Royal Ghost, Tesla)
             !targetUnit.isZone && // Cannot target zones (graveyard, etc.)
             // Ground melee units cannot target flying units, but ranged units can
-            // EXCEPTION: X-Bow targets ground ONLY despite having projectile
-            (u.type === 'flying' || (u.projectile && u.spriteId !== 'x_bow') || targetUnit.type !== 'flying')
+            // EXCEPTION: X-Bow and Fisherman target ground ONLY despite having projectile
+            (u.type === 'flying' || (u.projectile && u.spriteId !== 'x_bow' && !u.groundOnly) || targetUnit.type !== 'flying')
           );
 
           // Check if any tower is in range
@@ -8873,7 +8991,7 @@ export default function App() {
             if (u.damageRamp) {
               const timeRamping = (now - u.lastDamageRampTime) / 1000;
               u.currentDamageBonus = Math.min(350, timeRamping * 60); // Slower ramp, cap at +350
-              damageToDeal = actualDamage + u.currentDamageBonus;
+              damageToDeal = Math.floor(actualDamage + u.currentDamageBonus); // Use integer damage
             }
 
             // Hunter Shotgun Spread - damage falls off with distance
@@ -8907,8 +9025,16 @@ export default function App() {
                 if (u.shotgunSpread) {
                   // Hunter fires 10 bullets in a cone
                   const baseAngle = Math.atan2(target.y - u.y, target.x - u.x);
+
+                  // Calculate distance to target for dynamic spread
+                  const distToTarget = Math.sqrt(Math.pow(target.x - u.x, 2) + Math.pow(target.y - u.y, 2));
+
+                  // Reduce spread at closer range - tighter when close, wider when far
+                  // At close range (30): spread = 0.04, At long range (150): spread = 0.15
+                  const dynamicSpread = 0.04 + (distToTarget / 150) * 0.11;
+
                   for (let i = -4; i <= 5; i++) {
-                    const angle = baseAngle + (i * 0.15); // spread
+                    const angle = baseAngle + (i * dynamicSpread); // Dynamic spread based on distance
                     const tX = u.x + Math.cos(angle) * 150;
                     const tY = u.y + Math.sin(angle) * 150;
 
@@ -8957,6 +9083,18 @@ export default function App() {
                       isOpponent: u.isOpponent
                     });
                   }
+                } else if (u.projectile === 'hook') {
+                    nextProjectiles.push({
+                      id: now + Math.random(),
+                      x: u.x, y: u.y,
+                      targetId: target.id, targetX: target.x, targetY: target.y,
+                      speed: 20,
+                      damage: damageToDeal,
+                      type: 'hook',
+                      attackerId: u.id,
+                      isOpponent: u.isOpponent,
+                      pull: true
+                    });
                 } else {
                   nextProjectiles.push({
                     id: now + Math.random() + target.id,
@@ -9242,22 +9380,46 @@ export default function App() {
                   }]);
                 }
 
-                // Ice Spirit - freeze visual
-                if (u.stun && u.stun > 0) {
-                  damageEvents.push({
-                    targetId: closestTarget.id,
-                    damage: damageToDeal,
-                    attackerId: u.id,
-                    stun: u.stun
+                // Ice Spirit - freeze effect (same as Freeze spell)
+                if (u.freezeDuration && u.freezeDuration > 0) {
+                  const freezeRadius = 50; // Small freeze radius
+                  const freezeDurationMs = u.freezeDuration * 1000;
+
+                  // Freeze all enemy units in radius (damage handled by splash event)
+                  setUnits(prevUnits => {
+                    return prevUnits.map(enemy => {
+                      if (enemy.isOpponent !== u.isOpponent && enemy.hp > 0) {
+                        const dist = Math.sqrt(Math.pow(enemy.x - closestTarget.x, 2) + Math.pow(enemy.y - closestTarget.y, 2));
+                        if (dist <= freezeRadius) {
+                          return { ...enemy, freezeUntil: Date.now() + freezeDurationMs };
+                        }
+                      }
+                      return enemy;
+                    });
                   });
+
+                  // Also freeze enemy towers in radius (damage handled by splash event)
+                  setTowers(prevTowers => {
+                    return prevTowers.map(tower => {
+                      if (tower.isOpponent !== u.isOpponent && tower.hp > 0) {
+                        const dist = Math.sqrt(Math.pow(tower.x - closestTarget.x, 2) + Math.pow(tower.y - closestTarget.y, 2));
+                        if (dist <= freezeRadius + 20) {
+                          return { ...tower, freezeUntil: Date.now() + freezeDurationMs };
+                        }
+                      }
+                      return tower;
+                    });
+                  });
+
+                  // Freeze spell visual effect
                   setVisualEffects(prev => [...prev, {
                     id: Date.now() + Math.random(),
-                    type: 'ice_freeze',
+                    type: 'freeze_spell',
                     x: closestTarget.x,
                     y: closestTarget.y,
-                    radius: 40,
+                    radius: freezeRadius,
                     startTime: Date.now(),
-                    duration: 800
+                    duration: 1500
                   }]);
                 }
 
@@ -9576,10 +9738,14 @@ export default function App() {
             u.currentDamageBonus = 0;
           }
 
+          // Clamp position to map bounds - prevent units from walking out
+          const clampedX = Math.max(10, Math.min(width - 10, nextX));
+          const clampedY = Math.max(10, Math.min(height - 10, nextY));
+
           return {
             ...u,
-            x: nextX,
-            y: nextY,
+            x: clampedX,
+            y: clampedY,
             hidden: u.hidden,
             charge: u.charge,
             lockedTarget: u.lockedTarget,
@@ -10557,6 +10723,26 @@ export default function App() {
                   updatedUnit.slowAmount = h.slow;
                 }
 
+                // Apply pull effect (Fisherman)
+                if (h.pull && h.attackerId) {
+                   const attacker = currentUnits.find(att => att.id === h.attackerId);
+                   if (attacker) {
+                       const pullDistance = 150; // Strong pull
+                       const angle = Math.atan2(attacker.y - u.y, attacker.x - u.x);
+                       const dist = Math.sqrt(Math.pow(attacker.x - u.x, 2) + Math.pow(attacker.y - u.y, 2));
+                       // Pull all the way to attacker (minus offset)
+                       const actualPull = Math.min(dist - 30, pullDistance); 
+                       
+                       const newX = u.x + Math.cos(angle) * actualPull;
+                       const newY = u.y + Math.sin(angle) * actualPull;
+                       
+                       updatedUnit.x = newX;
+                       updatedUnit.y = newY;
+                       updatedUnit.wasPushed = true;
+                       updatedUnit.stunUntil = now + 1000;
+                   }
+                }
+
                 // Electro Giant Shock Aura - if attacker is in Electro Giant's aura, shock them
                 if (h.attackerId) {
                   // Find all Electro Giants and check if attacker is in their aura
@@ -10761,7 +10947,7 @@ export default function App() {
           if (p.keepVisual && p.type === 'tesla_lightning') {
             return (now - Math.floor(p.id)) < 150;
           }
-          if (p.isPoison || p.isRage || p.isTornado) {
+          if (p.isPoison || p.isRage || p.isTornado || p.isVoid || p.appliesCurse) {
             return ((now - p.spawnTime) / 1000 < p.duration);
           }
           return !p.hit;
@@ -10821,6 +11007,56 @@ export default function App() {
             return unit;
           });
         });
+
+        // Process Void Spell - damage scales inversely with target count
+        activeProjectiles.filter(p => p.isVoid && (now - p.spawnTime) / 1000 < p.duration).forEach(voidZone => {
+          if (now - (voidZone.lastTick || voidZone.spawnTime) < 1500) return;
+          voidZone.lastTick = now;
+
+          const radius = voidZone.radius || 50;
+          const targets = currentUnits.filter(u => 
+            u.isOpponent !== voidZone.isOpponent && u.hp > 0 &&
+            Math.sqrt(Math.pow(u.x - voidZone.x, 2) + Math.pow(u.y - voidZone.y, 2)) <= radius
+          );
+          
+          if (targets.length > 0) {
+             let damagePerTick = 20; 
+             if (targets.length === 1) damagePerTick = 250; // Single target nuke
+             else if (targets.length <= 4) damagePerTick = 80; 
+             else damagePerTick = 20; 
+
+             currentUnits = currentUnits.map(unit => {
+                if (targets.includes(unit)) {
+                   return { ...unit, hp: unit.hp - damagePerTick };
+                }
+                return unit;
+             });
+             
+             // Add visual for hit
+             setVisualEffects(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: 'void_hit',
+                x: voidZone.x, y: voidZone.y,
+                radius: radius,
+                startTime: Date.now(),
+                duration: 300
+             }]);
+          }
+        });
+
+        // Process Goblin Curse - apply cursed status
+        activeProjectiles.filter(p => p.appliesCurse && (now - p.spawnTime) / 1000 < p.duration).forEach(curseZone => {
+           const radius = curseZone.radius || 50;
+           currentUnits = currentUnits.map(unit => {
+              if (unit.isOpponent !== curseZone.isOpponent && unit.hp > 0) {
+                 const dist = Math.sqrt(Math.pow(unit.x - curseZone.x, 2) + Math.pow(unit.y - curseZone.y, 2));
+                 if (dist <= radius) {
+                    return { ...unit, cursed: true, cursedByOpponent: curseZone.isOpponent };
+                 }
+              }
+              return unit;
+           });
+        });
       }
 
       activeProjectiles = activeProjectiles.filter(p =>
@@ -10844,6 +11080,10 @@ export default function App() {
         // Check if tower is stunned - can't attack while stunned
         const isStunned = tower.stunUntil && now < tower.stunUntil;
         if (isStunned) return tower;
+
+        // Check if tower is frozen - can't attack while frozen
+        const isFrozen = tower.freezeUntil && now < tower.freezeUntil;
+        if (isFrozen) return tower;
 
         if (now - tower.lastShot < (tower.type === 'king' ? FIRE_RATE_KING : FIRE_RATE_PRINCESS)) return tower;
 
