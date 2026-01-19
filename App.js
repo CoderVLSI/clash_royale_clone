@@ -2004,9 +2004,23 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
     case 'rune_giant':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
-          <Circle cx="50" cy="50" r="48" fill={color} stroke="#3498db" strokeWidth="3" />
-          <Path d="M30 30 L70 70 M70 30 L30 70" stroke="#00BFFF" strokeWidth="4" opacity="0.7" />
-          <Circle cx="50" cy="50" r="10" fill="#00BFFF" />
+          {/* Brown shirt/body */}
+          <Rect x="25" y="55" width="50" height="40" fill="#8B4513" rx="5" />
+          {/* Arms */}
+          <Rect x="15" y="55" width="15" height="35" fill="#8B4513" rx="3" />
+          <Rect x="70" y="55" width="15" height="35" fill="#8B4513" rx="3" />
+          {/* Big head */}
+          <Circle cx="50" cy="40" r="28" fill="#ffe0b2" stroke="#d4a76a" strokeWidth="2" />
+          {/* Orange hair */}
+          <Path d="M22 35 Q50 5 78 35 Q80 45 75 50 Q50 30 25 50 Q20 45 22 35" fill="#e67e22" />
+          <Circle cx="30" cy="32" r="8" fill="#e67e22" />
+          <Circle cx="70" cy="32" r="8" fill="#e67e22" />
+          {/* Face features */}
+          <Circle cx="40" cy="40" r="4" fill="#2c3e50" />
+          <Circle cx="60" cy="40" r="4" fill="#2c3e50" />
+          <Path d="M42 50 Q50 55 58 50" stroke="#2c3e50" strokeWidth="2" fill="none" />
+          {/* Rune symbol on shirt */}
+          <Path d="M40 65 L60 75 M60 65 L40 75" stroke="#f39c12" strokeWidth="3" opacity="0.8" />
         </Svg>
       );
     case 'suspicious_bush':
@@ -4316,6 +4330,45 @@ const VisualEffects = ({ effects, setEffects }) => {
                 })}
                 {/* Center bright point */}
                 <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.15} fill="#E0FFFF" opacity={1} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'hieroglyph') {
+          // Hieroglyph symbols floating above enhanced allies
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: 0.8,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Ancient rune/hieroglyph symbols - floating above unit */}
+                {/* Ankh symbol */}
+                <Path d={`M${effect.radius * 0.5} ${effect.radius * 0.3} L${effect.radius * 0.5} ${effect.radius * 0.8} M${effect.radius * 0.35} ${effect.radius * 0.5} L${effect.radius * 0.65} ${effect.radius * 0.5}`}
+                  stroke="#f39c12" strokeWidth="2" fill="none" />
+                <Circle cx={effect.radius * 0.5} cy={effect.radius * 0.25} r={effect.radius * 0.08} stroke="#f39c12" strokeWidth="2" fill="none" />
+                {/* Eye symbol */}
+                <Path d={`M${effect.radius * 0.7} ${effect.radius * 0.4} Q${effect.radius} ${effect.radius * 0.5} ${effect.radius * 1.3} ${effect.radius * 0.4}`}
+                  stroke="#00BFFF" strokeWidth="2" fill="none" />
+                <Circle cx={effect.radius} cy={effect.radius * 0.4} r={effect.radius * 0.1} fill="#00BFFF" opacity={0.8} />
+                <Circle cx={effect.radius} cy={effect.radius * 0.4} r={effect.radius * 0.04} fill="#1a1a2e" />
+                {/* Zigzag rune */}
+                <Path d={`M${effect.radius * 0.3} ${effect.radius * 0.7} L${effect.radius * 0.4} ${effect.radius * 0.6} L${effect.radius * 0.5} ${effect.radius * 0.7} L${effect.radius * 0.6} ${effect.radius * 0.6} L${effect.radius * 0.7} ${effect.radius * 0.7}`}
+                  stroke="#e74c3c" strokeWidth="2" fill="none" />
+                {/* Triangle rune */}
+                <Path d={`M${effect.radius * 1.2} ${effect.radius * 0.6} L${effect.radius * 1.3} ${effect.radius * 0.8} L${effect.radius * 1.1} ${effect.radius * 0.8} Z`}
+                  stroke="#2ecc71" strokeWidth="2" fill="none" />
+                {/* Glowing dots */}
+                <Circle cx={effect.radius * 0.25} cy={effect.radius * 0.5} r={effect.radius * 0.05} fill="#f39c12" opacity={0.8} />
+                <Circle cx={effect.radius * 1.35} cy={effect.radius * 0.35} r={effect.radius * 0.05} fill="#00BFFF" opacity={0.8} />
+                <Circle cx={effect.radius * 1.1} cy={effect.radius * 0.65} r={effect.radius * 0.05} fill="#e74c3c" opacity={0.8} />
               </Svg>
             </View>
           );
@@ -9628,6 +9681,26 @@ export default function App() {
                 x: u.x,
                 y: u.y,
                 radius: shockRadius,
+                startTime: Date.now(),
+                duration: 100 // Short duration, will be refreshed each frame
+              }];
+            });
+          }
+
+          // Rune Enhanced Allies - show hieroglyph symbols above them
+          if (u.runeEnhanced && u.runeEnhancedUntil && now < u.runeEnhancedUntil) {
+            setVisualEffects(prev => {
+              // Remove old hieroglyphs from this unit
+              const filtered = prev.filter(e => e.attackerId !== u.id || e.type !== 'hieroglyph');
+
+              // Add updated hieroglyph effect
+              return [...filtered, {
+                id: Date.now() + Math.random(),
+                type: 'hieroglyph',
+                attackerId: u.id,
+                x: u.x,
+                y: u.y - 15, // Above the unit
+                radius: 20,
                 startTime: Date.now(),
                 duration: 100 // Short duration, will be refreshed each frame
               }];
