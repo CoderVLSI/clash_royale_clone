@@ -7359,9 +7359,17 @@ export default function App() {
 
         for (let i = 0; i < count; i++) {
 
-          const offsetX = count > 1 ? (Math.random() * 20 - 10) : 0;
+          let offsetX = count > 1 ? (Math.random() * 20 - 10) : 0;
 
-          const offsetY = count > 1 ? (Math.random() * 20 - 10) : 0;
+          let offsetY = count > 1 ? (Math.random() * 20 - 10) : 0;
+
+          // Royal Recruits - splitSpawn spreads them in a circle
+          if (actualCard.splitSpawn && count > 1) {
+            const angle = (i / count) * Math.PI * 2;
+            const distance = 50; // Spread radius
+            offsetX = Math.cos(angle) * distance;
+            offsetY = Math.sin(angle) * distance;
+          }
 
           let unitLane = lane;
 
