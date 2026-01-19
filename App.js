@@ -198,6 +198,9 @@ const CARDS = [
   { id: 'monk', name: 'Monk', cost: 5, color: '#ecf0f1', hp: 2000, speed: 1.5, type: 'ground', range: 25, damage: 140, attackSpeed: 900, projectile: null, count: 1, rarity: 'champion', pushback: 40, reflectAbility: true, abilityCooldown: 15000, abilityCost: 1 },
   { id: 'mighty_miner', name: 'Mighty Miner', cost: 4, color: '#e67e22', hp: 2400, speed: 2, type: 'ground', range: 25, damage: 40, attackSpeed: 100, projectile: null, count: 1, rarity: 'champion', damageRamp: true, escapeAbility: true, abilityCooldown: 10000, abilityCost: 1 },
   { id: 'little_prince', name: 'Little Prince', cost: 3, color: '#f1c40f', hp: 700, speed: 2, type: 'ground', range: 110, damage: 110, attackSpeed: 1000, projectile: 'arrow', count: 1, rarity: 'champion', damageRamp: true, guardianAbility: true, abilityCooldown: 15000, abilityCost: 3 },
+  { id: 'boss_bandit', name: 'Boss Bandit', cost: 6, color: '#2c3e50', hp: 2803, speed: 2.5, type: 'ground', range: 25, damage: 245, attackSpeed: 1100, projectile: null, count: 1, rarity: 'champion', dashAbility: true, dashRange: [3.5, 6], getawayAbility: true, abilityCooldown: 8000, abilityCost: 1 },
+  { id: 'goblinstein', name: 'Goblinstein', cost: 5, color: '#2ecc71', hp: 955, speed: 2, type: 'ground', range: 5.5, damage: 122, attackSpeed: 1800, projectile: 'electric_zap', count: 1, rarity: 'champion', stun: 0.5, monsterAbility: true, abilityCooldown: 17000, abilityCost: 2 },
+  { id: 'goblinstein_monster', name: 'The Monster', cost: 0, color: '#27ae60', hp: 3169, speed: 2, type: 'ground', targetType: 'buildings', range: 1.2, damage: 169, attackSpeed: 1500, count: 1, rarity: 'champion', isToken: true },
   { id: 'guardian', name: 'Guardian', cost: 0, color: '#f1c40f', hp: 1800, speed: 3, type: 'ground', range: 30, damage: 200, attackSpeed: 1200, count: 1, rarity: 'champion', isToken: true, knockback: 50, spawnDamage: 200 }
 ];
 
@@ -1720,6 +1723,44 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Path d="M68 30 L73 22 L78 30 Z" fill="#f1c40f" transform="rotate(45 73 47)" />
         </Svg>
       );
+    case 'boss_bandit':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#2c3e50" stroke="#f1c40f" strokeWidth="3" />
+          <Path d="M20 45 Q50 35 80 45 Q80 65 50 70 Q20 65 20 45 Z" fill="#e74c3c" stroke="#c0392b" strokeWidth="2" />
+          {/* Crown */}
+          <Path d="M30 20 L40 10 L50 20 L60 10 L70 20 L70 30 L30 30 Z" fill="#f1c40f" />
+          <Circle cx="40" cy="50" r="4" fill="white" />
+          <Circle cx="60" cy="50" r="4" fill="white" />
+          <Circle cx="40" cy="50" r="2" fill="black" />
+          <Circle cx="60" cy="50" r="2" fill="black" />
+          <Rect x="70" y="30" width="8" height="40" fill="#bdc3c7" transform="rotate(45 74 50)" />
+          <Path d="M68 30 L74 20 L80 30 Z" fill="#f1c40f" transform="rotate(45 74 50)" />
+        </Svg>
+      );
+    case 'goblinstein':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#2ecc71" stroke="#27ae60" strokeWidth="2" />
+          <Rect x="30" y="40" width="40" height="45" fill="#ecf0f1" rx="5" /> {/* Lab coat */}
+          <Rect x="35" y="35" width="30" height="10" fill="#34495e" rx="2" /> {/* Goggles */}
+          <Circle cx="42" cy="40" r="3" fill="#3498db" />
+          <Circle cx="58" cy="40" r="3" fill="#3498db" />
+          <Path d="M40 70 Q50 80 60 70" stroke="black" strokeWidth="2" fill="none" />
+        </Svg>
+      );
+    case 'goblinstein_monster':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="48" fill="#27ae60" stroke="#1e8449" strokeWidth="3" />
+          <Rect x="20" y="20" width="10" height="10" fill="#95a5a6" /> {/* Bolt Left */}
+          <Rect x="70" y="20" width="10" height="10" fill="#95a5a6" /> {/* Bolt Right */}
+          <Rect x="25" y="60" width="50" height="30" fill="#8e44ad" rx="5" /> {/* Pants */}
+          <Path d="M30 40 L70 40 M30 45 L70 45" stroke="#1e8449" strokeWidth="5" /> {/* Muscles/Stitches */}
+          <Circle cx="40" cy="35" r="5" fill="#e74c3c" /> {/* Angry eye */}
+          <Circle cx="60" cy="35" r="5" fill="#e74c3c" />
+        </Svg>
+      );
     case 'battle_ram':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
@@ -3045,6 +3086,24 @@ const VisualEffects = ({ effects, setEffects }) => {
              <View key={effect.id} style={{ position: 'absolute', left: effect.x - 30, top: effect.y - 30, width: 60, height: 60, alignItems: 'center', justifyContent: 'center' }}>
                 <Svg width="60" height="60" viewBox="0 0 60 60">
                    <Circle cx="30" cy="30" r={30*progress} fill="none" stroke="#3498db" strokeWidth="3" opacity={1-progress} />
+                </Svg>
+             </View>
+           );
+        }
+        if (effect.type === 'lightning_link') {
+           return (
+             <View key={effect.id} style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%' }}>
+                <Svg width="100%" height="100%">
+                   <Line 
+                     x1={effect.startX} y1={effect.startY} 
+                     x2={effect.endX} y2={effect.endY} 
+                     stroke="#f1c40f" strokeWidth="4" strokeDasharray="5,5" 
+                   />
+                   <Line 
+                     x1={effect.startX} y1={effect.startY} 
+                     x2={effect.endX} y2={effect.endY} 
+                     stroke="#fff" strokeWidth="2" strokeDasharray="3,3" 
+                   />
                 </Svg>
              </View>
            );
@@ -8751,6 +8810,38 @@ export default function App() {
 
         setUnits(prev => [...(prev || []), ...newUnits]);
 
+        // Goblinstein - spawn Monster in front of the Doctor
+        if (actualCard.id === 'goblinstein') {
+          const monsterCard = CARDS.find(c => c.id === 'goblinstein_monster');
+          if (monsterCard) {
+            const frontOffset = isOpponent ? 60 : -60; // Monster is in front (towards enemy)
+            const monsterUnit = {
+              id: 'monster_' + Date.now() + '_' + Math.random(),
+              x: x,
+              y: y + frontOffset,
+              hp: monsterCard.hp,
+              maxHp: monsterCard.hp,
+              isOpponent: isOpponent,
+              speed: monsterCard.speed,
+              lane: lane,
+              lastAttack: 0,
+              spriteId: 'goblinstein_monster',
+              type: 'ground',
+              targetType: 'buildings',
+              range: monsterCard.range,
+              damage: monsterCard.damage,
+              attackSpeed: monsterCard.attackSpeed,
+              rarity: 'champion',
+              spawnTime: now,
+              isMonster: true,
+              doctorId: newUnits[0].id // Link to the Doctor
+            };
+            // Link Doctor to Monster
+            newUnits[0].monsterId = monsterUnit.id;
+            setUnits(prev => [...(prev || []), monsterUnit]);
+          }
+        }
+
         // Rascals - spawn girls instantly behind the boy
         if (actualCard.spawnsExtra && actualCard.extraCount > 0) {
           const extraCard = CARDS.find(c => c.id === actualCard.spawnsExtra);
@@ -9539,6 +9630,27 @@ export default function App() {
                   }
                }
 
+               // Boss Bandit
+               else if (u.getawayAbility) {
+                  const teleportDist = u.isOpponent ? -120 : 120; // Teleport backwards
+                  u.y += teleportDist;
+                  u.hidden = { active: true, visibleHp: u.hp };
+                  u.hiddenEndTime = now + 1000;
+                  abilityUsed = true;
+                  setVisualEffects(prev => [...prev, {
+                      id: 'getaway_' + now,
+                      type: 'fire_explosion', // Placeholder for smoke
+                      x: u.x, y: u.y - teleportDist, radius: 40, startTime: now, duration: 500
+                  }]);
+               }
+
+               // Goblinstein
+               else if (u.monsterAbility) {
+                  u.lightningLinkActive = true;
+                  u.lightningLinkEndTime = now + 4000;
+                  abilityUsed = true;
+               }
+
                if (abilityUsed) {
                    u.lastAbilityTime = now;
                    u.abilityActiveRequest = false;
@@ -9569,6 +9681,17 @@ export default function App() {
               duration: 400
             }]);
           }
+        }
+
+        // Boss Bandit Ability Recharge at 50% HP
+        if (u.spriteId === 'boss_bandit' && u.hp < u.maxHp * 0.5 && !u.rechargedAtHalfHp) {
+           u.lastAbilityTime = 0; // Instant recharge
+           u.rechargedAtHalfHp = true;
+           setVisualEffects(prev => [...prev, {
+              id: 'recharge_' + u.id,
+              type: 'golden_dash',
+              x: u.x, y: u.y, radius: 40, startTime: now, duration: 500
+           }]);
         }
 
         // Check building lifetime - depreciate HP over time
@@ -10140,7 +10263,7 @@ export default function App() {
         }
 
         // Bandit Dash - activate dash when entering dash range while moving toward target
-        if (u.dashInvincible && u.spriteId === 'bandit' && !u.isDashing && closestTarget && minDist <= (u.dashRange || 80) && minDist > u.range + 10) {
+        if ((u.dashInvincible || u.dashAbility) && (u.spriteId === 'bandit' || u.spriteId === 'boss_bandit') && !u.isDashing && closestTarget && minDist <= (u.dashRange || 80) && minDist > u.range + 10) {
           // Activate dash when within dash range (but not too close)
           u.isDashing = true;
           u.dashEndTime = now + 750; // Dash lasts 750ms
@@ -10156,6 +10279,46 @@ export default function App() {
             startTime: Date.now(),
             duration: 750
           }]);
+        }
+
+        // Goblinstein Lightning Link Processing
+        if (u.lightningLinkActive && u.lightningLinkEndTime > now) {
+           const monster = currentUnits.find(m => m.id === u.monsterId && m.hp > 0);
+           if (monster) {
+              // Damage units between Doctor and Monster
+              currentUnits.forEach(enemy => {
+                 if (enemy.isOpponent !== u.isOpponent && enemy.hp > 0) {
+                    // Check distance to line segment (Doctor -> Monster)
+                    const d2 = (u.x - monster.x)**2 + (u.y - monster.y)**2;
+                    if (d2 > 0) {
+                       const t = ((enemy.x - u.x) * (monster.x - u.x) + (enemy.y - u.y) * (monster.y - u.y)) / d2;
+                       const clampedT = Math.max(0, Math.min(1, t));
+                       const projX = u.x + clampedT * (monster.x - u.x);
+                       const projY = u.y + clampedT * (monster.y - u.y);
+                       const dist = Math.sqrt((enemy.x - projX)**2 + (enemy.y - projY)**2);
+                       
+                       if (dist < 40) { // 2 tiles radius
+                          damageEvents.push({ targetId: enemy.id, damage: 20, attackerId: u.id }); // Ticking damage
+                       }
+                    }
+                 }
+              });
+              
+              // Visual Link
+              setVisualEffects(prev => {
+                 const linkId = 'link_' + u.id;
+                 const filtered = prev.filter(v => v.id !== linkId);
+                 return [...filtered, {
+                    id: linkId,
+                    type: 'lightning_link',
+                    startX: u.x, startY: u.y,
+                    endX: monster.x, endY: monster.y,
+                    startTime: now, duration: 100
+                 }];
+              });
+           } else {
+              u.lightningLinkActive = false;
+           }
         }
 
         if (closestTarget && minDist <= actualRange + 25) {
