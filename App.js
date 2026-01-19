@@ -143,7 +143,37 @@ const CARDS = [
   { id: 'mother_witch', name: 'Mother Witch', cost: 4, color: '#9b59b6', hp: 720, speed: 1.5, type: 'ground', range: 55, damage: 159, attackSpeed: 1400, projectile: 'witch_projectile', count: 1, splash: false, turnsToPig: true, pigDuration: 5000, rarity: 'legendary' },
   { id: 'bomb_tower', name: 'Bomb Tower', cost: 4, color: '#7f8c8d', hp: 1400, speed: 0, type: 'building', range: 55, damage: 200, attackSpeed: 1500, projectile: 'bomb', count: 1, lifetime: 40, deathDamage: 500, deathRadius: 60, deathBombDelay: 1000, rarity: 'rare' },
   { id: 'mortar', name: 'Mortar', cost: 4, color: '#95a5a6', hp: 340, speed: 0, type: 'building', range: 200, damage: 228, attackSpeed: 3000, projectile: 'mortar_shell', count: 1, lifetime: 25, chargeTime: 3000, stopsToAttack: true, rarity: 'common', splashRadius: 45 },
-  { id: 'clone', name: 'Clone', cost: 3, color: '#3498db', type: 'spell', damage: 0, radius: 35, count: 1, cloneUnits: true, cloneDuration: 10, rarity: 'epic' }
+  { id: 'clone', name: 'Clone', cost: 3, color: '#3498db', type: 'spell', damage: 0, radius: 35, count: 1, cloneUnits: true, cloneDuration: 10, rarity: 'epic' },
+
+  // REMAINING MISSING CARDS (Non-Champions)
+  // Spells
+  { id: 'freeze', name: 'Freeze', cost: 4, color: '#87CEEB', type: 'spell', damage: 91, radius: 50, count: 1, freezeDuration: 4, rarity: 'epic' },
+  { id: 'rage', name: 'Rage', cost: 2, color: '#9b59b6', type: 'spell', damage: 0, radius: 60, count: 1, rageDuration: 7, rageBoost: 0.35, rarity: 'epic' },
+  { id: 'snowball', name: 'Snowball', cost: 2, color: '#E8F4F8', type: 'spell', damage: 159, radius: 35, count: 1, knockback: 15, slow: 0.35, slowDuration: 2.5, rarity: 'common' },
+  { id: 'barb_barrel', name: 'Barb Barrel', cost: 2, color: '#8B4513', type: 'spell', damage: 243, radius: 30, count: 1, spawns: 'barbarian_single', spawnCount: 1, knockback: 10, rarity: 'epic' },
+  { id: 'barbarian_single', name: 'Barbarian', cost: 0, color: '#CD853F', hp: 670, speed: 1.5, type: 'ground', range: 30, damage: 192, attackSpeed: 1300, projectile: null, count: 1, rarity: 'common', isToken: true },
+  { id: 'royal_delivery', name: 'Royal Delivery', cost: 3, color: '#3498db', type: 'spell', damage: 362, radius: 45, count: 1, spawns: 'royal_recruit_single', spawnCount: 1, spawnDelay: 3000, rarity: 'common' },
+  { id: 'royal_recruit_single', name: 'Royal Recruit', cost: 0, color: '#3498db', hp: 1281, shieldHp: 240, speed: 1.5, type: 'ground', range: 30, damage: 190, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common', isToken: true, hasShield: true },
+  { id: 'tornado', name: 'Tornado', cost: 3, color: '#7f8c8d', type: 'spell', damage: 44, radius: 60, count: 1, duration: 1, pullStrength: 100, rarity: 'epic' },
+
+  // Troops - Easy
+  { id: 'flying_machine', name: 'Flying Machine', cost: 4, color: '#f1c40f', hp: 510, speed: 2, type: 'flying', range: 100, damage: 152, attackSpeed: 1100, projectile: 'bullet', count: 1, rarity: 'rare' },
+  { id: 'wall_breakers', name: 'Wall Breakers', cost: 2, color: '#bdc3c7', hp: 332, speed: 4, type: 'ground', range: 5, damage: 446, attackSpeed: 1000, projectile: null, count: 2, targetType: 'buildings', kamikaze: true, rarity: 'epic' },
+  { id: 'skeleton_dragons', name: 'Skel Dragons', cost: 4, color: '#27ae60', hp: 596, speed: 2, type: 'flying', range: 55, damage: 106, attackSpeed: 1800, projectile: 'dragon_fire', count: 2, splash: true, rarity: 'common' },
+
+  // Troops - Medium
+  { id: 'bowler', name: 'Bowler', cost: 5, color: '#3498db', hp: 2350, speed: 1.5, type: 'ground', range: 50, damage: 290, attackSpeed: 2500, projectile: 'boulder', count: 1, splash: true, knockback: 25, pierce: true, rarity: 'epic' },
+  { id: 'executioner', name: 'Executioner', cost: 5, color: '#2c3e50', hp: 1150, speed: 1.5, type: 'ground', range: 70, damage: 210, attackSpeed: 2400, projectile: 'axe_boomerang', count: 1, splash: true, boomerang: true, rarity: 'epic' },
+  { id: 'zappies', name: 'Zappies', cost: 4, color: '#f1c40f', hp: 440, speed: 1.5, type: 'ground', range: 55, damage: 85, attackSpeed: 2100, projectile: 'electric_zap', count: 3, stun: 0.5, rarity: 'rare' },
+  { id: 'rascals', name: 'Rascals', cost: 5, color: '#e67e22', hp: 1281, speed: 1.5, type: 'ground', range: 25, damage: 182, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common', spawnsExtra: 'rascal_girls', extraCount: 2 },
+  { id: 'rascal_girls', name: 'Rascal Girls', cost: 0, color: '#e67e22', hp: 300, speed: 2.5, type: 'ground', range: 100, damage: 107, attackSpeed: 1100, projectile: 'slingshot', count: 1, rarity: 'common', isToken: true },
+  { id: 'royal_recruits', name: 'Royal Recruits', cost: 7, color: '#3498db', hp: 630, shieldHp: 200, speed: 1.5, type: 'ground', range: 30, damage: 125, attackSpeed: 1200, projectile: null, count: 6, rarity: 'common', hasShield: true, splitSpawn: true },
+
+  // Troops/Buildings - Hard
+  { id: 'cannon_cart', name: 'Cannon Cart', cost: 5, color: '#7f8c8d', hp: 696, shieldHp: 590, speed: 2.5, type: 'ground', range: 70, damage: 202, attackSpeed: 1200, projectile: 'cannonball', count: 1, rarity: 'epic', hasShield: true, transformsToBuilding: true },
+  { id: 'goblin_drill', name: 'Goblin Drill', cost: 4, color: '#2ecc71', hp: 1200, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 9, spawns: 'sword_goblins', spawnRate: 1.1, spawnCount: 1, rarity: 'epic', deployAnywhere: true },
+  { id: 'phoenix', name: 'Phoenix', cost: 4, color: '#e74c3c', hp: 1000, speed: 2.5, type: 'flying', range: 50, damage: 200, attackSpeed: 1600, projectile: 'phoenix_fire', count: 1, splash: true, rarity: 'legendary', revivesAsEgg: true, eggHp: 800, eggDuration: 3000 },
+  { id: 'phoenix_egg', name: 'Phoenix Egg', cost: 0, color: '#f39c12', hp: 800, speed: 0, type: 'ground', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, rarity: 'legendary', isToken: true, hatchesInto: 'phoenix', hatchDuration: 3000 }
 ];
 
 const RARITY_COLORS = {
@@ -206,17 +236,17 @@ const MainMenu = ({ onStart }) => {
 
         <View style={styles.loadingBottomContainer}>
           <Text style={styles.tipText}>{TIPS[tipIndex]}</Text>
-          
+
           <View style={styles.loadingBarRow}>
             <Text style={styles.loadingPercentage}>{progress}%</Text>
             <View style={styles.loadingBarTrack}>
               <View style={[styles.loadingBarFill, { width: `${progress}%` }]} />
             </View>
           </View>
-          
+
           <Text style={styles.loadingStateText}>Updating Arena...</Text>
         </View>
-        
+
         <Text style={styles.copyrightText}>SUPERCELL</Text>
       </View>
     </ImageBackground>
@@ -2006,6 +2036,197 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Path d="M55 75 L60 82 L65 75" fill="#f1c40f" opacity="0.8" />
         </Svg>
       );
+    // NEW CARD SPRITES
+    case 'freeze':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#87CEEB" stroke="#5DADE2" strokeWidth="2" />
+          <Path d="M50 15 L50 85" stroke="white" strokeWidth="3" />
+          <Path d="M15 50 L85 50" stroke="white" strokeWidth="3" />
+          <Path d="M25 25 L75 75" stroke="white" strokeWidth="2" />
+          <Path d="M75 25 L25 75" stroke="white" strokeWidth="2" />
+          <Circle cx="50" cy="50" r="10" fill="white" opacity="0.8" />
+        </Svg>
+      );
+    case 'rage':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#9b59b6" stroke="#8e44ad" strokeWidth="2" />
+          <Path d="M30 60 Q50 20 70 60" stroke="#f1c40f" strokeWidth="4" fill="none" />
+          <Path d="M35 65 Q50 35 65 65" stroke="#e74c3c" strokeWidth="3" fill="none" />
+          <Circle cx="50" cy="45" r="8" fill="#f1c40f" />
+        </Svg>
+      );
+    case 'snowball':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="40" fill="#E8F4F8" stroke="#bdc3c7" strokeWidth="2" />
+          <Circle cx="40" cy="40" r="5" fill="white" opacity="0.8" />
+          <Circle cx="60" cy="55" r="4" fill="white" opacity="0.7" />
+          <Circle cx="45" cy="60" r="3" fill="white" opacity="0.6" />
+          <Path d="M70 30 L80 20" stroke="#3498db" strokeWidth="2" />
+        </Svg>
+      );
+    case 'barb_barrel':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Rect x="20" y="35" width="60" height="30" rx="15" fill="#8B4513" stroke="#5D3A1A" strokeWidth="2" />
+          <Circle cx="30" cy="50" r="10" fill="#A0522D" />
+          <Circle cx="70" cy="50" r="10" fill="#A0522D" />
+          <Circle cx="50" cy="50" r="8" fill="#CD853F" />
+        </Svg>
+      );
+    case 'tornado':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#7f8c8d" stroke="#95a5a6" strokeWidth="2" />
+          <Path d="M30 30 Q50 50 70 30 Q50 50 70 70 Q50 50 30 70 Q50 50 30 30" stroke="#ecf0f1" strokeWidth="3" fill="none" />
+          <Circle cx="50" cy="50" r="10" fill="#34495e" />
+        </Svg>
+      );
+    case 'flying_machine':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="40" fill="#f1c40f" stroke="#e67e22" strokeWidth="2" />
+          <Rect x="35" y="40" width="30" height="20" fill="#7f8c8d" rx="3" />
+          <Circle cx="35" cy="50" r="8" fill="#95a5a6" stroke="#7f8c8d" strokeWidth="2" />
+          <Circle cx="65" cy="50" r="8" fill="#95a5a6" stroke="#7f8c8d" strokeWidth="2" />
+          <Rect x="45" y="25" width="10" height="15" fill="#e74c3c" />
+        </Svg>
+      );
+    case 'wall_breakers':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="40" fill="#bdc3c7" stroke="#95a5a6" strokeWidth="2" />
+          <Circle cx="50" cy="45" r="15" fill="#ecf0f1" />
+          <Circle cx="45" cy="42" r="3" fill="black" />
+          <Circle cx="55" cy="42" r="3" fill="black" />
+          <Rect x="40" y="60" width="20" height="25" fill="#e74c3c" rx="5" />
+          <Path d="M45 58 L50 65 L55 58" fill="#f39c12" />
+        </Svg>
+      );
+    case 'skeleton_dragons':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="35" cy="50" r="25" fill="#27ae60" stroke="#2ecc71" strokeWidth="2" />
+          <Circle cx="65" cy="50" r="25" fill="#27ae60" stroke="#2ecc71" strokeWidth="2" />
+          <Circle cx="30" cy="45" r="3" fill="white" />
+          <Circle cx="40" cy="45" r="3" fill="white" />
+          <Circle cx="60" cy="45" r="3" fill="white" />
+          <Circle cx="70" cy="45" r="3" fill="white" />
+        </Svg>
+      );
+    case 'bowler':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#3498db" stroke="#2980b9" strokeWidth="3" />
+          <Circle cx="50" cy="55" r="25" fill="#2c3e50" />
+          <Circle cx="42" cy="40" r="5" fill="white" />
+          <Circle cx="58" cy="40" r="5" fill="white" />
+          <Circle cx="42" cy="40" r="2" fill="black" />
+          <Circle cx="58" cy="40" r="2" fill="black" />
+          <Circle cx="75" cy="70" r="12" fill="#7f8c8d" stroke="#95a5a6" strokeWidth="2" />
+        </Svg>
+      );
+    case 'executioner':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#2c3e50" stroke="#34495e" strokeWidth="2" />
+          <Rect x="35" y="30" width="30" height="20" fill="#7f8c8d" rx="3" />
+          <Circle cx="42" cy="40" r="3" fill="#e74c3c" />
+          <Circle cx="58" cy="40" r="3" fill="#e74c3c" />
+          <Path d="M70 30 L90 50 L70 70" stroke="#bdc3c7" strokeWidth="4" fill="none" />
+          <Circle cx="80" cy="50" r="8" fill="#95a5a6" />
+        </Svg>
+      );
+    case 'zappies':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="30" cy="50" r="20" fill="#f1c40f" stroke="#e67e22" strokeWidth="2" />
+          <Circle cx="50" cy="35" r="20" fill="#f1c40f" stroke="#e67e22" strokeWidth="2" />
+          <Circle cx="70" cy="50" r="20" fill="#f1c40f" stroke="#e67e22" strokeWidth="2" />
+          <Path d="M28 45 L32 55 L28 55 L32 65" stroke="#3498db" strokeWidth="2" fill="none" />
+          <Path d="M48 30 L52 40 L48 40 L52 50" stroke="#3498db" strokeWidth="2" fill="none" />
+          <Path d="M68 45 L72 55 L68 55 L72 65" stroke="#3498db" strokeWidth="2" fill="none" />
+        </Svg>
+      );
+    case 'rascals':
+    case 'rascal_girls':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#e67e22" stroke="#d35400" strokeWidth="2" />
+          <Circle cx="50" cy="40" r="15" fill="#ecf0f1" />
+          <Circle cx="45" cy="38" r="3" fill="black" />
+          <Circle cx="55" cy="38" r="3" fill="black" />
+          <Path d="M45 48 Q50 52 55 48" stroke="black" strokeWidth="2" fill="none" />
+          <Rect x="40" y="55" width="20" height="25" fill="#3498db" rx="3" />
+        </Svg>
+      );
+    case 'royal_recruits':
+    case 'royal_recruit_single':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#3498db" stroke="#2980b9" strokeWidth="2" />
+          <Rect x="30" y="35" width="40" height="30" fill="#7f8c8d" rx="5" />
+          <Rect x="35" y="30" width="30" height="10" fill="#f1c40f" />
+          <Circle cx="42" cy="50" r="4" fill="white" />
+          <Circle cx="58" cy="50" r="4" fill="white" />
+          <Rect x="25" y="45" width="10" height="25" fill="#95a5a6" rx="2" />
+        </Svg>
+      );
+    case 'cannon_cart':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Rect x="20" y="50" width="60" height="25" fill="#7f8c8d" rx="5" />
+          <Circle cx="30" cy="75" r="10" fill="#2c3e50" />
+          <Circle cx="70" cy="75" r="10" fill="#2c3e50" />
+          <Rect x="35" y="30" width="30" height="25" fill="#5D4037" rx="3" />
+          <Circle cx="50" cy="42" r="8" fill="#2c3e50" />
+        </Svg>
+      );
+    case 'goblin_drill':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="40" fill="#2ecc71" stroke="#27ae60" strokeWidth="3" />
+          <Path d="M50 20 L60 50 L50 45 L40 50 Z" fill="#7f8c8d" />
+          <Circle cx="50" cy="60" r="15" fill="#95a5a6" />
+          <Path d="M40 55 L50 70 L60 55" fill="#27ae60" />
+        </Svg>
+      );
+    case 'phoenix':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#e74c3c" stroke="#c0392b" strokeWidth="2" />
+          <Path d="M30 60 Q50 20 70 60" fill="#f39c12" />
+          <Path d="M35 55 Q50 30 65 55" fill="#f1c40f" />
+          <Circle cx="42" cy="45" r="4" fill="white" />
+          <Circle cx="58" cy="45" r="4" fill="white" />
+          <Circle cx="42" cy="45" r="2" fill="black" />
+          <Circle cx="58" cy="45" r="2" fill="black" />
+          <Path d="M25 30 L35 45 M75 30 L65 45" stroke="#f39c12" strokeWidth="3" />
+        </Svg>
+      );
+    case 'phoenix_egg':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Path d="M50 15 Q80 50 50 85 Q20 50 50 15" fill="#f39c12" stroke="#e67e22" strokeWidth="3" />
+          <Path d="M40 50 Q50 40 60 50" stroke="#f1c40f" strokeWidth="2" fill="none" />
+          <Circle cx="50" cy="55" r="5" fill="#e74c3c" opacity="0.6" />
+        </Svg>
+      );
+    case 'barbarian_single':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#CD853F" stroke="#8B4513" strokeWidth="2" />
+          <Rect x="35" y="25" width="30" height="15" fill="#f1c40f" />
+          <Path d="M30 30 L25 15 M70 30 L75 15" stroke="#bdc3c7" strokeWidth="3" />
+          <Circle cx="42" cy="45" r="4" fill="white" />
+          <Circle cx="58" cy="45" r="4" fill="white" />
+          <Circle cx="42" cy="45" r="2" fill="black" />
+          <Circle cx="58" cy="45" r="2" fill="black" />
+          <Rect x="70" y="40" width="5" height="30" fill="#bdc3c7" />
+        </Svg>
+      );
     default:
       const sprite = (
         <Svg width={size} height={size} viewBox="0 0 100 100">
@@ -2539,6 +2760,215 @@ const VisualEffects = ({ effects, setEffects }) => {
           );
         }
 
+        // FREEZE SPELL - Light blue icy circle with snowflake pattern
+        if (effect.type === 'freeze_spell') {
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity * 0.8,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Outer freezing ring */}
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * 0.95}
+                  fill="rgba(135, 206, 235, 0.3)"
+                  stroke="#87CEEB"
+                  strokeWidth="4"
+                />
+                {/* Inner icy glow */}
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * 0.6}
+                  fill="rgba(255, 255, 255, 0.4)"
+                />
+                {/* Snowflake pattern - cross */}
+                <Path
+                  d={`M${effect.radius} ${effect.radius * 0.3} L${effect.radius} ${effect.radius * 1.7}`}
+                  stroke="white"
+                  strokeWidth="3"
+                  opacity={0.8}
+                />
+                <Path
+                  d={`M${effect.radius * 0.3} ${effect.radius} L${effect.radius * 1.7} ${effect.radius}`}
+                  stroke="white"
+                  strokeWidth="3"
+                  opacity={0.8}
+                />
+                {/* Diagonal lines */}
+                <Path
+                  d={`M${effect.radius * 0.5} ${effect.radius * 0.5} L${effect.radius * 1.5} ${effect.radius * 1.5}`}
+                  stroke="white"
+                  strokeWidth="2"
+                  opacity={0.6}
+                />
+                <Path
+                  d={`M${effect.radius * 1.5} ${effect.radius * 0.5} L${effect.radius * 0.5} ${effect.radius * 1.5}`}
+                  stroke="white"
+                  strokeWidth="2"
+                  opacity={0.6}
+                />
+              </Svg>
+            </View>
+          );
+        }
+
+        // RAGE SPELL - Purple pulsing circle with energy lines
+        if (effect.type === 'rage_zone' || effect.type === 'rage_spell') {
+          const pulseScale = 0.9 + Math.sin(progress * Math.PI * 4) * 0.1;
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity * 0.7,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Outer pulsing ring */}
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * pulseScale}
+                  fill="rgba(155, 89, 182, 0.25)"
+                  stroke="#9b59b6"
+                  strokeWidth="3"
+                />
+                {/* Inner energy core */}
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * 0.4}
+                  fill="rgba(231, 76, 60, 0.4)"
+                />
+                {/* Energy arrows pointing up */}
+                <Path
+                  d={`M${effect.radius * 0.7} ${effect.radius * 0.8} L${effect.radius} ${effect.radius * 0.4} L${effect.radius * 1.3} ${effect.radius * 0.8}`}
+                  stroke="#f1c40f"
+                  strokeWidth="3"
+                  fill="none"
+                />
+                <Path
+                  d={`M${effect.radius * 0.8} ${effect.radius * 1.2} L${effect.radius} ${effect.radius * 0.8} L${effect.radius * 1.2} ${effect.radius * 1.2}`}
+                  stroke="#e74c3c"
+                  strokeWidth="2"
+                  fill="none"
+                />
+              </Svg>
+            </View>
+          );
+        }
+
+        // SNOWBALL SPELL - White circle with snowflake particles
+        if (effect.type === 'snowball_spell') {
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Expanding white circle */}
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * (0.3 + progress * 0.7)}
+                  fill="rgba(236, 240, 241, 0.5)"
+                  stroke="#E8F4F8"
+                  strokeWidth="3"
+                />
+                {/* Snow particles */}
+                <Circle cx={effect.radius * 0.6} cy={effect.radius * 0.5} r={4} fill="white" opacity={0.9} />
+                <Circle cx={effect.radius * 1.4} cy={effect.radius * 0.7} r={3} fill="white" opacity={0.8} />
+                <Circle cx={effect.radius * 0.5} cy={effect.radius * 1.3} r={5} fill="white" opacity={0.7} />
+                <Circle cx={effect.radius * 1.3} cy={effect.radius * 1.4} r={4} fill="white" opacity={0.8} />
+                <Circle cx={effect.radius} cy={effect.radius * 0.3} r={3} fill="white" opacity={0.9} />
+              </Svg>
+            </View>
+          );
+        }
+
+        // TORNADO - Swirling gray vortex with spiral
+        if (effect.type === 'tornado_zone' || effect.type === 'tornado_spell') {
+          const spinAngle = progress * 720; // Spin multiple times
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity * 0.8,
+              alignItems: 'center',
+              justifyContent: 'center',
+              transform: [{ rotate: `${spinAngle}deg` }]
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Outer vortex ring */}
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * 0.9}
+                  fill="none"
+                  stroke="rgba(127, 140, 141, 0.5)"
+                  strokeWidth="8"
+                  strokeDasharray="20 10"
+                />
+                {/* Middle ring */}
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * 0.6}
+                  fill="none"
+                  stroke="rgba(149, 165, 166, 0.6)"
+                  strokeWidth="6"
+                  strokeDasharray="15 8"
+                />
+                {/* Inner vortex */}
+                <Circle
+                  cx={effect.radius}
+                  cy={effect.radius}
+                  r={effect.radius * 0.3}
+                  fill="rgba(52, 73, 94, 0.6)"
+                  stroke="#2c3e50"
+                  strokeWidth="3"
+                />
+                {/* Spiral arms */}
+                <Path
+                  d={`M${effect.radius} ${effect.radius * 0.2} Q${effect.radius * 1.5} ${effect.radius * 0.5} ${effect.radius * 1.5} ${effect.radius}`}
+                  stroke="#95a5a6"
+                  strokeWidth="3"
+                  fill="none"
+                  opacity={0.7}
+                />
+                <Path
+                  d={`M${effect.radius} ${effect.radius * 1.8} Q${effect.radius * 0.5} ${effect.radius * 1.5} ${effect.radius * 0.5} ${effect.radius}`}
+                  stroke="#95a5a6"
+                  strokeWidth="3"
+                  fill="none"
+                  opacity={0.7}
+                />
+              </Svg>
+            </View>
+          );
+        }
+
         if (effect.type === 'chain_lightning' && effect.targets && effect.targets.length > 1) {
           // Chain lightning - draw lines connecting all targets
           const lines = [];
@@ -2735,7 +3165,7 @@ const VisualEffects = ({ effects, setEffects }) => {
                 color: '#D442F5', // Elixir Pink
                 textShadowColor: 'black',
                 textShadowRadius: 2,
-                textShadowOffset: {width: 1, height: 1}
+                textShadowOffset: { width: 1, height: 1 }
               }}>
                 {effect.value}
               </Text>
@@ -3608,6 +4038,81 @@ const Projectile = ({ type, position }) => {
       </View>
     );
   }
+  if (type === 'barb_barrel') {
+    // Barb Barrel - smaller wooden barrel rolling forward
+    const rotation = (Date.now() / 8) % 360; // Rolling animation (faster than log)
+
+    return (
+      <View style={{
+        position: 'absolute',
+        left: position.x - 15,
+        top: position.y - 12,
+        width: 30,
+        height: 24,
+        transform: [{ rotate: `${rotation}deg` }]
+      }}>
+        <Svg width="30" height="24" viewBox="0 0 30 24">
+          {/* Main barrel body */}
+          <Rect
+            x="2"
+            y="3"
+            width="26"
+            height="18"
+            rx="9"
+            fill="#8B4513"
+            stroke="#5D3A1A"
+            strokeWidth="2"
+          />
+          {/* Metal bands on barrel */}
+          <Rect x="6" y="3" width="3" height="18" fill="#7f8c8d" opacity="0.8" />
+          <Rect x="21" y="3" width="3" height="18" fill="#7f8c8d" opacity="0.8" />
+          {/* Wood plank lines */}
+          <Line x1="12" y1="4" x2="12" y2="20" stroke="#654321" strokeWidth="1" opacity="0.6" />
+          <Line x1="18" y1="4" x2="18" y2="20" stroke="#654321" strokeWidth="1" opacity="0.6" />
+          {/* Barrel end caps */}
+          <Circle cx="4" cy="12" r="7" fill="#A0522D" opacity="0.9" stroke="#654321" strokeWidth="1" />
+          <Circle cx="4" cy="12" r="4" fill="none" stroke="#8B4513" strokeWidth="1" opacity="0.7" />
+          <Circle cx="4" cy="12" r="2" fill="#CD853F" opacity="0.8" />
+          {/* Barbarian icon hint - yellow helmet */}
+          <Circle cx="15" cy="12" r="4" fill="#f1c40f" opacity="0.7" />
+        </Svg>
+      </View>
+    );
+  }
+  if (type === 'royal_delivery_box') {
+    // Royal Delivery - falling wooden crate
+    // Calculate fall progress for visual scale/shadow
+    // (Actual position is updated by game loop, this is just drawing the sprite)
+    return (
+      <View style={{
+        position: 'absolute',
+        left: position.x - 20,
+        top: position.y - 20,
+        width: 40,
+        height: 40,
+        zIndex: 100 // On top of everything
+      }}>
+        <Svg width="40" height="40" viewBox="0 0 40 40">
+          {/* Shadow growing as it falls */}
+          <Ellipse cx="20" cy="40" rx="15" ry="5" fill="black" opacity="0.3" />
+
+          {/* Crate Body */}
+          <Rect x="5" y="5" width="30" height="30" fill="#8B4513" stroke="#5D3A1A" strokeWidth="2" />
+          {/* Cross bracing */}
+          <Line x1="5" y1="5" x2="35" y2="35" stroke="#5D3A1A" strokeWidth="2" />
+          <Line x1="35" y1="5" x2="5" y2="35" stroke="#5D3A1A" strokeWidth="2" />
+          {/* Metal Corners */}
+          <Path d="M5 5 L15 5 L5 15 Z" fill="#95a5a6" />
+          <Path d="M35 5 L25 5 L35 15 Z" fill="#95a5a6" />
+          <Path d="M5 35 L15 35 L5 25 Z" fill="#95a5a6" />
+          <Path d="M35 35 L25 35 L35 25 Z" fill="#95a5a6" />
+          {/* Royal Emblem/Crown in center */}
+          <Circle cx="20" cy="20" r="6" fill="#f1c40f" stroke="#e67e22" strokeWidth="1" />
+          <Path d="M17 20 L23 20 L20 16 Z" fill="#e67e22" />
+        </Svg>
+      </View>
+    );
+  }
   if (type === 'fireball_spell') {
     return (
       <View style={[styles.fireballSpell, { left: position.x, top: position.y }]} />
@@ -3696,7 +4201,7 @@ const Projectile = ({ type, position }) => {
     const isRage = type === 'rage_spell';
     const mainColor = isRage ? "rgba(155, 89, 182, 0.4)" : "rgba(255, 140, 0, 0.4)";
     const strokeColor = isRage ? "#8e44ad" : "#FF8C00";
-    
+
     // Use dynamic radius from spell data (default to 50 if undefined)
     const spellRadius = position.radius || 50;
     const diameter = spellRadius * 2;
@@ -3707,25 +4212,25 @@ const Projectile = ({ type, position }) => {
           <Circle cx={spellRadius} cy={spellRadius} r={spellRadius - 2} fill={mainColor} stroke={strokeColor} strokeWidth="2" />
 
           {isRage ? (
-             // Rage Spell Visuals - Anger symbol / Energy
-             <>
-                <Circle cx={spellRadius} cy={spellRadius} r={spellRadius * 0.7} fill="none" stroke="#9b59b6" strokeWidth="2" strokeDasharray="5 5" opacity="0.6" />
-             </>
+            // Rage Spell Visuals - Anger symbol / Energy
+            <>
+              <Circle cx={spellRadius} cy={spellRadius} r={spellRadius * 0.7} fill="none" stroke="#9b59b6" strokeWidth="2" strokeDasharray="5 5" opacity="0.6" />
+            </>
           ) : (
-             // Poison Spell Visuals - Skulls/Bubbles (scaled positions)
-             <>
-                <Circle cx={spellRadius * 0.7} cy={spellRadius * 0.8} r={spellRadius * 0.12} fill="white" opacity="0.8" />
-                <Circle cx={spellRadius * 0.66} cy={spellRadius * 0.8} r={spellRadius * 0.03} fill="black" />
-                <Circle cx={spellRadius * 0.74} cy={spellRadius * 0.8} r={spellRadius * 0.03} fill="black" />
+            // Poison Spell Visuals - Skulls/Bubbles (scaled positions)
+            <>
+              <Circle cx={spellRadius * 0.7} cy={spellRadius * 0.8} r={spellRadius * 0.12} fill="white" opacity="0.8" />
+              <Circle cx={spellRadius * 0.66} cy={spellRadius * 0.8} r={spellRadius * 0.03} fill="black" />
+              <Circle cx={spellRadius * 0.74} cy={spellRadius * 0.8} r={spellRadius * 0.03} fill="black" />
 
-                <Circle cx={spellRadius * 1.3} cy={spellRadius * 1.2} r={spellRadius * 0.12} fill="white" opacity="0.8" />
-                <Circle cx={spellRadius * 1.26} cy={spellRadius * 1.2} r={spellRadius * 0.03} fill="black" />
-                <Circle cx={spellRadius * 1.34} cy={spellRadius * 1.2} r={spellRadius * 0.03} fill="black" />
+              <Circle cx={spellRadius * 1.3} cy={spellRadius * 1.2} r={spellRadius * 0.12} fill="white" opacity="0.8" />
+              <Circle cx={spellRadius * 1.26} cy={spellRadius * 1.2} r={spellRadius * 0.03} fill="black" />
+              <Circle cx={spellRadius * 1.34} cy={spellRadius * 1.2} r={spellRadius * 0.03} fill="black" />
 
-                <Circle cx={spellRadius} cy={spellRadius * 0.6} r={spellRadius * 0.1} fill="white" opacity="0.8" />
-                <Circle cx={spellRadius * 0.96} cy={spellRadius * 0.6} r={spellRadius * 0.03} fill="black" />
-                <Circle cx={spellRadius * 1.04} cy={spellRadius * 0.6} r={spellRadius * 0.03} fill="black" />
-             </>
+              <Circle cx={spellRadius} cy={spellRadius * 0.6} r={spellRadius * 0.1} fill="white" opacity="0.8" />
+              <Circle cx={spellRadius * 0.96} cy={spellRadius * 0.6} r={spellRadius * 0.03} fill="black" />
+              <Circle cx={spellRadius * 1.04} cy={spellRadius * 0.6} r={spellRadius * 0.03} fill="black" />
+            </>
           )}
         </Svg>
         {isRage && (
@@ -3817,7 +4322,7 @@ const Projectile = ({ type, position }) => {
           <Path d="M5 10 L35 10" stroke="#8B4513" strokeWidth="2" />
           <Path d="M35 10 L30 7 L30 13 Z" fill="#e74c3c" />
           <Circle cx="32" cy="10" r="3" fill="#f1c40f" opacity="0.8" />
-          
+
           {/* Arrow 2 (Top) */}
           <Path d="M0 5 L30 5" stroke="#8B4513" strokeWidth="2" />
           <Path d="M30 5 L25 2 L25 8 Z" fill="#e74c3c" />
@@ -4080,6 +4585,7 @@ const Unit = ({ unit }) => {
   const isEnemy = unit.isOpponent;
   const isSlowed = unit.slowUntil > Date.now();
   const isRaged = unit.rageUntil > Date.now();
+  const isFrozen = unit.freezeUntil > Date.now();
   const isCursed = unit.cursedUntil > Date.now();
 
   // Use dynamic size for zones (radius * 2) or default to 30 for troops
@@ -4129,7 +4635,7 @@ const Unit = ({ unit }) => {
   }, [unit.kamikaze, unit.isJumpingAttack]);
 
   let verticalOffset = bounceAnim;
-  
+
   // Calculate Attack Jump Arc (Parabola)
   if (unit.isJumpingAttack) {
     const jumpDuration = 300;
@@ -4137,7 +4643,7 @@ const Unit = ({ unit }) => {
     // Parabolic arc: 4 * height * x * (1 - x)
     const jumpHeight = 50;
     const currentHeight = -4 * jumpHeight * progress * (1 - progress);
-    
+
     // We can't easily mix Animated.Value and raw numbers in style transform without `Animated.add` or similar.
     // But since this is a re-render loop, we can just use the value if we wrap it in an Animated.View that accepts non-animated values?
     // No, Animated.View expects Animated.Value or plain numbers.
@@ -4154,7 +4660,7 @@ const Unit = ({ unit }) => {
 
   return (
     <View style={[
-      styles.unit, 
+      styles.unit,
       { left: unit.x - unitSize / 2, top: unit.y - unitSize / 2, width: unitSize, height: unitSize },
       isStealthed && { opacity: 0.4 }
     ]}>
@@ -4199,7 +4705,7 @@ const Unit = ({ unit }) => {
           </View>
         </View>
       </Animated.View>
-      
+
       {/* Spawn Delay Indicator (rotating swirl) */}
       {isSpawning && (
         <Animated.View style={{
@@ -4247,6 +4753,34 @@ const Unit = ({ unit }) => {
           <Text style={{ position: 'absolute', top: -10, right: -10, fontSize: 10 }}>❄️</Text>
         </View>
       )}
+
+      {/* FROZEN Effect Overlay - Thick Ice Border with Crystals */}
+      {isFrozen && (
+        <View style={{
+          position: 'absolute',
+          top: -4, left: -4, right: -4, bottom: -4,
+          backgroundColor: 'rgba(135, 206, 235, 0.5)',
+          borderRadius: unitSize / 2,
+          borderWidth: 4,
+          borderColor: '#87CEEB',
+          zIndex: 7
+        }}>
+          {/* Multiple ice crystals around the unit */}
+          <Text style={{ position: 'absolute', top: -15, left: '50%', marginLeft: -8, fontSize: 14 }}>❄️</Text>
+          <Text style={{ position: 'absolute', bottom: -15, left: '50%', marginLeft: -8, fontSize: 12 }}>❄️</Text>
+          <Text style={{ position: 'absolute', left: -15, top: '50%', marginTop: -8, fontSize: 12 }}>❄️</Text>
+          <Text style={{ position: 'absolute', right: -15, top: '50%', marginTop: -8, fontSize: 12 }}>❄️</Text>
+          {/* Inner ice pattern */}
+          <Svg width={unitSize + 8} height={unitSize + 8} viewBox="0 0 40 40" style={{ position: 'absolute' }}>
+            {/* Cross ice pattern */}
+            <Path d="M20 5 L20 35" stroke="white" strokeWidth="2" opacity="0.6" />
+            <Path d="M5 20 L35 20" stroke="white" strokeWidth="2" opacity="0.6" />
+            <Path d="M10 10 L30 30" stroke="white" strokeWidth="1.5" opacity="0.4" />
+            <Path d="M30 10 L10 30" stroke="white" strokeWidth="1.5" opacity="0.4" />
+          </Svg>
+        </View>
+      )}
+
       {/* Stun Effect Overlay - Electric Zap */}
       {unit.stunUntil > Date.now() && (
         <View style={{
@@ -4415,10 +4949,10 @@ const ChestSlots = ({ chests, onUnlock, onOpen }) => {
 
           const isUnlocking = chest.state === 'UNLOCKING';
           const isUnlocked = chest.state === 'UNLOCKED';
-          
+
           return (
-            <TouchableOpacity 
-              key={index} 
+            <TouchableOpacity
+              key={index}
               style={[styles.chestSlot, { borderColor: getChestColor(chest.type), borderWidth: 2 }]}
               onPress={() => isUnlocked ? onOpen(chest) : onUnlock(chest)}
               disabled={isUnlocking}
@@ -4431,7 +4965,7 @@ const ChestSlots = ({ chests, onUnlock, onOpen }) => {
               ) : (
                 <Text style={styles.chestLockedText}>{formatChestTime(chest.unlockTime)}</Text>
               )}
-              {isUnlocking && <Text style={{fontSize: 10, color: '#f1c40f'}}>Unlocking...</Text>}
+              {isUnlocking && <Text style={{ fontSize: 10, color: '#f1c40f' }}>Unlocking...</Text>}
             </TouchableOpacity>
           );
         })}
@@ -4469,9 +5003,9 @@ const ShopTab = () => {
             <Text style={styles.offerTag}>BEST VALUE!</Text>
             <Text style={styles.offerTitle}>SUPER MAGICAL BUNDLE</Text>
             <View style={styles.offerImageRow}>
-              <Text style={{fontSize: 40}}>🎁</Text>
-              <Text style={{fontSize: 40}}>💰</Text>
-              <Text style={{fontSize: 40}}>💎</Text>
+              <Text style={{ fontSize: 40 }}>🎁</Text>
+              <Text style={{ fontSize: 40 }}>💰</Text>
+              <Text style={{ fontSize: 40 }}>💎</Text>
             </View>
             <TouchableOpacity style={styles.offerButton}>
               <Text style={styles.offerButtonText}>$9.99</Text>
@@ -4488,7 +5022,7 @@ const ShopTab = () => {
       <View style={styles.dealsGrid}>
         {dailyDeals.map((deal, index) => (
           <View key={index} style={styles.dealCard}>
-            <View style={[styles.dealRarityBar, {backgroundColor: RARITY_COLORS[deal.rarity]}]} />
+            <View style={[styles.dealRarityBar, { backgroundColor: RARITY_COLORS[deal.rarity] }]} />
             <Text style={styles.dealHeader}>{deal.currency === 'FREE' ? 'FREE' : 'x' + deal.count}</Text>
             <View style={styles.dealImageContainer}>
               <UnitSprite id={deal.id} size={45} />
@@ -4508,12 +5042,12 @@ const ShopTab = () => {
       </View>
       <View style={styles.chestShopRow}>
         <TouchableOpacity style={styles.shopChestCard}>
-          <Text style={{fontSize: 40}}>🥈</Text>
+          <Text style={{ fontSize: 40 }}>🥈</Text>
           <Text style={styles.shopChestName}>Silver Chest</Text>
           <View style={styles.shopChestPrice}><Text style={styles.shopChestPriceText}>50 💎</Text></View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.shopChestCard}>
-          <Text style={{fontSize: 40}}>🥇</Text>
+          <Text style={{ fontSize: 40 }}>🥇</Text>
           <Text style={styles.shopChestName}>Gold Chest</Text>
           <View style={styles.shopChestPrice}><Text style={styles.shopChestPriceText}>150 💎</Text></View>
         </TouchableOpacity>
@@ -4549,7 +5083,7 @@ const EventsTab = () => (
           <Text style={styles.eventStat}>Wins: 0</Text>
           <Text style={styles.eventStat}>Losses: 0/3</Text>
         </View>
-        <TouchableOpacity style={[styles.eventButton, {backgroundColor: '#3498db'}]}>
+        <TouchableOpacity style={[styles.eventButton, { backgroundColor: '#3498db' }]}>
           <Text style={styles.eventButtonText}>ENTER</Text>
         </TouchableOpacity>
       </LinearGradient>
@@ -4601,7 +5135,7 @@ const CollectionCard = memo(({ card, isInDeck, isDragging, onTap, onDragStart, o
 
   const isLegendary = card.rarity === 'legendary';
   const componentRef = useRef(null);
-  
+
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => false,
@@ -4625,8 +5159,8 @@ const CollectionCard = memo(({ card, isInDeck, isDragging, onTap, onDragStart, o
   ).current;
 
   return (
-    <View 
-      ref={componentRef} 
+    <View
+      ref={componentRef}
       style={{ opacity: isDragging ? 0.3 : 1 }}
       {...panResponder.panHandlers}
     >
@@ -4675,9 +5209,9 @@ const CollectionCard = memo(({ card, isInDeck, isDragging, onTap, onDragStart, o
     </View>
   );
 }, (prev, next) => {
-  return prev.card.id === next.card.id && 
-         prev.isInDeck === next.isInDeck && 
-         prev.isDragging === next.isDragging;
+  return prev.card.id === next.card.id &&
+    prev.isInDeck === next.isInDeck &&
+    prev.isDragging === next.isDragging;
 });
 
 // Card menu component (popup) - Memoized
@@ -4869,7 +5403,7 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
   }, [dragHandlers]);
 
   const handleDragEnd = useCallback((gesture) => {
-    const target = dropZones.current.find(zone => 
+    const target = dropZones.current.find(zone =>
       gesture.moveX >= zone.x && gesture.moveX <= zone.x + zone.width &&
       gesture.moveY >= zone.y && gesture.moveY <= zone.y + zone.height
     );
@@ -4976,7 +5510,7 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
           </View>
           <View style={styles.cardRowCompact}>
             {cards.slice(4, 8).map((card, i) => (
-              <View key={card.id} ref={el => deckSlotRefs.current[i+4] = el} style={{ width: '23%', aspectRatio: 0.8 }}>
+              <View key={card.id} ref={el => deckSlotRefs.current[i + 4] = el} style={{ width: '23%', aspectRatio: 0.8 }}>
                 {card.rarity === 'legendary' ? (
                   // Legendary hexagonal with rainbow border
                   <View style={{ width: '100%', height: '100%', position: 'relative' }}>
@@ -5045,7 +5579,7 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
             <Text style={styles.towerTroopText}>Princess</Text>
           </View>
           <View style={styles.avgElixirContainer}>
-            <Text style={styles.avgElixirText}>Avg. Elixir: {(cards.reduce((s,c)=>s+c.cost,0)/8).toFixed(1)}</Text>
+            <Text style={styles.avgElixirText}>Avg. Elixir: {(cards.reduce((s, c) => s + c.cost, 0) / 8).toFixed(1)}</Text>
           </View>
         </View>
       </View>
@@ -5112,7 +5646,7 @@ const BattleTab = ({ currentDeck, onStartBattle, chests, onUnlockChest, onOpenCh
     {/* Crown Chest / Pass Royale Bar */}
     <View style={styles.crownChestBar}>
       <View style={styles.passRoyaleIcon}>
-        <Text style={{fontSize: 16}}>👑</Text>
+        <Text style={{ fontSize: 16 }}>👑</Text>
       </View>
       <View style={styles.crownProgressContainer}>
         <View style={styles.crownProgressBar}>
@@ -5121,7 +5655,7 @@ const BattleTab = ({ currentDeck, onStartBattle, chests, onUnlockChest, onOpenCh
         <Text style={styles.crownProgressText}>6/10</Text>
       </View>
       <View style={styles.crownChestReward}>
-        <Text style={{fontSize: 18}}>🎁</Text>
+        <Text style={{ fontSize: 18 }}>🎁</Text>
       </View>
     </View>
 
@@ -5131,7 +5665,7 @@ const BattleTab = ({ currentDeck, onStartBattle, chests, onUnlockChest, onOpenCh
         <Text style={styles.arenaTitle}>ARENA 11</Text>
         <Text style={styles.arenaSubtitle}>Electro Valley</Text>
       </View>
-      
+
       <View style={styles.trophyRoadContainer}>
         <View style={styles.trorophyRoadTrack}>
           <View style={[styles.trophyRoadFill, { width: '75%' }]} />
@@ -5160,12 +5694,12 @@ const BattleTab = ({ currentDeck, onStartBattle, chests, onUnlockChest, onOpenCh
       <TouchableOpacity style={styles.smallBlueButton} onPress={onFriendlyBattle}>
         <Text style={styles.smallButtonIcon}>👥</Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity style={styles.battleButton} onPress={onStartBattle}>
         <Text style={styles.battleButtonText}>BATTLE</Text>
         <View style={styles.battleButtonTrophyRow}>
           <Text style={styles.battleButtonTrophyText}>+30</Text>
-          <Text style={{fontSize: 10}}>🏆</Text>
+          <Text style={{ fontSize: 10 }}>🏆</Text>
         </View>
       </TouchableOpacity>
 
@@ -5200,7 +5734,7 @@ const SocialTab = () => {
     return (
       <View style={[styles.chatRow, isMe ? styles.chatRowMe : styles.chatRowOther]}>
         <View style={[styles.chatBubble, isMe ? styles.chatBubbleMe : styles.chatBubbleOther]}>
-          {!isMe && <Text style={[styles.chatUser, {color: item.role === 'Elder' ? '#f1c40f' : '#3498db'}]}>{item.user}</Text>}
+          {!isMe && <Text style={[styles.chatUser, { color: item.role === 'Elder' ? '#f1c40f' : '#3498db' }]}>{item.user}</Text>}
           <Text style={styles.chatText}>{item.text}</Text>
           <Text style={styles.chatTime}>{item.time}</Text>
         </View>
@@ -5212,13 +5746,13 @@ const SocialTab = () => {
     <View style={styles.clanTabContainer}>
       <View style={styles.socialHeader}>
         <View style={styles.clanMainInfo}>
-          <View style={styles.clanBadgeLarge}><Text style={{fontSize: 24}}>🛡️</Text></View>
+          <View style={styles.clanBadgeLarge}><Text style={{ fontSize: 24 }}>🛡️</Text></View>
           <View>
             <Text style={styles.clanNameText}>Blue Kings</Text>
             <Text style={styles.clanStatusText}>48/50 Members • 🏆 4000+</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.clanSettingsIcon}><Text style={{fontSize: 18}}>ℹ️</Text></TouchableOpacity>
+        <TouchableOpacity style={styles.clanSettingsIcon}><Text style={{ fontSize: 18 }}>ℹ️</Text></TouchableOpacity>
       </View>
 
       <View style={styles.requestBanner}>
@@ -5363,16 +5897,16 @@ const GameBoard = ({
           transform: [{ translateX: shakeAnim }]
         }
       ]}>
-            {/* Top Info Bar (Opponent) */}
-            <View style={styles.topInfoBar}>
-              <View style={styles.playerInfoContainer}>
-                <Text style={styles.playerName}>Trainer Cheddar</Text>
-                <Text style={styles.clanName}>Training Camp</Text>
-              </View>
-                    {/* AI Elixir Bar - Small and subtle */}
-                    <View style={{ width: 80, height: 10, backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: 5, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }}>
-                      <View style={{ width: `${(enemyElixir / 10) * 100}%`, height: '100%', backgroundColor: '#D442F5', opacity: 0.7 }} />
-                    </View>            </View>
+        {/* Top Info Bar (Opponent) */}
+        <View style={styles.topInfoBar}>
+          <View style={styles.playerInfoContainer}>
+            <Text style={styles.playerName}>Trainer Cheddar</Text>
+            <Text style={styles.clanName}>Training Camp</Text>
+          </View>
+          {/* AI Elixir Bar - Small and subtle */}
+          <View style={{ width: 80, height: 10, backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: 5, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }}>
+            <View style={{ width: `${(enemyElixir / 10) * 100}%`, height: '100%', backgroundColor: '#D442F5', opacity: 0.7 }} />
+          </View>            </View>
         {/* Score & Time Board */}
         <View style={styles.scoreBoard}>
           <View style={styles.crownContainer}>
@@ -5616,7 +6150,7 @@ const GameBoard = ({
                     <>
                       {/* Rectangular damage area showing the log's path */}
                       <Rect
-                        x={dragPosition.x + 30 - logWidth/2}
+                        x={dragPosition.x + 30 - logWidth / 2}
                         y={draggingCard.isOpponent ? startY : endY}
                         width={logWidth}
                         height={logDistance}
@@ -5679,61 +6213,61 @@ const ChestOpeningModal = ({ chest, onClose }) => {
   const [revealedIndex, setRevealedIndex] = useState(-1);
   const shakeAnim = useRef(new Animated.Value(0)).current;
 
-      const generateRewards = () => {
-        let gold = 0;
-        let gems = 0;
-        let totalCards = 0;
-  
-        switch (chest.type) {
-          case 'SILVER': gold = 50; totalCards = 5; break;
-          case 'GOLD': gold = 200; gems = 2; totalCards = 15; break;
-          case 'GIANT': gold = 1000; totalCards = 50; break;
-          case 'MAGICAL': gold = 500; gems = 10; totalCards = 20; break;
-          case 'SUPER MAGICAL': gold = 5000; gems = 50; totalCards = 100; break;
-          default: gold = 100; totalCards = 10;
-        }
-  
-        const newRewards = [];
-        if (gold > 0) newRewards.push({ type: 'GOLD', value: gold, icon: '💰', label: 'Gold' });
-        if (gems > 0) newRewards.push({ type: 'GEM', value: gems, icon: '💎', label: 'Gems' });
-  
-        // --- TIERED CARD DISTRIBUTION ---
-        const getCardsOfRarity = (rarity) => CARDS.filter(c => !c.isToken && c.rarity === rarity);
-        
-        const addCardReward = (rarity, count) => {
-          if (count <= 0) return;
-          const possible = getCardsOfRarity(rarity);
-          if (possible.length === 0) return;
-          const card = possible[Math.floor(Math.random() * possible.length)];
-          newRewards.push({ type: 'CARD', value: count, icon: '🃏', label: card.name, card: card });
-        };
-  
-        if (chest.type === 'SILVER') {
-          addCardReward('common', totalCards);
-        } 
-        else if (chest.type === 'GOLD') {
-          addCardReward('common', totalCards - 3);
-          addCardReward('rare', 3);
-        }
-        else if (chest.type === 'GIANT') {
-          addCardReward('common', Math.floor(totalCards * 0.8));
-          addCardReward('rare', Math.floor(totalCards * 0.2));
-        }
-        else if (chest.type === 'MAGICAL') {
-          addCardReward('common', totalCards - 6);
-          addCardReward('rare', 4);
-          addCardReward('epic', 2);
-        }
-        else if (chest.type === 'SUPER MAGICAL') {
-          addCardReward('common', 60);
-          addCardReward('rare', 25);
-          addCardReward('epic', 14);
-          // 50% chance for a Legendary in Super Magical
-          if (Math.random() > 0.5) addCardReward('legendary', 1);
-        }
-  
-        setRewards(newRewards);
-      };
+  const generateRewards = () => {
+    let gold = 0;
+    let gems = 0;
+    let totalCards = 0;
+
+    switch (chest.type) {
+      case 'SILVER': gold = 50; totalCards = 5; break;
+      case 'GOLD': gold = 200; gems = 2; totalCards = 15; break;
+      case 'GIANT': gold = 1000; totalCards = 50; break;
+      case 'MAGICAL': gold = 500; gems = 10; totalCards = 20; break;
+      case 'SUPER MAGICAL': gold = 5000; gems = 50; totalCards = 100; break;
+      default: gold = 100; totalCards = 10;
+    }
+
+    const newRewards = [];
+    if (gold > 0) newRewards.push({ type: 'GOLD', value: gold, icon: '💰', label: 'Gold' });
+    if (gems > 0) newRewards.push({ type: 'GEM', value: gems, icon: '💎', label: 'Gems' });
+
+    // --- TIERED CARD DISTRIBUTION ---
+    const getCardsOfRarity = (rarity) => CARDS.filter(c => !c.isToken && c.rarity === rarity);
+
+    const addCardReward = (rarity, count) => {
+      if (count <= 0) return;
+      const possible = getCardsOfRarity(rarity);
+      if (possible.length === 0) return;
+      const card = possible[Math.floor(Math.random() * possible.length)];
+      newRewards.push({ type: 'CARD', value: count, icon: '🃏', label: card.name, card: card });
+    };
+
+    if (chest.type === 'SILVER') {
+      addCardReward('common', totalCards);
+    }
+    else if (chest.type === 'GOLD') {
+      addCardReward('common', totalCards - 3);
+      addCardReward('rare', 3);
+    }
+    else if (chest.type === 'GIANT') {
+      addCardReward('common', Math.floor(totalCards * 0.8));
+      addCardReward('rare', Math.floor(totalCards * 0.2));
+    }
+    else if (chest.type === 'MAGICAL') {
+      addCardReward('common', totalCards - 6);
+      addCardReward('rare', 4);
+      addCardReward('epic', 2);
+    }
+    else if (chest.type === 'SUPER MAGICAL') {
+      addCardReward('common', 60);
+      addCardReward('rare', 25);
+      addCardReward('epic', 14);
+      // 50% chance for a Legendary in Super Magical
+      if (Math.random() > 0.5) addCardReward('legendary', 1);
+    }
+
+    setRewards(newRewards);
+  };
   const handleTap = () => {
     if (step === 'CLOSED') {
       // Shake animation for first open
@@ -5770,31 +6304,31 @@ const ChestOpeningModal = ({ chest, onClose }) => {
   const currentReward = rewards[revealedIndex];
 
   return (
-    <TouchableOpacity 
-      style={styles.chestModalOverlay} 
-      activeOpacity={1} 
+    <TouchableOpacity
+      style={styles.chestModalOverlay}
+      activeOpacity={1}
       onPress={handleTap}
     >
       <View style={styles.chestModalContent}>
         <Text style={styles.chestModalTitle}>{chest.type} CHEST</Text>
-        
+
         {step === 'CLOSED' && (
-          <View style={{alignItems: 'center'}}>
+          <View style={{ alignItems: 'center' }}>
             <Animated.View style={[
-              styles.chestVisual, 
-              { 
+              styles.chestVisual,
+              {
                 borderColor: getChestColor(chest.type),
-                transform: [{ translateX: shakeAnim }] 
+                transform: [{ translateX: shakeAnim }]
               }
             ]}>
-              <Text style={{fontSize: 50}}>🔒</Text>
+              <Text style={{ fontSize: 50 }}>🔒</Text>
             </Animated.View>
             <Text style={styles.chestTapText}>Tap to Open!</Text>
           </View>
         )}
 
         {(step === 'OPENING' || step === 'FINISHED') && currentReward && (
-          <View style={{alignItems: 'center', width: '100%'}}>
+          <View style={{ alignItems: 'center', width: '100%' }}>
             {/* Authentic CR Item Count Indicator */}
             {step === 'OPENING' && remainingCount > 0 && (
               <View style={styles.itemCountBadge}>
@@ -5806,7 +6340,7 @@ const ChestOpeningModal = ({ chest, onClose }) => {
             <Animated.View style={styles.rewardRevealContainer}>
               <View style={styles.rewardItemLarge}>
                 {currentReward.type === 'CARD' ? (
-                  <View style={{alignItems: 'center'}}>
+                  <View style={{ alignItems: 'center' }}>
                     <UnitSprite id={currentReward.card.id} isOpponent={false} size={120} />
                     <Text style={styles.rewardValueLarge}>{currentReward.label}</Text>
                     <View style={styles.cardCountBadge}>
@@ -5814,7 +6348,7 @@ const ChestOpeningModal = ({ chest, onClose }) => {
                     </View>
                   </View>
                 ) : (
-                  <View style={{alignItems: 'center'}}>
+                  <View style={{ alignItems: 'center' }}>
                     <Text style={styles.rewardIconLarge}>{currentReward.icon}</Text>
                     <Text style={styles.rewardValueLarge}>{currentReward.value}</Text>
                     <Text style={styles.rewardLabelLarge}>{currentReward.label}</Text>
@@ -5828,7 +6362,7 @@ const ChestOpeningModal = ({ chest, onClose }) => {
                 <Text style={styles.closeChestButtonText}>COLLECT</Text>
               </TouchableOpacity>
             )}
-            
+
             {step === 'OPENING' && (
               <Text style={styles.chestTapText}>Tap to reveal next!</Text>
             )}
@@ -5908,7 +6442,7 @@ const FriendlyBattleModal = ({ visible, onClose, socket }) => {
           )}
 
           {mode === 'CREATE' && (
-            <View style={{alignItems: 'center', width: '100%'}}>
+            <View style={{ alignItems: 'center', width: '100%' }}>
               <Text style={styles.waitingText}>Share this code with your friend:</Text>
               <Text style={styles.roomCodeText}>{roomCode || '...'}</Text>
               <Text style={styles.waitingText}>Waiting for opponent...</Text>
@@ -5917,7 +6451,7 @@ const FriendlyBattleModal = ({ visible, onClose, socket }) => {
           )}
 
           {mode === 'JOIN' && (
-            <View style={{alignItems: 'center', width: '100%'}}>
+            <View style={{ alignItems: 'center', width: '100%' }}>
               <TextInput
                 style={styles.roomInput}
                 placeholder="Enter Room Code"
@@ -5932,7 +6466,7 @@ const FriendlyBattleModal = ({ visible, onClose, socket }) => {
             </View>
           )}
 
-          {error ? <Text style={{color: 'red', marginTop: 10, fontWeight: 'bold'}}>{error}</Text> : null}
+          {error ? <Text style={{ color: 'red', marginTop: 10, fontWeight: 'bold' }}>{error}</Text> : null}
 
           <TouchableOpacity style={styles.cardMenuCancel} onPress={onClose}>
             <Text style={styles.cardMenuCancelText}>Cancel</Text>
@@ -5981,7 +6515,7 @@ export default function App() {
 
   // Multiple deck slots - 5 decks of 8 cards each
   const getDeckByIds = (ids) => ids.map(id => CARDS.find(c => c.id === id)).filter(Boolean);
-  
+
   const [allDecks, setAllDecks] = useState([
     getDeckByIds(['mother_witch', 'elixir_golem', 'ice_golem', 'ice_spirit', 'skeletons', 'fireball', 'zap', 'hog_rider']), // Test Deck
     getDeckByIds(['goblin_barrel', 'princess', 'knight', 'dart_goblin', 'inferno_tower', 'rocket', 'arrows', 'skeletons']), // Log Bait
@@ -6109,7 +6643,7 @@ export default function App() {
     setIsDoubleElixir(false);
     setShowDoubleElixirAlert(false);
     doubleElixirTriggeredRef.current = false;
-    
+
     // Player Deck Randomization
     const currentDeck = userCards || allDecks[0];
     const shuffledPlayerDeck = [...currentDeck].sort(() => Math.random() - 0.5);
@@ -6223,173 +6757,125 @@ export default function App() {
     }
   };
 
-    const spawnCard = (card, x, y, isOpponent = false) => {
+  const spawnCard = (card, x, y, isOpponent = false) => {
 
 
-  
-
-      // Handle Mirror card - copy the last played card with +1 level
-
-      let actualCard = card;
-
-      let levelBoost = 0;
-
-      if (card.id === 'mirror') {
-
-        const lastCard = isOpponent ? enemyLastPlayedCardRef.current : lastPlayedCardRef.current;
-
-        if (!lastCard) {
 
 
-          return;
+    // Handle Mirror card - copy the last played card with +1 level
 
-        }
+    let actualCard = card;
 
-        levelBoost = (lastCard.level || 11) + 1; // Tournament Standard 11 + 1
+    let levelBoost = 0;
 
-        actualCard = { ...lastCard };
+    if (card.id === 'mirror') {
 
-        actualCard.cost = lastCard.cost + 1;
+      const lastCard = isOpponent ? enemyLastPlayedCardRef.current : lastPlayedCardRef.current;
 
-        actualCard.level = levelBoost;
+      if (!lastCard) {
 
-        const levelBonus = 1 + (levelBoost - 11) * 0.1; 
 
-        actualCard.hp = Math.floor(lastCard.hp * levelBonus);
-
-        actualCard.damage = Math.floor(lastCard.damage * levelBonus);
+        return;
 
       }
 
-  
+      levelBoost = (lastCard.level || 11) + 1; // Tournament Standard 11 + 1
 
-      const setTargetElixir = isOpponent ? setEnemyElixir : setElixir;
+      actualCard = { ...lastCard };
 
-      const setTargetHand = isOpponent ? setEnemyHand : setHand;
+      actualCard.cost = lastCard.cost + 1;
 
-      const setTargetQueue = isOpponent ? setEnemyDeckQueue : setDeckQueue;
+      actualCard.level = levelBoost;
 
-      const setTargetNext = isOpponent ? setEnemyNextCard : setNextCard;
+      const levelBonus = 1 + (levelBoost - 11) * 0.1;
 
-      const nextCardToUse = isOpponent ? enemyNextCardRef.current : nextCard;
+      actualCard.hp = Math.floor(lastCard.hp * levelBonus);
 
-  
+      actualCard.damage = Math.floor(lastCard.damage * levelBonus);
 
-      setTargetElixir(currentElixir => {
-
-        const costToUse = actualCard.cost;
-
-        if (currentElixir < costToUse) return currentElixir;
-
-        const newElixir = currentElixir - costToUse;
-
-  
-
-        if (actualCard.type === 'spell') {
-
-          let spellType = 'fireball_spell';
-
-          let spellSpeed = 15;
-
-          let startX = width / 2;
-
-          let startY = isOpponent ? 0 : height;
-
-  
-
-          if (actualCard.id === 'lightning') {
-
-            spellType = 'lightning_bolt';
-
-            spellSpeed = 100;
-
-            const allTargets = [
-
-              ...(unitsRef.current || []).filter(u => u.isOpponent !== isOpponent),
-
-              ...(towersRef.current || []).filter(t => t.isOpponent !== isOpponent && t.hp > 0)
-
-            ];
-
-            const targetsInRange = allTargets.filter(t => {
-
-              const dist = Math.sqrt(Math.pow(t.x - x, 2) + Math.pow(t.y - y, 2));
-
-              return dist <= actualCard.radius;
-
-            });
-
-            const topTargets = targetsInRange.sort((a, b) => b.hp - a.hp).slice(0, 3);
-
-            if (topTargets.length > 0) {
-
-              const newProjectiles = topTargets.map((t, index) => ({
-
-                id: Date.now() + index,
-
-                x: t.x, y: t.y - 50, targetX: t.x, targetY: t.y,
-
-                speed: 100, damage: actualCard.damage, type: 'lightning_bolt',
-
-                isSpell: true, stun: 0.5, hit: true, spawnTime: Date.now(), isOpponent
-
-              }));
-
-              setProjectiles(prev => [...prev, ...newProjectiles]);
-
-              setUnits(prev => prev.map(u => {
-
-                if (topTargets.some(t => t.id === u.id)) {
-
-                  return { ...u, hp: u.hp - actualCard.damage, stunUntil: Date.now() + 500, wasStunned: true };
-
-                }
-
-                return u;
-
-              }));
-
-              setTowers(prev => prev.map(t => {
-
-                if (topTargets.some(target => target.id === t.id)) {
-
-                  const towerDamage = Math.floor(actualCard.damage * 0.3);
-
-                  return { ...t, hp: t.hp - towerDamage };
-
-                }
-
-                return t;
-
-              }));
-
-            }
-
-          } else if (actualCard.id === 'zap') {
-
-            spellType = 'zap_spell';
-
-            const zapRadius = actualCard.radius || 35;
-
-            const zapDamage = actualCard.damage;
-
-            const zapStun = (actualCard.stun || 0.5) * 1000;
+    }
 
 
 
-            // Apply damage and stun immediately
+    const setTargetElixir = isOpponent ? setEnemyElixir : setElixir;
+
+    const setTargetHand = isOpponent ? setEnemyHand : setHand;
+
+    const setTargetQueue = isOpponent ? setEnemyDeckQueue : setDeckQueue;
+
+    const setTargetNext = isOpponent ? setEnemyNextCard : setNextCard;
+
+    const nextCardToUse = isOpponent ? enemyNextCardRef.current : nextCard;
+
+
+
+    setTargetElixir(currentElixir => {
+
+      const costToUse = actualCard.cost;
+
+      if (currentElixir < costToUse) return currentElixir;
+
+      const newElixir = currentElixir - costToUse;
+
+
+
+      if (actualCard.type === 'spell') {
+
+        let spellType = 'fireball_spell';
+
+        let spellSpeed = 15;
+
+        let startX = width / 2;
+
+        let startY = isOpponent ? 0 : height;
+
+
+
+        if (actualCard.id === 'lightning') {
+
+          spellType = 'lightning_bolt';
+
+          spellSpeed = 100;
+
+          const allTargets = [
+
+            ...(unitsRef.current || []).filter(u => u.isOpponent !== isOpponent),
+
+            ...(towersRef.current || []).filter(t => t.isOpponent !== isOpponent && t.hp > 0)
+
+          ];
+
+          const targetsInRange = allTargets.filter(t => {
+
+            const dist = Math.sqrt(Math.pow(t.x - x, 2) + Math.pow(t.y - y, 2));
+
+            return dist <= actualCard.radius;
+
+          });
+
+          const topTargets = targetsInRange.sort((a, b) => b.hp - a.hp).slice(0, 3);
+
+          if (topTargets.length > 0) {
+
+            const newProjectiles = topTargets.map((t, index) => ({
+
+              id: Date.now() + index,
+
+              x: t.x, y: t.y - 50, targetX: t.x, targetY: t.y,
+
+              speed: 100, damage: actualCard.damage, type: 'lightning_bolt',
+
+              isSpell: true, stun: 0.5, hit: true, spawnTime: Date.now(), isOpponent
+
+            }));
+
+            setProjectiles(prev => [...prev, ...newProjectiles]);
 
             setUnits(prev => prev.map(u => {
 
-              if (u.isOpponent !== isOpponent) {
+              if (topTargets.some(t => t.id === u.id)) {
 
-                const dist = Math.sqrt(Math.pow(u.x - x, 2) + Math.pow(u.y - y, 2));
-
-                if (dist <= zapRadius) {
-
-                  return { ...u, hp: u.hp - zapDamage, stunUntil: Date.now() + zapStun, wasStunned: true };
-
-                }
+                return { ...u, hp: u.hp - actualCard.damage, stunUntil: Date.now() + 500, wasStunned: true };
 
               }
 
@@ -6397,21 +6883,13 @@ export default function App() {
 
             }));
 
-
-
             setTowers(prev => prev.map(t => {
 
-              if (t.isOpponent !== isOpponent && t.hp > 0) {
+              if (topTargets.some(target => target.id === t.id)) {
 
-                const dist = Math.sqrt(Math.pow(t.x - x, 2) + Math.pow(t.y - y, 2));
+                const towerDamage = Math.floor(actualCard.damage * 0.3);
 
-                if (dist <= zapRadius) {
-
-                  const towerDamage = Math.floor(zapDamage * 0.3);
-
-                  return { ...t, hp: t.hp - towerDamage, stunUntil: Date.now() + zapStun, wasStunned: true };
-
-                }
+                return { ...t, hp: t.hp - towerDamage };
 
               }
 
@@ -6419,511 +6897,691 @@ export default function App() {
 
             }));
 
-
-
-            // Add visual effect
-
-            setVisualEffects(prev => [...prev, {
-
-              id: Date.now(),
-
-              type: 'zap_aura',
-
-              x, y,
-
-              radius: zapRadius,
-
-              startTime: Date.now(),
-
-              duration: 500
-
-            }]);
-
-
-
-          } else if (actualCard.id === 'the_log') {
-
-            spellType = 'the_log';
-
-            // The Log starts WHERE you deploy it, then rolls FORWARD
-            // Player (bottom): starts at deploy position, rolls UP (towards Y=0)
-            // Opponent (top): starts at deploy position, rolls DOWN (towards Y=height)
-            startX = x;
-            startY = y;
-            // Store the direction for damage calculation
-            const logDirection = isOpponent ? 1 : -1; // 1 = down, -1 = up
-            const logDistance = 150; // How far the log rolls
-
-            // Calculate target position based on direction
-            const targetY = y + (logDirection * logDistance);
-
-            setProjectiles(prev => [...prev, {
-
-              id: Date.now(), x: startX, y: startY, targetX: x, targetY: targetY,
-
-              speed: 15, damage: actualCard.damage, radius: actualCard.radius,
-
-              type: spellType, isSpell: true, stun: actualCard.stun || 0,
-
-              duration: actualCard.duration || 0, hit: false, spawnTime: Date.now(),
-
-              isOpponent,
-
-              knockback: actualCard.knockback || 0,
-
-              splash: false, // Not splash, uses rectangular path damage
-
-              isLog: true, // Special flag for log damage
-
-              logStartY: startY,
-              logEndY: targetY,
-
-              y: startY
-
-            }]);
-
-          } else if (actualCard.id === 'poison') {
-
-            spellType = 'poison_spell';
-
-            spellSpeed = 100;
-
-            startX = x; startY = y;
-
-          } else if (actualCard.id === 'rocket') {
-
-            spellType = 'rocket_spell';
-
-            startY = isOpponent ? 0 : height;
-
-            spellSpeed = 12;
-
-          } else if (actualCard.id === 'goblin_barrel') {
-
-            spellType = 'goblin_barrel_spell';
-
-            spellSpeed = 25;
-
-            startX = x; startY = isOpponent ? 0 : 0;
-
-            setProjectiles(prev => [...prev, {
-
-              id: Date.now(), x: startX, y: startY, targetX: x, targetY: y,
-
-              speed: spellSpeed, damage: 0, radius: actualCard.radius,
-
-              type: spellType, isSpell: true, hit: false, spawnTime: Date.now(),
-
-              isGoblinBarrel: true, spawns: actualCard.spawns, spawnCount: actualCard.spawnCount || 3, isOpponent
-
-            }]);
-
-          } else if (actualCard.id === 'earthquake') {
-
-            spellType = 'earthquake_spell';
-
-            spellSpeed = 100;
-
-            setProjectiles(prev => [...prev, {
-
-              id: Date.now(), x: x, y: y, targetX: x, targetY: y,
-
-              speed: spellSpeed, damage: actualCard.damage, radius: actualCard.radius,
-
-              type: spellType, isSpell: true, stun: actualCard.stun || 0,
-
-              duration: actualCard.duration || 0, hit: true, spawnTime: Date.now(),
-
-              slow: actualCard.slow, isOpponent
-
-            }]);
-
-            setScreenShake({ intensity: 1.0, duration: 500 });
-
-          } else if (actualCard.id === 'graveyard') {
-
-            spellType = 'graveyard_spell';
-
-            spellSpeed = 100;
-
-            setUnits(prev => [...prev, {
-
-              id: 'graveyard_' + Date.now(), x: x, y: y, hp: 9999, maxHp: 9999,
-
-              isOpponent, speed: 0, lane: x < width / 2 ? 'LEFT' : 'RIGHT',
-
-              lastAttack: 0, spriteId: 'graveyard_zone', type: 'graveyard_zone',
-
-              range: 0, damage: 0, attackSpeed: 0, spawns: actualCard.spawns,
-
-              spawnRate: 0.5, spawnCount: 1, lastSpawn: Date.now(), lifetimeDuration: 10,
-
-              spawnTime: Date.now(), totalToSpawn: 20, spawnedSoFar: 0, isZone: true, radius: actualCard.radius
-
-            }]);
-
-          } else if (actualCard.id === 'clone') {
-
-            // Clone spell - duplicate all units in radius
-            const cloneRadius = actualCard.radius || 35;
-
-            setUnits(prevUnits => {
-              const newClones = prevUnits.filter(unit => {
-                const dx = unit.x - x;
-                const dy = unit.y - y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                return distance <= cloneRadius && !unit.isOpponent && unit.type !== 'building';
-              }).map(unit => ({
-                ...unit,
-                id: 'clone_' + Date.now() + '_' + Math.random(),
-                x: unit.x + (Math.random() * 20 - 10),
-                y: unit.y + (Math.random() * 20 - 10),
-                hp: 1, // Clones have only 1 HP
-                maxHp: 1,
-                isClone: true,
-                cloneEndTime: Date.now() + (actualCard.cloneDuration || 10) * 1000
-              }));
-              return [...prevUnits, ...newClones];
-            });
-
-            // Add visual effect
-            setVisualEffects(prev => [...prev, {
-              id: Date.now(),
-              type: 'clone_spell',
-              x, y,
-              radius: cloneRadius,
-              startTime: Date.now(),
-              duration: 1000
-            }]);
-
           }
 
+        } else if (actualCard.id === 'zap') {
 
+          spellType = 'zap_spell';
 
-          const isPoison = actualCard.id === 'poison';
+          const zapRadius = actualCard.radius || 35;
 
-          if (actualCard.id !== 'lightning' && actualCard.id !== 'goblin_barrel' && actualCard.id !== 'graveyard' && actualCard.id !== 'earthquake' && actualCard.id !== 'zap' && actualCard.id !== 'clone') {
+          const zapDamage = actualCard.damage;
 
-            setProjectiles(prev => [...prev, {
+          const zapStun = (actualCard.stun || 0.5) * 1000;
 
-              id: Date.now(), x: startX, y: startY, targetX: x, targetY: y,
 
-              speed: spellSpeed, damage: actualCard.damage, radius: actualCard.radius,
 
-              type: spellType, isSpell: true, stun: actualCard.stun || 0,
+          // Apply damage and stun immediately
 
-              duration: actualCard.duration || 0, hit: isPoison, spawnTime: Date.now(),
+          setUnits(prev => prev.map(u => {
 
-              isPoison, isOpponent,
-
-              knockback: actualCard.knockback || 0,
-
-              splash: actualCard.id === 'fireball' || actualCard.id === 'the_log', // These spells do splash damage
-
-              y: startY // Store starting Y for knockback calculation
-
-            }]);
-
-          }
-
-        } else {
-
-          const lane = x < width / 2 ? 'LEFT' : 'RIGHT';
-
-          const count = actualCard.count || 1;
-
-          const newUnits = [];
-
-          for (let i = 0; i < count; i++) {
-
-            const offsetX = count > 1 ? (Math.random() * 20 - 10) : 0;
-
-            const offsetY = count > 1 ? (Math.random() * 20 - 10) : 0;
-
-            let unitLane = lane;
-
-            let spawnX = x + offsetX;
-
-            let spawnY = y + offsetY;
-
-            // LANE CENTERING: Pull spawn position towards center of lane
-            const laneCenter = lane === 'LEFT' ? 95 : width - 95;
-            const distFromCenter = spawnX - laneCenter;
-            spawnX -= distFromCenter * 0.3; // Pull 30% towards center
-
-            // MINER: Starts at player's side, travels underground to deployment position
-            let targetX = x + offsetX;
-            let targetY = y + offsetY;
-
-            if (actualCard.id === 'miner') {
-              // Miner starts from behind player's towers
-              spawnY = isOpponent ? height * 0.1 : height * 0.9; // Behind player's towers
-              // Keep X in the same lane as deployment
-              spawnX = x;
-            }
-
-            if (actualCard.id === 'three_musketeers' && count === 3) {
-
-              if (i < 2) unitLane = lane;
-
-              else {
-
-                unitLane = lane === 'LEFT' ? 'RIGHT' : 'LEFT';
-
-                spawnX = unitLane === 'LEFT' ? 70 + offsetX : width - 70 + offsetX;
-
-              }
-
-            }
-
-            newUnits.push({
-
-              id: Date.now() + i + (isOpponent ? 10000 : 0),
-
-              x: spawnX, y: spawnY, hp: actualCard.hp, maxHp: actualCard.hp,
-
-              isOpponent, speed: actualCard.speed, lane: unitLane,
-
-              lastAttack: 0, spriteId: actualCard.id, type: actualCard.type,
-
-              range: actualCard.range, damage: actualCard.damage,
-
-              attackSpeed: actualCard.attackSpeed, projectile: actualCard.projectile,
-
-              targetType: actualCard.targetType,
-
-              charge: actualCard.charge ? { active: false, distance: 0, threshold: 2 } : undefined,
-
-              chargeState: actualCard.chargeTime ? { startTime: Date.now(), duration: actualCard.chargeTime, isCharged: false } : undefined,
-
-              hidden: actualCard.hidden ? { active: true, visibleHp: actualCard.hp } : undefined,
-
-              burrowing: actualCard.burrows ? { active: true, startTime: Date.now(), targetX, targetY } : undefined,
-
-              deployAnywhere: actualCard.deployAnywhere || false,
-
-              splash: actualCard.splash || false,
-
-              frontalSplash: actualCard.frontalSplash || false,
-
-              spawnDamage: actualCard.spawnDamage || undefined,
-
-              spawns: actualCard.spawns || undefined,
-
-              spawnRate: actualCard.spawnRate || undefined,
-
-              spawnCount: actualCard.spawnCount || undefined,
-
-              deathSpawnCount: actualCard.deathSpawnCount || undefined,
-
-              deathSpawns: actualCard.deathSpawns || undefined,
-
-              lastSpawn: actualCard.spawnRate ? Date.now() : 0,
-
-              lifetimeDuration: actualCard.lifetime || undefined,
-
-              spawnTime: Date.now(),
-
-              spawnDelay: actualCard.spawnDelay || 0,
-
-              jumps: actualCard.jumps || false,
-
-              slow: actualCard.slow || 0,
-
-              slowUntil: 0, stunUntil: 0, baseDamage: actualCard.damage,
-
-              lockedTarget: null, wasPushed: false, wasStunned: false,
-
-              kamikaze: actualCard.kamikaze || false,
-
-              chain: actualCard.chain || 0,
-
-              healsOnAttack: actualCard.healsOnAttack || 0,
-
-              healRadius: actualCard.healRadius || 0,
-
-              passiveHeal: actualCard.passiveHeal || 0,
-
-              deathRage: actualCard.deathRage || false,
-
-              generatesElixir: actualCard.generatesElixir || false,
-
-              elixirGenerationTime: 0,
-
-              hasShield: actualCard.hasShield || false,
-
-              currentShieldHp: actualCard.shieldHp || 0,
-
-              shieldHp: actualCard.shieldHp || 0,
-
-              deathDamage: actualCard.deathDamage || 0,
-
-              deathRadius: actualCard.deathRadius || 0,
-
-              deathSlow: actualCard.deathSlow || 0,
-
-              dashInvincible: actualCard.dashInvincible || false,
-
-              dashRange: actualCard.dashRange || 80,
-
-              recoil: actualCard.recoil || 0,
-
-              stopsToAttack: actualCard.stopsToAttack || false,
-
-              turnsToPig: actualCard.turnsToPig || false,
-
-              extraProjectiles: actualCard.extraProjectiles || 0,
-
-              isDashing: false, dashEndTime: 0,
-
-              damageRamp: actualCard.damageRamp || false,
-
-              currentDamageBonus: 0, lastDamageRampTime: Date.now(),
-
-              lastTargetId: null, bombDrops: actualCard.bombDrops || false,
-
-              lastBombDrop: Date.now(), shotgunSpread: actualCard.shotgunSpread || false,
-
-              pierce: actualCard.pierce || false,
-
-              givesOpponentElixir: actualCard.givesOpponentElixir || false
-
-            });
-
-          }
-
-          if (actualCard.id === 'elixir_golem' || actualCard.deathSpawns) {
-            console.log('[SPAWN]', actualCard.id, 'deathSpawns:', actualCard.deathSpawns, 'count:', actualCard.deathSpawnCount);
-          }
-
-          setUnits(prev => [...(prev || []), ...newUnits]);
-
-          // Miner burrowing visual - dirt going into ground at spawn point (player's bridge)
-          if (actualCard.id === 'miner') {
-            setVisualEffects(prev => [...prev, {
-              id: Date.now() + Math.random(),
-              type: 'miner_burrow',
-              x: spawnX,
-              y: spawnY,
-              radius: 50,
-              startTime: Date.now(),
-              duration: 1000
-            }]);
-          }
-
-          if (actualCard.id === 'electro_wizard' || actualCard.id === 'mega_knight') {
-
-            const spawnZapRange = actualCard.id === 'mega_knight' ? 80 : 60;
-
-            const spawnZapDamage = actualCard.spawnDamage || actualCard.damage;
-
-            const stunDuration = actualCard.stun || (actualCard.id === 'mega_knight' ? 0 : 0.5);
-
-            const knockbackForce = actualCard.id === 'mega_knight' ? 40 : 0;
-
-            setUnits(prevUnits => prevUnits.map(u => {
-
-              if (u.isOpponent === isOpponent) return u;
+            if (u.isOpponent !== isOpponent) {
 
               const dist = Math.sqrt(Math.pow(u.x - x, 2) + Math.pow(u.y - y, 2));
 
-              if (dist <= spawnZapRange) {
+              if (dist <= zapRadius) {
 
-                if (actualCard.id === 'electro_wizard') {
-
-                  setProjectiles(prevProjs => [...prevProjs, {
-
-                    id: Date.now() + Math.random(), x, y, targetX: u.x, targetY: u.y,
-
-                    speed: 50, damage: 0, type: 'electric_bolt', stun: stunDuration,
-
-                    isSpell: true, hit: true, spawnZap: true, isOpponent
-
-                  }]);
-
-                }
-
-                let newX = u.x; let newY = u.y;
-
-                if (knockbackForce > 0) {
-                  const angle = Math.atan2(u.y - y, u.x - x);
-                  let nX = u.x + Math.cos(angle) * knockbackForce;
-                  let nY = u.y + Math.sin(angle) * knockbackForce;
-
-                  // River collision during knockback
-                  const rY = height / 2;
-                  const distR = Math.abs(nY - rY);
-                  const bW = 60;
-                  const lBX = 95;
-                  const rBX = width - 95;
-                  const onB = (Math.abs(nX - lBX) < bW / 2) || (Math.abs(nX - rBX) < bW / 2);
-                  
-                  const isFlyingOrJumping = u.jumps || u.type === 'flying';
-                  if (distR < 25 && !onB && !isFlyingOrJumping) {
-                     nY = rY + (u.y < rY ? -25 : 25);
-                  }
-
-                  newX = Math.max(10, Math.min(width - 10, nX));
-                  newY = Math.max(10, Math.min(height - 10, nY));
-                }
-
-                return { ...u, x: newX, y: newY, hp: u.hp - spawnZapDamage, stunUntil: stunDuration > 0 ? Date.now() + (stunDuration * 1000) : u.stunUntil, wasStunned: stunDuration > 0, wasPushed: knockbackForce > 0 };
+                return { ...u, hp: u.hp - zapDamage, stunUntil: Date.now() + zapStun, wasStunned: true };
 
               }
 
-              return u;
+            }
 
+            return u;
+
+          }));
+
+
+
+          setTowers(prev => prev.map(t => {
+
+            if (t.isOpponent !== isOpponent && t.hp > 0) {
+
+              const dist = Math.sqrt(Math.pow(t.x - x, 2) + Math.pow(t.y - y, 2));
+
+              if (dist <= zapRadius) {
+
+                const towerDamage = Math.floor(zapDamage * 0.3);
+
+                return { ...t, hp: t.hp - towerDamage, stunUntil: Date.now() + zapStun, wasStunned: true };
+
+              }
+
+            }
+
+            return t;
+
+          }));
+
+
+
+          // Add visual effect
+
+          setVisualEffects(prev => [...prev, {
+
+            id: Date.now(),
+
+            type: 'zap_aura',
+
+            x, y,
+
+            radius: zapRadius,
+
+            startTime: Date.now(),
+
+            duration: 500
+
+          }]);
+
+
+
+        } else if (actualCard.id === 'the_log') {
+
+          spellType = 'the_log';
+
+          // The Log starts WHERE you deploy it, then rolls FORWARD
+          // Player (bottom): starts at deploy position, rolls UP (towards Y=0)
+          // Opponent (top): starts at deploy position, rolls DOWN (towards Y=height)
+          startX = x;
+          startY = y;
+          // Store the direction for damage calculation
+          const logDirection = isOpponent ? 1 : -1; // 1 = down, -1 = up
+          const logDistance = 150; // How far the log rolls
+
+          // Calculate target position based on direction
+          const targetY = y + (logDirection * logDistance);
+
+          setProjectiles(prev => [...prev, {
+
+            id: Date.now(), x: startX, y: startY, targetX: x, targetY: targetY,
+
+            speed: 15, damage: actualCard.damage, radius: actualCard.radius,
+
+            type: spellType, isSpell: true, stun: actualCard.stun || 0,
+
+            duration: actualCard.duration || 0, hit: false, spawnTime: Date.now(),
+
+            isOpponent,
+
+            knockback: actualCard.knockback || 0,
+
+            splash: false, // Not splash, uses rectangular path damage
+
+            isLog: true, // Special flag for log damage
+
+            logStartY: startY,
+            logEndY: targetY,
+
+            y: startY
+
+          }]);
+
+        } else if (actualCard.id === 'poison') {
+
+          spellType = 'poison_spell';
+
+          spellSpeed = 100;
+
+          startX = x; startY = y;
+
+        } else if (actualCard.id === 'rocket') {
+
+          spellType = 'rocket_spell';
+
+          startY = isOpponent ? 0 : height;
+
+          spellSpeed = 12;
+
+        } else if (actualCard.id === 'goblin_barrel') {
+
+          spellType = 'goblin_barrel_spell';
+
+          spellSpeed = 25;
+
+          startX = x; startY = isOpponent ? 0 : 0;
+
+          setProjectiles(prev => [...prev, {
+
+            id: Date.now(), x: startX, y: startY, targetX: x, targetY: y,
+
+            speed: spellSpeed, damage: 0, radius: actualCard.radius,
+
+            type: spellType, isSpell: true, hit: false, spawnTime: Date.now(),
+
+            isGoblinBarrel: true, spawns: actualCard.spawns, spawnCount: actualCard.spawnCount || 3, isOpponent
+
+          }]);
+
+        } else if (actualCard.id === 'earthquake') {
+
+          spellType = 'earthquake_spell';
+
+          spellSpeed = 100;
+
+          setProjectiles(prev => [...prev, {
+
+            id: Date.now(), x: x, y: y, targetX: x, targetY: y,
+
+            speed: spellSpeed, damage: actualCard.damage, radius: actualCard.radius,
+
+            type: spellType, isSpell: true, stun: actualCard.stun || 0,
+
+            duration: actualCard.duration || 0, hit: true, spawnTime: Date.now(),
+
+            slow: actualCard.slow, isOpponent
+
+          }]);
+
+          setScreenShake({ intensity: 1.0, duration: 500 });
+
+        } else if (actualCard.id === 'graveyard') {
+
+          spellType = 'graveyard_spell';
+
+          spellSpeed = 100;
+
+          setUnits(prev => [...prev, {
+
+            id: 'graveyard_' + Date.now(), x: x, y: y, hp: 9999, maxHp: 9999,
+
+            isOpponent, speed: 0, lane: x < width / 2 ? 'LEFT' : 'RIGHT',
+
+            lastAttack: 0, spriteId: 'graveyard_zone', type: 'graveyard_zone',
+
+            range: 0, damage: 0, attackSpeed: 0, spawns: actualCard.spawns,
+
+            spawnRate: 0.5, spawnCount: 1, lastSpawn: Date.now(), lifetimeDuration: 10,
+
+            spawnTime: Date.now(), totalToSpawn: 20, spawnedSoFar: 0, isZone: true, radius: actualCard.radius
+
+          }]);
+
+        } else if (actualCard.id === 'clone') {
+
+          // Clone spell - duplicate all units in radius
+          const cloneRadius = actualCard.radius || 35;
+
+          setUnits(prevUnits => {
+            const newClones = prevUnits.filter(unit => {
+              const dx = unit.x - x;
+              const dy = unit.y - y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              return distance <= cloneRadius && !unit.isOpponent && unit.type !== 'building';
+            }).map(unit => ({
+              ...unit,
+              id: 'clone_' + Date.now() + '_' + Math.random(),
+              x: unit.x + (Math.random() * 20 - 10),
+              y: unit.y + (Math.random() * 20 - 10),
+              hp: 1, // Clones have only 1 HP
+              maxHp: 1,
+              isClone: true,
+              cloneEndTime: Date.now() + (actualCard.cloneDuration || 10) * 1000
             }));
+            return [...prevUnits, ...newClones];
+          });
 
-          }
+          // Add visual effect
+          setVisualEffects(prev => [...prev, {
+            id: Date.now(),
+            type: 'clone_spell',
+            x, y,
+            radius: cloneRadius,
+            startTime: Date.now(),
+            duration: 1000
+          }]);
+
+        } else if (actualCard.id === 'freeze') {
+          // Freeze spell - freeze all enemies in radius for X seconds
+          const freezeRadius = actualCard.radius || 50;
+          const freezeDuration = (actualCard.freezeDuration || 4) * 1000;
+
+          // Freeze all enemy units in radius
+          setUnits(prev => prev.map(u => {
+            if (u.isOpponent !== isOpponent) {
+              const dist = Math.sqrt(Math.pow(u.x - x, 2) + Math.pow(u.y - y, 2));
+              if (dist <= freezeRadius) {
+                return { ...u, hp: u.hp - (actualCard.damage || 0), freezeUntil: Date.now() + freezeDuration };
+              }
+            }
+            return u;
+          }));
+
+          // Freeze enemy towers in radius
+          setTowers(prev => prev.map(t => {
+            if (t.isOpponent !== isOpponent && t.hp > 0) {
+              const dist = Math.sqrt(Math.pow(t.x - x, 2) + Math.pow(t.y - y, 2));
+              if (dist <= freezeRadius + 30) {
+                const towerDamage = Math.floor((actualCard.damage || 0) * 0.3);
+                return { ...t, hp: t.hp - towerDamage, freezeUntil: Date.now() + freezeDuration };
+              }
+            }
+            return t;
+          }));
+
+          // Add visual effect
+          setVisualEffects(prev => [...prev, {
+            id: Date.now(),
+            type: 'freeze_spell',
+            x, y,
+            radius: freezeRadius,
+            startTime: Date.now(),
+            duration: freezeDuration
+          }]);
+
+        } else if (actualCard.id === 'rage') {
+          // Rage spell - boost allies' speed and attack in radius
+          const rageRadius = actualCard.radius || 60;
+          const rageDuration = (actualCard.rageDuration || 7) * 1000;
+          const rageBoost = actualCard.rageBoost || 0.35;
+
+          // Apply rage to all friendly units in radius
+          setUnits(prev => prev.map(u => {
+            if (u.isOpponent === isOpponent) {
+              const dist = Math.sqrt(Math.pow(u.x - x, 2) + Math.pow(u.y - y, 2));
+              if (dist <= rageRadius) {
+                return { ...u, rageUntil: Date.now() + rageDuration, rageBoost: rageBoost };
+              }
+            }
+            return u;
+          }));
+
+          // Add visual rage zone effect (persists for duration)
+          setProjectiles(prev => [...prev, {
+            id: Date.now(), x: x, y: y, targetX: x, targetY: y,
+            speed: 0, damage: 0, radius: rageRadius,
+            type: 'rage_zone', isSpell: true, hit: true, spawnTime: Date.now(),
+            isRage: true, duration: rageDuration / 1000, isOpponent, rageBoost: rageBoost
+          }]);
+
+          // NOTE: Snowball travels as projectile - damage handled in projectile hit code
+          // No instant handler needed here
+
+        } else if (actualCard.id === 'tornado') {
+          // Tornado spell - pull enemies toward center
+          const tornadoRadius = actualCard.radius || 60;
+          const pullStrength = actualCard.pullStrength || 100;
+
+          // Create tornado zone that persists and pulls enemies
+          setProjectiles(prev => [...prev, {
+            id: Date.now(), x: x, y: y, targetX: x, targetY: y,
+            speed: 0, damage: actualCard.damage || 0, radius: tornadoRadius,
+            type: 'tornado_zone', isSpell: true, hit: true, spawnTime: Date.now(),
+            isTornado: true, duration: actualCard.duration || 1, isOpponent, pullStrength: pullStrength
+          }]);
+
+        } else if (actualCard.id === 'barb_barrel') {
+          // Barb Barrel - rolls forward like The Log, spawns barbarian at end
+          spellType = 'barb_barrel';
+
+          // Same pattern as The Log but shorter distance and no knockback
+          startX = x;
+          startY = y;
+          const logDirection = isOpponent ? 1 : -1; // 1 = down, -1 = up
+          const rollDistance = 100; // Shorter than log's 150
+
+          const targetY = y + (logDirection * rollDistance);
+
+          setProjectiles(prev => [...prev, {
+            id: Date.now(), x: startX, y: startY, targetX: x, targetY: targetY,
+            speed: 12, damage: actualCard.damage, radius: actualCard.radius,
+            type: 'barb_barrel', isSpell: true, stun: 0,
+            duration: 0, hit: false, spawnTime: Date.now(),
+            isOpponent,
+            knockback: 0, // No knockback unlike The Log
+            splash: false,
+            isLog: true, // Use same damage processing as Log
+            isBarrel: true, // Flag to spawn barbarian at end
+            logStartY: startY,
+            logEndY: targetY,
+            spawns: 'barbarian_single',
+            y: startY
+          }]);
+
+        } else if (actualCard.id === 'royal_delivery') {
+          // Royal Delivery - Delayed falling box, then damage + spawn
+          const spawnDelay = actualCard.spawnDelay || 3000;
+
+          // Create falling visual projectile
+          setProjectiles(prev => [...prev, {
+            id: Date.now(), x: x, y: y - 300, targetX: x, targetY: y, // Start high up
+            speed: 0, // Speed handled by gravity/duration
+            damage: actualCard.damage, radius: actualCard.radius || 45,
+            type: 'royal_delivery_box', isSpell: true,
+            duration: spawnDelay / 1000,
+            hit: false, spawnTime: Date.now(), isOpponent,
+            isDelivery: true, // Flag for delivery logic
+            spawns: 'royal_recruit_single',
+            knockback: 15 // Knockback on impact
+          }]);
 
         }
 
-  
 
-        if (!isOpponent) setLastPlayedCard(actualCard);
 
-        else setEnemyLastPlayedCard(actualCard);
+        const isPoison = actualCard.id === 'poison';
 
-  
+        if (actualCard.id !== 'lightning' && actualCard.id !== 'goblin_barrel' && actualCard.id !== 'graveyard' && actualCard.id !== 'earthquake' && actualCard.id !== 'zap' && actualCard.id !== 'clone' && actualCard.id !== 'freeze' && actualCard.id !== 'rage' && actualCard.id !== 'tornado' && actualCard.id !== 'barb_barrel' && actualCard.id !== 'royal_delivery') {
 
-        setTargetHand(currentHand => {
+          setProjectiles(prev => [...prev, {
 
-          const newHand = [...currentHand];
+            id: Date.now(), x: startX, y: startY, targetX: x, targetY: y,
 
-          const cardIndex = newHand.findIndex(c => c.id === card.id);
+            speed: spellSpeed, damage: actualCard.damage, radius: actualCard.radius,
 
-          if (cardIndex !== -1) newHand.splice(cardIndex, 1);
+            type: spellType, isSpell: true, stun: actualCard.stun || 0,
 
-          newHand.push(nextCardToUse);
+            duration: actualCard.duration || 0, hit: isPoison, spawnTime: Date.now(),
 
-          return newHand;
+            isPoison, isOpponent,
 
-        });
+            knockback: actualCard.knockback || 0,
 
-  
+            splash: actualCard.id === 'fireball' || actualCard.id === 'the_log', // These spells do splash damage
 
-        setTargetQueue(currentQueue => {
+            y: startY // Store starting Y for knockback calculation
 
-          const newQueue = [...currentQueue];
+          }]);
 
-          const newNext = newQueue.shift();
+        }
 
-          if (card.id !== 'mirror') newQueue.push(card);
+      } else {
 
-          setTargetNext(newNext);
+        const lane = x < width / 2 ? 'LEFT' : 'RIGHT';
 
-          return newQueue;
+        const count = actualCard.count || 1;
 
-        });
+        const newUnits = [];
 
-  
+        for (let i = 0; i < count; i++) {
 
-        return newElixir;
+          const offsetX = count > 1 ? (Math.random() * 20 - 10) : 0;
+
+          const offsetY = count > 1 ? (Math.random() * 20 - 10) : 0;
+
+          let unitLane = lane;
+
+          let spawnX = x + offsetX;
+
+          let spawnY = y + offsetY;
+
+          // LANE CENTERING: Pull spawn position towards center of lane
+          const laneCenter = lane === 'LEFT' ? 95 : width - 95;
+          const distFromCenter = spawnX - laneCenter;
+          spawnX -= distFromCenter * 0.3; // Pull 30% towards center
+
+          // MINER: Starts at player's side, travels underground to deployment position
+          let targetX = x + offsetX;
+          let targetY = y + offsetY;
+
+          if (actualCard.id === 'miner') {
+            // Miner starts from behind player's towers
+            spawnY = isOpponent ? height * 0.1 : height * 0.9; // Behind player's towers
+            // Keep X in the same lane as deployment
+            spawnX = x;
+          }
+
+          if (actualCard.id === 'three_musketeers' && count === 3) {
+
+            if (i < 2) unitLane = lane;
+
+            else {
+
+              unitLane = lane === 'LEFT' ? 'RIGHT' : 'LEFT';
+
+              spawnX = unitLane === 'LEFT' ? 70 + offsetX : width - 70 + offsetX;
+
+            }
+
+          }
+
+          newUnits.push({
+
+            id: Date.now() + i + (isOpponent ? 10000 : 0),
+
+            x: spawnX, y: spawnY, hp: actualCard.hp, maxHp: actualCard.hp,
+
+            isOpponent, speed: actualCard.speed, lane: unitLane,
+
+            lastAttack: 0, spriteId: actualCard.id, type: actualCard.type,
+
+            range: actualCard.range, damage: actualCard.damage,
+
+            attackSpeed: actualCard.attackSpeed, projectile: actualCard.projectile,
+
+            targetType: actualCard.targetType,
+
+            charge: actualCard.charge ? { active: false, distance: 0, threshold: 2 } : undefined,
+
+            chargeState: actualCard.chargeTime ? { startTime: Date.now(), duration: actualCard.chargeTime, isCharged: false } : undefined,
+
+            hidden: actualCard.hidden ? { active: true, visibleHp: actualCard.hp } : undefined,
+
+            burrowing: actualCard.burrows ? { active: true, startTime: Date.now(), targetX, targetY } : undefined,
+
+            deployAnywhere: actualCard.deployAnywhere || false,
+
+            splash: actualCard.splash || false,
+
+            frontalSplash: actualCard.frontalSplash || false,
+
+            spawnDamage: actualCard.spawnDamage || undefined,
+
+            spawns: actualCard.spawns || undefined,
+
+            spawnRate: actualCard.spawnRate || undefined,
+
+            spawnCount: actualCard.spawnCount || undefined,
+
+            deathSpawnCount: actualCard.deathSpawnCount || undefined,
+
+            deathSpawns: actualCard.deathSpawns || undefined,
+
+            lastSpawn: actualCard.spawnRate ? Date.now() : 0,
+
+            lifetimeDuration: actualCard.lifetime || undefined,
+
+            spawnTime: Date.now(),
+
+            spawnDelay: actualCard.spawnDelay || 0,
+
+            jumps: actualCard.jumps || false,
+
+            slow: actualCard.slow || 0,
+
+            slowUntil: 0, stunUntil: 0, baseDamage: actualCard.damage,
+
+            lockedTarget: null, wasPushed: false, wasStunned: false,
+
+            kamikaze: actualCard.kamikaze || false,
+
+            chain: actualCard.chain || 0,
+
+            healsOnAttack: actualCard.healsOnAttack || 0,
+
+            healRadius: actualCard.healRadius || 0,
+
+            passiveHeal: actualCard.passiveHeal || 0,
+
+            deathRage: actualCard.deathRage || false,
+
+            generatesElixir: actualCard.generatesElixir || false,
+
+            elixirGenerationTime: 0,
+
+            hasShield: actualCard.hasShield || false,
+
+            currentShieldHp: actualCard.shieldHp || 0,
+
+            shieldHp: actualCard.shieldHp || 0,
+
+            deathDamage: actualCard.deathDamage || 0,
+
+            deathRadius: actualCard.deathRadius || 0,
+
+            deathSlow: actualCard.deathSlow || 0,
+
+            dashInvincible: actualCard.dashInvincible || false,
+
+            dashRange: actualCard.dashRange || 80,
+
+            recoil: actualCard.recoil || 0,
+
+            stopsToAttack: actualCard.stopsToAttack || false,
+
+            turnsToPig: actualCard.turnsToPig || false,
+
+            extraProjectiles: actualCard.extraProjectiles || 0,
+
+            isDashing: false, dashEndTime: 0,
+
+            damageRamp: actualCard.damageRamp || false,
+
+            currentDamageBonus: 0, lastDamageRampTime: Date.now(),
+
+            lastTargetId: null, bombDrops: actualCard.bombDrops || false,
+
+            lastBombDrop: Date.now(), shotgunSpread: actualCard.shotgunSpread || false,
+
+            pierce: actualCard.pierce || false,
+
+            givesOpponentElixir: actualCard.givesOpponentElixir || false
+
+          });
+
+        }
+
+        if (actualCard.id === 'elixir_golem' || actualCard.deathSpawns) {
+          console.log('[SPAWN]', actualCard.id, 'deathSpawns:', actualCard.deathSpawns, 'count:', actualCard.deathSpawnCount);
+        }
+
+        setUnits(prev => [...(prev || []), ...newUnits]);
+
+        // Miner burrowing visual - dirt going into ground at spawn point (player's bridge)
+        if (actualCard.id === 'miner') {
+          setVisualEffects(prev => [...prev, {
+            id: Date.now() + Math.random(),
+            type: 'miner_burrow',
+            x: spawnX,
+            y: spawnY,
+            radius: 50,
+            startTime: Date.now(),
+            duration: 1000
+          }]);
+        }
+
+        if (actualCard.id === 'electro_wizard' || actualCard.id === 'mega_knight') {
+
+          const spawnZapRange = actualCard.id === 'mega_knight' ? 80 : 60;
+
+          const spawnZapDamage = actualCard.spawnDamage || actualCard.damage;
+
+          const stunDuration = actualCard.stun || (actualCard.id === 'mega_knight' ? 0 : 0.5);
+
+          const knockbackForce = actualCard.id === 'mega_knight' ? 40 : 0;
+
+          setUnits(prevUnits => prevUnits.map(u => {
+
+            if (u.isOpponent === isOpponent) return u;
+
+            const dist = Math.sqrt(Math.pow(u.x - x, 2) + Math.pow(u.y - y, 2));
+
+            if (dist <= spawnZapRange) {
+
+              if (actualCard.id === 'electro_wizard') {
+
+                setProjectiles(prevProjs => [...prevProjs, {
+
+                  id: Date.now() + Math.random(), x, y, targetX: u.x, targetY: u.y,
+
+                  speed: 50, damage: 0, type: 'electric_bolt', stun: stunDuration,
+
+                  isSpell: true, hit: true, spawnZap: true, isOpponent
+
+                }]);
+
+              }
+
+              let newX = u.x; let newY = u.y;
+
+              if (knockbackForce > 0) {
+                const angle = Math.atan2(u.y - y, u.x - x);
+                let nX = u.x + Math.cos(angle) * knockbackForce;
+                let nY = u.y + Math.sin(angle) * knockbackForce;
+
+                // River collision during knockback
+                const rY = height / 2;
+                const distR = Math.abs(nY - rY);
+                const bW = 60;
+                const lBX = 95;
+                const rBX = width - 95;
+                const onB = (Math.abs(nX - lBX) < bW / 2) || (Math.abs(nX - rBX) < bW / 2);
+
+                const isFlyingOrJumping = u.jumps || u.type === 'flying';
+                if (distR < 25 && !onB && !isFlyingOrJumping) {
+                  nY = rY + (u.y < rY ? -25 : 25);
+                }
+
+                newX = Math.max(10, Math.min(width - 10, nX));
+                newY = Math.max(10, Math.min(height - 10, nY));
+              }
+
+              return { ...u, x: newX, y: newY, hp: u.hp - spawnZapDamage, stunUntil: stunDuration > 0 ? Date.now() + (stunDuration * 1000) : u.stunUntil, wasStunned: stunDuration > 0, wasPushed: knockbackForce > 0 };
+
+            }
+
+            return u;
+
+          }));
+
+        }
+
+      }
+
+
+
+      if (!isOpponent) setLastPlayedCard(actualCard);
+
+      else setEnemyLastPlayedCard(actualCard);
+
+
+
+      setTargetHand(currentHand => {
+
+        const newHand = [...currentHand];
+
+        const cardIndex = newHand.findIndex(c => c.id === card.id);
+
+        if (cardIndex !== -1) newHand.splice(cardIndex, 1);
+
+        newHand.push(nextCardToUse);
+
+        return newHand;
 
       });
 
-    };
+
+
+      setTargetQueue(currentQueue => {
+
+        const newQueue = [...currentQueue];
+
+        const newNext = newQueue.shift();
+
+        if (card.id !== 'mirror') newQueue.push(card);
+
+        setTargetNext(newNext);
+
+        return newQueue;
+
+      });
+
+
+
+      return newElixir;
+
+    });
+
+  };
 
   const spawnTestEnemy = () => {
     if (gameOver) return;
@@ -7034,7 +7692,7 @@ export default function App() {
     let result = 'DRAW';
     if (playerTowers > opponentTowers) result = 'VICTORY';
     else if (opponentTowers > playerTowers) result = 'DEFEAT';
-    
+
     setGameOver(result);
 
     // Reward Chest on Victory
@@ -7057,14 +7715,14 @@ export default function App() {
           if (randomType === 'GOLD') unlockTime = 8 * 60 * 60;
           if (randomType === 'GIANT' || randomType === 'MAGICAL') unlockTime = 12 * 60 * 60;
 
-                  const newChest = {
-                    id: `chest_${Date.now()}`,
-                    slotIndex: emptySlot,
-                    type: randomType,
-                    state: 'UNLOCKED',
-                    unlockTime: 0,
-                    timeLeft: 0
-                  };          return [...prev, newChest];
+          const newChest = {
+            id: `chest_${Date.now()}`,
+            slotIndex: emptySlot,
+            type: randomType,
+            state: 'UNLOCKED',
+            unlockTime: 0,
+            timeLeft: 0
+          }; return [...prev, newChest];
         }
         return prev;
       });
@@ -7141,6 +7799,9 @@ export default function App() {
         const isCurrentlyStunned = u.stunUntil && now < u.stunUntil;
         const wasPreviouslyStunned = u.wasStunned || false;
 
+        // Check if frozen
+        const isCurrentlyFrozen = u.freezeUntil && now < u.freezeUntil;
+
         // If stun just ended, unlock target
         if (wasPreviouslyStunned && !isCurrentlyStunned) {
           u.lockedTarget = null;
@@ -7150,143 +7811,161 @@ export default function App() {
           return u; // Can't move or attack while stunned
         }
 
+        // If frozen, can't move or attack
+        if (isCurrentlyFrozen) {
+          return { ...u, isFrozen: true }; // Return but don't process movement/attacks
+        } else if (u.isFrozen) {
+          u.isFrozen = false; // Unfreeze when duration ends
+        }
+
+        // Check if raged - boost speed and attack
+        const isRaged = u.rageUntil && now < u.rageUntil;
+        const rageMultiplier = isRaged ? (1 + (u.rageBoost || 0.35)) : 1;
+        u.currentRageMultiplier = rageMultiplier; // Store for attack speed calculation
+
         // Jump Attack Processing (Spirits)
         if (u.isJumpingAttack) {
           const jumpDuration = 300; // ms
           const progress = Math.min(1, (now - u.jumpStartTime) / jumpDuration);
-          
+
           // Lerp position
           const newX = u.jumpStartX + (u.jumpTargetX - u.jumpStartX) * progress;
           const newY = u.jumpStartY + (u.jumpTargetY - u.jumpStartY) * progress;
-          
+
           if (progress >= 1) {
-             // Landed! Apply effects
-             const target = (unitsRef.current || []).find(t => t.id === u.jumpTargetId) || 
-                            (nextTowers || []).find(t => t.id === u.jumpTargetId);
-             
-             // Even if target died, spirits often splash area. But let's assume we hit the location.
-             const hitX = u.jumpTargetX;
-             const hitY = u.jumpTargetY;
-             const damage = u.damage;
+            // Landed! Apply effects
+            const target = (unitsRef.current || []).find(t => t.id === u.jumpTargetId) ||
+              (nextTowers || []).find(t => t.id === u.jumpTargetId);
 
-             // Fire Spirit / Splash
-             if (u.splash) {
-                splashEvents.push({
-                  attacker: u,
-                  targetX: hitX,
-                  targetY: hitY,
-                  damage: damage,
-                  stun: u.stun || 0
-                });
-                // Visual - different for Ice Spirit vs Fire Spirit
-                const visualType = u.spriteId === 'ice_spirit' ? 'ice_freeze' : 'fire_explosion';
-                const visualRadius = u.spriteId === 'ice_spirit' ? 40 : 50;
-                setVisualEffects(prev => [...prev, {
-                    id: Date.now() + Math.random(),
-                    type: visualType,
-                    x: hitX,
-                    y: hitY,
-                    radius: visualRadius,
-                    startTime: Date.now(),
-                    duration: 600
-                }]);
-             } else if (target) {
-                // Single target damage if not splash (though most spirits are splash or special)
-                // Ice Spirit is splash too? Actually Ice Spirit IS splash in CR.
-                // My data says Ice Spirit splash: true. So handled above.
-                // What about non-splash spirits? (None currently).
-                // Just in case:
-                if (target.id >= 100) { // Unit
-                   damageEvents.push({ targetId: target.id, damage: damage, attackerId: u.id });
-                } else { // Tower
-                   // Modify tower directly in nextTowers? Can't do that easily here as we are iterating units.
-                   // We'll use damageEvents for units, but for towers we might need a separate queue or handle it in the tower loop.
-                   // Actually, existing damageEvents logic only handles units.
-                   // Let's add a `towerDamageEvents` or just apply it to `nextTowers` via a lookup later?
-                   // Easier: Add a special `projectile` style hit event that creates a "hit" that resolves immediately.
-                   // Or just find the tower in `nextTowers` index and update it.
-                   const tIndex = nextTowers.findIndex(t => t.id === target.id);
-                   if (tIndex !== -1) {
-                      nextTowers[tIndex].hp -= damage;
-                   }
+            // Even if target died, spirits often splash area. But let's assume we hit the location.
+            const hitX = u.jumpTargetX;
+            const hitY = u.jumpTargetY;
+            const damage = u.damage;
+
+            // Fire Spirit / Splash
+            if (u.splash) {
+              splashEvents.push({
+                attacker: u,
+                targetX: hitX,
+                targetY: hitY,
+                damage: damage,
+                stun: u.stun || 0
+              });
+              // Visual - different for Ice Spirit vs Fire Spirit
+              const visualType = u.spriteId === 'ice_spirit' ? 'ice_freeze' : 'fire_explosion';
+              const visualRadius = u.spriteId === 'ice_spirit' ? 40 : 50;
+              setVisualEffects(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: visualType,
+                x: hitX,
+                y: hitY,
+                radius: visualRadius,
+                startTime: Date.now(),
+                duration: 600
+              }]);
+            } else if (target) {
+              // Single target damage if not splash (though most spirits are splash or special)
+              // Ice Spirit is splash too? Actually Ice Spirit IS splash in CR.
+              // My data says Ice Spirit splash: true. So handled above.
+              // What about non-splash spirits? (None currently).
+              // Just in case:
+              if (target.id >= 100) { // Unit
+                damageEvents.push({ targetId: target.id, damage: damage, attackerId: u.id });
+              } else { // Tower
+                // Modify tower directly in nextTowers? Can't do that easily here as we are iterating units.
+                // We'll use damageEvents for units, but for towers we might need a separate queue or handle it in the tower loop.
+                // Actually, existing damageEvents logic only handles units.
+                // Let's add a `towerDamageEvents` or just apply it to `nextTowers` via a lookup later?
+                // Easier: Add a special `projectile` style hit event that creates a "hit" that resolves immediately.
+                // Or just find the tower in `nextTowers` index and update it.
+                const tIndex = nextTowers.findIndex(t => t.id === target.id);
+                if (tIndex !== -1) {
+                  nextTowers[tIndex].hp -= damage;
                 }
-             }
+              }
+            }
 
-             // Ice Spirit Freeze (stun)
-             if (u.stun && u.stun > 0) {
-                // Apply to area if splash, or target
-                // Existing splash logic doesn't handle stun well, it just does damage/knockback.
-                // We need to add stun to splashEvents or handle it manually.
-                // Let's iterate units for stun here.
-                const affectRadius = 50;
-                // Units
-                currentUnits.forEach(unit => {
-                   if (unit.isOpponent !== u.isOpponent && unit.hp > 0) {
-                      const dist = Math.sqrt(Math.pow(unit.x - hitX, 2) + Math.pow(unit.y - hitY, 2));
-                      if (dist <= affectRadius) {
-                         unit.stunUntil = now + (u.stun * 1000);
-                         unit.wasStunned = true;
-                      }
-                   }
-                });
-                // Towers
-                nextTowers.forEach(tower => {
-                   if (tower.isOpponent !== u.isOpponent && tower.hp > 0) {
-                      const dist = Math.sqrt(Math.pow(tower.x - hitX, 2) + Math.pow(tower.y - hitY, 2));
-                      if (dist <= affectRadius + 20) {
-                         tower.stunUntil = now + (u.stun * 1000);
-                      }
-                   }
-                });
-                // Visual
-                setVisualEffects(prev => [...prev, {
-                    id: Date.now() + Math.random(),
-                    type: 'ice_freeze',
-                    x: hitX,
-                    y: hitY,
-                    radius: 40,
-                    startTime: Date.now(),
-                    duration: 800
-                }]);
-             }
+            // Ice Spirit Freeze (stun)
+            if (u.stun && u.stun > 0) {
+              // Apply to area if splash, or target
+              const affectRadius = 50;
+              const isIceSpirit = u.spriteId === 'ice_spirit';
+              // Units
+              currentUnits.forEach(unit => {
+                if (unit.isOpponent !== u.isOpponent && unit.hp > 0) {
+                  const dist = Math.sqrt(Math.pow(unit.x - hitX, 2) + Math.pow(unit.y - hitY, 2));
+                  if (dist <= affectRadius) {
+                    unit.stunUntil = now + (u.stun * 1000);
+                    unit.wasStunned = true;
+                    // Ice Spirit applies freeze visual (same as Freeze spell)
+                    if (isIceSpirit) {
+                      unit.freezeUntil = now + (u.stun * 1000);
+                    }
+                  }
+                }
+              });
+              // Towers
+              nextTowers.forEach(tower => {
+                if (tower.isOpponent !== u.isOpponent && tower.hp > 0) {
+                  const dist = Math.sqrt(Math.pow(tower.x - hitX, 2) + Math.pow(tower.y - hitY, 2));
+                  if (dist <= affectRadius + 20) {
+                    tower.stunUntil = now + (u.stun * 1000);
+                    // Ice Spirit applies freeze visual to towers too
+                    if (isIceSpirit) {
+                      tower.freezeUntil = now + (u.stun * 1000);
+                    }
+                  }
+                }
+              });
+              // Visual
+              setVisualEffects(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: 'ice_freeze',
+                x: hitX,
+                y: hitY,
+                radius: 40,
+                startTime: Date.now(),
+                duration: 800
+              }]);
+            }
 
-             // Heal Spirit
-             if (u.healsOnAttack > 0) {
-                healEvents.push({
-                  x: hitX,
-                  y: hitY,
-                  radius: u.healRadius,
-                  amount: u.healsOnAttack,
-                  isOpponent: u.isOpponent
-                });
-                setVisualEffects(prev => [...prev, {
-                    id: Date.now() + Math.random(),
-                    type: 'heal_glow',
-                    x: hitX,
-                    y: hitY,
-                    radius: u.healRadius,
-                    startTime: Date.now(),
-                    duration: 600
-                }]);
-             }
+            // Heal Spirit
+            if (u.healsOnAttack > 0) {
+              healEvents.push({
+                x: hitX,
+                y: hitY,
+                radius: u.healRadius,
+                amount: u.healsOnAttack,
+                isOpponent: u.isOpponent
+              });
+              setVisualEffects(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: 'heal_glow',
+                x: hitX,
+                y: hitY,
+                radius: u.healRadius,
+                startTime: Date.now(),
+                duration: 600
+              }]);
+            }
 
-             // Electro Spirit Chain
-             if (u.chain > 0 && target) {
-                  chainEvents.push({
-                    attackerId: u.id,
-                    primaryTarget: target,
-                    chainCount: Math.min(u.chain - 1, 3),
-                    damage: damage,
-                    stun: u.stun || 0,
-                    isOpponent: u.isOpponent,
-                    startX: hitX,
-                    startY: hitY
-                  });
-             }
+            // Electro Spirit Chain
+            if (u.chain > 0 && target) {
+              chainEvents.push({
+                attackerId: u.id,
+                primaryTarget: target,
+                chainCount: Math.min(u.chain - 1, 3),
+                damage: damage,
+                stun: u.stun || 0,
+                isOpponent: u.isOpponent,
+                startX: hitX,
+                startY: hitY
+              });
+            }
 
-             return { ...u, x: newX, y: newY, hp: 0 }; // Die
+            return { ...u, x: newX, y: newY, hp: 0 }; // Die
           }
-          
+
           return { ...u, x: newX, y: newY };
         }
 
@@ -7294,19 +7973,19 @@ export default function App() {
         if (u.passiveHeal && u.passiveHeal > 0) {
           const lastPassiveHeal = u.lastPassiveHeal || u.spawnTime;
           if (now - lastPassiveHeal >= 1000) {
-             u.hp = Math.min(u.maxHp, u.hp + u.passiveHeal);
-             u.lastPassiveHeal = now;
-             
-             // Visual effect for passive heal
-             setVisualEffects(prev => [...prev, {
-                id: Date.now() + Math.random(),
-                type: 'heal_glow',
-                x: u.x,
-                y: u.y,
-                radius: 20,
-                startTime: Date.now(),
-                duration: 400
-             }]);
+            u.hp = Math.min(u.maxHp, u.hp + u.passiveHeal);
+            u.lastPassiveHeal = now;
+
+            // Visual effect for passive heal
+            setVisualEffects(prev => [...prev, {
+              id: Date.now() + Math.random(),
+              type: 'heal_glow',
+              x: u.x,
+              y: u.y,
+              radius: 20,
+              startTime: Date.now(),
+              duration: 400
+            }]);
           }
         }
 
@@ -7334,7 +8013,7 @@ export default function App() {
             } else {
               setElixir(prev => Math.min(10, prev + 1));
             }
-            
+
             // Visual effect for elixir generation
             setVisualEffects(prev => [...prev, {
               id: Date.now() + Math.random(),
@@ -7980,11 +8659,11 @@ export default function App() {
               const lBX = 95;
               const rBX = width - 95;
               const onB = (Math.abs(nextRX - lBX) < bW / 2) || (Math.abs(nextRX - rBX) < bW / 2);
-              
+
               const isFlyingOrJumping = u.jumps || u.type === 'flying';
               if (distR < 25 && !onB && !isFlyingOrJumping) {
-                 // Recoil would put unit into river - stop at edge
-                 nextRY = rY + (u.y < rY ? -25 : 25);
+                // Recoil would put unit into river - stop at edge
+                nextRY = rY + (u.y < rY ? -25 : 25);
               }
 
               u.x = Math.max(10, Math.min(width - 10, nextRX));
@@ -8004,21 +8683,21 @@ export default function App() {
 
             if (u.kamikaze && u.spriteId !== 'battle_ram') {
               // SPIRIT JUMP ATTACK INITIATION
-              return { 
-                ...u, 
-                isJumpingAttack: true, 
-                jumpStartTime: now, 
+              return {
+                ...u,
+                isJumpingAttack: true,
+                jumpStartTime: now,
                 jumpStartX: u.x,
                 jumpStartY: u.y,
                 jumpTargetX: closestTarget.x,
                 jumpTargetY: closestTarget.y,
                 jumpTargetId: closestTarget.id,
                 lastAttack: now,
-                hidden: u.hidden, 
-                charge: u.charge, 
-                lockedTarget: u.lockedTarget, 
-                wasPushed: false, 
-                wasStunned: u.wasStunned 
+                hidden: u.hidden,
+                charge: u.charge,
+                lockedTarget: u.lockedTarget,
+                wasPushed: false,
+                wasStunned: u.wasStunned
               };
             } else {
               // Melee attack - apply damage directly
@@ -8118,13 +8797,13 @@ export default function App() {
               // Heal on Attack (Battle Healer & Heal Spirit)
               if (u.healsOnAttack > 0) {
                 healEvents.push({
-                  x: u.x, 
+                  x: u.x,
                   y: u.y,
                   radius: u.healRadius,
                   amount: u.healsOnAttack,
                   isOpponent: u.isOpponent
                 });
-                
+
                 setVisualEffects(prev => [...prev, {
                   id: Date.now() + Math.random(),
                   type: 'heal_pulse',
@@ -8153,7 +8832,7 @@ export default function App() {
 
                 // Battle Ram - wood break visual
                 if (u.spriteId === 'battle_ram') {
-                   setVisualEffects(prev => [...prev, {
+                  setVisualEffects(prev => [...prev, {
                     id: Date.now() + Math.random(),
                     type: 'goblin_barrel_spawn', // Reuse wood effect
                     x: u.x,
@@ -8161,7 +8840,7 @@ export default function App() {
                     radius: 40,
                     startTime: Date.now(),
                     duration: 500
-                   }]);
+                  }]);
                 }
 
                 // Ice Spirit - freeze visual
@@ -8284,234 +8963,239 @@ export default function App() {
           } else if (u.isDashing) {
             // BANDIT DASH MOVEMENT
             const dashTarget = (u.lockedTarget && targets.find(t => t.id === u.lockedTarget)) || closestTarget;
-            
+
             if (dashTarget) {
-               effectiveSpeed = 12; // Dash speed (very fast)
-               const angle = Math.atan2(dashTarget.y - u.y, dashTarget.x - u.x);
-               nextX += Math.cos(angle) * effectiveSpeed;
-               nextY += Math.sin(angle) * effectiveSpeed;
-               
-               const distRemaining = Math.sqrt(Math.pow(dashTarget.x - nextX, 2) + Math.pow(dashTarget.y - nextY, 2));
-               
-               // End dash if close enough (attack range)
-               if (distRemaining < 25) {
-                  u.isDashing = false;
-                  // Damage multiplier handled in attack logic
-               }
+              effectiveSpeed = 12; // Dash speed (very fast)
+              const angle = Math.atan2(dashTarget.y - u.y, dashTarget.x - u.x);
+              nextX += Math.cos(angle) * effectiveSpeed;
+              nextY += Math.sin(angle) * effectiveSpeed;
+
+              const distRemaining = Math.sqrt(Math.pow(dashTarget.x - nextX, 2) + Math.pow(dashTarget.y - nextY, 2));
+
+              // End dash if close enough (attack range)
+              if (distRemaining < 25) {
+                u.isDashing = false;
+                // Damage multiplier handled in attack logic
+              }
             } else {
-               u.isDashing = false; // Target lost
+              u.isDashing = false; // Target lost
             }
           } else if (u.burrowing && u.burrowing.active && u.burrowing.targetX !== undefined) {
             // MINER BURROW MOVEMENT - travels underground to target location
-              const targetX = u.burrowing.targetX;
-              const targetY = u.burrowing.targetY;
-              const distToTarget = Math.sqrt(Math.pow(targetX - u.x, 2) + Math.pow(targetY - u.y, 2));
+            const targetX = u.burrowing.targetX;
+            const targetY = u.burrowing.targetY;
+            const distToTarget = Math.sqrt(Math.pow(targetX - u.x, 2) + Math.pow(targetY - u.y, 2));
 
-              if (distToTarget > 5) {
-                // Move toward burrow target
-                const angle = Math.atan2(targetY - u.y, targetX - u.x);
-                nextX += Math.cos(angle) * effectiveSpeed;
-                nextY += Math.sin(angle) * effectiveSpeed;
-              } else {
-                // Reached target - stop burrowing and pop up
-                u.burrowing.active = false;
-                // Add popup visual
-                setVisualEffects(prev => [...prev, {
-                  id: Date.now() + Math.random(),
-                  type: 'miner_popup',
-                  x: u.x,
-                  y: u.y,
-                  radius: 50,
-                  startTime: Date.now(),
-                  duration: 800
-                }]);
+            if (distToTarget > 5) {
+              // Move toward burrow target
+              const angle = Math.atan2(targetY - u.y, targetX - u.x);
+              nextX += Math.cos(angle) * effectiveSpeed;
+              nextY += Math.sin(angle) * effectiveSpeed;
+            } else {
+              // Reached target - stop burrowing and pop up
+              u.burrowing.active = false;
+              // Add popup visual
+              setVisualEffects(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: 'miner_popup',
+                x: u.x,
+                y: u.y,
+                radius: 50,
+                startTime: Date.now(),
+                duration: 800
+              }]);
+            }
+          } else {
+            // Regular movement for non-miner, non-dashing units
+            // Apply slow effect
+            if (u.slowUntil > now) {
+              effectiveSpeed *= (1 - (u.slowAmount || 0.35));
+            }
+
+            // Apply rage speed boost
+            if (u.rageUntil > now) {
+              effectiveSpeed *= (1 + (u.rageBoost || 0.35));
+            }
+
+            // Stop to attack - units like Sparky stop moving when in range
+            if (u.stopsToAttack && closestTarget) {
+              const distToTarget = Math.sqrt(Math.pow(closestTarget.x - u.x, 2) + Math.pow(closestTarget.y - u.y, 2));
+              const attackRange = (u.range || 25) + 15; // Add buffer
+              if (distToTarget <= attackRange) {
+                effectiveSpeed = 0; // Stop moving to attack
+              }
+            }
+
+            // Movement Calculation
+            if ((u.jumps || u.type === 'flying') && closestTarget) {
+              // Direct pathfinding for units that ignore terrain
+              const angle = Math.atan2(closestTarget.y - u.y, closestTarget.x - u.x);
+              nextX += Math.cos(angle) * effectiveSpeed;
+              nextY += Math.sin(angle) * effectiveSpeed;
+
+              // Skeleton Barrel - POP when reaching building!
+              if (u.spriteId === 'skeleton_barrel') {
+                const distToTarget = Math.sqrt(Math.pow(closestTarget.x - nextX, 2) + Math.pow(closestTarget.y - nextY, 2));
+                // Pop if touching (30px buffer)
+                if (distToTarget < 30) {
+                  return { ...u, x: nextX, y: nextY, hp: 0 }; // Die immediately to trigger death spawn
+                }
               }
             } else {
-              // Regular movement for non-miner, non-dashing units
-              // Apply slow effect
-              if (u.slowUntil > now) {
-                effectiveSpeed *= (1 - (u.slowAmount || 0.35));
-              }
-
-              // Stop to attack - units like Sparky stop moving when in range
-              if (u.stopsToAttack && closestTarget) {
-                const distToTarget = Math.sqrt(Math.pow(closestTarget.x - u.x, 2) + Math.pow(closestTarget.y - u.y, 2));
-                const attackRange = (u.range || 25) + 15; // Add buffer
-                if (distToTarget <= attackRange) {
-                  effectiveSpeed = 0; // Stop moving to attack
-                }
-              }
-
-              // Movement Calculation
-              if ((u.jumps || u.type === 'flying') && closestTarget) {
-                // Direct pathfinding for units that ignore terrain
-                const angle = Math.atan2(closestTarget.y - u.y, closestTarget.x - u.x);
-                nextX += Math.cos(angle) * effectiveSpeed;
-                nextY += Math.sin(angle) * effectiveSpeed;
-
-                // Skeleton Barrel - POP when reaching building!
-                if (u.spriteId === 'skeleton_barrel') {
-                   const distToTarget = Math.sqrt(Math.pow(closestTarget.x - nextX, 2) + Math.pow(closestTarget.y - nextY, 2));
-                   // Pop if touching (30px buffer)
-                   if (distToTarget < 30) {
-                      return { ...u, x: nextX, y: nextY, hp: 0 }; // Die immediately to trigger death spawn
-                   }
-                }
+              // Standard vertical movement for ground units (bridges will handle steering)
+              if (u.isOpponent) {
+                nextY += effectiveSpeed;
               } else {
-                // Standard vertical movement for ground units (bridges will handle steering)
-                if (u.isOpponent) {
-                  nextY += effectiveSpeed;
+                nextY -= effectiveSpeed;
+              }
+            }
+
+            // Track distance for charge
+            if (u.charge && !u.charge.active) {
+              const moveDist = Math.sqrt(Math.pow(nextX - u.x, 2) + Math.pow(nextY - u.y, 2));
+              u.charge.distance = (u.charge.distance || 0) + moveDist;
+            }
+
+            // Defensive check: ensure nextTowers is an array
+            const allTowers = (towersRef.current || []).filter(t => t.hp > 0);
+
+            // Find the enemy King tower to redirect to after destroying princess tower
+            const enemyKing = (towersRef.current || []).find(t => t.type === 'king' && t.isOpponent !== u.isOpponent && t.hp > 0);
+            const kingCenterX = enemyKing ? enemyKing.x : width / 2;
+
+            // Check if unit's lane princess tower is destroyed
+            const lanePrincess = (towersRef.current || []).find(t =>
+              t.type === 'princess' &&
+              t.isOpponent !== u.isOpponent &&
+              ((u.lane === 'LEFT' && t.x < width / 2) || (u.lane === 'RIGHT' && t.x > width / 2))
+            );
+            const princessDestroyed = !lanePrincess || lanePrincess.hp <= 0;
+
+            // If princess tower is destroyed and unit is past the princess tower zone, steer toward King
+            const princessY = u.isOpponent ? (height - 230) : 150;
+            const pastPrincess = u.isOpponent ? (nextY > princessY + 30) : (nextY < princessY - 30);
+
+            if (princessDestroyed && pastPrincess && enemyKing) {
+              // Steer toward King tower center
+              const diffX = kingCenterX - nextX;
+              if (Math.abs(diffX) > 5) {
+                const steerSpeed = Math.min(2, Math.abs(diffX) * 0.1);
+                nextX += Math.sign(diffX) * steerSpeed;
+              }
+            }
+
+            let collision = false;
+            let avoidX = 0;
+
+            // LANE CENTERING: Make units bunch up more in the center of their lane
+            const laneCenterX = u.lane === 'LEFT' ? 95 : width - 95;
+            const distToLaneCenter = Math.abs(nextX - laneCenterX);
+            if (distToLaneCenter > 20 && effectiveSpeed > 0) {
+              // Steer toward lane center
+              const steerStrength = 2; // Strong steering to center
+              avoidX += Math.sign(laneCenterX - nextX) * steerStrength;
+            }
+
+            for (let t of allTowers) {
+              const distToTower = Math.sqrt(Math.pow(t.x - nextX, 2) + Math.pow(t.y - nextY, 2));
+              const minDistance = (t.type === 'king' ? 45 : 35);
+
+              if (distToTower < minDistance) {
+                collision = true;
+                if (nextX < t.x) {
+                  avoidX += -2;
                 } else {
-                  nextY -= effectiveSpeed;
+                  avoidX += 2;
                 }
+                break;
               }
+            }
 
-              // Track distance for charge
-              if (u.charge && !u.charge.active) {
-                const moveDist = Math.sqrt(Math.pow(nextX - u.x, 2) + Math.pow(nextY - u.y, 2));
-                u.charge.distance = (u.charge.distance || 0) + moveDist;
-              }
+            const riverY = height / 2;
+            const distToRiver = Math.abs(nextY - riverY);
 
-              // Defensive check: ensure nextTowers is an array
-              const allTowers = (towersRef.current || []).filter(t => t.hp > 0);
+            // Flying units and jumpers move differently - they skip tower collision avoidance AND bridge logic
+            const isFlyingOrJumping = u.jumps || u.type === 'flying';
 
-              // Find the enemy King tower to redirect to after destroying princess tower
-              const enemyKing = (towersRef.current || []).find(t => t.type === 'king' && t.isOpponent !== u.isOpponent && t.hp > 0);
-              const kingCenterX = enemyKing ? enemyKing.x : width / 2;
+            if (isFlyingOrJumping && effectiveSpeed > 0) {
+              // Flying/jumping units just move straight toward target, no special avoidance
+              // Movement already calculated above, do nothing extra
+            } else if (collision && effectiveSpeed > 0) {
+              nextX += avoidX;
+              nextY = u.y + (u.isOpponent ? effectiveSpeed * 0.5 : -effectiveSpeed * 0.5);
+            } else if (!collision && effectiveSpeed > 0) {
+              // STRICT RIVER BLOCKING
+              // Bridge zones: Left ~95, Right ~Width-95. Width ~40.
+              const bridgeWidth = 50; // generous width
+              const leftBridgeX = 95;
+              const rightBridgeX = width - 95;
 
-              // Check if unit's lane princess tower is destroyed
-              const lanePrincess = (towersRef.current || []).find(t =>
-                t.type === 'princess' &&
-                t.isOpponent !== u.isOpponent &&
-                ((u.lane === 'LEFT' && t.x < width / 2) || (u.lane === 'RIGHT' && t.x > width / 2))
-              );
-              const princessDestroyed = !lanePrincess || lanePrincess.hp <= 0;
+              const onLeftBridge = Math.abs(nextX - leftBridgeX) < bridgeWidth / 2;
+              const onRightBridge = Math.abs(nextX - rightBridgeX) < bridgeWidth / 2;
+              const onBridge = onLeftBridge || onRightBridge;
 
-              // If princess tower is destroyed and unit is past the princess tower zone, steer toward King
-              const princessY = u.isOpponent ? (height - 230) : 150;
-              const pastPrincess = u.isOpponent ? (nextY > princessY + 30) : (nextY < princessY - 30);
+              if (distToRiver < 30 && !onBridge) {
+                // BLOCKED BY RIVER
+                // Allow moving AWAY from the river, but not towards it
+                const isMovingTowardsRiver = (u.y < riverY && nextY > u.y) || (u.y > riverY && nextY < u.y);
+                if (isMovingTowardsRiver) {
+                  nextY = u.y;
+                }
 
-              if (princessDestroyed && pastPrincess && enemyKing) {
-                // Steer toward King tower center
-                const diffX = kingCenterX - nextX;
-                if (Math.abs(diffX) > 5) {
-                  const steerSpeed = Math.min(2, Math.abs(diffX) * 0.1);
+                // Slide towards nearest bridge
+                const bridgeCenterX = u.lane === 'LEFT' ? leftBridgeX : rightBridgeX;
+                const diffX = bridgeCenterX - nextX;
+                // Move sideways to find bridge - slightly faster than normal speed
+                nextX += Math.sign(diffX) * Math.min(Math.abs(diffX), effectiveSpeed * 1.5);
+              } else if (distToRiver < 120 && !onBridge) {
+                // Approaching river - steer towards bridge
+                const bridgeCenterX = u.lane === 'LEFT' ? leftBridgeX : rightBridgeX;
+                const diffX = bridgeCenterX - nextX;
+                if (Math.abs(diffX) > 2) {
+                  const steerSpeed = 2; // Stronger steering
                   nextX += Math.sign(diffX) * steerSpeed;
                 }
               }
-
-              let collision = false;
-              let avoidX = 0;
-
-              // LANE CENTERING: Make units bunch up more in the center of their lane
-              const laneCenterX = u.lane === 'LEFT' ? 95 : width - 95;
-              const distToLaneCenter = Math.abs(nextX - laneCenterX);
-              if (distToLaneCenter > 20 && effectiveSpeed > 0) {
-                // Steer toward lane center
-                const steerStrength = 2; // Strong steering to center
-                avoidX += Math.sign(laneCenterX - nextX) * steerStrength;
-              }
-
-              for (let t of allTowers) {
-                const distToTower = Math.sqrt(Math.pow(t.x - nextX, 2) + Math.pow(t.y - nextY, 2));
-                const minDistance = (t.type === 'king' ? 45 : 35);
-
-                if (distToTower < minDistance) {
-                  collision = true;
-                  if (nextX < t.x) {
-                    avoidX += -2;
-                  } else {
-                    avoidX += 2;
-                  }
-                  break;
-                }
-              }
-
-              const riverY = height / 2;
-              const distToRiver = Math.abs(nextY - riverY);
-
-              // Flying units and jumpers move differently - they skip tower collision avoidance AND bridge logic
-              const isFlyingOrJumping = u.jumps || u.type === 'flying';
-
-              if (isFlyingOrJumping && effectiveSpeed > 0) {
-                // Flying/jumping units just move straight toward target, no special avoidance
-                // Movement already calculated above, do nothing extra
-              } else if (collision && effectiveSpeed > 0) {
-                nextX += avoidX;
-                nextY = u.y + (u.isOpponent ? effectiveSpeed * 0.5 : -effectiveSpeed * 0.5);
-              } else if (!collision && effectiveSpeed > 0) {
-                // STRICT RIVER BLOCKING
-                // Bridge zones: Left ~95, Right ~Width-95. Width ~40.
-                const bridgeWidth = 50; // generous width
-                const leftBridgeX = 95;
-                const rightBridgeX = width - 95;
-
-                const onLeftBridge = Math.abs(nextX - leftBridgeX) < bridgeWidth / 2;
-                const onRightBridge = Math.abs(nextX - rightBridgeX) < bridgeWidth / 2;
-                const onBridge = onLeftBridge || onRightBridge;
-
-                if (distToRiver < 30 && !onBridge) {
-                   // BLOCKED BY RIVER
-                   // Allow moving AWAY from the river, but not towards it
-                   const isMovingTowardsRiver = (u.y < riverY && nextY > u.y) || (u.y > riverY && nextY < u.y);
-                   if (isMovingTowardsRiver) {
-                     nextY = u.y;
-                   }
-
-                   // Slide towards nearest bridge
-                   const bridgeCenterX = u.lane === 'LEFT' ? leftBridgeX : rightBridgeX;
-                   const diffX = bridgeCenterX - nextX;
-                   // Move sideways to find bridge - slightly faster than normal speed
-                   nextX += Math.sign(diffX) * Math.min(Math.abs(diffX), effectiveSpeed * 1.5);
-                } else if (distToRiver < 120 && !onBridge) {
-                  // Approaching river - steer towards bridge
-                  const bridgeCenterX = u.lane === 'LEFT' ? leftBridgeX : rightBridgeX;
-                  const diffX = bridgeCenterX - nextX;
-                  if (Math.abs(diffX) > 2) {
-                    const steerSpeed = 2; // Stronger steering
-                    nextX += Math.sign(diffX) * steerSpeed;
-                  }
-                }
-              }
             }
+          }
 
-            // Update Bandit dash state - end dash when time is up
-            let isDashingNow = u.isDashing || false;
-            if (isDashingNow && now > (u.dashEndTime || 0)) {
-              isDashingNow = false;
-            }
+          // Update Bandit dash state - end dash when time is up
+          let isDashingNow = u.isDashing || false;
+          if (isDashingNow && now > (u.dashEndTime || 0)) {
+            isDashingNow = false;
+          }
 
-            // Track Inferno Tower target for damage ramp reset
-            if (u.damageRamp && u.lockedTarget && u.lastTargetId !== u.lockedTarget) {
-              // Target changed, reset damage ramp
-              u.lastDamageRampTime = now;
-              u.currentDamageBonus = 0;
-              u.lastTargetId = u.lockedTarget;
-            } else if (u.damageRamp && !u.lockedTarget) {
-              // No target, reset
-              u.lastDamageRampTime = now;
-              u.currentDamageBonus = 0;
-            }
+          // Track Inferno Tower target for damage ramp reset
+          if (u.damageRamp && u.lockedTarget && u.lastTargetId !== u.lockedTarget) {
+            // Target changed, reset damage ramp
+            u.lastDamageRampTime = now;
+            u.currentDamageBonus = 0;
+            u.lastTargetId = u.lockedTarget;
+          } else if (u.damageRamp && !u.lockedTarget) {
+            // No target, reset
+            u.lastDamageRampTime = now;
+            u.currentDamageBonus = 0;
+          }
 
-            return {
-              ...u,
-              x: nextX,
-              y: nextY,
-              hidden: u.hidden,
-              charge: u.charge,
-              lockedTarget: u.lockedTarget,
-              wasPushed: u.wasPushed,
-              wasStunned: u.wasStunned,
-              isJumping: isJumpingNow,
-              jumpTargetId: u.jumpTargetId,
-              // Preserve new card properties
-              dashRange: u.dashRange || 80,
-              isDashing: isDashingNow,
-              dashEndTime: u.dashEndTime || 0,
-              currentDamageBonus: u.currentDamageBonus || 0,
-              lastBombDrop: u.lastBombDrop || 0,
-              lastTargetId: u.lastTargetId
-            };
+          return {
+            ...u,
+            x: nextX,
+            y: nextY,
+            hidden: u.hidden,
+            charge: u.charge,
+            lockedTarget: u.lockedTarget,
+            wasPushed: u.wasPushed,
+            wasStunned: u.wasStunned,
+            isJumping: isJumpingNow,
+            jumpTargetId: u.jumpTargetId,
+            // Preserve new card properties
+            dashRange: u.dashRange || 80,
+            isDashing: isDashingNow,
+            dashEndTime: u.dashEndTime || 0,
+            currentDamageBonus: u.currentDamageBonus || 0,
+            lastBombDrop: u.lastBombDrop || 0,
+            lastTargetId: u.lastTargetId
+          };
         }
       });
 
@@ -8558,7 +9242,7 @@ export default function App() {
               }
 
               const damage = Math.floor(event.damage * 0.5);
-              
+
               // Handle Shield
               let remainingDamage = damage;
               let newShieldHp = unit.currentShieldHp || 0;
@@ -8576,7 +9260,7 @@ export default function App() {
               }
 
               let updatedUnit = { ...unit, hp: unit.hp - remainingDamage, currentShieldHp: newShieldHp };
-              
+
               // Shield Break Visual
               if (shieldBroken) {
                 updatedUnit.hasShield = false;
@@ -8624,7 +9308,7 @@ export default function App() {
                 const angle = Math.atan2(unit.y - event.targetY, unit.x - event.targetX);
                 let knockX = updatedUnit.x + Math.cos(angle) * event.knockback;
                 let knockY = updatedUnit.y + Math.sin(angle) * event.knockback;
-                
+
                 // River collision during knockback
                 const rY = height / 2;
                 const distR = Math.abs(knockY - rY);
@@ -8632,11 +9316,11 @@ export default function App() {
                 const lBX = 95;
                 const rBX = width - 95;
                 const onB = (Math.abs(knockX - lBX) < bW / 2) || (Math.abs(knockX - rBX) < bW / 2);
-                
+
                 const isFlyingOrJumping = unit.jumps || unit.type === 'flying';
                 if (distR < 25 && !onB && !isFlyingOrJumping) {
-                   // Pushed into river - stop at edge
-                   knockY = rY + (unit.y < rY ? -25 : 25);
+                  // Pushed into river - stop at edge
+                  knockY = rY + (unit.y < rY ? -25 : 25);
                 }
 
                 updatedUnit.x = Math.max(10, Math.min(width - 10, knockX));
@@ -8826,58 +9510,72 @@ export default function App() {
         }
 
         if (p.type === 'bomb_delayed') {
-           if (Date.now() - p.spawnTime >= p.delay) {
-              return { ...p, hit: true };
-           }
-           return p; // Keep waiting
+          if (Date.now() - p.spawnTime >= p.delay) {
+            return { ...p, hit: true };
+          }
+          return p; // Keep waiting
+        }
+
+        // ROYAL DELIVERY: Handle falling movement and hit time
+        if (p.isDelivery) {
+          const progress = (Date.now() - p.spawnTime) / (p.duration * 1000);
+          if (progress >= 1) {
+            return { ...p, hit: true, x: p.targetX, y: p.targetY };
+          }
+          // Interpolate Y position (falling from 300px above target)
+          // newY = Target - (Difference * (1 - progress))
+          // Using quadratic easing for "gravity" feel: progress * progress
+          const fallDistance = 300;
+          const currentY = p.targetY - (fallDistance * (1 - (progress * progress)));
+          return { ...p, y: currentY, x: p.targetX };
         }
 
         // MAGIC ARCHER PIERCE LOGIC
         if (p.pierce) {
-           const angle = Math.atan2(dy, dx);
-           const nextX = p.x + Math.cos(angle) * p.speed;
-           const nextY = p.y + Math.sin(angle) * p.speed;
-           const hitIds = p.hitIds || [];
-           const maxHits = 5; // Maximum number of targets to pierce through
+          const angle = Math.atan2(dy, dx);
+          const nextX = p.x + Math.cos(angle) * p.speed;
+          const nextY = p.y + Math.sin(angle) * p.speed;
+          const hitIds = p.hitIds || [];
+          const maxHits = 5; // Maximum number of targets to pierce through
 
-           // Check if projectile has traveled past its target by significant distance
-           const distTraveled = Math.sqrt(Math.pow(nextX - p.x, 2) + Math.pow(nextY - p.y, 2));
-           const totalDistTraveled = (p.totalDistTraveled || 0) + distTraveled;
-           const distToTarget = Math.sqrt(Math.pow(p.targetX - p.x, 2) + Math.pow(p.targetY - p.y, 2));
+          // Check if projectile has traveled past its target by significant distance
+          const distTraveled = Math.sqrt(Math.pow(nextX - p.x, 2) + Math.pow(nextY - p.y, 2));
+          const totalDistTraveled = (p.totalDistTraveled || 0) + distTraveled;
+          const distToTarget = Math.sqrt(Math.pow(p.targetX - p.x, 2) + Math.pow(p.targetY - p.y, 2));
 
-           // Check for collisions
-           const targets = [
-              ...(unitsRef.current || []).filter(u => u.isOpponent !== p.isOpponent && u.hp > 0),
-              ...(nextTowers || []).filter(t => t.isOpponent !== p.isOpponent && t.hp > 0)
-           ];
+          // Check for collisions
+          const targets = [
+            ...(unitsRef.current || []).filter(u => u.isOpponent !== p.isOpponent && u.hp > 0),
+            ...(nextTowers || []).filter(t => t.isOpponent !== p.isOpponent && t.hp > 0)
+          ];
 
-           targets.forEach(t => {
-              if (!hitIds.includes(t.id)) {
-                 const distToProj = Math.sqrt(Math.pow(t.x - nextX, 2) + Math.pow(t.y - nextY, 2));
-                 if (distToProj < 30) {
-                    // HIT!
-                    hitIds.push(t.id);
-                    // Apply damage immediately (since we want to hit multiple targets in one frame possibly)
-                    if (t.id < 100) {
-                       const tIndex = nextTowers.findIndex(tow => tow.id === t.id);
-                       if (tIndex !== -1) nextTowers[tIndex].hp -= p.damage;
-                    } else {
-                       damageEvents.push({ targetId: t.id, damage: p.damage, attackerId: p.attackerId });
-                    }
-                 }
+          targets.forEach(t => {
+            if (!hitIds.includes(t.id)) {
+              const distToProj = Math.sqrt(Math.pow(t.x - nextX, 2) + Math.pow(t.y - nextY, 2));
+              if (distToProj < 30) {
+                // HIT!
+                hitIds.push(t.id);
+                // Apply damage immediately (since we want to hit multiple targets in one frame possibly)
+                if (t.id < 100) {
+                  const tIndex = nextTowers.findIndex(tow => tow.id === t.id);
+                  if (tIndex !== -1) nextTowers[tIndex].hp -= p.damage;
+                } else {
+                  damageEvents.push({ targetId: t.id, damage: p.damage, attackerId: p.attackerId });
+                }
               }
-           });
+            }
+          });
 
-           // Remove projectile if:
-           // 1. Hit max number of targets
-           // 2. Traveled 100 pixels past target
-           // 3. Out of bounds
-           if (hitIds.length >= maxHits || (distToTarget < 100 && totalDistTraveled > distToTarget + 100) ||
-               nextX < -50 || nextX > width + 50 || nextY < -50 || nextY > height + 50) {
-              return { ...p, damageDealt: true, hit: true }; // Mark for removal
-           }
+          // Remove projectile if:
+          // 1. Hit max number of targets
+          // 2. Traveled 100 pixels past target
+          // 3. Out of bounds
+          if (hitIds.length >= maxHits || (distToTarget < 100 && totalDistTraveled > distToTarget + 100) ||
+            nextX < -50 || nextX > width + 50 || nextY < -50 || nextY > height + 50) {
+            return { ...p, damageDealt: true, hit: true }; // Mark for removal
+          }
 
-           return { ...p, x: nextX, y: nextY, hitIds, totalDistTraveled };
+          return { ...p, x: nextX, y: nextY, hitIds, totalDistTraveled };
         }
 
         if (dist < p.speed + 10) {
@@ -8921,16 +9619,16 @@ export default function App() {
                     }
                     return u;
                   });
-                                      // Deal damage to towers in radius
-                                      nextTowers = nextTowers.map(t => {
-                                        const isEnemy = t.isOpponent !== (h.isOpponent || false);
-                                        const dist = Math.sqrt(Math.pow(t.x - h.x, 2) + Math.pow(t.y - h.y, 2));
-                                        if (isEnemy && dist < h.radius + 30) {
-                                          const towerDamage = Math.floor(h.damage * 0.3); // 30% Crown Tower damage
-                                          return { ...t, hp: t.hp - towerDamage };
-                                        }
-                                        return t;
-                                      });                  // Update last tick time by modifying the projectile
+                  // Deal damage to towers in radius
+                  nextTowers = nextTowers.map(t => {
+                    const isEnemy = t.isOpponent !== (h.isOpponent || false);
+                    const dist = Math.sqrt(Math.pow(t.x - h.x, 2) + Math.pow(t.y - h.y, 2));
+                    if (isEnemy && dist < h.radius + 30) {
+                      const towerDamage = Math.floor(h.damage * 0.3); // 30% Crown Tower damage
+                      return { ...t, hp: t.hp - towerDamage };
+                    }
+                    return t;
+                  });                  // Update last tick time by modifying the projectile
                   h.lastDamageTick = now;
                 }
               }
@@ -8939,39 +9637,39 @@ export default function App() {
               // Rage Spell Logic
               const rageAge = (now - h.spawnTime) / 1000;
               if (rageAge < h.duration) {
-                 // Refresh rage effect on units in radius
-                 // Rage updates constantly (every tick)
-                 currentUnits = currentUnits.map(u => {
-                    const isFriendly = u.isOpponent === (h.isOpponent || false);
-                    const dist = Math.sqrt(Math.pow(u.x - h.x, 2) + Math.pow(u.y - h.y, 2));
-                    if (isFriendly && dist < h.radius) {
-                      return { ...u, rageUntil: now + 200 }; // Buffer of 200ms
-                    }
-                    return u;
-                 });
-                 // Rage towers
-                 nextTowers = nextTowers.map(t => {
-                    const isFriendly = t.isOpponent === (h.isOpponent || false);
-                    const dist = Math.sqrt(Math.pow(t.x - h.x, 2) + Math.pow(t.y - h.y, 2));
-                    if (isFriendly && dist < h.radius + 30) {
-                       return { ...t, rageUntil: now + 200 };
-                    }
-                    return t;
-                 });
+                // Refresh rage effect on units in radius
+                // Rage updates constantly (every tick)
+                currentUnits = currentUnits.map(u => {
+                  const isFriendly = u.isOpponent === (h.isOpponent || false);
+                  const dist = Math.sqrt(Math.pow(u.x - h.x, 2) + Math.pow(u.y - h.y, 2));
+                  if (isFriendly && dist < h.radius) {
+                    return { ...u, rageUntil: now + 200 }; // Buffer of 200ms
+                  }
+                  return u;
+                });
+                // Rage towers
+                nextTowers = nextTowers.map(t => {
+                  const isFriendly = t.isOpponent === (h.isOpponent || false);
+                  const dist = Math.sqrt(Math.pow(t.x - h.x, 2) + Math.pow(t.y - h.y, 2));
+                  if (isFriendly && dist < h.radius + 30) {
+                    return { ...t, rageUntil: now + 200 };
+                  }
+                  return t;
+                });
 
-                 // Create persistent rage visual effect (recreated every frame to show continuous effect)
-                 if (!h.rageEffectCreated) {
-                   setVisualEffects(prev => [...prev, {
-                     id: Date.now() + Math.random(),
-                     type: 'rage_aura',
-                     x: h.x,
-                     y: h.y,
-                     radius: h.radius || 50,
-                     startTime: Date.now(),
-                     duration: h.duration * 1000
-                   }]);
-                   h.rageEffectCreated = true;
-                 }
+                // Create persistent rage visual effect (recreated every frame to show continuous effect)
+                if (!h.rageEffectCreated) {
+                  setVisualEffects(prev => [...prev, {
+                    id: Date.now() + Math.random(),
+                    type: 'rage_aura',
+                    x: h.x,
+                    y: h.y,
+                    radius: h.radius || 50,
+                    startTime: Date.now(),
+                    duration: h.duration * 1000
+                  }]);
+                  h.rageEffectCreated = true;
+                }
               }
             } else if (h.isGoblinBarrel) {
               // Goblin Barrel hits - spawn goblins around impact point
@@ -9017,7 +9715,7 @@ export default function App() {
 
                 // Add goblins to queue (don't setUnits directly to avoid overwrite)
                 unitsToSpawn.push(...newGoblins);
-                
+
                 // Visual effect for barrel break
                 setVisualEffects(prev => [...prev, {
                   id: Date.now() + Math.random(),
@@ -9094,21 +9792,21 @@ export default function App() {
                 }
                 return u;
               });
-                                nextTowers = nextTowers.map(t => {
-                                  const isEnemy = t.isOpponent !== (h.isOpponent || false);
-                                  const dist = Math.sqrt(Math.pow(t.x - h.targetX, 2) + Math.pow(t.y - h.targetY, 2));
-                                  if (isEnemy && dist < h.radius + 30) {
-                                    let damageToDeal = Math.floor(h.damage * 0.3); // 30% Crown Tower damage
-                                    
-                                    // Earthquake exception: higher relative tower damage
-                                    if (h.type === 'earthquake_spell') {
-                                      damageToDeal = Math.floor(h.damage * 0.35);
-                                    }
-                                    
-                                    return { ...t, hp: t.hp - damageToDeal };
-                                  }
-                                  return t;
-                                });
+              nextTowers = nextTowers.map(t => {
+                const isEnemy = t.isOpponent !== (h.isOpponent || false);
+                const dist = Math.sqrt(Math.pow(t.x - h.targetX, 2) + Math.pow(t.y - h.targetY, 2));
+                if (isEnemy && dist < h.radius + 30) {
+                  let damageToDeal = Math.floor(h.damage * 0.3); // 30% Crown Tower damage
+
+                  // Earthquake exception: higher relative tower damage
+                  if (h.type === 'earthquake_spell') {
+                    damageToDeal = Math.floor(h.damage * 0.35);
+                  }
+
+                  return { ...t, hp: t.hp - damageToDeal };
+                }
+                return t;
+              });
               // Create visual effects for spells
               if (h.type === 'fireball_spell') {
                 setVisualEffects(prev => [...prev, {
@@ -9211,20 +9909,20 @@ export default function App() {
 
             // ELECTRO DRAGON CHAIN LOGIC
             if (h.chain > 0) {
-               const target = (unitsRef.current || []).find(u => u.id === h.targetId) || 
-                              (nextTowers || []).find(t => t.id === h.targetId);
-               if (target) {
-                  chainEvents.push({
-                    attackerId: h.attackerId,
-                    primaryTarget: target,
-                    chainCount: Math.min(h.chain - 1, 3), // Max 3 more
-                    damage: h.damage,
-                    stun: h.stun || 0,
-                    isOpponent: h.isOpponent,
-                    startX: h.x,
-                    startY: h.y
-                  });
-               }
+              const target = (unitsRef.current || []).find(u => u.id === h.targetId) ||
+                (nextTowers || []).find(t => t.id === h.targetId);
+              if (target) {
+                chainEvents.push({
+                  attackerId: h.attackerId,
+                  primaryTarget: target,
+                  chainCount: Math.min(h.chain - 1, 3), // Max 3 more
+                  damage: h.damage,
+                  stun: h.stun || 0,
+                  isOpponent: h.isOpponent,
+                  startX: h.x,
+                  startY: h.y
+                });
+              }
             }
 
             // THE LOG: Special rectangular damage along the path
@@ -9261,6 +9959,108 @@ export default function App() {
                 }
                 return u;
               });
+
+              // BARB BARREL: Spawn barbarian at end position
+              if (h.isBarrel && h.spawns) {
+                const barbCard = CARDS.find(c => c.id === h.spawns);
+                if (barbCard) {
+                  unitsToSpawn.push({
+                    id: 'barb_from_barrel_' + Date.now(),
+                    x: h.targetX,
+                    y: h.targetY,
+                    hp: barbCard.hp,
+                    maxHp: barbCard.hp,
+                    isOpponent: h.isOpponent,
+                    speed: barbCard.speed,
+                    lane: h.targetX < width / 2 ? 'LEFT' : 'RIGHT',
+                    lastAttack: 0,
+                    spriteId: barbCard.id,
+                    type: barbCard.type,
+                    range: barbCard.range,
+                    damage: barbCard.damage,
+                    attackSpeed: barbCard.attackSpeed,
+                    spawnTime: Date.now()
+                  });
+                }
+              }
+            }
+
+
+            // ROYAL DELIVERY: Splash damage (hits AIR too) + Spawn Recruit
+            if (h.isDelivery) {
+              // Deal splash damage to all enemies in radius
+              currentUnits = currentUnits.map(u => {
+                if (u.isOpponent !== h.isOpponent && u.hp > 0) {
+                  const dist = Math.sqrt(Math.pow(u.x - h.x, 2) + Math.pow(u.y - h.y, 2));
+                  if (dist <= (h.radius || 45)) {
+                    // Knockback away from impact center
+                    let newX = u.x;
+                    let newY = u.y;
+                    if (h.knockback && u.type !== 'building') {
+                      const angle = Math.atan2(u.y - h.y, u.x - h.x);
+                      newX = u.x + Math.cos(angle) * h.knockback;
+                      newY = u.y + Math.sin(angle) * h.knockback;
+                    }
+                    return {
+                      ...u,
+                      hp: u.hp - h.damage,
+                      x: newX,
+                      y: newY,
+                      wasPushed: true
+                    };
+                  }
+                }
+                return u;
+              });
+
+              // Apply damage to towers
+              nextTowers = nextTowers.map(t => {
+                if (t.isOpponent !== h.isOpponent && t.hp > 0) {
+                  const dist = Math.sqrt(Math.pow(t.x - h.x, 2) + Math.pow(t.y - h.y, 2));
+                  if (dist <= (h.radius || 45)) {
+                    return { ...t, hp: t.hp - h.damage };
+                  }
+                }
+                return t;
+              });
+
+              // Visual effect for impact
+              setVisualEffects(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: 'royal_delivery', // Splash impact visual
+                x: h.x,
+                y: h.y,
+                radius: h.radius || 45,
+                startTime: Date.now(),
+                duration: 500
+              }]);
+
+              // Spawn Royal Recruit
+              if (h.spawns) {
+                const recruitCard = CARDS.find(c => c.id === h.spawns);
+                if (recruitCard) {
+                  unitsToSpawn.push({
+                    id: 'royal_recruit_' + Date.now(),
+                    x: h.x,
+                    y: h.y,
+                    hp: recruitCard.hp,
+                    maxHp: recruitCard.hp,
+                    shieldHp: recruitCard.shieldHp,
+                    maxShieldHp: recruitCard.shieldHp,
+                    isOpponent: h.isOpponent,
+                    speed: recruitCard.speed,
+                    lane: h.x < width / 2 ? 'LEFT' : 'RIGHT',
+                    lastAttack: 0,
+                    spriteId: recruitCard.id,
+                    type: recruitCard.type,
+                    range: recruitCard.range,
+                    damage: recruitCard.damage,
+                    attackSpeed: recruitCard.attackSpeed,
+                    hasShield: recruitCard.hasShield,
+                    spawnTime: Date.now()
+                  });
+                }
+              }
             }
 
             // Damage the primary target
@@ -9440,87 +10240,143 @@ export default function App() {
               });
             }
 
-                            // Also damage towers (primary target)
-                            if (h.targetId < 100) {
-                              const tIndex = nextTowers.findIndex(t => t.id === h.targetId);
-                              if (tIndex !== -1) {
-                                const tower = nextTowers[tIndex];
-                                let damageToDeal = h.damage;
-                                if (h.isSpell) damageToDeal = Math.floor(damageToDeal * 0.3); // 30% for spells
-                                
-                                let updatedTower = { ...tower, hp: tower.hp - damageToDeal };
-            
-                                // Tower hit visual effect for significant damage
-                                if (damageToDeal > 15) {
-                                  setVisualEffects(prev => [...prev, {
-                                    id: Date.now() + Math.random(),
-                                    type: 'tower_hit',
-                                    x: tower.x,
-                                    y: tower.y,
-                                    radius: 40,
-                                    startTime: Date.now(),
-                                    duration: 200
-                                  }]);
-                                }
-            
-                                // Apply stun effect (Electro Wizard) to towers
-                                if (h.stun && h.stun > 0) {
-                                  updatedTower.stunUntil = now + (h.stun * 1000);
-                                }
-            
-                                // Apply slow effect (Ice Wizard) to towers
-                                if (h.slow && h.slow > 0) {
-                                  updatedTower.slowUntil = now + 2000;
-                                  updatedTower.slowAmount = h.slow;
-                                }
-            
-                                nextTowers[tIndex] = updatedTower;
-                              }
-            
-                              // Apply splash damage to OTHER towers (not primary target)
-                              if (h.splash) {
-                                const splashRadius = h.splashRadius || 50;
-                                nextTowers = nextTowers.map(tower => {
-                                  if (tower.id !== h.targetId && tower.hp > 0) {
-                                    const isEnemy = h.isOpponent !== undefined ? !h.isOpponent : tower.isOpponent;
-                                    if (isEnemy) {
-                                      const dist = Math.sqrt(Math.pow(tower.x - hitX, 2) + Math.pow(tower.y - hitY, 2));
-                                      if (dist <= splashRadius + 30) { // +30 for tower size
-                                        let damageToDeal = Math.floor(h.damage * 0.5);
-                                        if (h.isSpell) damageToDeal = Math.floor(damageToDeal * 0.3); // 30% reduction for spells
-                                        
-                                        let updatedTower = { ...tower, hp: tower.hp - damageToDeal };
-            
-                                        // Apply stun effect to towers
-                                        if (h.stun && h.stun > 0) {
-                                          updatedTower.stunUntil = now + (h.stun * 1000);
-                                        }
-            
-                                        // Apply slow effect to towers
-                                        if (h.slow && h.slow > 0) {
-                                          updatedTower.slowUntil = now + 2000;
-                                          updatedTower.slowAmount = h.slow;
-                                        }
-            
-                                        return updatedTower;
-                                      }
-                                    }
-                                  }
-                                  return tower;
-                                });
-                              }
-                            }          }
+            // Also damage towers (primary target)
+            if (h.targetId < 100) {
+              const tIndex = nextTowers.findIndex(t => t.id === h.targetId);
+              if (tIndex !== -1) {
+                const tower = nextTowers[tIndex];
+                let damageToDeal = h.damage;
+                if (h.isSpell) damageToDeal = Math.floor(damageToDeal * 0.3); // 30% for spells
+
+                let updatedTower = { ...tower, hp: tower.hp - damageToDeal };
+
+                // Tower hit visual effect for significant damage
+                if (damageToDeal > 15) {
+                  setVisualEffects(prev => [...prev, {
+                    id: Date.now() + Math.random(),
+                    type: 'tower_hit',
+                    x: tower.x,
+                    y: tower.y,
+                    radius: 40,
+                    startTime: Date.now(),
+                    duration: 200
+                  }]);
+                }
+
+                // Apply stun effect (Electro Wizard) to towers
+                if (h.stun && h.stun > 0) {
+                  updatedTower.stunUntil = now + (h.stun * 1000);
+                }
+
+                // Apply slow effect (Ice Wizard) to towers
+                if (h.slow && h.slow > 0) {
+                  updatedTower.slowUntil = now + 2000;
+                  updatedTower.slowAmount = h.slow;
+                }
+
+                nextTowers[tIndex] = updatedTower;
+              }
+
+              // Apply splash damage to OTHER towers (not primary target)
+              if (h.splash) {
+                const splashRadius = h.splashRadius || 50;
+                nextTowers = nextTowers.map(tower => {
+                  if (tower.id !== h.targetId && tower.hp > 0) {
+                    const isEnemy = h.isOpponent !== undefined ? !h.isOpponent : tower.isOpponent;
+                    if (isEnemy) {
+                      const dist = Math.sqrt(Math.pow(tower.x - hitX, 2) + Math.pow(tower.y - hitY, 2));
+                      if (dist <= splashRadius + 30) { // +30 for tower size
+                        let damageToDeal = Math.floor(h.damage * 0.5);
+                        if (h.isSpell) damageToDeal = Math.floor(damageToDeal * 0.3); // 30% reduction for spells
+
+                        let updatedTower = { ...tower, hp: tower.hp - damageToDeal };
+
+                        // Apply stun effect to towers
+                        if (h.stun && h.stun > 0) {
+                          updatedTower.stunUntil = now + (h.stun * 1000);
+                        }
+
+                        // Apply slow effect to towers
+                        if (h.slow && h.slow > 0) {
+                          updatedTower.slowUntil = now + 2000;
+                          updatedTower.slowAmount = h.slow;
+                        }
+
+                        return updatedTower;
+                      }
+                    }
+                  }
+                  return tower;
+                });
+              }
+            }
+          }
         });
 
-        // Remove hit projectiles, but keep poison and visual-only projectiles
+        // Remove hit projectiles, but keep poison, rage, and tornado visual-only projectiles
         activeProjectiles = activeProjectiles.filter(p => {
           if (p.keepVisual && p.type === 'tesla_lightning') {
             return (now - Math.floor(p.id)) < 150;
           }
-          if (p.isPoison || p.isRage) {
+          if (p.isPoison || p.isRage || p.isTornado) {
             return ((now - p.spawnTime) / 1000 < p.duration);
           }
           return !p.hit;
+        });
+
+        // Process tornado pull effect on enemies
+        activeProjectiles.filter(p => p.isTornado && (now - p.spawnTime) / 1000 < p.duration).forEach(tornado => {
+          const pullRadius = tornado.radius || 60;
+          const pullStrengthPerTick = 2; // Fixed pull strength per tick (not using delta)
+
+          // Pull enemy units toward tornado center
+          currentUnits = currentUnits.map(unit => {
+            if (unit.isOpponent !== tornado.isOpponent && unit.hp > 0) {
+              const dx = unit.x - tornado.x;
+              const dy = unit.y - tornado.y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+
+              if (dist <= pullRadius && dist > 5) {
+                // Pull toward center
+                const pullX = -dx / dist * pullStrengthPerTick;
+                const pullY = -dy / dist * pullStrengthPerTick;
+                return {
+                  ...unit,
+                  x: unit.x + pullX,
+                  y: unit.y + pullY,
+                  hp: unit.hp - 1 // Small fixed damage per tick
+                };
+              }
+            }
+            return unit;
+          });
+        });
+
+        // Process rage zone continuous refresh - units inside get rageUntil refreshed
+        activeProjectiles.filter(p => p.isRage && (now - p.spawnTime) / 1000 < p.duration).forEach(rageZone => {
+          const rageRadius = rageZone.radius || 60;
+          const remainingDuration = (rageZone.duration * 1000) - (now - rageZone.spawnTime);
+          const rageBoost = rageZone.rageBoost || 0.35;
+
+          // Refresh rage for all friendly units in radius
+          currentUnits = currentUnits.map(unit => {
+            if (unit.isOpponent === rageZone.isOpponent && unit.hp > 0) {
+              const dx = unit.x - rageZone.x;
+              const dy = unit.y - rageZone.y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+
+              if (dist <= rageRadius) {
+                // Refresh rage - extend rageUntil to remaining zone duration + buffer
+                const newRageUntil = now + Math.min(remainingDuration + 500, 2000);
+                return {
+                  ...unit,
+                  rageUntil: Math.max(unit.rageUntil || 0, newRageUntil),
+                  rageBoost: rageBoost
+                };
+              }
+            }
+            return unit;
+          });
         });
       }
 
@@ -10028,7 +10884,7 @@ export default function App() {
       // --- DECK STRATEGY SETTINGS ---
       const deckType = enemyDeckIndex; // 0: Hog, 1: Bait, 2: BridgeSpam, 3: Golem, 4: Giant
       let elixirThreshold = 5; // Default: play cards at 5 elixir
-      
+
       if (deckType === 3) elixirThreshold = 9.5; // Golem AI waits for max elixir
       if (deckType === 2) elixirThreshold = 7;   // Bridge Spam waits for decent elixir
       if (deckType === 0) elixirThreshold = 4;   // Hog Cycle plays fast
@@ -10092,7 +10948,7 @@ export default function App() {
           // Sort: prefer cheap cards if defending, expensive if building push
           affordable.sort((a, b) => isUnderAttack ? (a.cost - b.cost) : (b.cost - a.cost));
           cardToPlay = affordable[0];
-          
+
           if (isUnderAttack) {
             // Deploy defensively
             targetX = playerUnits[0].x + (Math.random() * 20 - 10);
@@ -10150,9 +11006,9 @@ export default function App() {
           onFriendlyBattle={handleFriendlyBattle}
         />
         {openingChest && (
-          <ChestOpeningModal 
-            chest={openingChest} 
-            onClose={handleCollectRewards} 
+          <ChestOpeningModal
+            chest={openingChest}
+            onClose={handleCollectRewards}
           />
         )}
         <FriendlyBattleModal
@@ -10166,35 +11022,35 @@ export default function App() {
 
   return (
     <>
-          <GameBoard
-            towers={towers}
-            units={units}
-            projectiles={projectiles}
-            visualEffects={visualEffects}
-            setVisualEffects={setVisualEffects}
-            screenShake={screenShake}
-            setScreenShake={setScreenShake}
-            timeLeft={timeLeft}
-            gameOver={gameOver}
-            elixir={elixir}
-            enemyElixir={enemyElixir}
-            hand={hand}
-            nextCard={nextCard}
-            draggingCard={draggingCard}
-            dragPosition={dragPosition}
-            handleDragStart={handleDragStart}
-            handleDragMove={handleDragMove}
-            handleDragEnd={handleDragEnd}
-            spawnTestEnemy={spawnTestEnemy}
-            formatTime={formatTime}
-            onRestart={(dest) => resetGame(dest)}
-            score={score}
-            isDoubleElixir={isDoubleElixir}
-            showDoubleElixirAlert={showDoubleElixirAlert}
-            audioEnabled={audioEnabled}
-            setAudioEnabled={setAudioEnabled}
-            onConcede={concedeGame}
-          />      {globalDraggingCard && (
+      <GameBoard
+        towers={towers}
+        units={units}
+        projectiles={projectiles}
+        visualEffects={visualEffects}
+        setVisualEffects={setVisualEffects}
+        screenShake={screenShake}
+        setScreenShake={setScreenShake}
+        timeLeft={timeLeft}
+        gameOver={gameOver}
+        elixir={elixir}
+        enemyElixir={enemyElixir}
+        hand={hand}
+        nextCard={nextCard}
+        draggingCard={draggingCard}
+        dragPosition={dragPosition}
+        handleDragStart={handleDragStart}
+        handleDragMove={handleDragMove}
+        handleDragEnd={handleDragEnd}
+        spawnTestEnemy={spawnTestEnemy}
+        formatTime={formatTime}
+        onRestart={(dest) => resetGame(dest)}
+        score={score}
+        isDoubleElixir={isDoubleElixir}
+        showDoubleElixirAlert={showDoubleElixirAlert}
+        audioEnabled={audioEnabled}
+        setAudioEnabled={setAudioEnabled}
+        onConcede={concedeGame}
+      />      {globalDraggingCard && (
         <View style={[styles.dragProxy, {
           position: 'absolute',
           left: globalDragPosition.x - 30,
@@ -12940,7 +13796,7 @@ const styles = StyleSheet.create({
     color: '#FFD700',
     marginBottom: 40,
     textShadowColor: '#000',
-    textShadowOffset: {width: 2, height: 2},
+    textShadowOffset: { width: 2, height: 2 },
     textShadowRadius: 5,
     letterSpacing: 2,
   },
