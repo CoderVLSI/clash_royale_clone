@@ -186,7 +186,7 @@ const CARDS = [
   { id: 'vines', name: 'Vines', cost: 2, color: '#27ae60', type: 'spell', damage: 0, radius: 45, count: 1, duration: 4, rarity: 'rare', isRoot: true },
   { id: 'goblin_demolisher', name: 'Gob Demolisher', cost: 4, color: '#e74c3c', hp: 600, speed: 2, type: 'ground', range: 25, damage: 300, attackSpeed: 1500, projectile: 'bomb', count: 1, rarity: 'epic', deathDamage: 500, deathRadius: 50 },
   { id: 'goblin_machine', name: 'Gob Machine', cost: 5, color: '#95a5a6', hp: 1200, speed: 1.5, type: 'ground', range: 25, damage: 200, attackSpeed: 1200, projectile: null, count: 1, rarity: 'legendary', rocketAbility: true, rocketInterval: 3000, rocketDamage: 250, rocketRange: 120 },
-  { id: 'rune_giant', name: 'Rune Giant', cost: 6, color: '#3498db', hp: 3200, speed: 1, type: 'ground', range: 45, damage: 200, attackSpeed: 1800, projectile: null, count: 1, rarity: 'epic', runeEnhancer: true, enhanceInterval: 3, enhanceBonus: 0.5, enhanceRadius: 100, enhanceDuration: 5000 },
+  { id: 'rune_giant', name: 'Rune Giant', cost: 6, color: '#8B4513', hp: 3200, speed: 1, type: 'ground', range: 30, damage: 200, attackSpeed: 1800, projectile: null, count: 1, rarity: 'epic', runeEnhancer: true, enhanceInterval: 3, enhanceBonus: 0.5, enhanceRadius: 100, enhanceDuration: 5000 },
   { id: 'suspicious_bush', name: 'Suspicious Bush', cost: 2, color: '#2ecc71', hp: 400, speed: 3, type: 'ground', range: 20, damage: 100, attackSpeed: 1000, projectile: null, count: 1, rarity: 'rare', hidden: true, deathSpawns: 'sword_goblins', deathSpawnCount: 2 },
   { id: 'berserker', name: 'Berserker', cost: 4, color: '#c0392b', hp: 900, speed: 3.5, type: 'ground', range: 25, damage: 350, attackSpeed: 1000, projectile: null, count: 1, rarity: 'epic', permRage: true },
 
@@ -4369,6 +4369,45 @@ const VisualEffects = ({ effects, setEffects }) => {
                 <Circle cx={effect.radius * 0.25} cy={effect.radius * 0.5} r={effect.radius * 0.05} fill="#f39c12" opacity={0.8} />
                 <Circle cx={effect.radius * 1.35} cy={effect.radius * 0.35} r={effect.radius * 0.05} fill="#00BFFF" opacity={0.8} />
                 <Circle cx={effect.radius * 1.1} cy={effect.radius * 0.65} r={effect.radius * 0.05} fill="#e74c3c" opacity={0.8} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'rune_giant_enhance') {
+          // Rune Giant casting enhancement - big glowing pulse effect
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Expanding gold circle */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.9 * progress} fill="none" stroke="#f39c12" strokeWidth="4" opacity={1 - progress * 0.5} />
+                {/* Secondary cyan circle */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.6 * progress} fill="none" stroke="#00BFFF" strokeWidth="3" opacity={0.8 - progress * 0.3} />
+                {/* Inner bright glow */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.3 * progress} fill="#f39c12" opacity={0.6 - progress * 0.4} />
+                {/* Radiating X symbols */}
+                {[0, 1, 2, 3].map(i => {
+                  const angle = (i / 4) * Math.PI * 2 + progress * Math.PI * 0.5;
+                  const dist = effect.radius * 0.5 * progress;
+                  const x = effect.radius + Math.cos(angle) * dist;
+                  const y = effect.radius + Math.sin(angle) * dist;
+                  return (
+                    <Path key={i} d={`M${x - 8} ${y - 8} L${x + 8} ${y + 8} M${x + 8} ${y - 8} L${x - 8} ${y + 8}`}
+                      stroke="#E0FFFF" strokeWidth="2" opacity={0.8 - progress * 0.5} />
+                  );
+                })}
+                {/* Central rune symbol */}
+                <Path d={`M${effect.radius * 0.3} ${effect.radius * 0.3} L${effect.radius * 0.7} ${effect.radius * 0.7} M${effect.radius * 0.7} ${effect.radius * 0.3} L${effect.radius * 0.3} ${effect.radius * 0.7}`}
+                  stroke="#fff" strokeWidth="3" opacity={1 - progress * 0.3} />
               </Svg>
             </View>
           );
@@ -10291,6 +10330,17 @@ export default function App() {
                     }]);
                   });
 
+                  // Visual effect at Rune Giant's position when enhancing
+                  setVisualEffects(prev => [...prev, {
+                    id: Date.now() + Math.random() + 'giant_enhance',
+                    type: 'rune_giant_enhance',
+                    x: u.x,
+                    y: u.y,
+                    radius: 50,
+                    startTime: Date.now(),
+                    duration: 600
+                  }]);
+
                   // Giant stops briefly after enhancing
                   u.stoppingForEnhance = true;
                   u.enhanceStopEndTime = now + 500; // Stop for 500ms
@@ -11201,6 +11251,7 @@ export default function App() {
                 if (timeSinceTick >= 1) {
                   // Deal damage to all units in radius
                   currentUnits = currentUnits.map(u => {
+                    if (u.spriteId === 'suspicious_bush' && u.hidden?.active) return u;
                     const isEnemy = u.isOpponent !== (h.isOpponent || false);
                     const dist = Math.sqrt(Math.pow(u.x - h.x, 2) + Math.pow(u.y - h.y, 2));
                     if (isEnemy && dist < h.radius) {
@@ -11319,6 +11370,7 @@ export default function App() {
             } else {
               // Other spells (Fireball, Arrows, Zap, Earthquake) - one-time damage
               currentUnits = currentUnits.map(u => {
+                if (u.spriteId === 'suspicious_bush' && u.hidden?.active) return u;
                 const isEnemy = u.isOpponent !== (h.isOpponent || false);
                 const dist = Math.sqrt(Math.pow(u.x - h.targetX, 2) + Math.pow(u.y - h.targetY, 2));
                 if (isEnemy && dist < h.radius) {
@@ -11492,6 +11544,7 @@ export default function App() {
                 // ROYAL DELIVERY: Splash damage (hits AIR too) + Spawn Recruit
                 // Deal splash damage to all enemies in radius
                 currentUnits = currentUnits.map(u => {
+                  if (u.spriteId === 'suspicious_bush' && u.hidden?.active) return u;
                   if (u.isOpponent !== h.isOpponent && u.hp > 0) {
                     const dist = Math.sqrt(Math.pow(u.x - h.x, 2) + Math.pow(u.y - h.y, 2));
                     if (dist <= (h.radius || 45)) {
@@ -11593,6 +11646,7 @@ export default function App() {
             // Damage the primary target
             currentUnits = currentUnits.map(u => {
               if (u.id === h.targetId) {
+                if (u.spriteId === 'suspicious_bush' && u.hidden?.active) return u;
                 // Monk Reflection
                 if (u.isReflecting && u.reflectEndTime > now && !h.reflected) {
                    setProjectiles(prev => [...prev, {
@@ -11742,6 +11796,7 @@ export default function App() {
             if (h.splash) {
               const splashRadius = h.splashRadius || 50; // Use projectile's splashRadius or default 50
               currentUnits = currentUnits.map(u => {
+                if (u.spriteId === 'suspicious_bush' && u.hidden?.active) return u;
                 if (u.id !== h.targetId && u.hp > 0) {
                   const isEnemy = h.isOpponent !== undefined ? !h.isOpponent : u.isOpponent;
                   if (isEnemy) {
@@ -11956,6 +12011,7 @@ export default function App() {
           const radius = voidZone.radius || 50;
           const targets = currentUnits.filter(u => 
             u.isOpponent !== voidZone.isOpponent && u.hp > 0 &&
+            !(u.spriteId === 'suspicious_bush' && u.hidden?.active) &&
             Math.sqrt(Math.pow(u.x - voidZone.x, 2) + Math.pow(u.y - voidZone.y, 2)) <= radius
           );
           
@@ -11988,7 +12044,7 @@ export default function App() {
         activeProjectiles.filter(p => p.appliesCurse && (now - p.spawnTime) / 1000 < p.duration).forEach(curseZone => {
            const radius = curseZone.radius || 50;
            currentUnits = currentUnits.map(unit => {
-              if (unit.isOpponent !== curseZone.isOpponent && unit.hp > 0) {
+              if (unit.isOpponent !== curseZone.isOpponent && unit.hp > 0 && !(unit.spriteId === 'suspicious_bush' && unit.hidden?.active)) {
                  const dist = Math.sqrt(Math.pow(unit.x - curseZone.x, 2) + Math.pow(unit.y - curseZone.y, 2));
                  if (dist <= radius) {
                     return { ...unit, cursed: true, cursedByOpponent: curseZone.isOpponent };
@@ -12002,7 +12058,7 @@ export default function App() {
         activeProjectiles.filter(p => p.isRoot && (now - p.spawnTime) / 1000 < p.duration).forEach(rootZone => {
            const radius = rootZone.radius || 45;
            currentUnits = currentUnits.map(unit => {
-              if (unit.isOpponent !== rootZone.isOpponent && unit.hp > 0) {
+              if (unit.isOpponent !== rootZone.isOpponent && unit.hp > 0 && !(unit.spriteId === 'suspicious_bush' && unit.hidden?.active)) {
                  const dist = Math.sqrt(Math.pow(unit.x - rootZone.x, 2) + Math.pow(unit.y - rootZone.y, 2));
                  if (dist <= radius) {
                     return { ...unit, rootUntil: Date.now() + 200 };
