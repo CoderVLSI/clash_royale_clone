@@ -9403,7 +9403,7 @@ export default function App() {
                         const angle = (i / spawnCount) * Math.PI * 2;
                         const dist = 30;
                         newSkeletons.push({
-                            id: Date.now() + i + 20000 + Math.random(),
+                            id: 'sk_skeleton_' + now + '_' + i + '_' + Math.random(),
                             x: u.x + Math.cos(angle)*dist,
                             y: u.y + Math.sin(angle)*dist,
                             hp: spawnCard.hp, maxHp: spawnCard.hp,
@@ -9484,7 +9484,7 @@ export default function App() {
                   if (guardianCard) {
                       const spawnOffset = u.isOpponent ? 40 : -40;
                       unitsToSpawn.push({
-                          id: Date.now() + Math.random(),
+                          id: 'guardian_' + now + '_' + Math.random(),
                           x: u.x,
                           y: u.y + spawnOffset,
                           hp: guardianCard.hp, maxHp: guardianCard.hp,
@@ -9497,7 +9497,13 @@ export default function App() {
                           attackSpeed: guardianCard.attackSpeed,
                           spawnTime: now,
                           spawnDamage: guardianCard.spawnDamage,
-                          knockback: 50
+                          knockback: 50,
+                          lastAttack: 0,
+                          lockedTarget: null,
+                          wasPushed: false,
+                          wasStunned: false,
+                          stunUntil: 0,
+                          baseDamage: guardianCard.damage
                       });
                       abilityUsed = true;
                   }
@@ -9644,7 +9650,7 @@ export default function App() {
                   const clampedSpawnY = Math.max(20, Math.min(height - 20, spawnY));
 
                   newSpawns.push({
-                    id: Date.now() + Math.random() * 1000 + i,
+                    id: 'spawn_' + now + '_' + i + '_' + Math.random(),
                     x: clampedSpawnX,
                     y: clampedSpawnY,
                     hp: spawnCard.hp,
@@ -9723,7 +9729,7 @@ export default function App() {
             const hatchCard = CARDS.find(c => c.id === u.hatchesInto);
             if (hatchCard) {
               unitsToSpawn.push({
-                id: 'phoenix_reborn_' + Date.now(),
+                id: 'phoenix_reborn_' + now + '_' + Math.random(),
                 x: u.x,
                 y: u.y,
                 hp: hatchCard.hp,
