@@ -8891,7 +8891,9 @@ export default function App() {
                   targetY: closestTarget.y,
                   damage: damageToDeal,
                   frontalSplash: u.frontalSplash || false,
-                  turnsToPig: u.turnsToPig || false
+                  turnsToPig: u.turnsToPig || false,
+                  knockback: u.knockback || 0,
+                  boomerang: u.boomerang || false
                 });
               }
 
@@ -9403,6 +9405,46 @@ export default function App() {
         let attackAngle = 0;
         if (event.frontalSplash) {
           attackAngle = Math.atan2(event.targetY - event.attackerY, event.targetX - event.attackerX);
+        }
+
+        // Boomerang return damage (Executioner)
+        if (event.boomerang) {
+          // Schedule second splash damage when axe returns to Executioner
+          setTimeout(() => {
+            setVisualEffects(prev => [...prev, {
+              id: Date.now() + Math.random(),
+              type: 'fire_explosion', // Reuse explosion visual for axe return
+              x: event.attackerX,
+              y: event.attackerY,
+              radius: 40,
+              startTime: Date.now(),
+              duration: 400
+            }]);
+            // Apply return damage to all enemies around Executioner
+            setUnits(prevUnits => {
+              return prevUnits.map(unit => {
+                if (unit.isOpponent !== event.attacker.isOpponent && unit.hp > 0) {
+                  const dist = Math.sqrt(Math.pow(unit.x - event.attackerX, 2) + Math.pow(unit.y - event.attackerY, 2));
+                  if (dist <= splashRadius) {
+                    const returnDamage = Math.floor(event.damage * 0.5); // Half damage on return
+                    let remainingDamage = returnDamage;
+                    let newShieldHp = unit.currentShieldHp || 0;
+                    if (unit.hasShield && newShieldHp > 0) {
+                      if (remainingDamage >= newShieldHp) {
+                        remainingDamage -= newShieldHp;
+                        newShieldHp = 0;
+                      } else {
+                        newShieldHp -= remainingDamage;
+                        remainingDamage = 0;
+                      }
+                    }
+                    return { ...unit, hp: unit.hp - remainingDamage, currentShieldHp: newShieldHp };
+                  }
+                }
+                return unit;
+              });
+            });
+          }, 600); // Axe returns after 600ms
         }
 
         // Damage all enemy units in splash radius
