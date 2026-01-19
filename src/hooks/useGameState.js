@@ -21,8 +21,9 @@ const useGameState = () => {
   const [showDoubleElixirAlert, setShowDoubleElixirAlert] = useState(false);
   const [isOvertime, setIsOvertime] = useState(false);
   const [showOvertimeAlert, setShowOvertimeAlert] = useState(false);
+  const [isTowerDecay, setIsTowerDecay] = useState(false);
+  const [showTowerDecayAlert, setShowTowerDecayAlert] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(true);
-  const [isTowerDecay, setIsTowerDecay] = useState(false); // ADDED
 
 
   const [chests, setChests] = useState([
@@ -35,6 +36,7 @@ const useGameState = () => {
   // Refs for Game Loop access
   const doubleElixirTriggeredRef = useRef(false);
   const overtimeStartedRef = useRef(false);
+  const towerDecayStartedRef = useRef(false);
   const socketRef = useRef(null);
 
   // Decks State
@@ -120,8 +122,10 @@ const useGameState = () => {
     setIsOvertime(false);
     setShowOvertimeAlert(false);
     setIsTowerDecay(false);
+    setShowTowerDecayAlert(false);
     doubleElixirTriggeredRef.current = false;
     overtimeStartedRef.current = false;
+    towerDecayStartedRef.current = false;
 
     // Player Deck Randomization
     const currentDeck = userCards || allDecks[0];
@@ -1362,9 +1366,11 @@ const useGameState = () => {
     showDoubleElixirAlert, setShowDoubleElixirAlert,
     isOvertime, setIsOvertime,
     showOvertimeAlert, setShowOvertimeAlert,
+    isTowerDecay, setIsTowerDecay,
+    showTowerDecayAlert, setShowTowerDecayAlert,
     audioEnabled, setAudioEnabled,
     chests, setChests,
-    doubleElixirTriggeredRef, overtimeStartedRef, socketRef,
+    doubleElixirTriggeredRef, overtimeStartedRef, towerDecayStartedRef, socketRef,
     allDecks, setAllDecks, selectedDeckIndex, setSelectedDeckIndex, userCards,
     elixir, setElixir,
     hand, setHand,
