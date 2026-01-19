@@ -8275,43 +8275,46 @@ export default function App() {
 
         // Handle Phoenix Egg hatching
         if (u.hatchesInto && u.hatchTime && now >= u.hatchTime) {
-          const hatchCard = CARDS.find(c => c.id === u.hatchesInto);
-          if (hatchCard) {
-            unitsToSpawn.push({
-              id: 'phoenix_reborn_' + Date.now(),
-              x: u.x,
-              y: u.y,
-              hp: hatchCard.hp,
-              maxHp: hatchCard.hp,
-              isOpponent: u.isOpponent,
-              speed: hatchCard.speed,
-              type: hatchCard.type,
-              range: hatchCard.range,
-              damage: hatchCard.damage,
-              attackSpeed: hatchCard.attackSpeed,
-              projectile: hatchCard.projectile,
-              lane: u.lane,
-              lastAttack: 0,
-              spriteId: hatchCard.id,
-              spawnTime: Date.now() - 2000,
-              splash: hatchCard.splash,
-              revivesAsEgg: true,
-              eggHp: u.eggHp,
-              eggDuration: u.eggDuration
-            });
-            // Hatch visual effect
-            setVisualEffects(prev => [...prev, {
-              id: Date.now() + Math.random(),
-              type: 'fire_explosion',
-              x: u.x,
-              y: u.y,
-              radius: 60,
-              startTime: Date.now(),
-              duration: 600
-            }]);
-            // Remove the egg
-            return null;
+          // Only hatch if the egg is still alive
+          if (u.hp > 0) {
+            const hatchCard = CARDS.find(c => c.id === u.hatchesInto);
+            if (hatchCard) {
+              unitsToSpawn.push({
+                id: 'phoenix_reborn_' + Date.now(),
+                x: u.x,
+                y: u.y,
+                hp: hatchCard.hp,
+                maxHp: hatchCard.hp,
+                isOpponent: u.isOpponent,
+                speed: hatchCard.speed,
+                type: hatchCard.type,
+                range: hatchCard.range,
+                damage: hatchCard.damage,
+                attackSpeed: hatchCard.attackSpeed,
+                projectile: hatchCard.projectile,
+                lane: u.lane,
+                lastAttack: 0,
+                spriteId: hatchCard.id,
+                spawnTime: Date.now() - 2000,
+                splash: hatchCard.splash,
+                revivesAsEgg: true,
+                eggHp: u.eggHp,
+                eggDuration: u.eggDuration
+              });
+              // Hatch visual effect
+              setVisualEffects(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: 'fire_explosion',
+                x: u.x,
+                y: u.y,
+                radius: 60,
+                startTime: Date.now(),
+                duration: 600
+              }]);
+            }
           }
+          // Remove the egg (whether it hatched or died)
+          return null;
         }
 
         // Handle Tesla hidden mechanic
