@@ -179,7 +179,15 @@ const CARDS = [
   { id: 'fisherman', name: 'Fisherman', cost: 3, color: '#3498db', hp: 720, speed: 1.5, type: 'ground', range: 60, damage: 160, attackSpeed: 1300, projectile: 'hook', count: 1, rarity: 'legendary', pull: true, groundOnly: true },
   { id: 'goblin_curse', name: 'Goblin Curse', cost: 2, color: '#9b59b6', type: 'spell', damage: 25, radius: 50, count: 1, duration: 6, rarity: 'epic', appliesCurse: true },
   { id: 'void', name: 'Void', cost: 3, color: '#8e44ad', type: 'spell', damage: 0, radius: 50, count: 1, duration: 5, rarity: 'epic', isVoid: true },
-  { id: 'goblin_gang', name: 'Goblin Gang', cost: 3, color: '#2ecc71', hp: 202, speed: 3, type: 'ground', range: 25, damage: 120, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common', spawnsExtra: 'spear_goblins', extraCount: 3, spawnUnitId: 'sword_goblins' }
+  { id: 'goblin_gang', name: 'Goblin Gang', cost: 3, color: '#2ecc71', hp: 202, speed: 3, type: 'ground', range: 25, damage: 120, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common', spawnsExtra: 'spear_goblins', extraCount: 3, spawnUnitId: 'sword_goblins' },
+
+  // NEW REQUESTED CARDS BATCH 2
+  { id: 'vines', name: 'Vines', cost: 2, color: '#27ae60', type: 'spell', damage: 0, radius: 45, count: 1, duration: 4, rarity: 'rare', isRoot: true },
+  { id: 'goblin_demolisher', name: 'Gob Demolisher', cost: 4, color: '#e74c3c', hp: 600, speed: 2, type: 'ground', range: 25, damage: 300, attackSpeed: 1500, projectile: 'bomb', count: 1, rarity: 'epic', deathDamage: 500, deathRadius: 50 },
+  { id: 'goblin_machine', name: 'Gob Machine', cost: 5, color: '#95a5a6', hp: 1200, speed: 1.5, type: 'ground', range: 25, damage: 200, attackSpeed: 1200, projectile: null, count: 1, rarity: 'legendary', rocketAbility: true, rocketInterval: 3000, rocketDamage: 250, rocketRange: 120 },
+  { id: 'rune_giant', name: 'Rune Giant', cost: 6, color: '#3498db', hp: 3200, speed: 1, type: 'ground', range: 30, damage: 250, attackSpeed: 1600, projectile: null, count: 1, rarity: 'epic', spawnDamage: 200 },
+  { id: 'suspicious_bush', name: 'Suspicious Bush', cost: 2, color: '#2ecc71', hp: 400, speed: 3, type: 'ground', range: 20, damage: 100, attackSpeed: 1000, projectile: null, count: 1, rarity: 'rare', hidden: true, deathSpawns: 'sword_goblins', deathSpawnCount: 2 },
+  { id: 'berserker', name: 'Berserker', cost: 4, color: '#c0392b', hp: 900, speed: 3.5, type: 'ground', range: 25, damage: 350, attackSpeed: 1000, projectile: null, count: 1, rarity: 'epic', permRage: true }
 ];
 
 const RARITY_COLORS = {
@@ -1952,6 +1960,61 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Path d="M50 20 L50 80 M20 50 L80 50" stroke="#D442F5" strokeWidth="2" opacity="0.6" />
         </Svg>
       );
+    case 'goblin_demolisher':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          <Circle cx="50" cy="40" r="15" fill="#2ecc71" />
+          <Circle cx="50" cy="65" r="20" fill="#2c3e50" />
+          <Path d="M50 55 L50 50" stroke="#f1c40f" strokeWidth="2" />
+        </Svg>
+      );
+    case 'goblin_machine':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Rect x="20" y="20" width="60" height="60" fill="#95a5a6" stroke="black" strokeWidth="2" rx="5" />
+          <Circle cx="50" cy="40" r="15" fill="#2ecc71" />
+          <Rect x="15" y="40" width="10" height="30" fill="#7f8c8d" />
+          <Rect x="75" y="40" width="10" height="30" fill="#7f8c8d" />
+          <Circle cx="50" cy="20" r="5" fill="#e74c3c" />
+        </Svg>
+      );
+    case 'rune_giant':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="48" fill={color} stroke="#3498db" strokeWidth="3" />
+          <Path d="M30 30 L70 70 M70 30 L30 70" stroke="#00BFFF" strokeWidth="4" opacity="0.7" />
+          <Circle cx="50" cy="50" r="10" fill="#00BFFF" />
+        </Svg>
+      );
+    case 'suspicious_bush':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#2ecc71" stroke="#27ae60" strokeWidth="3" />
+          <Path d="M20 50 Q50 20 80 50 Q50 80 20 50" fill="#27ae60" opacity="0.5" />
+          <Circle cx="30" cy="30" r="10" fill="#2ecc71" />
+          <Circle cx="70" cy="30" r="10" fill="#2ecc71" />
+          <Circle cx="30" cy="70" r="10" fill="#2ecc71" />
+          <Circle cx="70" cy="70" r="10" fill="#2ecc71" />
+        </Svg>
+      );
+    case 'berserker':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
+          <Path d="M30 30 L20 10 M70 30 L80 10" stroke="#f1c40f" strokeWidth="4" />
+          <Rect x="30" y="30" width="40" height="20" fill="#7f8c8d" />
+          <Path d="M35 45 L45 50 M65 45 L55 50" stroke="white" strokeWidth="2" />
+        </Svg>
+      );
+    case 'vines':
+       return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#27ae60" stroke="white" strokeWidth="2" />
+          <Path d="M20 50 Q50 20 80 50 M20 50 Q50 80 80 50" stroke="#2ecc71" strokeWidth="4" fill="none" />
+          <Path d="M50 20 L50 80" stroke="#2ecc71" strokeWidth="4" />
+        </Svg>
+       );
     case 'bomb_tower':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
@@ -2309,7 +2372,66 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
   }
 };
 
-const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd, isDragging, lastPlayedCard }) => {
+const SpellInfoTooltip = ({ visible, card, onClose }) => {
+  if (!visible || !card || card.type !== 'spell') return null;
+
+  const towerDamage = Math.floor(card.damage * 0.3);
+  const normalDamage = card.damage;
+
+  return (
+    <View style={styles.spellInfoOverlay}>
+      <View style={styles.spellInfoTooltip}>
+        <View style={styles.spellInfoHeader}>
+          <Text style={styles.spellInfoTitle}>{card.name}</Text>
+          <TouchableOpacity onPress={onClose} style={styles.spellInfoClose}>
+            <Text style={styles.spellInfoCloseText}>✕</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.spellInfoContent}>
+          <View style={styles.spellInfoRow}>
+            <View style={styles.spellInfoIcon}>
+              <Text style={styles.spellInfoIconText}>🏰</Text>
+            </View>
+            <View style={styles.spellInfoDetails}>
+              <Text style={styles.spellInfoLabel}>Crown Tower Damage</Text>
+              <Text style={styles.spellInfoValue}>{towerDamage}</Text>
+            </View>
+          </View>
+
+          <View style={styles.spellInfoDivider} />
+
+          <View style={styles.spellInfoRow}>
+            <View style={styles.spellInfoIcon}>
+              <Text style={styles.spellInfoIconText}>⚔️</Text>
+            </View>
+            <View style={styles.spellInfoDetails}>
+              <Text style={styles.spellInfoLabel}>Normal Damage</Text>
+              <Text style={styles.spellInfoValue}>{normalDamage}</Text>
+            </View>
+          </View>
+
+          {card.radius && (
+            <>
+              <View style={styles.spellInfoDivider} />
+              <View style={styles.spellInfoRow}>
+                <View style={styles.spellInfoIcon}>
+                  <Text style={styles.spellInfoIconText}>📏</Text>
+                </View>
+                <View style={styles.spellInfoDetails}>
+                  <Text style={styles.spellInfoLabel}>Radius</Text>
+                  <Text style={styles.spellInfoValue}>{card.radius}</Text>
+                </View>
+              </View>
+            </>
+          )}
+        </View>
+      </View>
+    </View>
+  );
+};
+
+const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd, isDragging, lastPlayedCard, onLongPress }) => {
   // Guard against undefined card
   if (!card) {
     return null;
@@ -2324,16 +2446,21 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
   const cardToDisplay = card.id === 'mirror' && lastPlayedCard ? lastPlayedCard : card;
   const isMirror = card.id === 'mirror';
 
-  const callbacksRef = useRef({ onDragStart, onDragMove, onDragEnd });
+  const callbacksRef = useRef({ onDragStart, onDragMove, onDragEnd, onLongPress });
   const canAffordRef = useRef(canAfford);
   const isNextRef = useRef(isNext);
 
+  // Double tap detection
+  const lastTapRef = useRef(0);
+  const tapCountRef = useRef(0);
+  const tapTimerRef = useRef(null);
+
   // Update refs when props change
   useEffect(() => {
-    callbacksRef.current = { onDragStart, onDragMove, onDragEnd };
+    callbacksRef.current = { onDragStart, onDragMove, onDragEnd, onLongPress };
     canAffordRef.current = canAfford;
     isNextRef.current = isNext;
-  }, [onDragStart, onDragMove, onDragEnd, canAfford, isNext]);
+  }, [onDragStart, onDragMove, onDragEnd, onLongPress, canAfford, isNext]);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -2342,15 +2469,57 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
       },
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: (evt, gestureState) => {
-        const currentCanAfford = canAffordRef.current;
-        const currentIsNext = isNextRef.current;
-        const { onDragStart } = callbacksRef.current;
-        if (!currentIsNext && currentCanAfford && onDragStart) {
-          onDragStart(card, gestureState);
+        const now = Date.now();
+        const timeSinceLastTap = now - lastTapRef.current;
+
+        // Check for double tap (within 300ms)
+        if (timeSinceLastTap < 300 && tapCountRef.current === 1) {
+          // Double tap detected - show spell info for spells
+          const { onLongPress } = callbacksRef.current;
+          if (onLongPress && card.type === 'spell') {
+            onLongPress(card);
+          }
+          // Reset
+          tapCountRef.current = 0;
+          lastTapRef.current = 0;
+          if (tapTimerRef.current) {
+            clearTimeout(tapTimerRef.current);
+            tapTimerRef.current = null;
+          }
         } else {
+          // First tap
+          tapCountRef.current = 1;
+          lastTapRef.current = now;
+
+          // Reset after delay
+          if (tapTimerRef.current) {
+            clearTimeout(tapTimerRef.current);
+          }
+          tapTimerRef.current = setTimeout(() => {
+            tapCountRef.current = 0;
+            lastTapRef.current = 0;
+            tapTimerRef.current = null;
+          }, 300);
+
+          // Start drag for single tap
+          const currentCanAfford = canAffordRef.current;
+          const currentIsNext = isNextRef.current;
+          const { onDragStart } = callbacksRef.current;
+          if (!currentIsNext && currentCanAfford && onDragStart) {
+            onDragStart(card, gestureState);
+          }
         }
       },
       onPanResponderMove: (evt, gestureState) => {
+        // Cancel double tap if moving significantly
+        if (Math.abs(gestureState.dx) > 5 || Math.abs(gestureState.dy) > 5) {
+          tapCountRef.current = 0;
+          if (tapTimerRef.current) {
+            clearTimeout(tapTimerRef.current);
+            tapTimerRef.current = null;
+          }
+        }
+
         const { onDragMove } = callbacksRef.current;
         if (!isNextRef.current && canAffordRef.current && onDragMove) {
           onDragMove(gestureState);
@@ -2364,6 +2533,15 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
       },
     })
   ).current;
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (tapTimerRef.current) {
+        clearTimeout(tapTimerRef.current);
+      }
+    };
+  }, []);
 
   // Always attach panHandlers - we check canAfford inside the callbacks
   // This prevents the responder from being lost when elixir changes
@@ -2482,6 +2660,28 @@ const VisualEffects = ({ effects, setEffects }) => {
       {activeEffects.map(effect => {
         const progress = (now - effect.startTime) / effect.duration; // 0 to 1
         const opacity = 1 - progress; // Fade out
+
+        if (effect.type === 'lock_on') {
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.8} fill="none" stroke="#e74c3c" strokeWidth="2" opacity={0.8} />
+                <Path d={`M${effect.radius} 0 L${effect.radius} ${effect.radius * 0.5} M${effect.radius} ${effect.radius * 1.5} L${effect.radius} ${effect.radius * 2}`} stroke="#e74c3c" strokeWidth="2" />
+                <Path d={`M0 ${effect.radius} L${effect.radius * 0.5} ${effect.radius} M${effect.radius * 1.5} ${effect.radius} L${effect.radius * 2} ${effect.radius}`} stroke="#e74c3c" strokeWidth="2" />
+                <Circle cx={effect.radius} cy={effect.radius} r={2} fill="#e74c3c" />
+              </Svg>
+            </View>
+          );
+        }
 
         if (effect.type === 'void_hit') {
           // Void strike from sky - dark red beam
@@ -4297,10 +4497,11 @@ const Projectile = ({ type, position }) => {
       </View>
     );
   }
-  if (type === 'poison_spell' || type === 'rage_spell' || type === 'void_zone' || type === 'goblin_curse_zone') {
+  if (type === 'poison_spell' || type === 'rage_spell' || type === 'void_zone' || type === 'goblin_curse_zone' || type === 'vines_zone') {
     const isRage = type === 'rage_spell';
     const isVoid = type === 'void_zone';
     const isCurse = type === 'goblin_curse_zone';
+    const isVines = type === 'vines_zone';
     
     let mainColor = "rgba(255, 140, 0, 0.4)";
     let strokeColor = "#FF8C00";
@@ -4314,6 +4515,9 @@ const Projectile = ({ type, position }) => {
     } else if (isCurse) {
         mainColor = "rgba(46, 204, 113, 0.4)"; 
         strokeColor = "#27ae60";
+    } else if (isVines) {
+        mainColor = "rgba(39, 174, 96, 0.3)";
+        strokeColor = "#2ecc71";
     }
 
     const spellRadius = position.radius || 50;
@@ -4345,6 +4549,12 @@ const Projectile = ({ type, position }) => {
                          />
                        </>          ) : isCurse ? (
              <Circle cx={spellRadius} cy={spellRadius} r={spellRadius * 0.6} fill="none" stroke="#27ae60" strokeWidth="2" strokeDasharray="4 4" />
+          ) : isVines ? (
+             <>
+               <Circle cx={spellRadius} cy={spellRadius} r={spellRadius * 0.8} fill="none" stroke="#2ecc71" strokeWidth="2" />
+               <Path d={`M${spellRadius*0.2} ${spellRadius} Q${spellRadius} ${spellRadius*0.2} ${spellRadius*1.8} ${spellRadius}`} stroke="#27ae60" strokeWidth="2" fill="none" />
+               <Path d={`M${spellRadius} ${spellRadius*0.2} Q${spellRadius*1.8} ${spellRadius} ${spellRadius} ${spellRadius*1.8}`} stroke="#27ae60" strokeWidth="2" fill="none" />
+             </>
           ) : (
             <>
               <Circle cx={spellRadius * 0.7} cy={spellRadius * 0.8} r={spellRadius * 0.12} fill="white" opacity="0.8" />
@@ -5098,8 +5308,91 @@ const Unit = ({ unit }) => {
 
 // --- Lobby Components ---
 
-const LobbyHeader = () => (
+const HamburgerMenu = ({ visible, onClose }) => {
+  if (!visible) return null;
+
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <View style={styles.menuWrapper}>
+        {/* Semi-transparent overlay - tap to close */}
+        <TouchableOpacity style={styles.hamburgerOverlay} onPress={onClose} activeOpacity={1} />
+        {/* Side menu - tap doesn't close */}
+        <View style={styles.hamburgerMenuContainer}>
+          <View style={styles.menuContent}>
+            <View style={styles.menuHeader}>
+              <Text style={styles.menuTitle}>Menu</Text>
+              <TouchableOpacity onPress={onClose} style={styles.menuCloseButton}>
+                <Text style={styles.menuCloseText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity style={styles.menuItem}>
+              <Text style={styles.menuItemIcon}>👤</Text>
+              <Text style={styles.menuItemText}>Profile</Text>
+              <Text style={styles.menuItemArrow}>›</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuItem}>
+              <Text style={styles.menuItemIcon}>📦</Text>
+              <Text style={styles.menuItemText}>Inventory</Text>
+              <Text style={styles.menuItemArrow}>›</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuItem}>
+              <Text style={styles.menuItemIcon}>🏆</Text>
+              <Text style={styles.menuItemText}>Achievements</Text>
+              <Text style={styles.menuItemArrow}>›</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuItem}>
+              <Text style={styles.menuItemIcon}>📊</Text>
+              <Text style={styles.menuItemText}>Leaderboard</Text>
+              <Text style={styles.menuItemArrow}>›</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuItem}>
+              <Text style={styles.menuItemIcon}>⚙️</Text>
+              <Text style={styles.menuItemText}>Settings</Text>
+              <Text style={styles.menuItemArrow}>›</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuItem}>
+              <Text style={styles.menuItemIcon}>❓</Text>
+              <Text style={styles.menuItemText}>Help</Text>
+              <Text style={styles.menuItemArrow}>›</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuItem}>
+              <Text style={styles.menuItemIcon}>📄</Text>
+              <Text style={styles.menuItemText}>Terms of Service</Text>
+              <Text style={styles.menuItemArrow}>›</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.menuItem}>
+              <Text style={styles.menuItemIcon}>🔒</Text>
+              <Text style={styles.menuItemText}>Privacy Policy</Text>
+              <Text style={styles.menuItemArrow}>›</Text>
+            </TouchableOpacity>
+
+            <View style={styles.menuDivider} />
+
+            <TouchableOpacity style={styles.menuItem}>
+              <Text style={styles.menuItemIcon}>🚪</Text>
+              <Text style={styles.menuItemText}>Log Out</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </View>
+  </Modal>
+  );
+};
+
+const LobbyHeader = ({ onMenuPress }) => (
   <View style={styles.lobbyHeader}>
+    <TouchableOpacity onPress={onMenuPress} style={styles.hamburgerButton}>
+      <Text style={styles.hamburgerIcon}>☰</Text>
+    </TouchableOpacity>
     <View style={styles.lobbyHeaderLeft}>
       <View style={styles.xpLevelContainer}>
         <Text style={styles.xpLevelText}>13</Text>
@@ -6018,6 +6311,8 @@ const MainLobby = ({
   dragHandlers, selectedDeckIndex, setSelectedDeckIndex, allDecks,
   chests, onUnlockChest, onOpenChest
 }) => {
+  const [showMenu, setShowMenu] = useState(false);
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 0: return <ShopTab />;
@@ -6043,15 +6338,18 @@ const MainLobby = ({
   };
 
   return (
-    <ImageBackground source={require('./lobby-bg.jpg')} style={styles.lobbyContainer}>
-      <View style={styles.lobbyOverlay}>
-        <LobbyHeader />
-        <View style={styles.tabContentArea}>
-          {renderTabContent()}
+    <>
+      <ImageBackground source={require('./lobby-bg.jpg')} style={styles.lobbyContainer}>
+        <View style={styles.lobbyOverlay}>
+          <LobbyHeader onMenuPress={() => setShowMenu(true)} />
+          <View style={styles.tabContentArea}>
+            {renderTabContent()}
+          </View>
+          <BottomNavigation activeTab={activeTab} onTabChange={onTabChange} />
         </View>
-        <BottomNavigation activeTab={activeTab} onTabChange={onTabChange} />
-      </View>
-    </ImageBackground>
+      </ImageBackground>
+      <HamburgerMenu visible={showMenu} onClose={() => setShowMenu(false)} />
+    </>
   );
 };
 
@@ -6067,6 +6365,14 @@ const GameBoard = ({
   audioEnabled, setAudioEnabled, onConcede
 }) => {
   const [showSettings, setShowSettings] = useState(false);
+  const [spellInfoCard, setSpellInfoCard] = useState(null);
+
+  const handleSpellLongPress = (card) => {
+    // Only show info for spells
+    if (card.type === 'spell') {
+      setSpellInfoCard(card);
+    }
+  };
 
   // Screen shake animation
   const shakeAnim = useRef(new Animated.Value(0)).current;
@@ -6325,6 +6631,7 @@ const GameBoard = ({
                 onDragStart={handleDragStart}
                 onDragMove={handleDragMove}
                 onDragEnd={handleDragEnd}
+                onLongPress={handleSpellLongPress}
                 isDragging={draggingCard && draggingCard.id === card.id}
               />
             ))}
@@ -6455,6 +6762,12 @@ const GameBoard = ({
           </View>
         </View>
       )}
+
+      <SpellInfoTooltip
+        visible={!!spellInfoCard}
+        card={spellInfoCard}
+        onClose={() => setSpellInfoCard(null)}
+      />
 
       {gameOver && <GameOverScreen result={gameOver} onRestart={onRestart} />}
 
@@ -7484,6 +7797,14 @@ export default function App() {
             type: 'void_zone', isSpell: true, hit: true, spawnTime: Date.now(),
             duration: actualCard.duration || 4, isOpponent, isVoid: true,
             lastTick: 0
+           }]);
+
+        } else if (actualCard.id === 'vines') {
+           setProjectiles(prev => [...prev, {
+            id: Date.now(), x: x, y: y, targetX: x, targetY: y,
+            speed: 0, damage: 0, radius: actualCard.radius,
+            type: 'vines_zone', isSpell: true, hit: true, spawnTime: Date.now(),
+            duration: actualCard.duration || 4, isOpponent, isRoot: true
            }]);
 
         } else if (actualCard.id === 'tornado') {
@@ -8757,6 +9078,68 @@ export default function App() {
           }
         }
 
+        // GOBLIN MACHINE: Rocket Ability
+        if (u.rocketAbility) {
+           const lastRocket = u.lastRocketTime || u.spawnTime;
+           const timeSinceRocket = now - lastRocket;
+           const interval = u.rocketInterval || 3000;
+           const lockOnDuration = 1000;
+
+           if (timeSinceRocket >= interval - lockOnDuration && timeSinceRocket < interval) {
+              const rocketRange = u.rocketRange || 120;
+              let target = (nextTowers || []).find(t => t.isOpponent !== u.isOpponent && t.hp > 0 && 
+                  Math.sqrt(Math.pow(t.x - u.x, 2) + Math.pow(t.y - u.y, 2)) <= rocketRange);
+              if (!target) {
+                  target = (unitsRef.current || []).find(t => t.isOpponent !== u.isOpponent && t.hp > 0 && !t.hidden?.active &&
+                      Math.sqrt(Math.pow(t.x - u.x, 2) + Math.pow(t.y - u.y, 2)) <= rocketRange);
+              }
+              if (target) {
+                 setVisualEffects(prev => {
+                    if (prev.some(e => e.type === 'lock_on' && e.targetId === target.id && (now - e.startTime) < 100)) return prev;
+                    return [...prev, {
+                       id: Date.now() + Math.random(),
+                       type: 'lock_on',
+                       targetId: target.id,
+                       x: target.x, y: target.y,
+                       radius: 30, startTime: now, duration: 200
+                    }];
+                 });
+              }
+           }
+           
+           if (timeSinceRocket >= interval) {
+              const rocketRange = u.rocketRange || 120;
+              let target = (nextTowers || []).find(t => t.isOpponent !== u.isOpponent && t.hp > 0 && 
+                  Math.sqrt(Math.pow(t.x - u.x, 2) + Math.pow(t.y - u.y, 2)) <= rocketRange);
+              if (!target) {
+                  target = (unitsRef.current || []).find(t => t.isOpponent !== u.isOpponent && t.hp > 0 && !t.hidden?.active &&
+                      Math.sqrt(Math.pow(t.x - u.x, 2) + Math.pow(t.y - u.y, 2)) <= rocketRange);
+              }
+              
+              if (target) {
+                 nextProjectiles.push({
+                    id: now + Math.random(),
+                    x: u.x, y: u.y - 20, 
+                    targetId: target.id, targetX: target.x, targetY: target.y,
+                    speed: 15,
+                    damage: u.rocketDamage || 250,
+                    type: 'rocket',
+                    attackerId: u.id,
+                    isOpponent: u.isOpponent,
+                    splash: true, splashRadius: 40
+                 });
+                 u.lastRocketTime = now;
+                 
+                 setVisualEffects(prev => [...prev, {
+                    id: Date.now() + Math.random(),
+                    type: 'fire_explosion',
+                    x: u.x, y: u.y - 20,
+                    radius: 20, startTime: now, duration: 300
+                 }]);
+              }
+           }
+        }
+
         // GOBLIN GIANT: Independent spear goblin attacks from his back
         // These attack continuously with their own speed, separate from Giant's melee punch
         if (u.extraProjectiles > 0 && u.spriteId === 'goblin_giant') {
@@ -8990,7 +9373,7 @@ export default function App() {
           if (u.slowUntil > now) {
             currentAttackSpeed = u.attackSpeed / (1 - (u.slowAmount || 0.35));
           }
-          if (u.rageUntil > now) {
+          if (u.rageUntil > now || u.permRage) {
             currentAttackSpeed = u.attackSpeed / 1.35; // 35% faster attack speed
           }
 
@@ -9531,8 +9914,11 @@ export default function App() {
           const speedMultiplier = (u.charge && u.charge.active) ? 2 : 1;
           let effectiveSpeed = u.speed * speedMultiplier;
 
-          if (u.rageUntil > now) {
+          if (u.rageUntil > now || u.permRage) {
             effectiveSpeed *= 1.35; // 35% faster movement speed
+          }
+          if (u.rootUntil > now) {
+            effectiveSpeed = 0; // Rooted by Vines
           }
 
           // Mega Knight Jump Movement
@@ -10990,7 +11376,7 @@ export default function App() {
           if (p.keepVisual && p.type === 'tesla_lightning') {
             return (now - Math.floor(p.id)) < 150;
           }
-          if (p.isPoison || p.isRage || p.isTornado || p.isVoid || p.appliesCurse) {
+          if (p.isPoison || p.isRage || p.isTornado || p.isVoid || p.appliesCurse || p.isRoot) {
             return ((now - p.spawnTime) / 1000 < p.duration);
           }
           return !p.hit;
@@ -11095,6 +11481,20 @@ export default function App() {
                  const dist = Math.sqrt(Math.pow(unit.x - curseZone.x, 2) + Math.pow(unit.y - curseZone.y, 2));
                  if (dist <= radius) {
                     return { ...unit, cursed: true, cursedByOpponent: curseZone.isOpponent };
+                 }
+              }
+              return unit;
+           });
+        });
+
+        // Process Vines (Root)
+        activeProjectiles.filter(p => p.isRoot && (now - p.spawnTime) / 1000 < p.duration).forEach(rootZone => {
+           const radius = rootZone.radius || 45;
+           currentUnits = currentUnits.map(unit => {
+              if (unit.isOpponent !== rootZone.isOpponent && unit.hp > 0) {
+                 const dist = Math.sqrt(Math.pow(unit.x - rootZone.x, 2) + Math.pow(unit.y - rootZone.y, 2));
+                 if (dist <= radius) {
+                    return { ...unit, rootUntil: Date.now() + 200 };
                  }
               }
               return unit;
@@ -13067,6 +13467,92 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
+  // --- Spell Info Tooltip Styles ---
+  spellInfoOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'transparent',
+    zIndex: 10000,
+  },
+  spellInfoTooltip: {
+    position: 'absolute',
+    top: '15%',
+    left: '50%',
+    marginLeft: -125,
+    width: 250,
+    backgroundColor: '#1a1a2e',
+    borderRadius: 15,
+    borderWidth: 2,
+    borderColor: '#D442F5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 20,
+  },
+  spellInfoHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#D442F5',
+  },
+  spellInfoTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  spellInfoClose: {
+    padding: 5,
+  },
+  spellInfoCloseText: {
+    fontSize: 20,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  spellInfoContent: {
+    padding: 15,
+  },
+  spellInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  spellInfoIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#D442F5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  spellInfoIconText: {
+    fontSize: 20,
+  },
+  spellInfoDetails: {
+    flex: 1,
+  },
+  spellInfoLabel: {
+    fontSize: 12,
+    color: '#aaa',
+    marginBottom: 2,
+  },
+  spellInfoValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  spellInfoDivider: {
+    height: 1,
+    backgroundColor: '#D442F5',
+    marginVertical: 10,
+    opacity: 0.3,
+  },
   // Lobby Styles
   lobbyContainer: {
     flex: 1,
@@ -13932,6 +14418,96 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 6,
     elevation: 10,
+  },
+  hamburgerButton: {
+    padding: 10,
+    marginRight: 10,
+  },
+  hamburgerIcon: {
+    fontSize: 28,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  menuWrapper: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 10000,
+    elevation: 30,
+  },
+  hamburgerOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+  },
+  hamburgerMenuContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '75%',
+    height: '100%',
+    backgroundColor: '#1a1a2e',
+    shadowColor: '#000',
+    shadowOffset: { width: 3, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 25,
+  },
+  menuHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    paddingTop: 50,
+    borderBottomWidth: 2,
+    borderBottomColor: '#D442F5',
+  },
+  menuTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  menuCloseButton: {
+    padding: 10,
+  },
+  menuCloseText: {
+    fontSize: 24,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  menuContent: {
+    flex: 1,
+    backgroundColor: '#1a1a2e',
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    marginBottom: 5,
+    borderRadius: 10,
+  },
+  menuItemIcon: {
+    fontSize: 24,
+    marginRight: 20,
+    width: 30,
+    textAlign: 'center',
+  },
+  menuItemText: {
+    fontSize: 18,
+    color: '#fff',
+    fontWeight: '500',
+  },
+  menuDivider: {
+    height: 1,
+    backgroundColor: '#D442F5',
+    marginVertical: 15,
+    opacity: 0.5,
   },
   lobbyHeaderLeft: {
     flexDirection: 'row',
