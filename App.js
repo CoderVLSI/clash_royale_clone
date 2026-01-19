@@ -167,7 +167,7 @@ const CARDS = [
   { id: 'zappies', name: 'Zappies', cost: 4, color: '#f1c40f', hp: 440, speed: 1.5, type: 'ground', range: 55, damage: 85, attackSpeed: 2100, projectile: 'electric_zap', count: 3, stun: 0.5, rarity: 'rare' },
   { id: 'rascals', name: 'Rascals', cost: 5, color: '#e67e22', hp: 1281, speed: 1.5, type: 'ground', range: 25, damage: 182, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common', spawnsExtra: 'rascal_girls', extraCount: 2 },
   { id: 'rascal_girls', name: 'Rascal Girls', cost: 0, color: '#e67e22', hp: 300, speed: 2.5, type: 'ground', range: 100, damage: 107, attackSpeed: 1100, projectile: 'slingshot', count: 1, rarity: 'common', isToken: true },
-  { id: 'royal_recruits', name: 'Royal Recruits', cost: 7, color: '#3498db', hp: 630, shieldHp: 200, speed: 1.5, type: 'ground', range: 30, damage: 125, attackSpeed: 1200, projectile: null, count: 6, rarity: 'common', hasShield: true, splitSpawn: true },
+  { id: 'royal_recruits', name: 'Royal Recruits', cost: 7, color: '#3498db', hp: 630, shieldHp: 200, speed: 1.5, type: 'ground', range: 30, damage: 125, attackSpeed: 1200, projectile: null, count: 7, rarity: 'common', hasShield: true, splitSpawn: true },
 
   // Troops/Buildings - Hard
   { id: 'cannon_cart', name: 'Cannon Cart', cost: 5, color: '#7f8c8d', hp: 696, shieldHp: 590, speed: 2.5, type: 'ground', range: 70, damage: 202, attackSpeed: 1200, projectile: 'cannonball', count: 1, rarity: 'epic', hasShield: true, transformsToBuilding: true },
@@ -7363,12 +7363,15 @@ export default function App() {
 
           let offsetY = count > 1 ? (Math.random() * 20 - 10) : 0;
 
-          // Royal Recruits - splitSpawn spreads them in a circle
+          // Royal Recruits - spread across the player's area horizontally
           if (actualCard.splitSpawn && count > 1) {
-            const angle = (i / count) * Math.PI * 2;
-            const distance = 50; // Spread radius
-            offsetX = Math.cos(angle) * distance;
-            offsetY = Math.sin(angle) * distance;
+            // Spread horizontally across the player's side
+            // 7 recruits spread from left to right
+            const spreadWidth = 120; // Total spread width
+            const horizontalPos = (i / (count - 1)) * spreadWidth - (spreadWidth / 2);
+            offsetX = horizontalPos;
+            // Small vertical offset for variety
+            offsetY = (Math.random() * 40 - 20);
           }
 
           let unitLane = lane;
