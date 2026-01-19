@@ -17,25 +17,25 @@ This document tracks the progress of splitting the monolithic `App.js` (14,000+ 
 
 ## 3. UI & Lobby Components (Next Steps)
 *Goal: Move the UI code (~2,000 lines) out of App.js.*
-- [ ] **Lobby Tabs**:
-    - [ ] `src/components/Lobby/ShopTab.js`
-    - [ ] `src/components/Lobby/DeckTab.js`
-    - [ ] `src/components/Lobby/SocialTab.js`
-    - [ ] `src/components/Lobby/EventsTab.js`
-- [ ] **Lobby Shell**:
-    - [ ] `src/components/Lobby/MainLobby.js` (Wrapper)
-    - [ ] `src/components/Lobby/LobbyHeader.js`
-    - [ ] `src/components/Lobby/BottomNavigation.js`
-- [ ] **Modals**:
-    - [ ] `src/components/Modals/ChestOpeningModal.js`
-    - [ ] `src/components/Modals/FriendlyBattleModal.js`
+- [x] **Lobby Tabs**:
+    - [x] `src/components/Lobby/ShopTab.js`
+    - [x] `src/components/Lobby/DeckTab.js`
+    - [x] `src/components/Lobby/SocialTab.js`
+    - [x] `src/components/Lobby/EventsTab.js`
+- [x] **Lobby Shell**:
+    - [x] `src/components/Lobby/MainLobby.js` (Wrapper)
+    - [x] `src/components/Lobby/LobbyHeader.js`
+    - [x] `src/components/Lobby/BottomNavigation.js`
+- [x] **Modals**:
+    - [x] `src/components/Modals/ChestOpeningModal.js`
+    - [x] `src/components/Modals/FriendlyBattleModal.js`
 
 ## 4. Game Entities (Pending)
 *Goal: Move game object rendering (~1,000 lines) out of App.js.*
-- [ ] **GameBoard**: Wrapper component (`src/components/GameBoard.js`).
-- [ ] **Unit**: The `Unit` component (`src/components/Unit.js`).
-- [ ] **Projectile**: The `Projectile` component (`src/components/Projectile.js`).
-- [ ] **Tower**: The `Tower` component (`src/components/Tower.js`).
+- [x] **GameBoard**: Wrapper component (`src/components/Game/GameBoard.js`).
+- [x] **Unit**: The `Unit` component (`src/components/Game/Unit.js`).
+- [x] **Projectile**: The `Projectile` component (`src/components/Game/Projectile.js`).
+- [x] **Tower**: The `Tower` component (`src/components/Game/Tower.js`).
 
 ## 5. Core Game Logic (Final Boss)
 *Goal: Refactor the massive Game Loop (~4,500 lines).*

@@ -5950,6 +5950,7 @@ const GameBoard = ({
   handleDragStart, handleDragMove, handleDragEnd,
   spawnTestEnemy, formatTime, onRestart, score,
   isDoubleElixir, showDoubleElixirAlert,
+  isOvertime, showOvertimeAlert,
   audioEnabled, setAudioEnabled, onConcede
 }) => {
   const [showSettings, setShowSettings] = useState(false);
@@ -6145,6 +6146,16 @@ const GameBoard = ({
           <View style={styles.doubleElixirAlertContent}>
             <Text style={styles.doubleElixirAlertTitle}>⚡ DOUBLE ELIXIR! ⚡</Text>
             <Text style={styles.doubleElixirAlertSubtitle}>Elixir generation 2x speed!</Text>
+          </View>
+        </View>
+      )}
+
+      {/* Overtime Alert */}
+      {showOvertimeAlert && (
+        <View style={styles.overtimeAlert}>
+          <View style={styles.overtimeAlertContent}>
+            <Text style={styles.overtimeAlertTitle}>⚔️ OVERTIME! ⚔️</Text>
+            <Text style={styles.overtimeAlertSubtitle}>Sudden Death - First tower wins!</Text>
           </View>
         </View>
       )}
@@ -6587,8 +6598,11 @@ export default function App() {
   const [score, setScore] = useState([0, 0]); // [Player, Opponent]
   const [isDoubleElixir, setIsDoubleElixir] = useState(false);
   const [showDoubleElixirAlert, setShowDoubleElixirAlert] = useState(false);
+  const [isOvertime, setIsOvertime] = useState(false);
+  const [showOvertimeAlert, setShowOvertimeAlert] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(true);
   const doubleElixirTriggeredRef = useRef(false);
+  const overtimeStartedRef = useRef(false);
   const socketRef = useRef(null);
 
   // Initialize Socket
@@ -6720,10 +6734,12 @@ export default function App() {
   const enemyDeckQueueRef = useRef(enemyDeckQueue);
   const lastPlayedCardRef = useRef(lastPlayedCard);
   const enemyLastPlayedCardRef = useRef(enemyLastPlayedCard);
+  const scoreRef = useRef(score);
 
   useEffect(() => { towersRef.current = towers; }, [towers]);
   useEffect(() => { unitsRef.current = units; }, [units]);
   useEffect(() => { projectilesRef.current = projectiles; }, [projectiles]);
+  useEffect(() => { scoreRef.current = score; }, [score]);
   useEffect(() => { enemyElixirRef.current = enemyElixir; }, [enemyElixir]);
   useEffect(() => { enemyHandRef.current = enemyHand; }, [enemyHand]);
   useEffect(() => { enemyNextCardRef.current = enemyNextCard; }, [enemyNextCard]);
@@ -6740,7 +6756,10 @@ export default function App() {
     setScore([0, 0]);
     setIsDoubleElixir(false);
     setShowDoubleElixirAlert(false);
+    setIsOvertime(false);
+    setShowOvertimeAlert(false);
     doubleElixirTriggeredRef.current = false;
+    overtimeStartedRef.current = false;
 
     // Player Deck Randomization
     const currentDeck = userCards || allDecks[0];
@@ -7925,12 +7944,27 @@ export default function App() {
     const timer = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
+          // Check if game is tied when timer hits 0
+          const currentTowers = towersRef.current || [];
+          const playerTowersStanding = currentTowers.filter(t => !t.isOpponent && t.hp > 0).length;
+          const opponentTowersStanding = currentTowers.filter(t => t.isOpponent && t.hp > 0).length;
+
+          // If tied and overtime hasn't started, enter overtime
+          if (playerTowersStanding === opponentTowersStanding && !overtimeStartedRef.current) {
+            overtimeStartedRef.current = true;
+            setIsOvertime(true);
+            setShowOvertimeAlert(true);
+            setTimeout(() => setShowOvertimeAlert(false), 3000);
+            return 60; // 60 seconds of overtime
+          }
+
+          // Overtime just ended or already was in overtime
           clearInterval(timer);
           checkWinner();
           return 0;
         }
         // Check for double elixir activation at 60 seconds (2 minutes into match)
-        if (prev === 60 && !doubleElixirTriggeredRef.current) {
+        if (prev === 60 && !doubleElixirTriggeredRef.current && !overtimeStartedRef.current) {
           doubleElixirTriggeredRef.current = true;
           setIsDoubleElixir(true);
           setShowDoubleElixirAlert(true);
@@ -7969,8 +8003,22 @@ export default function App() {
       const destroyedOpponentTowers = nextTowers.filter(t => t.isOpponent && t.hp <= 0).length;
       const destroyedPlayerTowers = nextTowers.filter(t => !t.isOpponent && t.hp <= 0).length;
 
-      // Only set state if score changed (to avoid infinite loops) - though in this simple interval it might be fine, 
-      // best to be safe if we were using refs for score. But here we use functional state updates elsewhere. 
+      // OVERTIME SUDDEN DEATH: First tower destroyed wins
+      if (overtimeStartedRef.current) {
+        // Check if a tower was just destroyed this frame (score changed)
+        const [prevOpponentDestroyed, prevPlayerDestroyed] = scoreRef.current || [0, 0];
+        if (destroyedOpponentTowers > prevOpponentDestroyed) {
+          setGameOver('VICTORY');
+          return;
+        }
+        if (destroyedPlayerTowers > prevPlayerDestroyed) {
+          setGameOver('DEFEAT');
+          return;
+        }
+      }
+
+      // Only set state if score changed (to avoid infinite loops) - though in this simple interval it might be fine,
+      // best to be safe if we were using refs for score. But here we use functional state updates elsewhere.
       // Actually, we can just update it.
       setScore([destroyedOpponentTowers, destroyedPlayerTowers]);
 
@@ -11415,6 +11463,8 @@ export default function App() {
         score={score}
         isDoubleElixir={isDoubleElixir}
         showDoubleElixirAlert={showDoubleElixirAlert}
+        isOvertime={isOvertime}
+        showOvertimeAlert={showOvertimeAlert}
         audioEnabled={audioEnabled}
         setAudioEnabled={setAudioEnabled}
         onConcede={concedeGame}
@@ -13418,6 +13468,44 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#8B4500',
+  },
+  // --- Overtime Alert Styles ---
+  overtimeAlert: {
+    position: 'absolute',
+    top: 100,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2000,
+  },
+  overtimeAlertContent: {
+    backgroundColor: 'rgba(231, 76, 60, 0.95)',
+    paddingHorizontal: 30,
+    paddingVertical: 15,
+    borderRadius: 15,
+    borderWidth: 3,
+    borderColor: '#c0392b',
+    shadowColor: '#e74c3c',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1,
+    shadowRadius: 15,
+    elevation: 10,
+    alignItems: 'center',
+  },
+  overtimeAlertTitle: {
+    fontSize: 32,
+    fontWeight: '900',
+    color: '#fff',
+    textShadowColor: '#c0392b',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 4,
+    marginBottom: 5,
+  },
+  overtimeAlertSubtitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
   },
   // --- Lobby Header Styles ---
   lobbyHeader: {
