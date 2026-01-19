@@ -5243,7 +5243,7 @@ const Unit = ({ unit }) => {
     <View style={[
       styles.unit,
       { left: unit.x - unitSize / 2, top: unit.y - unitSize / 2, width: unitSize, height: unitSize },
-      isStealthed && { opacity: 0.4 }
+      isStealthed && unit.spriteId !== 'suspicious_bush' && { opacity: 0.4 }
     ]}>
       {/* Range Indicator Circle - Only for Buildings and Units with Spawn Damage (e.g. Mega Knight) */}
       {Boolean(unit.range && unit.range > 0 && (unit.type === 'building' || unit.spawnDamage)) && (
@@ -9331,6 +9331,20 @@ export default function App() {
           }
         }
 
+        // GOBLIN DEMOLISHER: Enrage below 50% HP
+        if (u.spriteId === 'goblin_demolisher' && u.hp < u.maxHp * 0.5 && !u.isEnraged) {
+           u.isEnraged = true;
+           u.speed = (u.speed || 2) * 2; 
+           u.targetType = 'buildings'; 
+           u.kamikaze = true; 
+           
+           setVisualEffects(prev => [...prev, {
+              id: Date.now() + Math.random(),
+              type: 'rage_aura',
+              x: u.x, y: u.y, radius: 30, startTime: now, duration: 1000
+           }]);
+        }
+
         // GOBLIN MACHINE: Rocket Ability
         if (u.rocketAbility) {
            const lastRocket = u.lastRocketTime || u.spawnTime;
@@ -9666,9 +9680,27 @@ export default function App() {
               damageToDeal = actualDamage * 2; // Dash deals 2x damage
             }
 
-            // Rune Giant Enhancement - apply damage boost if active
-            if (u.damageBoost && u.damageBoostUntil && now < u.damageBoostUntil) {
-              damageToDeal = Math.floor(damageToDeal * (1 + u.damageBoost));
+            // Rune Giant Enhancement - enhanced allies deal bonus damage on every 3rd hit
+            if (u.runeEnhanced && u.runeEnhancedUntil && now < u.runeEnhancedUntil) {
+              const enhancedHits = (u.runeEnhancedHits || 0) + 1;
+              if (enhancedHits % 3 === 0) {
+                // Every 3rd hit deals bonus damage
+                const bonusMultiplier = 1 + (u.runeEnhanceBonus || 0.5);
+                damageToDeal = Math.floor(damageToDeal * bonusMultiplier);
+
+                // Visual effect for bonus hit
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'rune_enhance',
+                  x: u.x,
+                  y: u.y,
+                  radius: 25,
+                  startTime: Date.now(),
+                  duration: 400
+                }]);
+              }
+              // Update hit counter (will be preserved in return statement)
+              u.runeEnhancedHits = enhancedHits;
             }
 
             // Inferno Tower Damage Ramp - increases over time
@@ -10157,14 +10189,16 @@ export default function App() {
                     })
                     .slice(0, 2);
 
-                  // Apply enhancement
+                  // Apply enhancement - allies deal bonus damage on every 3rd hit
                   setUnits(prevUnits => {
                     return prevUnits.map(ally => {
                       if (alliesToEnhance.some(a => a.id === ally.id)) {
                         return {
                           ...ally,
-                          damageBoost: (ally.damageBoost || 0) + enhanceBonus,
-                          damageBoostUntil: Math.max(ally.damageBoostUntil || 0, Date.now() + enhanceDuration)
+                          runeEnhanced: true,
+                          runeEnhancedUntil: Date.now() + enhanceDuration,
+                          runeEnhancedHits: 0,
+                          runeEnhanceBonus: enhanceBonus
                         };
                       }
                       return ally;
@@ -10212,7 +10246,12 @@ export default function App() {
               // Preserve Rune Giant properties
               runeHits: u.runeHits,
               stoppingForEnhance: u.stoppingForEnhance,
-              enhanceStopEndTime: u.enhanceStopEndTime
+              enhanceStopEndTime: u.enhanceStopEndTime,
+              // Preserve rune enhancement properties (for enhanced allies)
+              runeEnhanced: u.runeEnhanced,
+              runeEnhancedUntil: u.runeEnhancedUntil,
+              runeEnhancedHits: u.runeEnhancedHits,
+              runeEnhanceBonus: u.runeEnhanceBonus
             };
           }
           return {
@@ -10230,7 +10269,12 @@ export default function App() {
             // Preserve Rune Giant properties
             runeHits: u.runeHits,
             stoppingForEnhance: u.stoppingForEnhance,
-            enhanceStopEndTime: u.enhanceStopEndTime
+            enhanceStopEndTime: u.enhanceStopEndTime,
+            // Preserve rune enhancement properties (for enhanced allies)
+            runeEnhanced: u.runeEnhanced,
+            runeEnhancedUntil: u.runeEnhancedUntil,
+            runeEnhancedHits: u.runeEnhancedHits,
+            runeEnhanceBonus: u.runeEnhanceBonus
           };
         } else if (u.spriteId === 'mega_knight' && closestTarget && !u.isJumping && minDist > 50 && minDist < 150) {
           // MEGA KNIGHT JUMP START
@@ -10259,7 +10303,12 @@ export default function App() {
               lastBombDrop: u.lastBombDrop || 0,
               runeHits: u.runeHits,
               stoppingForEnhance: now < u.enhanceStopEndTime,
-              enhanceStopEndTime: u.enhanceStopEndTime
+              enhanceStopEndTime: u.enhanceStopEndTime,
+              // Preserve rune enhancement properties (for enhanced allies)
+              runeEnhanced: u.runeEnhanced,
+              runeEnhancedUntil: u.runeEnhancedUntil,
+              runeEnhancedHits: u.runeEnhancedHits,
+              runeEnhanceBonus: u.runeEnhanceBonus
             };
           }
 
@@ -10546,7 +10595,16 @@ export default function App() {
             dashEndTime: u.dashEndTime || 0,
             currentDamageBonus: u.currentDamageBonus || 0,
             lastBombDrop: u.lastBombDrop || 0,
-            lastTargetId: u.lastTargetId
+            lastTargetId: u.lastTargetId,
+            // Preserve Rune Giant properties
+            runeHits: u.runeHits,
+            stoppingForEnhance: u.stoppingForEnhance,
+            enhanceStopEndTime: u.enhanceStopEndTime,
+            // Preserve rune enhancement properties (for enhanced allies)
+            runeEnhanced: u.runeEnhanced,
+            runeEnhancedUntil: u.runeEnhancedUntil,
+            runeEnhancedHits: u.runeEnhancedHits,
+            runeEnhanceBonus: u.runeEnhanceBonus
           };
         }
       });
