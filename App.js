@@ -9467,6 +9467,26 @@ export default function App() {
 
                // Mighty Miner
                else if (u.escapeAbility) {
+                  // Drop bomb at current location
+                  unitsToSpawn.push({
+                      id: 'miner_bomb_' + now + '_' + Math.random(),
+                      x: u.x,
+                      y: u.y,
+                      hp: 1, maxHp: 1,
+                      isOpponent: u.isOpponent,
+                      speed: 0,
+                      lane: u.lane,
+                      spriteId: 'bomb', type: 'ground',
+                      range: 0, damage: 0,
+                      attackSpeed: 0,
+                      spawnTime: now,
+                      kamikaze: true,
+                      splash: true,
+                      deathDamage: 300,
+                      deathRadius: 60,
+                      lifetime: 1 // Explode immediately? No, kamikaze needs to trigger.
+                  });
+
                   setVisualEffects(prev => [...prev, {
                       id: Date.now() + Math.random(),
                       type: 'fire_explosion',
@@ -12330,36 +12350,66 @@ export default function App() {
               const tIndex = nextTowers.findIndex(t => t.id === h.targetId);
               if (tIndex !== -1) {
                 const tower = nextTowers[tIndex];
-                let damageToDeal = h.damage;
-                if (h.isSpell) damageToDeal = Math.floor(damageToDeal * 0.3); // 30% for spells
 
-                let updatedTower = { ...tower, hp: tower.hp - damageToDeal };
+                // Monk Reflection for Towers
+                // Find if there's a reflecting Monk near the tower (simplified: any reflecting Monk on the same team)
+                const reflectingMonk = currentUnits.find(u => 
+                   !u.isOpponent === !tower.isOpponent && 
+                   u.isReflecting && u.reflectEndTime > now &&
+                   Math.sqrt(Math.pow(u.x - tower.x, 2) + Math.pow(u.y - tower.y, 2)) < 100 // Range check
+                );
 
-                // Tower hit visual effect for significant damage
-                if (damageToDeal > 15) {
-                  setVisualEffects(prev => [...prev, {
-                    id: Date.now() + Math.random(),
-                    type: 'tower_hit',
-                    x: tower.x,
-                    y: tower.y,
-                    radius: 40,
-                    startTime: Date.now(),
-                    duration: 200
-                  }]);
+                if (reflectingMonk && !h.reflected) {
+                   setProjectiles(prev => [...prev, {
+                      ...h,
+                      id: Date.now() + Math.random(),
+                      targetId: h.attackerId,
+                      attackerId: reflectingMonk.id,
+                      isOpponent: reflectingMonk.isOpponent,
+                      reflected: true,
+                      x: tower.x, y: tower.y,
+                      spawnTime: now
+                   }]);
+                   
+                   setVisualEffects(prev => [...prev, {
+                      id: Date.now() + Math.random(),
+                      type: 'monk_reflection',
+                      x: reflectingMonk.x, y: reflectingMonk.y, radius: 30, startTime: now, duration: 300
+                   }]);
+                   
+                   // Projectile is reflected, tower takes no damage
+                } else {
+                  let damageToDeal = h.damage;
+                  if (h.isSpell) damageToDeal = Math.floor(damageToDeal * 0.3); // 30% for spells
+
+                  let updatedTower = { ...tower, hp: tower.hp - damageToDeal };
+
+                  // Tower hit visual effect for significant damage
+                  if (damageToDeal > 15) {
+                    setVisualEffects(prev => [...prev, {
+                      id: Date.now() + Math.random(),
+                      type: 'tower_hit',
+                      x: tower.x,
+                      y: tower.y,
+                      radius: 40,
+                      startTime: Date.now(),
+                      duration: 200
+                    }]);
+                  }
+
+                  // Apply stun effect (Electro Wizard) to towers
+                  if (h.stun && h.stun > 0) {
+                    updatedTower.stunUntil = now + (h.stun * 1000);
+                  }
+
+                  // Apply slow effect (Ice Wizard) to towers
+                  if (h.slow && h.slow > 0) {
+                    updatedTower.slowUntil = now + 2000;
+                    updatedTower.slowAmount = h.slow;
+                  }
+
+                  nextTowers[tIndex] = updatedTower;
                 }
-
-                // Apply stun effect (Electro Wizard) to towers
-                if (h.stun && h.stun > 0) {
-                  updatedTower.stunUntil = now + (h.stun * 1000);
-                }
-
-                // Apply slow effect (Ice Wizard) to towers
-                if (h.slow && h.slow > 0) {
-                  updatedTower.slowUntil = now + 2000;
-                  updatedTower.slowAmount = h.slow;
-                }
-
-                nextTowers[tIndex] = updatedTower;
               }
 
               // Apply splash damage to OTHER towers (not primary target)
