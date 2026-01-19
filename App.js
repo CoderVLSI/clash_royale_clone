@@ -96,7 +96,8 @@ const CARDS = [
   { id: 'goblin_barrel', name: 'Goblin B', cost: 3, color: '#2ecc71', type: 'spell', damage: 0, radius: 20, count: 3, spawns: 'sword_goblins', spawnCount: 3, rarity: 'epic' },
   { id: 'elixir_collector', name: 'Elixir G', cost: 6, color: '#9b59b6', hp: 1070, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 70, rarity: 'rare', generatesElixir: true },
   { id: 'goblin_hut', name: 'Goblin Hut', cost: 5, color: '#2ecc71', hp: 1293, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 60, spawns: 'spear_goblins', spawnRate: 4.5, spawnCount: 1, rarity: 'rare' },
-  { id: 'furnace', name: 'Furnace', cost: 4, color: '#e74c3c', hp: 1003, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 50, spawns: 'fire_spirit', spawnRate: 7, spawnCount: 1, rarity: 'rare' },
+  { id: 'furnace', name: 'Furnace', cost: 4, color: '#e74c3c', hp: 1003, speed: 1.5, type: 'ground', range: 50, damage: 120, attackSpeed: 1200, projectile: 'flame', count: 1, spawns: 'fire_spirit', spawnRate: 5, spawnCount: 1, rarity: 'rare' },
+  { id: 'spirit_empress', name: 'Spirit Empress', cost: 6, color: '#9b59b6', hp: 1400, speed: 2, type: 'ground', range: 55, damage: 180, attackSpeed: 1400, projectile: 'spirit_bolt', count: 1, rarity: 'legendary', spawns: 'random_spirit', spawnRate: 4, spawnCount: 1 },
   { id: 'earthquake', name: 'Earthquake', cost: 3, color: '#7f8c8d', type: 'spell', damage: 81, radius: 70, count: 1, slow: 0.35, rarity: 'rare' },
   { id: 'graveyard', name: 'Graveyard', cost: 5, color: '#2c3e50', type: 'spell', damage: 0, radius: 80, count: 20, spawns: 'skeletons', spawnCount: 20, rarity: 'legendary' },
   { id: 'lumberjack', name: 'Lumberjack', cost: 4, color: '#e67e22', hp: 1232, speed: 2.5, type: 'ground', range: 25, damage: 240, attackSpeed: 800, projectile: null, count: 1, splash: true, deathRage: true, rarity: 'legendary' },
@@ -185,16 +186,23 @@ const CARDS = [
   { id: 'vines', name: 'Vines', cost: 2, color: '#27ae60', type: 'spell', damage: 0, radius: 45, count: 1, duration: 4, rarity: 'rare', isRoot: true },
   { id: 'goblin_demolisher', name: 'Gob Demolisher', cost: 4, color: '#e74c3c', hp: 600, speed: 2, type: 'ground', range: 25, damage: 300, attackSpeed: 1500, projectile: 'bomb', count: 1, rarity: 'epic', deathDamage: 500, deathRadius: 50 },
   { id: 'goblin_machine', name: 'Gob Machine', cost: 5, color: '#95a5a6', hp: 1200, speed: 1.5, type: 'ground', range: 25, damage: 200, attackSpeed: 1200, projectile: null, count: 1, rarity: 'legendary', rocketAbility: true, rocketInterval: 3000, rocketDamage: 250, rocketRange: 120 },
-  { id: 'rune_giant', name: 'Rune Giant', cost: 6, color: '#3498db', hp: 3200, speed: 1, type: 'ground', range: 30, damage: 250, attackSpeed: 1600, projectile: null, count: 1, rarity: 'epic', spawnDamage: 200 },
+  { id: 'rune_giant', name: 'Rune Giant', cost: 6, color: '#3498db', hp: 3200, speed: 1, type: 'ground', range: 45, damage: 200, attackSpeed: 1800, projectile: null, count: 1, rarity: 'epic', runeEnhancer: true, enhanceInterval: 3, enhanceBonus: 0.5, enhanceRadius: 100, enhanceDuration: 5000 },
   { id: 'suspicious_bush', name: 'Suspicious Bush', cost: 2, color: '#2ecc71', hp: 400, speed: 3, type: 'ground', range: 20, damage: 100, attackSpeed: 1000, projectile: null, count: 1, rarity: 'rare', hidden: true, deathSpawns: 'sword_goblins', deathSpawnCount: 2 },
-  { id: 'berserker', name: 'Berserker', cost: 4, color: '#c0392b', hp: 900, speed: 3.5, type: 'ground', range: 25, damage: 350, attackSpeed: 1000, projectile: null, count: 1, rarity: 'epic', permRage: true }
+  { id: 'berserker', name: 'Berserker', cost: 4, color: '#c0392b', hp: 900, speed: 3.5, type: 'ground', range: 25, damage: 350, attackSpeed: 1000, projectile: null, count: 1, rarity: 'epic', permRage: true },
+
+  // CHAMPIONS
+  { id: 'golden_knight', name: 'Golden Knight', cost: 4, color: '#f1c40f', hp: 1800, speed: 2, type: 'ground', range: 25, damage: 160, attackSpeed: 1000, projectile: null, count: 1, rarity: 'champion', dashChain: true, abilityCooldown: 6000 },
+  { id: 'skeleton_king', name: 'Skeleton King', cost: 4, color: '#2c3e50', hp: 2000, speed: 1.5, type: 'ground', range: 25, damage: 180, attackSpeed: 1400, projectile: null, count: 1, rarity: 'champion', splash: true, collectsSouls: true, abilityCooldown: 8000 },
+  { id: 'archer_queen', name: 'Archer Queen', cost: 5, color: '#9b59b6', hp: 1000, speed: 1.5, type: 'ground', range: 120, damage: 225, attackSpeed: 1200, projectile: 'arrow', count: 1, rarity: 'champion', stealthAbility: true, abilityCooldown: 7000 },
+  { id: 'monk', name: 'Monk', cost: 5, color: '#ecf0f1', hp: 2000, speed: 1.5, type: 'ground', range: 25, damage: 140, attackSpeed: 900, projectile: null, count: 1, rarity: 'champion', pushback: 40, reflectAbility: true, abilityCooldown: 9000 }
 ];
 
 const RARITY_COLORS = {
   common: '#7f8c8d',    // Gray
   rare: '#f39c12',      // Orange
   epic: '#9b59b6',      // Purple
-  legendary: '#2ecc71'  // Emerald/Rainbow substitute
+  legendary: '#2ecc71', // Emerald/Rainbow substitute
+  champion: '#f1c40f'   // Gold
 };
 
 // --- Main Menu Component ---
@@ -1211,6 +1219,8 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
     case 'furnace':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Mobile Legs */}
+          <Path d="M30 85 L25 95 M70 85 L75 95" stroke="#2c3e50" strokeWidth="4" />
           {/* Furnace body */}
           <Rect x="25" y="40" width="50" height="45" fill="#e74c3c" stroke="#c0392b" strokeWidth="2" rx="3" />
           {/* Top opening */}
@@ -1221,6 +1231,18 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           {/* Smoke vents */}
           <Rect x="30" y="30" width="8" height="8" fill="#7f8c8d" />
           <Rect x="62" y="30" width="8" height="8" fill="#7f8c8d" />
+        </Svg>
+      );
+    case 'spirit_empress':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="#9b59b6" strokeWidth="2" />
+          {/* Crown */}
+          <Path d="M30 30 L40 10 L50 30 L60 10 L70 30" fill="#f1c40f" />
+          {/* Floating Spirits */}
+          <Circle cx="30" cy="50" r="8" fill="#e74c3c" /> {/* Fire */}
+          <Circle cx="70" cy="50" r="8" fill="#3498db" /> {/* Ice */}
+          <Circle cx="50" cy="70" r="8" fill="#9b59b6" /> {/* Electro */}
         </Svg>
       );
     case 'earthquake':
@@ -2015,6 +2037,56 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Path d="M50 20 L50 80" stroke="#2ecc71" strokeWidth="4" />
         </Svg>
        );
+    case 'golden_knight':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#f1c40f" stroke="#f39c12" strokeWidth="2" />
+          {/* Hair */}
+          <Path d="M30 30 Q50 10 70 30 L80 60 Q60 50 30 60 Z" fill="#e67e22" />
+          <Circle cx="50" cy="50" r="25" fill="#f1c40f" /> {/* Face */}
+          <Path d="M40 45 L50 50 M60 45 L50 50" stroke="#c0392b" strokeWidth="2" /> {/* Smile */}
+        </Svg>
+      );
+    case 'skeleton_king':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="48" fill="#2c3e50" stroke="#95a5a6" strokeWidth="2" />
+          {/* Skull */}
+          <Circle cx="50" cy="45" r="20" fill="#ecf0f1" />
+          <Circle cx="42" cy="42" r="4" fill="#2c3e50" />
+          <Circle cx="58" cy="42" r="4" fill="#2c3e50" />
+          {/* Crown */}
+          <Path d="M30 30 L40 10 L50 25 L60 10 L70 30" fill="#f1c40f" />
+          {/* Club */}
+          <Rect x="70" y="40" width="10" height="40" fill="#7f8c8d" />
+          <Circle cx="75" cy="40" r="12" fill="#2c3e50" />
+        </Svg>
+      );
+    case 'archer_queen':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#9b59b6" stroke="#8e44ad" strokeWidth="2" />
+          {/* Hood */}
+          <Path d="M25 30 Q50 10 75 30 L75 80 L25 80 Z" fill="#8e44ad" />
+          <Circle cx="50" cy="45" r="20" fill="#ffe0b2" /> {/* Face */}
+          {/* Crossbow */}
+          <Path d="M20 50 Q50 80 80 50" stroke="#2c3e50" strokeWidth="4" fill="none" />
+          <Rect x="48" y="50" width="4" height="30" fill="#2c3e50" />
+        </Svg>
+      );
+    case 'monk':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#ecf0f1" stroke="#bdc3c7" strokeWidth="2" />
+          {/* Bald Head */}
+          <Circle cx="50" cy="40" r="20" fill="#ffe0b2" />
+          <Path d="M30 60 Q50 80 70 60" fill="#f39c12" /> {/* Robe */}
+          {/* Prayer Beads */}
+          <Circle cx="50" cy="65" r="5" fill="#e74c3c" />
+          <Circle cx="60" cy="62" r="5" fill="#e74c3c" />
+          <Circle cx="40" cy="62" r="5" fill="#e74c3c" />
+        </Svg>
+      );
     case 'bomb_tower':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
@@ -2660,6 +2732,39 @@ const VisualEffects = ({ effects, setEffects }) => {
       {activeEffects.map(effect => {
         const progress = (now - effect.startTime) / effect.duration; // 0 to 1
         const opacity = 1 - progress; // Fade out
+
+        if (effect.type === 'soul_absorb') {
+           const curX = effect.x + (effect.targetX - effect.x) * progress;
+           const curY = effect.y + (effect.targetY - effect.y) * progress;
+           return (
+             <View key={effect.id} style={{ position: 'absolute', left: curX, top: curY }}>
+                <Text style={{ fontSize: 10 }}>👻</Text>
+             </View>
+           );
+        }
+        if (effect.type === 'monk_reflection') {
+           return (
+             <View key={effect.id} style={{ position: 'absolute', left: effect.x - 30, top: effect.y - 30, width: 60, height: 60, alignItems: 'center', justifyContent: 'center' }}>
+                <Svg width="60" height="60" viewBox="0 0 60 60">
+                   <Circle cx="30" cy="30" r={30*progress} fill="none" stroke="#3498db" strokeWidth="3" opacity={1-progress} />
+                </Svg>
+             </View>
+           );
+        }
+        if (effect.type === 'queen_cloak') {
+           return (
+             <View key={effect.id} style={{ position: 'absolute', left: effect.x - 20, top: effect.y - 20 }}>
+                <Text style={{ fontSize: 20, opacity: opacity }}>💨</Text>
+             </View>
+           );
+        }
+        if (effect.type === 'golden_dash') {
+           return (
+             <View key={effect.id} style={{ position: 'absolute', left: effect.x - 20, top: effect.y - 20 }}>
+                <Text style={{ fontSize: 20, opacity: opacity }}>✨</Text>
+             </View>
+           );
+        }
 
         if (effect.type === 'lock_on') {
           return (
@@ -4178,6 +4283,44 @@ const VisualEffects = ({ effects, setEffects }) => {
           );
         }
 
+        if (effect.type === 'rune_enhance') {
+          // Rune Giant enhancement - glowing blue/cyan runes buffing allies
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - effect.radius,
+              top: effect.y - effect.radius,
+              width: effect.radius * 2,
+              height: effect.radius * 2,
+              opacity: opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
+                {/* Expanding cyan circle */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.8 * progress} fill="none" stroke="#00BFFF" strokeWidth="3" opacity={0.9 - progress * 0.3} />
+                {/* Inner glow */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.5 * progress} fill="#00BFFF" opacity={0.4 - progress * 0.2} />
+                {/* Rune symbols - X pattern */}
+                <Path d={`M${effect.radius * 0.3} ${effect.radius * 0.3} L${effect.radius * 0.7} ${effect.radius * 0.7} M${effect.radius * 0.7} ${effect.radius * 0.3} L${effect.radius * 0.3} ${effect.radius * 0.7}`}
+                  stroke="#E0FFFF" strokeWidth="2" opacity={1 - progress * 0.5} />
+                {/* Rising energy particles */}
+                {[0, 1, 2, 3].map(i => {
+                  const angle = (i / 4) * Math.PI * 2;
+                  const dist = effect.radius * 0.4 * progress;
+                  const x = effect.radius + Math.cos(angle) * dist;
+                  const y = effect.radius - Math.sin(angle) * dist - effect.radius * 0.3 * progress; // Move upward
+                  return (
+                    <Circle key={i} cx={x} cy={y} r={2} fill="#00BFFF" opacity={0.8 - progress * 0.5} />
+                  );
+                })}
+                {/* Center bright point */}
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.15} fill="#E0FFFF" opacity={1} />
+              </Svg>
+            </View>
+          );
+        }
+
         return null;
       })}
     </>
@@ -4403,7 +4546,25 @@ const Projectile = ({ type, position }) => {
       <View style={[styles.fireballSpell, { left: position.x, top: position.y }]} />
     );
   }
-  if (type === 'rocket_spell') {
+  if (type === 'flame') {
+    return (
+      <View style={{
+        position: 'absolute',
+        left: position.x - 6,
+        top: position.y - 6,
+        width: 12,
+        height: 12,
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <Svg width="12" height="12" viewBox="0 0 12 12">
+          <Path d="M6 0 Q10 6 6 12 Q2 6 6 0" fill="#e67e22" />
+          <Path d="M6 4 Q8 7 6 10 Q4 7 6 4" fill="#f39c12" />
+        </Svg>
+      </View>
+    );
+  }
+  if (type === 'rocket') {
     // Rocket projectile - larger cylinder shape with flame trail
     return (
       <View style={{ position: 'absolute', left: position.x - 8, top: position.y - 15 }}>
@@ -5383,7 +5544,6 @@ const HamburgerMenu = ({ visible, onClose }) => {
           </View>
         </View>
       </View>
-    </View>
   </Modal>
   );
 };
@@ -7991,6 +8151,15 @@ export default function App() {
             targetType: actualCard.targetType,
 
             charge: actualCard.charge ? { active: false, distance: 0, threshold: 2 } : undefined,
+            // Champion Properties
+            dashChain: actualCard.dashChain || false,
+            collectsSouls: actualCard.collectsSouls || false,
+            stealthAbility: actualCard.stealthAbility || false,
+            reflectAbility: actualCard.reflectAbility || false,
+            abilityCooldown: actualCard.abilityCooldown || 0,
+            lastAbilityTime: Date.now() - (actualCard.abilityCooldown || 0), // Start ready
+            souls: 0,
+            permRage: actualCard.permRage || false,
 
             chargeState: actualCard.chargeTime ? { startTime: Date.now(), duration: actualCard.chargeTime, isCharged: false } : undefined,
 
@@ -8100,7 +8269,10 @@ export default function App() {
 
             hatchTime: actualCard.hatchDuration ? Date.now() + actualCard.hatchDuration : undefined,
 
-            hatchesInto: actualCard.hatchesInto || undefined
+            hatchesInto: actualCard.hatchesInto || undefined,
+
+            // Rune Giant - hit counter for enhancement
+            runeHits: actualCard.runeEnhancer ? 0 : undefined
 
           });
 
@@ -8752,6 +8924,80 @@ export default function App() {
           return { ...u, x: newX, y: newY };
         }
 
+        // CHAMPION ABILITIES
+        if (now - (u.lastAbilityTime || 0) >= u.abilityCooldown && u.abilityCooldown > 0) {
+           // Skeleton King
+           if (u.collectsSouls && u.souls > 0) {
+              const spawnCount = u.souls;
+              const spawnCard = CARDS.find(c => c.id === 'skeletons');
+              if (spawnCard) {
+                 const newSkeletons = [];
+                 for(let i=0; i<spawnCount; i++) {
+                    const angle = (i / spawnCount) * Math.PI * 2;
+                    const dist = 30;
+                    newSkeletons.push({
+                        id: Date.now() + i + 20000 + Math.random(),
+                        x: u.x + Math.cos(angle)*dist,
+                        y: u.y + Math.sin(angle)*dist,
+                        hp: spawnCard.hp, maxHp: spawnCard.hp,
+                        isOpponent: u.isOpponent,
+                        speed: spawnCard.speed,
+                        lane: u.lane,
+                        lastAttack: 0,
+                        spriteId: 'skeletons', type: 'ground',
+                        range: spawnCard.range, damage: spawnCard.damage,
+                        attackSpeed: spawnCard.attackSpeed, projectile: null,
+                        spawnTime: now
+                    });
+                 }
+                 unitsToSpawn.push(...newSkeletons);
+                 u.souls = 0; 
+                 u.lastAbilityTime = now;
+                 setVisualEffects(prev => [...prev, {
+                    id: Date.now() + Math.random(),
+                    type: 'skeleton_king_ability',
+                    x: u.x, y: u.y, radius: 60, startTime: now, duration: 1000
+                 }]);
+              }
+           }
+
+           // Archer Queen
+           if (u.stealthAbility && u.lockedTarget) { 
+              u.hidden = { active: true, visibleHp: u.hp };
+              u.rageUntil = now + 3000; 
+              u.lastAbilityTime = now;
+              setVisualEffects(prev => [...prev, {
+                 id: Date.now() + Math.random(),
+                 type: 'queen_cloak',
+                 x: u.x, y: u.y, radius: 40, startTime: now, duration: 500
+              }]);
+           }
+
+           // Monk
+           if (u.reflectAbility && u.lockedTarget) {
+              u.isReflecting = true;
+              u.reflectEndTime = now + 4000;
+              u.lastAbilityTime = now;
+              setVisualEffects(prev => [...prev, {
+                 id: Date.now() + Math.random(),
+                 type: 'monk_protect',
+                 x: u.x, y: u.y, radius: 50, startTime: now, duration: 4000
+              }]);
+           }
+           
+           // Golden Knight
+           if (u.dashChain && u.lockedTarget) {
+              u.isDashing = true; 
+              u.dashEndTime = now + 500;
+              u.lastAbilityTime = now;
+              setVisualEffects(prev => [...prev, {
+                 id: Date.now() + Math.random(),
+                 type: 'golden_dash',
+                 x: u.x, y: u.y, radius: 40, startTime: now, duration: 500
+              }]);
+           }
+        }
+
         // Passive Healing (Battle Healer)
         if (u.passiveHeal && u.passiveHeal > 0) {
           const lastPassiveHeal = u.lastPassiveHeal || u.spawnTime;
@@ -8822,7 +9068,14 @@ export default function App() {
             const timeSinceLastSpawn = (now - u.lastSpawn) / 1000; // Convert to seconds
             if (timeSinceLastSpawn >= u.spawnRate) {
               // Spawn the units
-              const spawnCardId = u.spawns;
+              let spawnCardId = u.spawns;
+              
+              // Handle Spirit Empress random spawn
+              if (spawnCardId === 'random_spirit') {
+                 const spirits = ['fire_spirit', 'ice_spirit', 'electro_spirit', 'heal_spirit'];
+                 spawnCardId = spirits[Math.floor(Math.random() * spirits.length)];
+              }
+
               const spawnCard = CARDS.find(c => c.id === spawnCardId);
 
               if (spawnCard) {
@@ -9413,6 +9666,11 @@ export default function App() {
               damageToDeal = actualDamage * 2; // Dash deals 2x damage
             }
 
+            // Rune Giant Enhancement - apply damage boost if active
+            if (u.damageBoost && u.damageBoostUntil && now < u.damageBoostUntil) {
+              damageToDeal = Math.floor(damageToDeal * (1 + u.damageBoost));
+            }
+
             // Inferno Tower Damage Ramp - increases over time
             if (u.damageRamp) {
               const timeRamping = (now - u.lastDamageRampTime) / 1000;
@@ -9868,6 +10126,72 @@ export default function App() {
                 // Kamikaze - die after attacking
                 return { ...u, lastAttack: now, hp: 0, hidden: u.hidden, charge: u.charge ? { ...u.charge, distance: 0, active: false } : u.charge, lockedTarget: u.lockedTarget, wasPushed: false, wasStunned: u.wasStunned };
               }
+
+              // Rune Giant - enhance 2 closest allies every 3rd hit (NOT a kamikaze unit)
+              if (u.runeEnhancer) {
+                const currentHits = (u.runeHits || 0) + 1;
+                if (currentHits % 3 === 0) {
+                  // Every 3rd hit - enhance 2 closest allies
+                  const enhanceRadius = u.enhanceRadius || 100;
+                  const enhanceBonus = u.enhanceBonus || 0.5; // 50% damage increase
+                  const enhanceDuration = u.enhanceDuration || 5000;
+
+                  // Find all allies in radius
+                  const allies = (unitsRef.current || []).filter(ally =>
+                    ally.isOpponent === u.isOpponent &&
+                    ally.id !== u.id &&
+                    ally.hp > 0
+                  );
+
+                  // Sort by distance and pick 2 closest
+                  allies.sort((a, b) => {
+                    const distA = Math.sqrt(Math.pow(a.x - u.x, 2) + Math.pow(a.y - u.y, 2));
+                    const distB = Math.sqrt(Math.pow(b.x - u.x, 2) + Math.pow(b.y - u.y, 2));
+                    return distA - distB;
+                  });
+
+                  const alliesToEnhance = allies
+                    .filter(ally => {
+                      const dist = Math.sqrt(Math.pow(ally.x - u.x, 2) + Math.pow(ally.y - u.y, 2));
+                      return dist <= enhanceRadius;
+                    })
+                    .slice(0, 2);
+
+                  // Apply enhancement
+                  setUnits(prevUnits => {
+                    return prevUnits.map(ally => {
+                      if (alliesToEnhance.some(a => a.id === ally.id)) {
+                        return {
+                          ...ally,
+                          damageBoost: (ally.damageBoost || 0) + enhanceBonus,
+                          damageBoostUntil: Math.max(ally.damageBoostUntil || 0, Date.now() + enhanceDuration)
+                        };
+                      }
+                      return ally;
+                    });
+                  });
+
+                  // Visual effect for each enhanced ally
+                  alliesToEnhance.forEach(ally => {
+                    setVisualEffects(prev => [...prev, {
+                      id: Date.now() + Math.random() + ally.id,
+                      type: 'rune_enhance',
+                      x: ally.x,
+                      y: ally.y,
+                      radius: 30,
+                      startTime: Date.now(),
+                      duration: 800
+                    }]);
+                  });
+
+                  // Giant stops briefly after enhancing
+                  u.stoppingForEnhance = true;
+                  u.enhanceStopEndTime = now + 500; // Stop for 500ms
+                }
+
+                // Update runeHits and continue fighting (NOT kamikaze!)
+                u.runeHits = currentHits;
+              }
             }
             // Reset charge when Prince attacks (consumes charge)
             const updatedCharge = u.charge ? { ...u.charge, distance: 0, active: false } : u.charge;
@@ -9884,7 +10208,11 @@ export default function App() {
               isDashing: u.isDashing || false,
               dashEndTime: u.dashEndTime || 0,
               currentDamageBonus: u.currentDamageBonus || 0,
-              lastBombDrop: u.lastBombDrop || 0
+              lastBombDrop: u.lastBombDrop || 0,
+              // Preserve Rune Giant properties
+              runeHits: u.runeHits,
+              stoppingForEnhance: u.stoppingForEnhance,
+              enhanceStopEndTime: u.enhanceStopEndTime
             };
           }
           return {
@@ -9898,7 +10226,11 @@ export default function App() {
             isDashing: u.isDashing || false,
             dashEndTime: u.dashEndTime || 0,
             currentDamageBonus: u.currentDamageBonus || 0,
-            lastBombDrop: u.lastBombDrop || 0
+            lastBombDrop: u.lastBombDrop || 0,
+            // Preserve Rune Giant properties
+            runeHits: u.runeHits,
+            stoppingForEnhance: u.stoppingForEnhance,
+            enhanceStopEndTime: u.enhanceStopEndTime
           };
         } else if (u.spriteId === 'mega_knight' && closestTarget && !u.isJumping && minDist > 50 && minDist < 150) {
           // MEGA KNIGHT JUMP START
@@ -9909,6 +10241,32 @@ export default function App() {
           let nextY = u.y;
           let nextX = u.x;
           let isJumpingNow = u.isJumping;
+
+          // Rune Giant - stop for enhancement
+          if (u.stoppingForEnhance && u.enhanceStopEndTime && now < u.enhanceStopEndTime) {
+            // Currently stopping for enhancement - don't move
+            return {
+              ...u,
+              hidden: u.hidden,
+              lockedTarget: u.lockedTarget,
+              wasPushed: false,
+              wasStunned: u.wasStunned,
+              // Preserve properties
+              dashRange: u.dashRange || 80,
+              isDashing: u.isDashing || false,
+              dashEndTime: u.dashEndTime || 0,
+              currentDamageBonus: u.currentDamageBonus || 0,
+              lastBombDrop: u.lastBombDrop || 0,
+              runeHits: u.runeHits,
+              stoppingForEnhance: now < u.enhanceStopEndTime,
+              enhanceStopEndTime: u.enhanceStopEndTime
+            };
+          }
+
+          // Clear stopping flag if time has passed
+          if (u.stoppingForEnhance && u.enhanceStopEndTime && now >= u.enhanceStopEndTime) {
+            u.stoppingForEnhance = false;
+          }
 
           // Apply speed boost for charging Prince
           const speedMultiplier = (u.charge && u.charge.active) ? 2 : 1;
@@ -11104,6 +11462,28 @@ export default function App() {
             // Damage the primary target
             currentUnits = currentUnits.map(u => {
               if (u.id === h.targetId) {
+                // Monk Reflection
+                if (u.isReflecting && u.reflectEndTime > now && !h.reflected) {
+                   setProjectiles(prev => [...prev, {
+                      ...h,
+                      id: Date.now() + Math.random(),
+                      targetId: h.attackerId,
+                      attackerId: u.id,
+                      isOpponent: u.isOpponent,
+                      reflected: true,
+                      x: u.x, y: u.y,
+                      spawnTime: now
+                   }]);
+                   
+                   setVisualEffects(prev => [...prev, {
+                      id: Date.now() + Math.random(),
+                      type: 'monk_reflection', // Should add this visual too
+                      x: u.x, y: u.y, radius: 30, startTime: now, duration: 300
+                   }]);
+                   
+                   return u; 
+                }
+
                 // Handle Shield
                 let remainingDamage = h.damage;
                 let newShieldHp = u.currentShieldHp || 0;
@@ -11742,6 +12122,22 @@ export default function App() {
             isOpponent: deadUnit.isOpponent
           }]);
         }
+
+        // Skeleton King Soul Collection
+        const skeletonKings = currentUnits.filter(u => u.collectsSouls && u.hp > 0 && u.id !== deadUnit.id);
+        skeletonKings.forEach(sk => {
+           const dist = Math.sqrt(Math.pow(sk.x - deadUnit.x, 2) + Math.pow(sk.y - deadUnit.y, 2));
+           if (dist <= 150) {
+              sk.souls = Math.min((sk.souls || 0) + 1, 20);
+              setVisualEffects(prev => [...prev, {
+                 id: Date.now() + Math.random(),
+                 type: 'soul_absorb',
+                 x: deadUnit.x, y: deadUnit.y,
+                 targetId: sk.id, targetX: sk.x, targetY: sk.y,
+                 startTime: Date.now(), duration: 500
+              }]);
+           }
+        });
 
         // Generic Death Spawns (Skeleton Barrel, Tombstone, Lava Hound, Golem, Elixir Golem)
         if (deadUnit.spriteId === 'tombstone' || deadUnit.deathSpawns) {
