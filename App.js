@@ -6084,7 +6084,7 @@ const GameBoard = ({
           <View style={[styles.bridge, { right: 65 }]} />
         </View>
 
-        {(units || []).map(u => <Unit key={u.id} unit={u} />)}
+        {(units || []).filter(u => u !== null).map(u => <Unit key={u.id} unit={u} />)}
         {(projectiles || []).map(p => <Projectile key={p.id} type={p.type} position={p} />)}
         <VisualEffects effects={visualEffects} setEffects={setVisualEffects} />
 
