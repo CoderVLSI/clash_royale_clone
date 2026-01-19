@@ -179,7 +179,7 @@ const CARDS = [
   { id: 'fisherman', name: 'Fisherman', cost: 3, color: '#3498db', hp: 720, speed: 1.5, type: 'ground', range: 60, damage: 160, attackSpeed: 1300, projectile: 'hook', count: 1, rarity: 'legendary', pull: true, groundOnly: true },
   { id: 'goblin_curse', name: 'Goblin Curse', cost: 2, color: '#9b59b6', type: 'spell', damage: 25, radius: 50, count: 1, duration: 6, rarity: 'epic', appliesCurse: true },
   { id: 'void', name: 'Void', cost: 3, color: '#8e44ad', type: 'spell', damage: 0, radius: 50, count: 1, duration: 4, rarity: 'epic', isVoid: true },
-  { id: 'goblin_gang', name: 'Goblin Gang', cost: 3, color: '#2ecc71', hp: 202, speed: 3, type: 'ground', range: 25, damage: 120, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common', spawnsExtra: 'spear_goblins', extraCount: 2, spawnUnitId: 'sword_goblins' }
+  { id: 'goblin_gang', name: 'Goblin Gang', cost: 3, color: '#2ecc71', hp: 202, speed: 3, type: 'ground', range: 25, damage: 120, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common', spawnsExtra: 'spear_goblins', extraCount: 3, spawnUnitId: 'sword_goblins' }
 ];
 
 const RARITY_COLORS = {
@@ -2500,7 +2500,7 @@ const VisualEffects = ({ effects, setEffects }) => {
               justifyContent: 'center'
             }}>
               <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
-                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * progress} fill="#D442F5" opacity={0.6} />
+                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * progress} fill="#8B0000" opacity={0.6} />
               </Svg>
             </View>
           );
@@ -4295,8 +4295,8 @@ const Projectile = ({ type, position }) => {
         mainColor = "rgba(155, 89, 182, 0.4)";
         strokeColor = "#8e44ad";
     } else if (isVoid) {
-        mainColor = "rgba(142, 68, 173, 0.6)"; 
-        strokeColor = "#D442F5";
+        mainColor = "rgba(0, 0, 0, 0.7)"; 
+        strokeColor = "#8B0000";
     } else if (isCurse) {
         mainColor = "rgba(46, 204, 113, 0.4)"; 
         strokeColor = "#27ae60";
@@ -4312,25 +4312,24 @@ const Projectile = ({ type, position }) => {
 
           {isRage ? (
             <Circle cx={spellRadius} cy={spellRadius} r={spellRadius * 0.7} fill="none" stroke="#9b59b6" strokeWidth="2" strokeDasharray="5 5" opacity="0.6" />
-          ) : isVoid ? (
-             <>
-               {/* Black hole core */}
-               <Circle cx={spellRadius} cy={spellRadius} r={spellRadius * 0.4} fill="black" />
-               {/* Dark purple glow */}
-               <Circle cx={spellRadius} cy={spellRadius} r={spellRadius * 0.6} fill="none" stroke="#4a148c" strokeWidth="4" opacity={0.7} />
-               {/* Outer ripple */}
-               <Circle cx={spellRadius} cy={spellRadius} r={spellRadius * 0.8} fill="none" stroke="#D442F5" strokeWidth="2" strokeDasharray="10 5" opacity={0.4} />
-               {/* Swirl effect */}
-               <Path 
-                 d={`M${spellRadius} ${spellRadius*0.2} Q${spellRadius*1.8} ${spellRadius*0.5} ${spellRadius} ${spellRadius*1.8}`} 
-                 stroke="#D442F5" strokeWidth="2" fill="none" opacity={0.3} 
-               />
-               <Path 
-                 d={`M${spellRadius*0.2} ${spellRadius} Q${spellRadius*0.5} ${spellRadius*1.8} ${spellRadius*1.8} ${spellRadius}`} 
-                 stroke="#D442F5" strokeWidth="2" fill="none" opacity={0.3} 
-               />
-             </>
-          ) : isCurse ? (
+                    ) : isVoid ? (
+                       <>
+                         {/* Black hole core */}
+                         <Circle cx={spellRadius} cy={spellRadius} r={spellRadius * 0.4} fill="black" />
+                         {/* Dark red glow */}
+                         <Circle cx={spellRadius} cy={spellRadius} r={spellRadius * 0.6} fill="none" stroke="#8B0000" strokeWidth="4" opacity={0.7} />
+                         {/* Outer ripple */}
+                         <Circle cx={spellRadius} cy={spellRadius} r={spellRadius * 0.8} fill="none" stroke="#FF0000" strokeWidth="2" strokeDasharray="10 5" opacity={0.4} />
+                         {/* Swirl effect */}
+                         <Path 
+                           d={`M${spellRadius} ${spellRadius*0.2} Q${spellRadius*1.8} ${spellRadius*0.5} ${spellRadius} ${spellRadius*1.8}`} 
+                           stroke="#8B0000" strokeWidth="2" fill="none" opacity={0.3} 
+                         />
+                         <Path 
+                           d={`M${spellRadius*0.2} ${spellRadius} Q${spellRadius*0.5} ${spellRadius*1.8} ${spellRadius*1.8} ${spellRadius}`} 
+                           stroke="#8B0000" strokeWidth="2" fill="none" opacity={0.3} 
+                         />
+                       </>          ) : isCurse ? (
              <Circle cx={spellRadius} cy={spellRadius} r={spellRadius * 0.6} fill="none" stroke="#27ae60" strokeWidth="2" strokeDasharray="4 4" />
           ) : (
             <>
@@ -6116,6 +6115,16 @@ const GameBoard = ({
             <Text style={[styles.timerText, timeLeft <= 10 && styles.timerTextRed]}>
               {formatTime(timeLeft)}
             </Text>
+            {/* Total HP display during tower decay */}
+            {isTowerDecay && (() => {
+              const playerTotalHp = towers.filter(t => !t.isOpponent).reduce((sum, t) => sum + Math.max(0, t.hp), 0);
+              const opponentTotalHp = towers.filter(t => t.isOpponent).reduce((sum, t) => sum + Math.max(0, t.hp), 0);
+              return (
+                <Text style={{ fontSize: 10, color: opponentTotalHp > playerTotalHp ? '#e74c3c' : '#2ecc71', fontWeight: 'bold', marginTop: 2 }}>
+                  {Math.floor(playerTotalHp)} vs {Math.floor(opponentTotalHp)}
+                </Text>
+              );
+            })()}
           </View>
           <View style={styles.crownContainer}>
             <Text style={styles.scoreText}>{score[0]}</Text>
@@ -6220,6 +6229,21 @@ const GameBoard = ({
                 </View>
               )}
               <HealthBar current={tower.hp} max={tower.maxHp} isOpponent={tower.isOpponent} />
+              <Text style={{
+                position: 'absolute',
+                top: -20,
+                fontSize: 12,
+                fontWeight: 'bold',
+                color: '#fff',
+                textShadowColor: '#000',
+                textShadowRadius: 2,
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                paddingHorizontal: 4,
+                paddingVertical: 2,
+                borderRadius: 4
+              }}>
+                {Math.floor(tower.hp)}
+              </Text>
             </View>
           );
         })}
@@ -8031,12 +8055,17 @@ export default function App() {
   };
 
   const checkWinner = () => {
-    const playerTowers = towersRef.current.filter(t => !t.isOpponent && t.hp > 0).length;
-    const opponentTowers = towersRef.current.filter(t => t.isOpponent && t.hp > 0).length;
+    // Calculate total HP of all towers (not just standing towers)
+    const playerTotalHp = towersRef.current
+      .filter(t => !t.isOpponent)
+      .reduce((sum, t) => sum + Math.max(0, t.hp), 0);
+    const opponentTotalHp = towersRef.current
+      .filter(t => t.isOpponent)
+      .reduce((sum, t) => sum + Math.max(0, t.hp), 0);
 
     let result = 'DRAW';
-    if (playerTowers > opponentTowers) result = 'VICTORY';
-    else if (opponentTowers > playerTowers) result = 'DEFEAT';
+    if (playerTotalHp > opponentTotalHp) result = 'VICTORY';
+    else if (opponentTotalHp > playerTotalHp) result = 'DEFEAT';
 
     setGameOver(result);
 
@@ -11079,39 +11108,63 @@ export default function App() {
 
         // Check if tower is stunned - can't attack while stunned
         const isStunned = tower.stunUntil && now < tower.stunUntil;
-        if (isStunned) return tower;
+        if (isStunned) return { ...tower, lockedTarget: null }; // Lose target when stunned
 
         // Check if tower is frozen - can't attack while frozen
         const isFrozen = tower.freezeUntil && now < tower.freezeUntil;
-        if (isFrozen) return tower;
+        if (isFrozen) return { ...tower, lockedTarget: null }; // Lose target when frozen
 
         if (now - tower.lastShot < (tower.type === 'king' ? FIRE_RATE_KING : FIRE_RATE_PRINCESS)) return tower;
 
-        const targets = currentUnits.filter(u => u.isOpponent !== tower.isOpponent);
-        let closestTarget = null;
-        let minDist = Infinity;
+        let targetToShoot = null;
 
-        targets.forEach(u => {
-          const dist = Math.sqrt(Math.pow(u.x - tower.x, 2) + Math.pow(u.y - tower.y, 2));
-          if (dist <= tower.range && dist < minDist) {
-            minDist = dist;
-            closestTarget = u;
+        // Check if tower has a locked target that's still alive and in range
+        if (tower.lockedTarget) {
+          const lockedTarget = currentUnits.find(u => u.id === tower.lockedTarget);
+          if (lockedTarget && lockedTarget.hp > 0) {
+            const dist = Math.sqrt(Math.pow(lockedTarget.x - tower.x, 2) + Math.pow(lockedTarget.y - tower.y, 2));
+            if (dist <= tower.range) {
+              targetToShoot = lockedTarget;
+            }
           }
-        });
+          // Clear lock if target died or left range
+          if (!targetToShoot) {
+            tower.lockedTarget = null;
+          }
+        }
 
-        if (closestTarget) {
+        // If no locked target, find closest enemy in range
+        if (!targetToShoot) {
+          const targets = currentUnits.filter(u => u.isOpponent !== tower.isOpponent);
+          let minDist = Infinity;
+
+          targets.forEach(u => {
+            const dist = Math.sqrt(Math.pow(u.x - tower.x, 2) + Math.pow(u.y - tower.y, 2));
+            if (dist <= tower.range && dist < minDist) {
+              minDist = dist;
+              targetToShoot = u;
+            }
+          });
+
+          // Lock onto this target
+          if (targetToShoot) {
+            tower.lockedTarget = targetToShoot.id;
+          }
+        }
+
+        if (targetToShoot) {
           activeProjectiles.push({
             id: now + Math.random(),
             x: tower.x,
             y: tower.y,
-            targetId: closestTarget.id,
-            targetX: closestTarget.x,
-            targetY: closestTarget.y,
+            targetId: targetToShoot.id,
+            targetX: targetToShoot.x,
+            targetY: targetToShoot.y,
             speed: tower.type === 'king' ? PROJECTILE_SPEED_CANNON : PROJECTILE_SPEED_ARROW,
             damage: 125,
             type: tower.type === 'king' ? 'cannon' : 'arrow'
           });
-          return { ...tower, lastShot: now };
+          return { ...tower, lastShot: now, lockedTarget: tower.lockedTarget };
         }
         return tower;
       });
