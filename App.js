@@ -178,7 +178,7 @@ const CARDS = [
   // NEW REQUESTED CARDS
   { id: 'fisherman', name: 'Fisherman', cost: 3, color: '#3498db', hp: 720, speed: 1.5, type: 'ground', range: 60, damage: 160, attackSpeed: 1300, projectile: 'hook', count: 1, rarity: 'legendary', pull: true, groundOnly: true },
   { id: 'goblin_curse', name: 'Goblin Curse', cost: 2, color: '#9b59b6', type: 'spell', damage: 25, radius: 50, count: 1, duration: 6, rarity: 'epic', appliesCurse: true },
-  { id: 'void', name: 'Void', cost: 3, color: '#8e44ad', type: 'spell', damage: 0, radius: 50, count: 1, duration: 4, rarity: 'epic', isVoid: true },
+  { id: 'void', name: 'Void', cost: 3, color: '#8e44ad', type: 'spell', damage: 0, radius: 50, count: 1, duration: 5, rarity: 'epic', isVoid: true },
   { id: 'goblin_gang', name: 'Goblin Gang', cost: 3, color: '#2ecc71', hp: 202, speed: 3, type: 'ground', range: 25, damage: 120, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common', spawnsExtra: 'spear_goblins', extraCount: 3, spawnUnitId: 'sword_goblins' }
 ];
 
@@ -2435,10 +2435,6 @@ const HealthBar = ({ current, max, isOpponent, hasShield, shieldHp, shieldMax })
 
   return (
     <View style={{ position: 'absolute', top: -22, width: '120%', alignItems: 'center', zIndex: 20 }}>
-      <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#fff', textShadowColor: '#000', textShadowRadius: 3, marginBottom: 1 }}>
-        {current}
-      </Text>
-
       {/* Shield bar (shown above HP bar if shield exists) */}
       {hasShield && shieldHp > 0 && (
         <View style={{ width: '100%', height: 6, backgroundColor: '#2c3e50', borderRadius: 3, borderWidth: 1, borderColor: '#000', overflow: 'hidden', marginBottom: 1 }}>
@@ -2488,19 +2484,37 @@ const VisualEffects = ({ effects, setEffects }) => {
         const opacity = 1 - progress; // Fade out
 
         if (effect.type === 'void_hit') {
+          // Void strike from sky - dark red beam
+          const skyHeight = 400;
           return (
             <View key={effect.id} style={{
               position: 'absolute',
               left: effect.x - effect.radius,
-              top: effect.y - effect.radius,
+              top: effect.y - skyHeight,
               width: effect.radius * 2,
-              height: effect.radius * 2,
+              height: skyHeight + effect.radius,
               opacity: opacity,
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'flex-end',
+              zIndex: 999
             }}>
-              <Svg width={effect.radius * 2} height={effect.radius * 2} viewBox={`0 0 ${effect.radius * 2} ${effect.radius * 2}`}>
-                <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * progress} fill="#8B0000" opacity={0.6} />
+              <Svg width={effect.radius * 2} height={skyHeight + effect.radius} viewBox={`0 0 ${effect.radius * 2} ${skyHeight + effect.radius}`}>
+                {/* Beam */}
+                <Path 
+                  d={`M${effect.radius} 0 L${effect.radius} ${skyHeight}`} 
+                  stroke="#8B0000" 
+                  strokeWidth={effect.radius * 0.8 * (1 - progress)} 
+                  opacity={0.8} 
+                />
+                <Path 
+                  d={`M${effect.radius} 0 L${effect.radius} ${skyHeight}`} 
+                  stroke="#000" 
+                  strokeWidth={effect.radius * 0.4 * (1 - progress)} 
+                  opacity={0.6} 
+                />
+                {/* Impact */}
+                <Circle cx={effect.radius} cy={skyHeight} r={effect.radius * progress} fill="#8B0000" opacity={0.8} />
+                <Circle cx={effect.radius} cy={skyHeight} r={effect.radius * progress * 0.7} fill="black" opacity={0.6} />
               </Svg>
             </View>
           );
