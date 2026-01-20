@@ -7991,7 +7991,7 @@ export default function App() {
 
   const TOWER_TYPES = {
     princess: { hp: 2500, damage: 125, fireRate: 800, projectile: 'arrow', speed: 15, splash: false },
-    cannoneer: { hp: 1800, damage: 200, fireRate: 1200, projectile: 'bomb', speed: 10, splash: true, splashRadius: 40 },
+    cannoneer: { hp: 1800, damage: 200, fireRate: 1600, projectile: 'bomb', speed: 10, splash: true, splashRadius: 40 },
     royal_chef: { hp: 2200, damage: 150, fireRate: 1000, projectile: 'melee', speed: 0, splash: false, range: 50 },
     dagger_duchess: { hp: 2000, damage: 80, fireRate: 900, projectile: 'dagger', speed: 12, splash: false, maxAmmo: 8, reloadTime: 900 }
   };
