@@ -198,7 +198,7 @@ const CARDS = [
   { id: 'monk', name: 'Monk', cost: 5, color: '#ecf0f1', hp: 2000, speed: 1.5, type: 'ground', range: 25, damage: 140, attackSpeed: 900, projectile: null, count: 1, rarity: 'champion', pushback: 40, reflectAbility: true, abilityCooldown: 15000, abilityCost: 1 },
   { id: 'mighty_miner', name: 'Mighty Miner', cost: 4, color: '#e67e22', hp: 2400, speed: 2, type: 'ground', range: 25, damage: 40, attackSpeed: 100, projectile: null, count: 1, rarity: 'champion', damageRamp: true, escapeAbility: true, abilityCooldown: 10000, abilityCost: 1 },
   { id: 'little_prince', name: 'Little Prince', cost: 3, color: '#f1c40f', hp: 700, speed: 2, type: 'ground', range: 110, damage: 110, attackSpeed: 1000, projectile: 'arrow', count: 1, rarity: 'champion', damageRamp: true, guardianAbility: true, abilityCooldown: 15000, abilityCost: 3 },
-  { id: 'boss_bandit', name: 'Boss Bandit', cost: 6, color: '#2c3e50', hp: 2624, speed: 2.5, type: 'ground', range: 25, damage: 268, attackSpeed: 1200, projectile: null, count: 1, rarity: 'champion', dashAbility: true, dashRange: [3.5, 6], getawayAbility: true, abilityCooldown: 8000, abilityCost: 1 },
+  { id: 'boss_bandit', name: 'Boss Bandit', cost: 6, color: '#2c3e50', hp: 2624, speed: 2.5, type: 'ground', range: 25, damage: 268, attackSpeed: 1200, projectile: null, count: 1, rarity: 'champion', dashInvincible: true, dashRange: 80, getawayAbility: true, abilityCooldown: 8000, abilityCost: 1 },
   { id: 'goblinstein', name: 'Goblinstein', cost: 5, color: '#2ecc71', hp: 955, speed: 2, type: 'ground', range: 5.5, damage: 122, attackSpeed: 1800, projectile: 'electric_zap', count: 1, rarity: 'champion', stun: 0.5, monsterAbility: true, abilityCooldown: 17000, abilityCost: 2 },
   { id: 'goblinstein_monster', name: 'The Monster', cost: 0, color: '#27ae60', hp: 3169, speed: 2, type: 'ground', targetType: 'buildings', range: 1.2, damage: 169, attackSpeed: 1500, count: 1, rarity: 'champion', isToken: true },
   { id: 'guardian', name: 'Guardian', cost: 0, color: '#f1c40f', hp: 1800, speed: 3, type: 'ground', range: 30, damage: 200, attackSpeed: 1200, count: 1, rarity: 'champion', isToken: true, knockback: 50, spawnDamage: 200 }
@@ -9121,6 +9121,10 @@ export default function App() {
             dashInvincible: actualCard.dashInvincible || false,
 
             dashRange: actualCard.dashRange || 80,
+
+            getawayAbility: actualCard.getawayAbility || false,
+
+            monsterAbility: actualCard.monsterAbility || false,
 
             recoil: actualCard.recoil || 0,
 
