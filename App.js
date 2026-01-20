@@ -8114,13 +8114,17 @@ export default function App() {
     setProjectiles([]);
     setTimeLeft(180);
     setGameOver(null);
+
+    // Get player tower stats based on selected tower type
+    const playerTowerStats = getTowerStats(selectedTowerType);
+
     setTowers([
       { id: 0, type: 'king', isOpponent: true, hp: 4000, maxHp: 4000, x: width / 2, y: 80, range: KING_RANGE, lastShot: 0 },
-      { id: 1, type: 'princess', isOpponent: true, hp: 2500, maxHp: 2500, x: 70, y: 150, range: TOWER_RANGE, lastShot: 0 },
-      { id: 2, type: 'princess', isOpponent: true, hp: 2500, maxHp: 2500, x: width - 70, y: 150, range: TOWER_RANGE, lastShot: 0 },
+      { id: 1, type: 'princess', towerSubType: 'princess', isOpponent: true, hp: 2500, maxHp: 2500, x: 70, y: 150, range: TOWER_RANGE, lastShot: 0, damage: 125, fireRate: 800, projectileType: 'arrow', projectileSpeed: 15, splash: false },
+      { id: 2, type: 'princess', towerSubType: 'princess', isOpponent: true, hp: 2500, maxHp: 2500, x: width - 70, y: 150, range: TOWER_RANGE, lastShot: 0, damage: 125, fireRate: 800, projectileType: 'arrow', projectileSpeed: 15, splash: false },
       { id: 3, type: 'king', isOpponent: false, hp: 4000, maxHp: 4000, x: width / 2, y: height - 200, range: KING_RANGE, lastShot: 0 },
-      { id: 4, type: 'princess', isOpponent: false, hp: 2500, maxHp: 2500, x: 70, y: height - 270, range: TOWER_RANGE, lastShot: 0 },
-      { id: 5, type: 'princess', isOpponent: false, hp: 2500, maxHp: 2500, x: width - 70, y: height - 270, range: TOWER_RANGE, lastShot: 0 },
+      { id: 4, type: 'princess', towerSubType: selectedTowerType, isOpponent: false, hp: playerTowerStats.hp, maxHp: playerTowerStats.hp, x: 70, y: height - 270, range: TOWER_RANGE, lastShot: 0, damage: playerTowerStats.damage, fireRate: playerTowerStats.fireRate, projectileType: playerTowerStats.projectile, projectileSpeed: playerTowerStats.speed, splash: playerTowerStats.splash || false, splashRadius: playerTowerStats.splashRadius || 0, currentAmmo: playerTowerStats.maxAmmo || null, maxAmmo: playerTowerStats.maxAmmo || null, reloadTime: playerTowerStats.reloadTime || null, lastReload: 0 },
+      { id: 5, type: 'princess', towerSubType: selectedTowerType, isOpponent: false, hp: playerTowerStats.hp, maxHp: playerTowerStats.hp, x: width - 70, y: height - 270, range: TOWER_RANGE, lastShot: 0, damage: playerTowerStats.damage, fireRate: playerTowerStats.fireRate, projectileType: playerTowerStats.projectile, projectileSpeed: playerTowerStats.speed, splash: playerTowerStats.splash || false, splashRadius: playerTowerStats.splashRadius || 0, currentAmmo: playerTowerStats.maxAmmo || null, maxAmmo: playerTowerStats.maxAmmo || null, reloadTime: playerTowerStats.reloadTime || null, lastReload: 0 },
     ]);
 
     if (destination === 'lobby') {
@@ -13053,7 +13057,6 @@ export default function App() {
         if (targetToShoot) {
           // Handle ammo system for Dagger Duchess
           if (tower.maxAmmo !== null) {
-            const timeSinceLastShot = now - tower.lastShot;
             const needsReload = tower.currentAmmo <= 0;
 
             if (needsReload) {
@@ -13061,22 +13064,12 @@ export default function App() {
               if (tower.lastReload && now - tower.lastReload < tower.reloadTime) {
                 return tower; // Still reloading
               }
-              // Reload complete
-              return {
-                ...tower,
-                currentAmmo: tower.maxAmmo,
-                lastReload: now,
-                lastShot: now
-              };
+              // Reload complete - update ammo and continue to shoot
+              tower.currentAmmo = tower.maxAmmo;
+              tower.lastReload = now;
             }
-
-            // Use ammo
-            return {
-              ...tower,
-              currentAmmo: tower.currentAmmo - 1,
-              lastShot: now,
-              lockedTarget: tower.lockedTarget
-            };
+            // Consume ammo (will be applied when we return)
+            tower.currentAmmo = tower.currentAmmo - 1;
           }
 
           activeProjectiles.push({
