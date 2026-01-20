@@ -9977,10 +9977,12 @@ export default function App() {
               if (timeSinceCombat > 3) u.hidden.active = true;
             }
           } else if (u.spriteId === 'royal_ghost') {
-            // Royal Ghost: Reveal when enemy in range, re-cloak when 4 tiles away from all enemies
+            // Royal Ghost: Reveal when GROUND enemy or building in range, re-cloak when 4 tiles away
+            // Only check for GROUND units (Royal Ghost is melee, can't attack flying)
             const enemyInRange = (unitsRef.current || []).some(t =>
               t.isOpponent !== u.isOpponent &&
               t.hp > 0 &&
+              t.type === 'ground' && // Only ground units, not flying
               !t.hidden?.active && // Can't detect hidden enemies
               Math.sqrt(Math.pow(t.x - u.x, 2) + Math.pow(t.y - u.y, 2)) < u.range + 50
             );
@@ -9992,15 +9994,16 @@ export default function App() {
             );
 
             if (u.hidden.active) {
-              // If hidden, reveal when enemy is nearby
+              // If hidden, reveal when attackable target is nearby
               if (enemyInRange || towerInRange) {
                 u.hidden.active = false;
               }
             } else {
-              // If visible, re-cloak only when 4 tiles (~100px) away from ALL enemies
+              // If visible, re-cloak only when 4 tiles (~100px) away from ALL attackable targets
               const allEnemiesFar = (unitsRef.current || []).every(t =>
                 t.isOpponent === u.isOpponent ||
                 t.hp <= 0 ||
+                t.type === 'flying' || // Ignore flying units for re-cloak check
                 Math.sqrt(Math.pow(t.x - u.x, 2) + Math.pow(t.y - u.y, 2)) > 100
               );
               const allTowersFar = (towersRef.current || []).every(t =>
