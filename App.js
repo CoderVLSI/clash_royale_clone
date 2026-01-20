@@ -488,7 +488,7 @@ const BattleStartScreen = ({ playerName, opponentName }) => {
 };
 
 // --- SVG Sprites ---
-const TowerSprite = ({ type, isOpponent, size }) => {
+const TowerSprite = ({ type, isOpponent, size, towerSubType }) => {
   const color = isOpponent ? '#E74C3C' : '#3498DB';
   const secondary = isOpponent ? '#C0392B' : '#2980B9';
 
@@ -504,6 +504,68 @@ const TowerSprite = ({ type, isOpponent, size }) => {
       </Svg>
     );
   }
+
+  // Different princess tower variants
+  if (towerSubType === 'cannoneer') {
+    return (
+      <Svg width={size} height={size} viewBox="0 0 100 100">
+        {/* Stone base */}
+        <Rect x="15" y="40" width="70" height="50" rx="3" fill="#8B4513" stroke="black" strokeWidth="2" />
+        {/* Cannon barrel */}
+        <Rect x="35" y="20" width="30" height="35" fill="#2F4F4F" stroke="black" strokeWidth="2" />
+        {/* Cannon opening */}
+        <Circle cx="50" cy="30" r="8" fill="black" stroke="#555" strokeWidth="2" />
+        {/* Wheel on left */}
+        <Circle cx="20" cy="70" r="8" fill="#A0522D" stroke="black" strokeWidth="2" />
+        {/* Wheel on right */}
+        <Circle cx="80" cy="70" r="8" fill="#A0522D" stroke="black" strokeWidth="2" />
+        {/* Fire symbol */}
+        <Text x="50" y="55" fontSize="12" fill="black" textAnchor="middle" fontWeight="bold">💣</Text>
+      </Svg>
+    );
+  }
+
+  if (towerSubType === 'royal_chef') {
+    return (
+      <Svg width={size} height={size} viewBox="0 0 100 100">
+        {/* Chef hat */}
+        <Rect x="25" y="10" width="50" height="30" fill="white" stroke="black" strokeWidth="2" />
+        <Rect x="35" y="40" width="30" height="10" fill="white" stroke="black" strokeWidth="2" />
+        <Path d="M25 40 L50 30 L75 40" fill="white" stroke="black" strokeWidth="2" />
+        {/* Chef face */}
+        <Rect x="35" y="55" width="30" height="25" fill="#F5DEB3" stroke="black" strokeWidth="2" />
+        {/* Frying pan */}
+        <Rect x="75" y="70" width="20" height="15" fill="#708090" stroke="black" strokeWidth="2" rx="3" />
+        <Rect x="70" y="65" width="30" height="10" fill="#555" stroke="black" strokeWidth="2" />
+        {/* Mustache */}
+        <Path d="M38 65 Q50 62 62 65" stroke="black" strokeWidth="3" fill="none" />
+        <Text x="50" y="72" fontSize="10" fill="#333" textAnchor="middle" fontWeight="bold">👨‍🍳</Text>
+      </Svg>
+    );
+  }
+
+  if (towerSubType === 'dagger_duchess') {
+    return (
+      <Svg width={size} height={size} viewBox="0 0 100 100">
+        {/* Elegant purple base */}
+        <Rect x="20" y="30" width="60" height="60" rx="8" fill="#9B59B6" stroke="black" strokeWidth="2" />
+        {/* Gold trim */}
+        <Rect x="18" y="28" width="64" height="5" fill="#F1C40F" stroke="black" strokeWidth="1" />
+        {/* Dagger slots */}
+        <Rect x="30" y="40" width="8" height="30" fill="#2C3E50" stroke="black" strokeWidth="1" />
+        <Rect x="46" y="40" width="8" height="30" fill="#2C3E50" stroke="black" strokeWidth="1" />
+        <Rect x="62" y="40" width="8" height="30" fill="#2C3E50" stroke="black" strokeWidth="1" />
+        {/* Daggers visible */}
+        <Path d="M34 45 L34 65" stroke="#C0C0C0" strokeWidth="2" />
+        <Path d="M50 45 L50 65" stroke="#C0C0C0" strokeWidth="2" />
+        <Path d="M66 45 L66 65" stroke="#C0C0C0" strokeWidth="2" />
+        {/* Ammo count */}
+        <Text x="50" y="80" fontSize="10" fill="white" textAnchor="middle" fontWeight="bold">🗡️</Text>
+      </Svg>
+    );
+  }
+
+  // Default princess tower
   return (
     <Svg width={size} height={size} viewBox="0 0 100 100">
       <Rect x="20" y="30" width="60" height="60" rx="5" fill="#95a5a6" stroke="black" strokeWidth="2" />
@@ -7200,7 +7262,7 @@ const GameBoard = ({
 
           return (
             <View key={tower.id} style={[styles.towerContainer, styleObj]}>
-              <TowerSprite type={tower.type} isOpponent={tower.isOpponent} size={size} />
+              <TowerSprite type={tower.type} isOpponent={tower.isOpponent} size={size} towerSubType={tower.towerSubType} />
               {isSlowed && (
                 <View style={{
                   position: 'absolute',
