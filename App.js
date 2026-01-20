@@ -8061,6 +8061,15 @@ export default function App() {
     setGlobalDraggingCard(null);
   };
 
+  // Generate a random AI deck from all available cards
+  // Must be defined BEFORE using it in useMemo below
+  const generateRandomAIDeck = () => {
+    const availableCards = CARDS.filter(card => !card.isToken); // Exclude tokens
+    const shuffled = [...availableCards].sort(() => Math.random() - 0.5);
+    const deck = shuffled.slice(0, 8);
+    return deck;
+  };
+
   // Enemy State
   const initialEnemyDeck = useMemo(() => generateRandomAIDeck(), []);
   const [enemyElixir, setEnemyElixir] = useState(5);
@@ -8080,14 +8089,6 @@ export default function App() {
 
   const getTowerStats = (towerType) => {
     return TOWER_TYPES[towerType] || TOWER_TYPES.princess;
-  };
-
-  // Generate a random AI deck from all available cards
-  const generateRandomAIDeck = () => {
-    const availableCards = CARDS.filter(card => !card.isToken); // Exclude tokens
-    const shuffled = [...availableCards].sort(() => Math.random() - 0.5);
-    const deck = shuffled.slice(0, 8);
-    return deck;
   };
 
   const playerTowerStats = getTowerStats(selectedTowerType);
