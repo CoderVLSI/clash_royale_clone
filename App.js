@@ -193,7 +193,7 @@ const CARDS = [
 
   // CHAMPIONS
   { id: 'golden_knight', name: 'Golden Knight', cost: 4, color: '#f1c40f', hp: 1800, speed: 2, type: 'ground', range: 25, damage: 160, attackSpeed: 1000, projectile: null, count: 1, rarity: 'champion', dashChain: true, abilityCooldown: 8000, abilityCost: 1 },
-  { id: 'skeleton_king', name: 'Skeleton King', cost: 4, color: '#2c3e50', hp: 2000, speed: 1.5, type: 'ground', range: 25, damage: 180, attackSpeed: 1400, projectile: null, count: 1, rarity: 'champion', splash: true, collectsSouls: true, abilityCooldown: 8000, abilityCost: 2 },
+  { id: 'skeleton_king', name: 'Skeleton King', cost: 4, color: '#2c3e50', hp: 2298, speed: 1.5, type: 'ground', range: 25, damage: 204, attackSpeed: 1600, projectile: null, count: 1, rarity: 'champion', splash: true, collectsSouls: true, abilityCooldown: 8000, abilityCost: 2 },
   { id: 'archer_queen', name: 'Archer Queen', cost: 5, color: '#9b59b6', hp: 1000, speed: 1.5, type: 'ground', range: 120, damage: 225, attackSpeed: 1200, projectile: 'arrow', count: 1, rarity: 'champion', stealthAbility: true, abilityCooldown: 17000, abilityCost: 1 },
   { id: 'monk', name: 'Monk', cost: 5, color: '#ecf0f1', hp: 2000, speed: 1.5, type: 'ground', range: 25, damage: 140, attackSpeed: 900, projectile: null, count: 1, rarity: 'champion', pushback: 40, reflectAbility: true, abilityCooldown: 15000, abilityCost: 1 },
   { id: 'mighty_miner', name: 'Mighty Miner', cost: 4, color: '#e67e22', hp: 2400, speed: 2, type: 'ground', range: 25, damage: 40, attackSpeed: 100, projectile: null, count: 1, rarity: 'champion', damageRamp: true, escapeAbility: true, abilityCooldown: 10000, abilityCost: 1 },
@@ -6579,7 +6579,7 @@ const DeckSlotSelector = memo(({ visible, onClose, cards, onSwap }) => {
   );
 });
 
-const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeckIndex, setSelectedDeckIndex, selectedTower: initialSelectedTower = 'princess', setSelectedTower: onSetSelectedTower }) => {
+const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeckIndex, setSelectedDeckIndex, selectedTower: initialSelectedTower = 'princess', setSelectedTower: onSetSelectedTower, onRandomizeDeck }) => {
   const [selectedCard, setSelectedCard] = useState(null);
   const [cardMenuCard, setCardMenuCard] = useState(null);
   const [showSlotSelector, setShowSlotSelector] = useState(null);
@@ -6917,6 +6917,11 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
         </View>
       </View>
 
+      {/* Randomize Deck Button */}
+      <TouchableOpacity style={styles.randomizeDeckButton} onPress={onRandomizeDeck}>
+        <Text style={styles.randomizeDeckButtonText}>🎲 Randomize Deck</Text>
+      </TouchableOpacity>
+
       {/* Collection Section */}
       <View style={styles.collectionHeader}>
         <Text style={styles.collectionTitle}>Collection</Text>
@@ -7139,7 +7144,8 @@ const BottomNavigation = ({ activeTab, onTabChange }) => {
 const MainLobby = ({
   activeTab, onTabChange, onStartGame, currentDeck, onSwapCards,
   dragHandlers, selectedDeckIndex, setSelectedDeckIndex, allDecks,
-  chests, onUnlockChest, onOpenChest, selectedTowerType, setSelectedTowerType
+  chests, onUnlockChest, onOpenChest, selectedTowerType, setSelectedTowerType,
+  onRandomizeDeck
 }) => {
   const [showMenu, setShowMenu] = useState(false);
 
@@ -7155,6 +7161,7 @@ const MainLobby = ({
         allDecks={allDecks}
         selectedTower={selectedTowerType}
         setSelectedTower={setSelectedTowerType}
+        onRandomizeDeck={onRandomizeDeck}
       />;
       case 2: return <BattleTab
         currentDeck={currentDeck}
@@ -7449,16 +7456,35 @@ const GameBoard = ({
       <View style={styles.footerContainer}>
         <View style={styles.deckContainer}>
         {/* Champion Ability Button */}
-        {(units || []).map(u => {
-           if (!u.isOpponent && u.rarity === 'champion') {
-              const cooldownReady = (Date.now() - (u.lastAbilityTime || 0)) >= u.abilityCooldown;
-              const cost = u.abilityCost || 1;
+        {(() => {
+           // Find champion card in player's deck (hand + next + queue)
+           const allDeckCards = [...(hand || []), nextCard, ...(deckQueue || [])].filter(c => c);
+           const championCard = allDeckCards.find(c => c && c.rarity === 'champion');
+
+           // Find if champion is deployed on field
+           const deployedChampion = (units || []).find(u => !u.isOpponent && u.rarity === 'champion' && u.spriteId === championCard?.id);
+
+           if (championCard) {
+              const isDeployed = !!deployedChampion;
+              const cooldownReady = isDeployed && (Date.now() - (deployedChampion.lastAbilityTime || 0)) >= (deployedChampion.abilityCooldown || 0);
+              const cost = championCard.abilityCost || 1;
               const canAfford = elixir >= cost;
-              const opacity = (cooldownReady && canAfford) ? 1 : 0.5;
-              
+              const opacity = (isDeployed && cooldownReady && canAfford) ? 1 : (isDeployed ? 0.5 : 0.3);
+
+              const championIcons = {
+                 golden_knight: '✨',
+                 skeleton_king: '💀',
+                 archer_queen: '🏹',
+                 monk: '🛡️',
+                 mighty_miner: '💣',
+                 little_prince: '💂',
+                 boss_bandit: '🗡️',
+                 goblinstein: '🧟'
+              };
+
               return (
-                 <TouchableOpacity 
-                    key={`ability-${u.id}`}
+                 <TouchableOpacity
+                    key={`ability-${championCard.id}`}
                     style={{
                        position: 'absolute',
                        right: 20,
@@ -7470,25 +7496,20 @@ const GameBoard = ({
                        justifyContent: 'center',
                        alignItems: 'center',
                        borderWidth: 2,
-                       borderColor: '#f1c40f',
+                       borderColor: isDeployed ? '#f1c40f' : '#7f8c8d',
                        opacity: opacity,
                        zIndex: 20
                     }}
-                    onPress={() => onActivateAbility(u.id)}
-                    disabled={!cooldownReady || !canAfford}
+                    onPress={() => isDeployed && onActivateAbility(deployedChampion.id)}
+                    disabled={!isDeployed || !cooldownReady || !canAfford}
                  >
                     <Text style={{fontSize: 24}}>
-                       {u.spriteId === 'golden_knight' ? '✨' : 
-                        u.spriteId === 'skeleton_king' ? '💀' :
-                        u.spriteId === 'archer_queen' ? '🏹' :
-                        u.spriteId === 'monk' ? '🛡️' :
-                        u.spriteId === 'mighty_miner' ? '💣' :
-                        u.spriteId === 'little_prince' ? '💂' : '⚡'}
+                       {championIcons[championCard.id] || '⚡'}
                     </Text>
                     <View style={{
                        position: 'absolute',
                        top: -5, right: -5,
-                       backgroundColor: '#f1c40f',
+                       backgroundColor: isDeployed ? '#f1c40f' : '#7f8c8d',
                        borderRadius: 10,
                        width: 20, height: 20,
                        justifyContent: 'center', alignItems: 'center'
@@ -8044,6 +8065,20 @@ export default function App() {
       }
 
       newDecks[selectedDeckIndex] = currentDeck;
+      return newDecks;
+    });
+  };
+
+  const handleRandomizeDeck = () => {
+    // Generate random deck from all available cards (excluding tokens)
+    const availableCards = CARDS.filter(card => !card.isToken);
+    const shuffled = [...availableCards].sort(() => Math.random() - 0.5);
+    const randomDeck = shuffled.slice(0, 8);
+
+    // Update the current deck
+    setAllDecks(prevDecks => {
+      const newDecks = [...prevDecks];
+      newDecks[selectedDeckIndex] = randomDeck;
       return newDecks;
     });
   };
@@ -9125,7 +9160,7 @@ export default function App() {
               damage: monsterCard.damage,
               attackSpeed: monsterCard.attackSpeed,
               rarity: 'champion',
-              spawnTime: now,
+              spawnTime: Date.now(),
               isMonster: true,
               doctorId: newUnits[0].id // Link to the Doctor
             };
@@ -9175,8 +9210,8 @@ export default function App() {
           setVisualEffects(prev => [...prev, {
             id: Date.now() + Math.random(),
             type: 'miner_burrow',
-            x: spawnX,
-            y: spawnY,
+            x: x,
+            y: y,
             radius: 50,
             startTime: Date.now(),
             duration: 1000
@@ -9188,8 +9223,8 @@ export default function App() {
           setVisualEffects(prev => [...prev, {
             id: Date.now() + Math.random(),
             type: 'miner_burrow',
-            x: spawnX,
-            y: spawnY,
+            x: x,
+            y: y,
             radius: 50,
             startTime: Date.now(),
             duration: 1000
@@ -9788,8 +9823,10 @@ export default function App() {
                let abilityUsed = false;
 
                // Skeleton King
-               if (u.collectsSouls && u.souls > 0) {
-                  const spawnCount = u.souls;
+               if (u.collectsSouls) {
+                  // Minimum 6 skeletons, +1 per soul collected (up to ~16 total)
+                  const collectedSouls = u.souls || 0;
+                  const spawnCount = Math.min(6 + collectedSouls, 16);
                   const spawnCard = CARDS.find(c => c.id === 'skeletons');
                   if (spawnCard) {
                      const newSkeletons = [];
@@ -9813,7 +9850,7 @@ export default function App() {
                         });
                      }
                      unitsToSpawn.push(...newSkeletons);
-                     u.souls = 0; 
+                     u.souls = 0;
                      abilityUsed = true;
                      setVisualEffects(prev => [...prev, {
                         id: Date.now() + Math.random(),
@@ -10642,29 +10679,15 @@ export default function App() {
           }]);
         }
 
-        // Goblinstein Lightning Link Processing
+        // Goblinstein Lightning Link Processing - Damage buff instead of line damage
         if (u.lightningLinkActive && u.lightningLinkEndTime > now) {
            const monster = currentUnits.find(m => m.id === u.monsterId && m.hp > 0);
            if (monster) {
-              // Damage units between Doctor and Monster
-              currentUnits.forEach(enemy => {
-                 if (enemy.isOpponent !== u.isOpponent && enemy.hp > 0) {
-                    // Check distance to line segment (Doctor -> Monster)
-                    const d2 = (u.x - monster.x)**2 + (u.y - monster.y)**2;
-                    if (d2 > 0) {
-                       const t = ((enemy.x - u.x) * (monster.x - u.x) + (enemy.y - u.y) * (monster.y - u.y)) / d2;
-                       const clampedT = Math.max(0, Math.min(1, t));
-                       const projX = u.x + clampedT * (monster.x - u.x);
-                       const projY = u.y + clampedT * (monster.y - u.y);
-                       const dist = Math.sqrt((enemy.x - projX)**2 + (enemy.y - projY)**2);
-                       
-                       if (dist < 40) { // 2 tiles radius
-                          damageEvents.push({ targetId: enemy.id, damage: 20, attackerId: u.id }); // Ticking damage
-                       }
-                    }
-                 }
-              });
-              
+              // Apply damage buff to both Doctor and Monster (50% damage increase)
+              const damageBuff = 0.5;
+              u.lightningDamageBuff = damageBuff;
+              monster.lightningDamageBuff = damageBuff;
+
               // Visual Link
               setVisualEffects(prev => {
                  const linkId = 'link_' + u.id;
@@ -10679,6 +10702,14 @@ export default function App() {
               });
            } else {
               u.lightningLinkActive = false;
+              u.lightningDamageBuff = 0;
+           }
+        } else if (u.lightningDamageBuff > 0) {
+           // Remove buff when ability ends
+           u.lightningDamageBuff = 0;
+           const monster = currentUnits.find(m => m.id === u.monsterId);
+           if (monster) {
+              monster.lightningDamageBuff = 0;
            }
         }
 
@@ -10810,7 +10841,7 @@ export default function App() {
                } else {
                   u.attackCount = (u.attackCount || 0) + 1;
                   if (u.attackCount % 3 === 0) {
-                     damageToDeal += 220; 
+                     damageToDeal += 220;
                      setVisualEffects(prev => [...prev, {
                         id: Date.now() + Math.random(),
                         type: 'rune_crit',
@@ -10818,6 +10849,11 @@ export default function App() {
                      }]);
                   }
                }
+            }
+
+            // Goblinstein Lightning Link - 50% damage buff
+            if (u.lightningDamageBuff > 0) {
+               damageToDeal = Math.floor(damageToDeal * (1 + u.lightningDamageBuff));
             }
 
             // Inferno Tower Damage Ramp - increases over time
@@ -13504,20 +13540,18 @@ export default function App() {
           }]);
         }
 
-        // Skeleton King Soul Collection
+        // Skeleton King Soul Collection - works anywhere on arena
         const skeletonKings = currentUnits.filter(u => u.collectsSouls && u.hp > 0 && u.id !== deadUnit.id);
         skeletonKings.forEach(sk => {
-           const dist = Math.sqrt(Math.pow(sk.x - deadUnit.x, 2) + Math.pow(sk.y - deadUnit.y, 2));
-           if (dist <= 150) {
-              sk.souls = Math.min((sk.souls || 0) + 1, 20);
-              setVisualEffects(prev => [...prev, {
-                 id: Date.now() + Math.random(),
-                 type: 'soul_absorb',
-                 x: deadUnit.x, y: deadUnit.y,
-                 targetId: sk.id, targetX: sk.x, targetY: sk.y,
-                 startTime: Date.now(), duration: 500
-              }]);
-           }
+           // Souls collected from ANY troop death anywhere on arena (no distance limit)
+           sk.souls = Math.min((sk.souls || 0) + 1, 10); // Max 10 bonus souls (for 16 total skeletons)
+           setVisualEffects(prev => [...prev, {
+              id: Date.now() + Math.random(),
+              type: 'soul_absorb',
+              x: deadUnit.x, y: deadUnit.y,
+              targetId: sk.id, targetX: sk.x, targetY: sk.y,
+              startTime: Date.now(), duration: 500
+           }]);
         });
 
         // Generic Death Spawns (Skeleton Barrel, Tombstone, Lava Hound, Golem, Elixir Golem)
@@ -14052,6 +14086,7 @@ export default function App() {
           onFriendlyBattle={handleFriendlyBattle}
           selectedTowerType={selectedTowerType}
           setSelectedTowerType={setSelectedTowerType}
+          onRandomizeDeck={handleRandomizeDeck}
         />
         {openingChest && (
           <ChestOpeningModal
@@ -14335,6 +14370,25 @@ const styles = StyleSheet.create({
   avgElixirText: {
     color: '#f1c40f',
     fontSize: 12,
+    fontWeight: 'bold',
+  },
+  randomizeDeckButton: {
+    backgroundColor: '#9b59b6',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 15,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  randomizeDeckButtonText: {
+    color: '#fff',
+    fontSize: 16,
     fontWeight: 'bold',
   },
   collectionHeader: {
