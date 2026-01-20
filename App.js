@@ -5712,6 +5712,29 @@ const Projectile = ({ type, position }) => {
       </View>
     );
   }
+  if (type === 'dagger') {
+    // Dagger Duchess's dagger - small silver throwing knife
+    const angleDeg = (Math.atan2(position.targetY - position.y, position.targetX - position.x) * 180 / Math.PI);
+    return (
+      <View style={{
+        position: 'absolute',
+        left: position.x,
+        top: position.y,
+        transform: [{ rotate: `${angleDeg}deg` }]
+      }}>
+        <Svg width="20" height="6" viewBox="0 0 20 6">
+          {/* Blade */}
+          <Rect x="10" y="2" width="10" height="2" fill="#C0C0C0" stroke="#A0A0A0" strokeWidth="0.5" />
+          {/* Sharp point */}
+          <Path d="M20 2 L20 4 L18 3 Z" fill="#C0C0C0" stroke="#A0A0A0" strokeWidth="0.5" />
+          {/* Handle */}
+          <Rect x="5" y="1.5" width="5" height="3" fill="#9B59B6" stroke="#8E44AD" strokeWidth="0.5" />
+          {/* Pommel */}
+          <Circle cx="5" cy="3" r="2" fill="#F1C40F" stroke="#D4AC0D" strokeWidth="0.5" />
+        </Svg>
+      </View>
+    );
+  }
   return <View style={[styles.cannonball, { left: position.x, top: position.y }]} />;
 };
 
@@ -8052,7 +8075,7 @@ export default function App() {
     princess: { hp: 2500, damage: 125, fireRate: 800, projectile: 'arrow', speed: 15, splash: false },
     cannoneer: { hp: 1800, damage: 200, fireRate: 1600, projectile: 'bomb', speed: 10, splash: true, splashRadius: 40 },
     royal_chef: { hp: 3918, damage: 158, fireRate: 1000, projectile: 'melee', speed: 0, splash: false, range: 50, pancakeCookTime: 28000 }, // ~28 seconds base cook time
-    dagger_duchess: { hp: 2000, damage: 80, fireRate: 900, projectile: 'dagger', speed: 12, splash: false, maxAmmo: 8, reloadTime: 900 }
+    dagger_duchess: { hp: 2768, damage: 110, fireRate: 350, projectile: 'dagger', speed: 12, splash: false, maxAmmo: 8, reloadTime: 1200 } // Fast burst (350ms), slow reload (1200ms)
   };
 
   const getTowerStats = (towerType) => {
@@ -13260,16 +13283,16 @@ export default function App() {
         if (targetToShoot) {
           // Handle ammo system for Dagger Duchess
           if (tower.maxAmmo !== null) {
-            const needsReload = tower.currentAmmo <= 0;
-
-            if (needsReload) {
-              // Check if reload is complete
+            // Check if we need to start a reload
+            if (tower.currentAmmo <= 0) {
+              // Check if we're in the middle of reloading a dagger
               if (tower.lastReload && now - tower.lastReload < tower.reloadTime) {
-                return tower; // Still reloading
+                return tower; // Still reloading this dagger
               }
-              // Reload complete - update ammo and continue to shoot
-              tower.currentAmmo = tower.maxAmmo;
+              // Start reloading ONE dagger
               tower.lastReload = now;
+              // Reload 1 dagger - currentAmmo becomes 1, can fire immediately
+              tower.currentAmmo = 1;
             }
             // Consume ammo (will be applied when we return)
             tower.currentAmmo = tower.currentAmmo - 1;
