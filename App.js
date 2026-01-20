@@ -4818,6 +4818,65 @@ const VisualEffects = ({ effects, setEffects }) => {
           );
         }
 
+        if (effect.type === 'pancake_throw') {
+          // Royal Chef throwing pancake - animated pancake flying from chef to target
+          const curX = effect.x + (effect.targetX - effect.x) * progress;
+          const curY = effect.y + (effect.targetY - effect.y) * progress;
+          return (
+            <View key={effect.id} style={{ position: 'absolute', left: curX - 15, top: curY - 15 }}>
+              <Text style={{ fontSize: 20 }}>🥞</Text>
+            </View>
+          );
+        }
+
+        if (effect.type === 'level_up') {
+          // Level up effect - golden sparkles and +1 indicator
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - 30,
+              top: effect.y - 40,
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: opacity
+            }}>
+              {/* Golden ring */}
+              <Svg width="60" height="60" viewBox="0 0 60 60">
+                <Circle cx="30" cy="30" r={25 * progress} fill="none" stroke="#FFD700" strokeWidth="3" opacity={1 - progress * 0.5} />
+                <Circle cx="30" cy="30" r={15 * progress} fill="none" stroke="#FFA500" strokeWidth="2" opacity={1 - progress * 0.3} />
+              </Svg>
+              {/* Level up text */}
+              <View style={{
+                position: 'absolute',
+                backgroundColor: 'rgba(255, 215, 0, 0.9)',
+                paddingHorizontal: 8,
+                paddingVertical: 2,
+                borderRadius: 10,
+                borderWidth: 2,
+                borderColor: '#FFA500'
+              }}>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#fff' }}>+1</Text>
+              </View>
+              {/* Sparkles */}
+              {[0, 1, 2, 3].map(i => {
+                const angle = (i / 4) * Math.PI * 2 + progress * Math.PI;
+                const dist = 25 + progress * 15;
+                const x = 30 + Math.cos(angle) * dist;
+                const y = 30 + Math.sin(angle) * dist;
+                return (
+                  <Text key={i} style={{
+                    position: 'absolute',
+                    left: x - 8,
+                    top: y - 8,
+                    fontSize: 12,
+                    opacity: 1 - progress
+                  }}>✨</Text>
+                );
+              })}
+            </View>
+          );
+        }
+
         return null;
       })}
     </>
@@ -7992,7 +8051,7 @@ export default function App() {
   const TOWER_TYPES = {
     princess: { hp: 2500, damage: 125, fireRate: 800, projectile: 'arrow', speed: 15, splash: false },
     cannoneer: { hp: 1800, damage: 200, fireRate: 1600, projectile: 'bomb', speed: 10, splash: true, splashRadius: 40 },
-    royal_chef: { hp: 2200, damage: 150, fireRate: 1000, projectile: 'melee', speed: 0, splash: false, range: 50 },
+    royal_chef: { hp: 3918, damage: 158, fireRate: 1000, projectile: 'melee', speed: 0, splash: false, range: 50, pancakeCookTime: 28000 }, // ~28 seconds base cook time
     dagger_duchess: { hp: 2000, damage: 80, fireRate: 900, projectile: 'dagger', speed: 12, splash: false, maxAmmo: 8, reloadTime: 900 }
   };
 
@@ -8015,8 +8074,8 @@ export default function App() {
     { id: 1, type: 'princess', towerSubType: 'princess', isOpponent: true, hp: 2500, maxHp: 2500, x: 70, y: 150, range: TOWER_RANGE, lastShot: 0, damage: 125, fireRate: 800, projectileType: 'arrow', projectileSpeed: 15, splash: false },
     { id: 2, type: 'princess', towerSubType: 'princess', isOpponent: true, hp: 2500, maxHp: 2500, x: width - 70, y: 150, range: TOWER_RANGE, lastShot: 0, damage: 125, fireRate: 800, projectileType: 'arrow', projectileSpeed: 15, splash: false },
     { id: 3, type: 'king', isOpponent: false, hp: 4000, maxHp: 4000, x: width / 2, y: height - 200, range: KING_RANGE, lastShot: 0 },
-    { id: 4, type: 'princess', towerSubType: selectedTowerType, isOpponent: false, hp: playerTowerStats.hp, maxHp: playerTowerStats.hp, x: 70, y: height - 270, range: TOWER_RANGE, lastShot: 0, damage: playerTowerStats.damage, fireRate: playerTowerStats.fireRate, projectileType: playerTowerStats.projectile, projectileSpeed: playerTowerStats.speed, splash: playerTowerStats.splash || false, splashRadius: playerTowerStats.splashRadius || 0, currentAmmo: playerTowerStats.maxAmmo || null, maxAmmo: playerTowerStats.maxAmmo || null, reloadTime: playerTowerStats.reloadTime || null, lastReload: 0 },
-    { id: 5, type: 'princess', towerSubType: selectedTowerType, isOpponent: false, hp: playerTowerStats.hp, maxHp: playerTowerStats.hp, x: width - 70, y: height - 270, range: TOWER_RANGE, lastShot: 0, damage: playerTowerStats.damage, fireRate: playerTowerStats.fireRate, projectileType: playerTowerStats.projectile, projectileSpeed: playerTowerStats.speed, splash: playerTowerStats.splash || false, splashRadius: playerTowerStats.splashRadius || 0, currentAmmo: playerTowerStats.maxAmmo || null, maxAmmo: playerTowerStats.maxAmmo || null, reloadTime: playerTowerStats.reloadTime || null, lastReload: 0 },
+    { id: 4, type: 'princess', towerSubType: selectedTowerType, isOpponent: false, hp: playerTowerStats.hp, maxHp: playerTowerStats.hp, x: 70, y: height - 270, range: TOWER_RANGE, lastShot: 0, damage: playerTowerStats.damage, fireRate: playerTowerStats.fireRate, projectileType: playerTowerStats.projectile, projectileSpeed: playerTowerStats.speed, splash: playerTowerStats.splash || false, splashRadius: playerTowerStats.splashRadius || 0, currentAmmo: playerTowerStats.maxAmmo || null, maxAmmo: playerTowerStats.maxAmmo || null, reloadTime: playerTowerStats.reloadTime || null, lastReload: 0, pancakeTimer: 0, lastPancakeTime: 0, fedUnits: [] },
+    { id: 5, type: 'princess', towerSubType: selectedTowerType, isOpponent: false, hp: playerTowerStats.hp, maxHp: playerTowerStats.hp, x: width - 70, y: height - 270, range: TOWER_RANGE, lastShot: 0, damage: playerTowerStats.damage, fireRate: playerTowerStats.fireRate, projectileType: playerTowerStats.projectile, projectileSpeed: playerTowerStats.speed, splash: playerTowerStats.splash || false, splashRadius: playerTowerStats.splashRadius || 0, currentAmmo: playerTowerStats.maxAmmo || null, maxAmmo: playerTowerStats.maxAmmo || null, reloadTime: playerTowerStats.reloadTime || null, lastReload: 0, pancakeTimer: 0, lastPancakeTime: 0, fedUnits: [] },
   ]);
 
   const [units, setUnits] = useState([]);
@@ -8068,7 +8127,10 @@ export default function App() {
           currentAmmo: newPlayerTowerStats.maxAmmo || null,
           maxAmmo: newPlayerTowerStats.maxAmmo || null,
           reloadTime: newPlayerTowerStats.reloadTime || null,
-          lastReload: 0
+          lastReload: 0,
+          pancakeTimer: 0,
+          lastPancakeTime: 0,
+          fedUnits: []
         };
       }
       return tower;
@@ -8129,8 +8191,8 @@ export default function App() {
       { id: 1, type: 'princess', towerSubType: 'princess', isOpponent: true, hp: 2500, maxHp: 2500, x: 70, y: 150, range: TOWER_RANGE, lastShot: 0, damage: 125, fireRate: 800, projectileType: 'arrow', projectileSpeed: 15, splash: false },
       { id: 2, type: 'princess', towerSubType: 'princess', isOpponent: true, hp: 2500, maxHp: 2500, x: width - 70, y: 150, range: TOWER_RANGE, lastShot: 0, damage: 125, fireRate: 800, projectileType: 'arrow', projectileSpeed: 15, splash: false },
       { id: 3, type: 'king', isOpponent: false, hp: 4000, maxHp: 4000, x: width / 2, y: height - 200, range: KING_RANGE, lastShot: 0 },
-      { id: 4, type: 'princess', towerSubType: selectedTowerType, isOpponent: false, hp: playerTowerStats.hp, maxHp: playerTowerStats.hp, x: 70, y: height - 270, range: TOWER_RANGE, lastShot: 0, damage: playerTowerStats.damage, fireRate: playerTowerStats.fireRate, projectileType: playerTowerStats.projectile, projectileSpeed: playerTowerStats.speed, splash: playerTowerStats.splash || false, splashRadius: playerTowerStats.splashRadius || 0, currentAmmo: playerTowerStats.maxAmmo || null, maxAmmo: playerTowerStats.maxAmmo || null, reloadTime: playerTowerStats.reloadTime || null, lastReload: 0 },
-      { id: 5, type: 'princess', towerSubType: selectedTowerType, isOpponent: false, hp: playerTowerStats.hp, maxHp: playerTowerStats.hp, x: width - 70, y: height - 270, range: TOWER_RANGE, lastShot: 0, damage: playerTowerStats.damage, fireRate: playerTowerStats.fireRate, projectileType: playerTowerStats.projectile, projectileSpeed: playerTowerStats.speed, splash: playerTowerStats.splash || false, splashRadius: playerTowerStats.splashRadius || 0, currentAmmo: playerTowerStats.maxAmmo || null, maxAmmo: playerTowerStats.maxAmmo || null, reloadTime: playerTowerStats.reloadTime || null, lastReload: 0 },
+      { id: 4, type: 'princess', towerSubType: selectedTowerType, isOpponent: false, hp: playerTowerStats.hp, maxHp: playerTowerStats.hp, x: 70, y: height - 270, range: TOWER_RANGE, lastShot: 0, damage: playerTowerStats.damage, fireRate: playerTowerStats.fireRate, projectileType: playerTowerStats.projectile, projectileSpeed: playerTowerStats.speed, splash: playerTowerStats.splash || false, splashRadius: playerTowerStats.splashRadius || 0, currentAmmo: playerTowerStats.maxAmmo || null, maxAmmo: playerTowerStats.maxAmmo || null, reloadTime: playerTowerStats.reloadTime || null, lastReload: 0, pancakeTimer: 0, lastPancakeTime: 0, fedUnits: [] },
+      { id: 5, type: 'princess', towerSubType: selectedTowerType, isOpponent: false, hp: playerTowerStats.hp, maxHp: playerTowerStats.hp, x: width - 70, y: height - 270, range: TOWER_RANGE, lastShot: 0, damage: playerTowerStats.damage, fireRate: playerTowerStats.fireRate, projectileType: playerTowerStats.projectile, projectileSpeed: playerTowerStats.speed, splash: playerTowerStats.splash || false, splashRadius: playerTowerStats.splashRadius || 0, currentAmmo: playerTowerStats.maxAmmo || null, maxAmmo: playerTowerStats.maxAmmo || null, reloadTime: playerTowerStats.reloadTime || null, lastReload: 0, pancakeTimer: 0, lastPancakeTime: 0, fedUnits: [] },
     ]);
 
     if (destination === 'lobby') {
@@ -13053,6 +13115,107 @@ export default function App() {
         // Check if tower is frozen - can't attack while frozen
         const isFrozen = tower.freezeUntil && now < tower.freezeUntil;
         if (isFrozen) return { ...tower, lockedTarget: null }; // Lose target when frozen
+
+        // ROYAL CHEF PANCAKE COOKING SYSTEM
+        if (tower.towerSubType === 'royal_chef') {
+          // Check if player still has princess towers (pancakes don't cook if both are gone)
+          const myPrincessTowers = nextTowers.filter(t => t.isOpponent === tower.isOpponent && t.type === 'princess' && t.hp > 0);
+          const canCookPancakes = myPrincessTowers.length > 0;
+
+          if (canCookPancakes) {
+            // Calculate cooking speed multiplier
+            // - Idle (not attacking): 1.0x speed (fastest)
+            // - Attacking: 0.6x speed (slower)
+            // - One princess down: 0.5x speed (much slower)
+            let cookingMultiplier = 1.0;
+            if (tower.lockedTarget || (now - tower.lastShot) < tower.fireRate * 2) {
+              cookingMultiplier = 0.6; // Slower when attacking
+            }
+            if (myPrincessTowers.length < 2) {
+              cookingMultiplier *= 0.5; // Even slower if lost a tower
+            }
+
+            // Get base cook time from TOWER_TYPES (28 seconds)
+            const baseCookTime = TOWER_TYPES.royal_chef.pancakeCookTime;
+            const cookProgress = 16 * cookingMultiplier; // ~16ms per tick at 60fps
+
+            tower.pancakeTimer = (tower.pancakeTimer || 0) + cookProgress;
+
+            // Check if pancake is ready
+            if (tower.pancakeTimer >= baseCookTime) {
+              // Find best target: highest HP ally >33% health, not yet fed
+              const allyUnits = currentUnits.filter(u =>
+                !u.isOpponent &&
+                u.hp > 0 &&
+                u.hp > u.maxHp * 0.33 && // Above 33% health threshold
+                !(tower.fedUnits || []).includes(u.id) // Not fed yet
+              );
+
+              // Sort by HP (highest first)
+              allyUnits.sort((a, b) => b.hp - a.hp);
+
+              if (allyUnits.length > 0) {
+                const target = allyUnits[0];
+
+                // Apply +1 level buff (increase HP and damage by ~10% per level)
+                const levelMultiplier = 1.1;
+                const newHp = Math.min(target.hp * levelMultiplier, target.maxHp * levelMultiplier);
+                const newMaxHp = target.maxHp * levelMultiplier;
+                const newDamage = target.damage ? target.damage * levelMultiplier : target.damage;
+
+                // Update the unit with buff
+                currentUnits = currentUnits.map(u => {
+                  if (u.id === target.id) {
+                    return {
+                      ...u,
+                      hp: newHp,
+                      maxHp: newMaxHp,
+                      damage: newDamage,
+                      pancakeBuffed: true
+                    };
+                  }
+                  return u;
+                });
+
+                // Track that this unit was fed
+                if (!tower.fedUnits) tower.fedUnits = [];
+                tower.fedUnits.push(target.id);
+
+                // Reset pancake timer
+                tower.pancakeTimer = 0;
+                tower.lastPancakeTime = now;
+
+                // Add visual effect for pancake throw
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'pancake_throw',
+                  x: tower.x,
+                  y: tower.y,
+                  targetX: target.x,
+                  targetY: target.y,
+                  startTime: Date.now(),
+                  duration: 500
+                }]);
+
+                // Add visual effect for buffed unit
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'level_up',
+                  x: target.x,
+                  y: target.y,
+                  startTime: Date.now(),
+                  duration: 1000
+                }]);
+              } else {
+                // No valid targets - keep timer at max until a unit is deployed
+                tower.pancakeTimer = baseCookTime;
+              }
+            }
+          } else {
+            // Both princess towers destroyed - stop cooking
+            tower.pancakeTimer = 0;
+          }
+        }
 
         // Use tower-specific fire rate
         const fireRate = tower.fireRate || (tower.type === 'king' ? FIRE_RATE_KING : FIRE_RATE_PRINCESS);
