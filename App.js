@@ -6435,7 +6435,7 @@ const DeckSlotSelector = memo(({ visible, onClose, cards, onSwap }) => {
   );
 });
 
-const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeckIndex, setSelectedDeckIndex }) => {
+const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeckIndex, setSelectedDeckIndex, selectedTower: initialSelectedTower = 'princess', setSelectedTower: onSetSelectedTower }) => {
   const [selectedCard, setSelectedCard] = useState(null);
   const [cardMenuCard, setCardMenuCard] = useState(null);
   const [showSlotSelector, setShowSlotSelector] = useState(null);
@@ -6443,7 +6443,7 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
   const [filterRarity, setFilterRarity] = useState('all');
   const [sortByElixir, setSortByElixir] = useState(false);
   const [showTowerSelector, setShowTowerSelector] = useState(false);
-  const [selectedTower, setSelectedTower] = useState('princess'); // princess, dagger_duchess, royal_chef, cannoneer
+  const [selectedTower, setSelectedTower] = useState(initialSelectedTower); // princess, dagger_duchess, royal_chef, cannoneer
 
   const dropZones = useRef([]);
   const deckSlotRefs = useRef([]);
@@ -6579,6 +6579,7 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
                   key={tower.id}
                   onPress={() => {
                     setSelectedTower(tower.id);
+                    onSetSelectedTower && onSetSelectedTower(tower.id);
                     setShowTowerSelector(false);
                   }}
                   style={{
@@ -7003,6 +7004,8 @@ const MainLobby = ({
         selectedDeckIndex={selectedDeckIndex}
         setSelectedDeckIndex={setSelectedDeckIndex}
         allDecks={allDecks}
+        selectedTower={selectedTowerType}
+        setSelectedTower={setSelectedTowerType}
       />;
       case 2: return <BattleTab
         currentDeck={currentDeck}
@@ -7916,13 +7919,29 @@ export default function App() {
   const [enemyDeckQueue, setEnemyDeckQueue] = useState([allDecks[4][5], allDecks[4][6], allDecks[4][7]]);
   const [enemyDeckIndex, setEnemyDeckIndex] = useState(4);
 
+  // Tower type configuration
+  const [selectedTowerType, setSelectedTowerType] = useState('princess'); // princess, cannoneer, royal_chef, dagger_duchess
+
+  const TOWER_TYPES = {
+    princess: { hp: 2500, damage: 125, fireRate: 800, projectile: 'arrow', speed: 15, splash: false },
+    cannoneer: { hp: 1800, damage: 200, fireRate: 1200, projectile: 'bomb', speed: 10, splash: true, splashRadius: 40 },
+    royal_chef: { hp: 2200, damage: 150, fireRate: 1000, projectile: 'melee', speed: 0, splash: false, range: 50 },
+    dagger_duchess: { hp: 2000, damage: 80, fireRate: 900, projectile: 'dagger', speed: 12, splash: false, maxAmmo: 8, reloadTime: 900 }
+  };
+
+  const getTowerStats = (towerType) => {
+    return TOWER_TYPES[towerType] || TOWER_TYPES.princess;
+  };
+
+  const playerTowerStats = getTowerStats(selectedTowerType);
+
   const [towers, setTowers] = useState([
     { id: 0, type: 'king', isOpponent: true, hp: 4000, maxHp: 4000, x: width / 2, y: 80, range: KING_RANGE, lastShot: 0 },
-    { id: 1, type: 'princess', isOpponent: true, hp: 2500, maxHp: 2500, x: 70, y: 150, range: TOWER_RANGE, lastShot: 0 },
-    { id: 2, type: 'princess', isOpponent: true, hp: 2500, maxHp: 2500, x: width - 70, y: 150, range: TOWER_RANGE, lastShot: 0 },
+    { id: 1, type: 'princess', towerSubType: 'princess', isOpponent: true, hp: 2500, maxHp: 2500, x: 70, y: 150, range: TOWER_RANGE, lastShot: 0, damage: 125, fireRate: 800, projectileType: 'arrow', projectileSpeed: 15, splash: false },
+    { id: 2, type: 'princess', towerSubType: 'princess', isOpponent: true, hp: 2500, maxHp: 2500, x: width - 70, y: 150, range: TOWER_RANGE, lastShot: 0, damage: 125, fireRate: 800, projectileType: 'arrow', projectileSpeed: 15, splash: false },
     { id: 3, type: 'king', isOpponent: false, hp: 4000, maxHp: 4000, x: width / 2, y: height - 200, range: KING_RANGE, lastShot: 0 },
-    { id: 4, type: 'princess', isOpponent: false, hp: 2500, maxHp: 2500, x: 70, y: height - 270, range: TOWER_RANGE, lastShot: 0 },
-    { id: 5, type: 'princess', isOpponent: false, hp: 2500, maxHp: 2500, x: width - 70, y: height - 270, range: TOWER_RANGE, lastShot: 0 },
+    { id: 4, type: 'princess', towerSubType: selectedTowerType, isOpponent: false, hp: playerTowerStats.hp, maxHp: playerTowerStats.hp, x: 70, y: height - 270, range: TOWER_RANGE, lastShot: 0, damage: playerTowerStats.damage, fireRate: playerTowerStats.fireRate, projectileType: playerTowerStats.projectile, projectileSpeed: playerTowerStats.speed, splash: playerTowerStats.splash || false, splashRadius: playerTowerStats.splashRadius || 0, currentAmmo: playerTowerStats.maxAmmo || null, maxAmmo: playerTowerStats.maxAmmo || null, reloadTime: playerTowerStats.reloadTime || null, lastReload: 0 },
+    { id: 5, type: 'princess', towerSubType: selectedTowerType, isOpponent: false, hp: playerTowerStats.hp, maxHp: playerTowerStats.hp, x: width - 70, y: height - 270, range: TOWER_RANGE, lastShot: 0, damage: playerTowerStats.damage, fireRate: playerTowerStats.fireRate, projectileType: playerTowerStats.projectile, projectileSpeed: playerTowerStats.speed, splash: playerTowerStats.splash || false, splashRadius: playerTowerStats.splashRadius || 0, currentAmmo: playerTowerStats.maxAmmo || null, maxAmmo: playerTowerStats.maxAmmo || null, reloadTime: playerTowerStats.reloadTime || null, lastReload: 0 },
   ]);
 
   const [units, setUnits] = useState([]);
@@ -7954,6 +7973,32 @@ export default function App() {
   useEffect(() => { enemyDeckQueueRef.current = enemyDeckQueue; }, [enemyDeckQueue]);
   useEffect(() => { lastPlayedCardRef.current = lastPlayedCard; }, [lastPlayedCard]);
   useEffect(() => { enemyLastPlayedCardRef.current = enemyLastPlayedCard; }, [enemyLastPlayedCard]);
+
+  // Update player towers when tower type changes
+  useEffect(() => {
+    const newPlayerTowerStats = getTowerStats(selectedTowerType);
+    setTowers(prevTowers => prevTowers.map(tower => {
+      if (tower.id === 4 || tower.id === 5) {
+        return {
+          ...tower,
+          towerSubType: selectedTowerType,
+          hp: newPlayerTowerStats.hp,
+          maxHp: newPlayerTowerStats.hp,
+          damage: newPlayerTowerStats.damage,
+          fireRate: newPlayerTowerStats.fireRate,
+          projectileType: newPlayerTowerStats.projectile,
+          projectileSpeed: newPlayerTowerStats.speed,
+          splash: newPlayerTowerStats.splash || false,
+          splashRadius: newPlayerTowerStats.splashRadius || 0,
+          currentAmmo: newPlayerTowerStats.maxAmmo || null,
+          maxAmmo: newPlayerTowerStats.maxAmmo || null,
+          reloadTime: newPlayerTowerStats.reloadTime || null,
+          lastReload: 0
+        };
+      }
+      return tower;
+    }));
+  }, [selectedTowerType]);
 
   const concedeGame = () => {
     setGameOver('LOSE');
@@ -12898,7 +12943,9 @@ export default function App() {
         const isFrozen = tower.freezeUntil && now < tower.freezeUntil;
         if (isFrozen) return { ...tower, lockedTarget: null }; // Lose target when frozen
 
-        if (now - tower.lastShot < (tower.type === 'king' ? FIRE_RATE_KING : FIRE_RATE_PRINCESS)) return tower;
+        // Use tower-specific fire rate
+        const fireRate = tower.fireRate || (tower.type === 'king' ? FIRE_RATE_KING : FIRE_RATE_PRINCESS);
+        if (now - tower.lastShot < fireRate) return tower;
 
         let targetToShoot = null;
 
@@ -12937,6 +12984,34 @@ export default function App() {
         }
 
         if (targetToShoot) {
+          // Handle ammo system for Dagger Duchess
+          if (tower.maxAmmo !== null) {
+            const timeSinceLastShot = now - tower.lastShot;
+            const needsReload = tower.currentAmmo <= 0;
+
+            if (needsReload) {
+              // Check if reload is complete
+              if (tower.lastReload && now - tower.lastReload < tower.reloadTime) {
+                return tower; // Still reloading
+              }
+              // Reload complete
+              return {
+                ...tower,
+                currentAmmo: tower.maxAmmo,
+                lastReload: now,
+                lastShot: now
+              };
+            }
+
+            // Use ammo
+            return {
+              ...tower,
+              currentAmmo: tower.currentAmmo - 1,
+              lastShot: now,
+              lockedTarget: tower.lockedTarget
+            };
+          }
+
           activeProjectiles.push({
             id: now + Math.random(),
             x: tower.x,
@@ -12944,9 +13019,13 @@ export default function App() {
             targetId: targetToShoot.id,
             targetX: targetToShoot.x,
             targetY: targetToShoot.y,
-            speed: tower.type === 'king' ? PROJECTILE_SPEED_CANNON : PROJECTILE_SPEED_ARROW,
-            damage: 125,
-            type: tower.type === 'king' ? 'cannon' : 'arrow'
+            speed: tower.projectileSpeed || (tower.type === 'king' ? PROJECTILE_SPEED_CANNON : PROJECTILE_SPEED_ARROW),
+            damage: tower.damage || 125,
+            type: tower.projectileType || (tower.type === 'king' ? 'cannon' : 'arrow'),
+            splash: tower.splash || false,
+            splashRadius: tower.splashRadius || 0,
+            attackerId: tower.id,
+            isOpponent: tower.isOpponent
           });
           return { ...tower, lastShot: now, lockedTarget: tower.lockedTarget };
         }
