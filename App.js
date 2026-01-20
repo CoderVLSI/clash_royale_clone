@@ -6507,6 +6507,11 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
   const [showTowerSelector, setShowTowerSelector] = useState(false);
   const [selectedTower, setSelectedTower] = useState(initialSelectedTower); // princess, dagger_duchess, royal_chef, cannoneer
 
+  // Sync local state with parent prop
+  useEffect(() => {
+    setSelectedTower(initialSelectedTower);
+  }, [initialSelectedTower]);
+
   const dropZones = useRef([]);
   const deckSlotRefs = useRef([]);
   const [localDraggingCard, setLocalDraggingCard] = useState(null);
