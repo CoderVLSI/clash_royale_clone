@@ -2694,7 +2694,7 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
         </Svg>
       );
     case 'rascals':
-    case 'rascal_girls':
+      // Rascal Boy - orange
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
           <Circle cx="50" cy="50" r="45" fill="#e67e22" stroke="#d35400" strokeWidth="2" />
@@ -2703,6 +2703,25 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Circle cx="55" cy="38" r="3" fill="black" />
           <Path d="M45 48 Q50 52 55 48" stroke="black" strokeWidth="2" fill="none" />
           <Rect x="40" y="55" width="20" height="25" fill="#3498db" rx="3" />
+        </Svg>
+      );
+    case 'rascal_girls':
+      // Rascal Girls - pink with bow
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="45" fill="#fd79a8" stroke="#e84393" strokeWidth="2" />
+          {/* Hair bow */}
+          <Circle cx="70" cy="35" r="8" fill="#e84393" stroke="#c0392b" strokeWidth="2" />
+          <Circle cx="70" cy="35" r="3" fill="#fd79a8" />
+          <Circle cx="50" cy="40" r="15" fill="#ecf0f1" />
+          {/* Longer eyelashes for girls */}
+          <Path d="M42 35 L40 33 M43 34 L41 32" stroke="black" strokeWidth="1.5" />
+          <Path d="M58 35 L60 33 M57 34 L59 32" stroke="black" strokeWidth="1.5" />
+          <Circle cx="45" cy="38" r="3" fill="black" />
+          <Circle cx="55" cy="38" r="3" fill="black" />
+          <Path d="M45 48 Q50 52 55 48" stroke="#e84393" strokeWidth="2" fill="none" />
+          {/* Pink dress */}
+          <Path d="M35 55 Q50 53 65 55 L68 80 Q50 85 32 80 Z" fill="#e84393" stroke="#c0392b" strokeWidth="2" />
         </Svg>
       );
     case 'royal_recruits':
@@ -5731,6 +5750,22 @@ const Projectile = ({ type, position }) => {
           <Rect x="5" y="1.5" width="5" height="3" fill="#9B59B6" stroke="#8E44AD" strokeWidth="0.5" />
           {/* Pommel */}
           <Circle cx="5" cy="3" r="2" fill="#F1C40F" stroke="#D4AC0D" strokeWidth="0.5" />
+        </Svg>
+      </View>
+    );
+  }
+  if (type === 'slingshot') {
+    // Small rock projectile for Rascal Girls
+    return (
+      <View style={{
+        position: 'absolute',
+        left: position.x - 4,
+        top: position.y - 4,
+        width: 8,
+        height: 8
+      }}>
+        <Svg width="8" height="8" viewBox="0 0 8 8">
+          <Circle cx="4" cy="4" r="3" fill="#7f8c8d" stroke="#5d6d7e" strokeWidth="1" />
         </Svg>
       </View>
     );
@@ -11117,7 +11152,9 @@ export default function App() {
                   frontalSplash: u.frontalSplash || false,
                   turnsToPig: u.turnsToPig || false,
                   knockback: u.knockback || 0,
-                  boomerang: u.boomerang || false
+                  boomerang: u.boomerang || false,
+                  attackerX: u.x,
+                  attackerY: u.y
                 });
               }
 
@@ -11824,46 +11861,6 @@ export default function App() {
           attackAngle = Math.atan2(event.targetY - event.attackerY, event.targetX - event.attackerX);
         }
 
-        // Boomerang return damage (Executioner)
-        if (event.boomerang) {
-          // Schedule second splash damage when axe returns to Executioner
-          setTimeout(() => {
-            setVisualEffects(prev => [...prev, {
-              id: Date.now() + Math.random(),
-              type: 'fire_explosion', // Reuse explosion visual for axe return
-              x: event.attackerX,
-              y: event.attackerY,
-              radius: 40,
-              startTime: Date.now(),
-              duration: 400
-            }]);
-            // Apply return damage to all enemies around Executioner
-            setUnits(prevUnits => {
-              return prevUnits.map(unit => {
-                if (unit.isOpponent !== event.attacker.isOpponent && unit.hp > 0) {
-                  const dist = Math.sqrt(Math.pow(unit.x - event.attackerX, 2) + Math.pow(unit.y - event.attackerY, 2));
-                  if (dist <= splashRadius) {
-                    const returnDamage = Math.floor(event.damage * 0.5); // Half damage on return
-                    let remainingDamage = returnDamage;
-                    let newShieldHp = unit.currentShieldHp || 0;
-                    if (unit.hasShield && newShieldHp > 0) {
-                      if (remainingDamage >= newShieldHp) {
-                        remainingDamage -= newShieldHp;
-                        newShieldHp = 0;
-                      } else {
-                        newShieldHp -= remainingDamage;
-                        remainingDamage = 0;
-                      }
-                    }
-                    return { ...unit, hp: unit.hp - remainingDamage, currentShieldHp: newShieldHp };
-                  }
-                }
-                return unit;
-              });
-            });
-          }, 600); // Axe returns after 600ms
-        }
-
         // Damage all enemy units in splash radius
         currentUnits = currentUnits.map(unit => {
           if (unit.isOpponent !== event.attacker.isOpponent && unit.hp > 0) {
@@ -12232,6 +12229,85 @@ export default function App() {
           }
 
           return { ...p, x: nextX, y: nextY, hitIds, totalDistTraveled };
+        }
+
+        // BOOMERANG LOGIC (Executioner)
+        if (p.boomerang) {
+          // Track boomerang state
+          const isReturning = p.isReturning || false;
+          const attackerX = p.attackerX || p.x;
+          const attackerY = p.attackerY || p.y;
+
+          if (!isReturning) {
+            // Going OUT towards target
+            if (dist < p.speed + 10) {
+              // Reached target, now turn around and return
+              // Reset damageDealt so it can deal damage again on return
+              return {
+                ...p,
+                isReturning: true,
+                damageDealt: false, // Allow damage on return
+                targetX: attackerX,
+                targetY: attackerY
+              };
+            }
+            // Continue towards target
+            const angle = Math.atan2(dy, dx);
+            return {
+              ...p,
+              x: p.x + Math.cos(angle) * p.speed,
+              y: p.y + Math.sin(angle) * p.speed,
+              targetX,
+              targetY,
+              attackerX,
+              attackerY
+            };
+          } else {
+            // RETURNING to attacker - deal damage again
+            const returnDx = attackerX - p.x;
+            const returnDy = attackerY - p.y;
+            const returnDist = Math.sqrt(returnDx * returnDx + returnDy);
+
+            // Check if near any enemy on return trip for splash damage
+            const enemiesNearPath = currentUnits.filter(u =>
+              u.isOpponent !== p.isOpponent &&
+              u.hp > 0
+            );
+
+            enemiesNearPath.forEach(enemy => {
+              const distToEnemy = Math.sqrt(Math.pow(enemy.x - p.x, 2) + Math.pow(enemy.y - p.y, 2));
+              if (distToEnemy < 40 && !p.damageDealt) {
+                // Deal splash damage on return
+                damageEvents.push({
+                  targetId: enemy.id,
+                  damage: Math.floor(p.damage * 0.5), // Half damage on return
+                  attacker: p.attacker,
+                  attackerId: p.attackerId,
+                  isOpponent: p.isOpponent,
+                  splash: true,
+                  radius: 40,
+                  targetX: enemy.x,
+                  targetY: enemy.y,
+                  attackerX: p.x,
+                  attackerY: p.y
+                });
+              }
+            });
+
+            if (returnDist < p.speed + 10) {
+              // Returned to attacker, remove projectile
+              return { ...p, damageDealt: true, hit: true };
+            }
+            // Continue back to attacker
+            const returnAngle = Math.atan2(returnDy, returnDx);
+            return {
+              ...p,
+              x: p.x + Math.cos(returnAngle) * p.speed,
+              y: p.y + Math.sin(returnAngle) * p.speed,
+              targetX: attackerX,
+              targetY: attackerY
+            };
+          }
         }
 
         if (dist < p.speed + 10) {
