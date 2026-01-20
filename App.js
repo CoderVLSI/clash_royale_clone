@@ -6442,6 +6442,8 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [filterRarity, setFilterRarity] = useState('all');
   const [sortByElixir, setSortByElixir] = useState(false);
+  const [showTowerSelector, setShowTowerSelector] = useState(false);
+  const [selectedTower, setSelectedTower] = useState('princess'); // princess, dagger_duchess, royal_chef, cannoneer
 
   const dropZones = useRef([]);
   const deckSlotRefs = useRef([]);
@@ -6449,6 +6451,13 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
   const [scrollEnabled, setScrollEnabled] = useState(true);
 
   const [searchQuery, setSearchQuery] = useState('');
+
+  const towerOptions = [
+    { id: 'princess', name: 'Princess Tower', icon: '🏯' },
+    { id: 'dagger_duchess', name: 'Dagger Duchess', icon: '🗡️' },
+    { id: 'royal_chef', name: 'Royal Chef', icon: '👨‍🍳' },
+    { id: 'cannoneer', name: 'Cannoneer', icon: '💣' }
+  ];
 
   const filteredCards = useMemo(() => {
     return CARDS.filter(card => !card.isToken).filter(card => {
@@ -6534,13 +6543,99 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
       {/* Header Deck Grid (Persistent) */}
       <View style={styles.deckGridContainer}>
         <View style={styles.deckHeaderRow}>
-          <Text style={styles.deckTabTitle}>Battle Deck</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.deckTabTitle}>Battle Deck</Text>
+            {/* Tower Selection Dropdown */}
+            <TouchableOpacity
+              onPress={() => setShowTowerSelector(true)}
+              style={{
+                marginTop: 5,
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: '#f0f0f0',
+                padding: 8,
+                borderRadius: 8,
+                borderWidth: 1,
+                borderColor: '#ccc'
+              }}
+            >
+              <Text style={{ fontSize: 16, marginRight: 5 }}>
+                {towerOptions.find(t => t.id === selectedTower)?.icon}
+              </Text>
+              <Text style={{ fontSize: 12, color: '#333', flex: 1 }}>
+                {towerOptions.find(t => t.id === selectedTower)?.name}
+              </Text>
+              <Text style={{ fontSize: 12 }}>▼</Text>
+            </TouchableOpacity>
+          </View>
           <View style={styles.deckSelectorMini}>
             {allDecks.map((_, i) => (
               <TouchableOpacity key={i} onPress={() => setSelectedDeckIndex(i)} style={[styles.deckDot, selectedDeckIndex === i && styles.deckDotActive]} />
             ))}
           </View>
         </View>
+
+        {/* Tower Selection Modal */}
+        <Modal
+          visible={showTowerSelector}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setShowTowerSelector(false)}
+        >
+          <View style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
+            <View style={{
+              backgroundColor: 'white',
+              borderRadius: 12,
+              padding: 20,
+              width: '80%',
+              maxHeight: '50%'
+            }}>
+              <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 15, textAlign: 'center' }}>
+                Select Tower Type
+              </Text>
+              {towerOptions.map(tower => (
+                <TouchableOpacity
+                  key={tower.id}
+                  onPress={() => {
+                    setSelectedTower(tower.id);
+                    setShowTowerSelector(false);
+                  }}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    padding: 12,
+                    borderBottomWidth: 1,
+                    borderBottomColor: '#eee',
+                    backgroundColor: selectedTower === tower.id ? '#e3f2fd' : 'white'
+                  }}
+                >
+                  <Text style={{ fontSize: 24, marginRight: 15 }}>{tower.icon}</Text>
+                  <Text style={{ fontSize: 16, color: '#333' }}>{tower.name}</Text>
+                  {selectedTower === tower.id && (
+                    <Text style={{ marginLeft: 'auto', fontSize: 18, color: '#2196F3' }}>✓</Text>
+                  )}
+                </TouchableOpacity>
+              ))}
+              <TouchableOpacity
+                onPress={() => setShowTowerSelector(false)}
+                style={{
+                  marginTop: 15,
+                  padding: 12,
+                  backgroundColor: '#ccc',
+                  borderRadius: 8,
+                  alignItems: 'center'
+                }}
+              >
+                <Text style={{ fontSize: 16, color: '#333' }}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
         <View style={styles.deckCardGrid}>
           <View style={styles.cardRowCompact}>
