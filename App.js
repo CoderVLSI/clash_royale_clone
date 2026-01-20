@@ -12277,10 +12277,10 @@ export default function App() {
             enemiesNearPath.forEach(enemy => {
               const distToEnemy = Math.sqrt(Math.pow(enemy.x - p.x, 2) + Math.pow(enemy.y - p.y, 2));
               if (distToEnemy < 40 && !p.damageDealt) {
-                // Deal splash damage on return
+                // Deal full splash damage on return
                 damageEvents.push({
                   targetId: enemy.id,
-                  damage: Math.floor(p.damage * 0.5), // Half damage on return
+                  damage: p.damage, // Full damage on return
                   attacker: p.attacker,
                   attackerId: p.attackerId,
                   isOpponent: p.isOpponent,
