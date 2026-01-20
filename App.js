@@ -9977,10 +9977,41 @@ export default function App() {
               if (timeSinceCombat > 3) u.hidden.active = true;
             }
           } else if (u.spriteId === 'royal_ghost') {
-            // Royal Ghost logic: Re-cloak 3s after last attack
-            const timeSinceAttack = now - (u.hidden.lastAttackTime || 0);
-            if (!u.hidden.active && timeSinceAttack > 3000) {
-              u.hidden.active = true;
+            // Royal Ghost: Reveal when enemy in range, re-cloak when 4 tiles away from all enemies
+            const enemyInRange = (unitsRef.current || []).some(t =>
+              t.isOpponent !== u.isOpponent &&
+              t.hp > 0 &&
+              !t.hidden?.active && // Can't detect hidden enemies
+              Math.sqrt(Math.pow(t.x - u.x, 2) + Math.pow(t.y - u.y, 2)) < u.range + 50
+            );
+            // Also check if any enemy tower is in range
+            const towerInRange = (towersRef.current || []).some(t =>
+              t.isOpponent !== u.isOpponent &&
+              t.hp > 0 &&
+              Math.sqrt(Math.pow(t.x - u.x, 2) + Math.pow(t.y - u.y, 2)) < u.range + 50
+            );
+
+            if (u.hidden.active) {
+              // If hidden, reveal when enemy is nearby
+              if (enemyInRange || towerInRange) {
+                u.hidden.active = false;
+              }
+            } else {
+              // If visible, re-cloak only when 4 tiles (~100px) away from ALL enemies
+              const allEnemiesFar = (unitsRef.current || []).every(t =>
+                t.isOpponent === u.isOpponent ||
+                t.hp <= 0 ||
+                Math.sqrt(Math.pow(t.x - u.x, 2) + Math.pow(t.y - u.y, 2)) > 100
+              );
+              const allTowersFar = (towersRef.current || []).every(t =>
+                t.isOpponent === u.isOpponent ||
+                t.hp <= 0 ||
+                Math.sqrt(Math.pow(t.x - u.x, 2) + Math.pow(t.y - u.y, 2)) > 100
+              );
+
+              if (allEnemiesFar && allTowersFar) {
+                u.hidden.active = true;
+              }
             }
           }
         }
@@ -13025,9 +13056,12 @@ export default function App() {
               const offsetX = Math.cos(angle) * distance;
               const offsetY = Math.sin(angle) * distance;
 
-              // Clamp spawn position to map bounds to prevent spawned units from going off-map
-              const spawnX = Math.max(20, Math.min(width - 20, deadUnit.x + offsetX));
-              const spawnY = Math.max(20, Math.min(height - 20, deadUnit.y + offsetY));
+              // Clamp spawn position to map bounds with extra padding to prevent edge confusion
+              // Death spawns (Skeleton Barrel, Elixir Golem, etc.) at edges cause enemy units to freeze
+              // Use 80px padding for all death spawns to prevent AI confusion
+              const padding = 80;
+              const spawnX = Math.max(padding, Math.min(width - padding, deadUnit.x + offsetX));
+              const spawnY = Math.max(padding, Math.min(height - padding, deadUnit.y + offsetY));
 
               unitsToSpawn.push({
                 id: Date.now() + Math.random() * 1000 + i,
