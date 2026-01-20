@@ -10232,7 +10232,8 @@ export default function App() {
           const unitTargets = (unitsRef.current || []).filter(targetUnit =>
             targetUnit.isOpponent !== u.isOpponent &&
             targetUnit.hp > 0 &&
-            !targetUnit.hidden?.active && // Untargetable if hidden (Royal Ghost, Tesla)
+            // Hidden units are untargetable, EXCEPT Royal Ghost can be seen by flying units
+            !(targetUnit.hidden?.active && targetUnit.spriteId !== 'royal_ghost' && u.type !== 'flying') &&
             !targetUnit.isZone && // Cannot target zones (graveyard, etc.)
             // Ground melee units cannot target flying units, but ranged units can
             // EXCEPTION: X-Bow and Fisherman target ground ONLY despite having projectile
