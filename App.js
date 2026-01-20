@@ -13250,13 +13250,13 @@ export default function App() {
         // Check if tower has a locked target that's still alive and in range
         if (tower.lockedTarget) {
           const lockedTarget = currentUnits.find(u => u.id === tower.lockedTarget);
-          if (lockedTarget && lockedTarget.hp > 0) {
+          if (lockedTarget && lockedTarget.hp > 0 && !lockedTarget.hidden?.active) {
             const dist = Math.sqrt(Math.pow(lockedTarget.x - tower.x, 2) + Math.pow(lockedTarget.y - tower.y, 2));
             if (dist <= tower.range) {
               targetToShoot = lockedTarget;
             }
           }
-          // Clear lock if target died or left range
+          // Clear lock if target died, left range, or became hidden
           if (!targetToShoot) {
             tower.lockedTarget = null;
           }
@@ -13264,7 +13264,10 @@ export default function App() {
 
         // If no locked target, find closest enemy in range
         if (!targetToShoot) {
-          const targets = currentUnits.filter(u => u.isOpponent !== tower.isOpponent);
+          const targets = currentUnits.filter(u =>
+            u.isOpponent !== tower.isOpponent &&
+            !u.hidden?.active // Can't target hidden units (Royal Ghost)
+          );
           let minDist = Infinity;
 
           targets.forEach(u => {
