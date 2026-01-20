@@ -178,7 +178,7 @@ const CARDS = [
   { id: 'phoenix_egg', name: 'Phoenix Egg', cost: 0, color: '#f39c12', hp: 800, speed: 0, type: 'ground', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, rarity: 'legendary', isToken: true, hatchesInto: 'phoenix', hatchDuration: 3000 },
 
   // NEW REQUESTED CARDS
-  { id: 'fisherman', name: 'Fisherman', cost: 3, color: '#3498db', hp: 720, speed: 1.5, type: 'ground', range: 60, damage: 160, attackSpeed: 1300, projectile: 'hook', count: 1, rarity: 'legendary', pull: true, groundOnly: true },
+  { id: 'fisherman', name: 'Fisherman', cost: 3, color: '#3498db', hp: 870, speed: 1.5, type: 'ground', range: 105, damage: 194, attackSpeed: 1300, projectile: 'hook', count: 1, rarity: 'legendary', pull: true, pullSlow: 0.35, pullSlowDuration: 2500, groundOnly: true },
   { id: 'goblin_curse', name: 'Goblin Curse', cost: 2, color: '#9b59b6', type: 'spell', damage: 25, radius: 50, count: 1, duration: 6, rarity: 'epic', appliesCurse: true },
   { id: 'void', name: 'Void', cost: 3, color: '#8e44ad', type: 'spell', damage: 0, radius: 50, count: 1, duration: 5, rarity: 'epic', isVoid: true },
   { id: 'goblin_gang', name: 'Goblin Gang', cost: 3, color: '#2ecc71', hp: 202, speed: 3, type: 'ground', range: 25, damage: 120, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common', spawnsExtra: 'spear_goblins', extraCount: 3, spawnUnitId: 'sword_goblins' },
@@ -189,7 +189,7 @@ const CARDS = [
   { id: 'goblin_machine', name: 'Gob Machine', cost: 5, color: '#95a5a6', hp: 1200, speed: 1.5, type: 'ground', range: 25, damage: 200, attackSpeed: 1200, projectile: null, count: 1, rarity: 'legendary', rocketAbility: true, rocketInterval: 3000, rocketDamage: 250, rocketRange: 120 },
   { id: 'rune_giant', name: 'Rune Giant', cost: 4, color: '#8B4513', hp: 3500, speed: 1, type: 'ground', range: 25, damage: 100, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', rarity: 'epic', enchantAbility: true, enchantCount: 2 },
   { id: 'suspicious_bush', name: 'Suspicious Bush', cost: 2, color: '#2ecc71', hp: 400, speed: 3, type: 'ground', range: 20, damage: 100, attackSpeed: 1000, projectile: null, count: 1, rarity: 'rare', hidden: true, deathSpawns: 'sword_goblins', deathSpawnCount: 2 },
-  { id: 'berserker', name: 'Berserker', cost: 4, color: '#c0392b', hp: 900, speed: 3.5, type: 'ground', range: 25, damage: 350, attackSpeed: 1000, projectile: null, count: 1, rarity: 'epic', permRage: true },
+  { id: 'berserker', name: 'Berserker', cost: 2, color: '#c0392b', hp: 832, speed: 2, type: 'ground', range: 25, damage: 102, attackSpeed: 600, projectile: null, count: 1, rarity: 'common' },
 
   // CHAMPIONS
   { id: 'golden_knight', name: 'Golden Knight', cost: 4, color: '#f1c40f', hp: 1800, speed: 2, type: 'ground', range: 25, damage: 160, attackSpeed: 1000, projectile: null, count: 1, rarity: 'champion', dashChain: true, abilityCooldown: 8000, abilityCost: 1 },
@@ -10926,7 +10926,9 @@ export default function App() {
                       type: 'hook',
                       attackerId: u.id,
                       isOpponent: u.isOpponent,
-                      pull: true
+                      pull: true,
+                      pullSlow: u.pullSlow,
+                      pullSlowDuration: u.pullSlowDuration
                     });
                 } else {
                   nextProjectiles.push({
@@ -12751,19 +12753,24 @@ export default function App() {
                 if (h.pull && h.attackerId) {
                    const attacker = currentUnits.find(att => att.id === h.attackerId);
                    if (attacker) {
-                       const pullDistance = 150; // Strong pull
+                       // Fisherman hook: Pull enemy toward him and slow them
+                       const pullDistance = 120; // Pull distance
                        const angle = Math.atan2(attacker.y - u.y, attacker.x - u.x);
                        const dist = Math.sqrt(Math.pow(attacker.x - u.x, 2) + Math.pow(attacker.y - u.y, 2));
-                       // Pull all the way to attacker (minus offset)
-                       const actualPull = Math.min(dist - 30, pullDistance); 
-                       
+                       // Pull toward Fisherman
+                       const actualPull = Math.min(dist - 25, pullDistance);
+
                        const newX = u.x + Math.cos(angle) * actualPull;
                        const newY = u.y + Math.sin(angle) * actualPull;
-                       
+
                        updatedUnit.x = newX;
                        updatedUnit.y = newY;
                        updatedUnit.wasPushed = true;
-                       updatedUnit.stunUntil = now + 1000;
+
+                       // Apply slow effect (35% slow for 2.5 seconds)
+                       if (attacker.pullSlow && attacker.pullSlowDuration) {
+                           updatedUnit.slowUntil = now + attacker.pullSlowDuration;
+                       }
                    }
                 }
 
