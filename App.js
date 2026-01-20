@@ -6543,31 +6543,7 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
       {/* Header Deck Grid (Persistent) */}
       <View style={styles.deckGridContainer}>
         <View style={styles.deckHeaderRow}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.deckTabTitle}>Battle Deck</Text>
-            {/* Tower Selection Dropdown */}
-            <TouchableOpacity
-              onPress={() => setShowTowerSelector(true)}
-              style={{
-                marginTop: 5,
-                flexDirection: 'row',
-                alignItems: 'center',
-                backgroundColor: '#f0f0f0',
-                padding: 8,
-                borderRadius: 8,
-                borderWidth: 1,
-                borderColor: '#ccc'
-              }}
-            >
-              <Text style={{ fontSize: 16, marginRight: 5 }}>
-                {towerOptions.find(t => t.id === selectedTower)?.icon}
-              </Text>
-              <Text style={{ fontSize: 12, color: '#333', flex: 1 }}>
-                {towerOptions.find(t => t.id === selectedTower)?.name}
-              </Text>
-              <Text style={{ fontSize: 12 }}>▼</Text>
-            </TouchableOpacity>
-          </View>
+          <Text style={styles.deckTabTitle}>Battle Deck</Text>
           <View style={styles.deckSelectorMini}>
             {allDecks.map((_, i) => (
               <TouchableOpacity key={i} onPress={() => setSelectedDeckIndex(i)} style={[styles.deckDot, selectedDeckIndex === i && styles.deckDotActive]} />
@@ -6768,8 +6744,22 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
 
         <View style={styles.deckFooterRow}>
           <View style={styles.towerTroopSlot}>
-            <UnitSprite id="princess" size={25} />
-            <Text style={styles.towerTroopText}>Princess</Text>
+            {/* Tower Selection Dropdown */}
+            <TouchableOpacity
+              onPress={() => setShowTowerSelector(true)}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
+            >
+              <Text style={{ fontSize: 20, marginRight: 5 }}>
+                {towerOptions.find(t => t.id === selectedTower)?.icon}
+              </Text>
+              <Text style={styles.towerTroopText}>
+                {towerOptions.find(t => t.id === selectedTower)?.name}
+              </Text>
+              <Text style={{ fontSize: 12, marginLeft: 3 }}>▼</Text>
+            </TouchableOpacity>
           </View>
           <View style={styles.avgElixirContainer}>
             <Text style={styles.avgElixirText}>Avg. Elixir: {(cards.reduce((s, c) => s + c.cost, 0) / 8).toFixed(1)}</Text>
