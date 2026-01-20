@@ -11566,6 +11566,21 @@ export default function App() {
                   return { ...u, x: nextX, y: nextY, hp: 0 }; // Die immediately to trigger death spawn
                 }
               }
+            } else if (u.targetType === 'buildings' && closestTarget) {
+              // Building-targeting units (Wall Breakers, Giant, Hog, etc.) move DIRECTLY toward target
+              const angle = Math.atan2(closestTarget.y - u.y, closestTarget.x - u.x);
+              nextX += Math.cos(angle) * effectiveSpeed;
+              nextY += Math.sin(angle) * effectiveSpeed;
+
+              // Wall Breakers explode when reaching target
+              if (u.kamikaze) {
+                const distToTarget = Math.sqrt(Math.pow(closestTarget.x - nextX, 2) + Math.pow(closestTarget.y - nextY, 2));
+                // Explode if touching target
+                if (distToTarget <= u.range + 10) {
+                  // Trigger death immediately
+                  return { ...u, x: nextX, y: nextY, hp: 0 };
+                }
+              }
             } else {
               // Standard vertical movement for ground units (bridges will handle steering)
               if (u.isOpponent) {
