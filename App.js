@@ -10433,6 +10433,16 @@ export default function App() {
           }
         }
 
+        // ADD BUILDINGS to targets (Cannon, Furnace, etc.) - CRITICAL FOR KITING
+        // Buildings like Cannon should distract enemy troops
+        const buildingTargets = (unitsRef.current || []).filter(targetUnit =>
+          targetUnit.isOpponent !== u.isOpponent &&
+          targetUnit.hp > 0 &&
+          targetUnit.type === 'building' &&
+          !targetUnit.hidden?.active // Can't target hidden Teslas
+        );
+        targets = [...targets, ...buildingTargets];
+
         // Units that target buildings ONLY (Giant, Hog) ignore other units
         if (u.targetType !== 'buildings') {
           // For other units: PRIORITIZE towers, only target units if no towers in range
@@ -10442,6 +10452,7 @@ export default function App() {
           const unitTargets = (unitsRef.current || []).filter(targetUnit =>
             targetUnit.isOpponent !== u.isOpponent &&
             targetUnit.hp > 0 &&
+            targetUnit.type !== 'building' && // Buildings already added above
             !targetUnit.hidden?.active && // Untargetable if hidden (Royal Ghost, Tesla)
             !targetUnit.isZone && // Cannot target zones (graveyard, etc.)
             // Ground melee units cannot target flying units, but ranged units can
@@ -10449,20 +10460,21 @@ export default function App() {
             (u.type === 'flying' || (u.projectile && u.spriteId !== 'x_bow' && !u.groundOnly) || targetUnit.type !== 'flying')
           );
 
-          // Check if any tower is in range
-          const hasTowerInRange = targets.some(t => {
+          // Check if any tower/building is in range
+          const hasBuildingInRange = targets.some(t => {
             const dist = Math.sqrt(Math.pow(t.x - u.x, 2) + Math.pow(t.y - u.y, 2));
             return dist <= actualRange + 25;
           });
 
-          // Only add unit targets if no towers are in range
-          if (!hasTowerInRange) {
+          // Only add unit targets if no buildings are in range
+          if (!hasBuildingInRange) {
             targets = [...targets, ...unitTargets];
           }
         }
 
-        // LOCKED TARGET MECHANIC
+        // LOCKED TARGET MECHANIC with AGGRO system
         // If unit has a locked target, check if it's still alive and valid
+        // AGGRO: Units can switch targets if a new threat is much closer (kiting)
         if (u.lockedTarget) {
           // Check if locked target still exists and is alive
           const lockedTargetAlive = targets.some(t => t.id === u.lockedTarget);
@@ -10472,6 +10484,28 @@ export default function App() {
             u.lockedTarget = null;
             u.wasPushed = false;
           } else {
+            // AGGRO MECHANIC: Check if a closer target should pull aggro
+            const lockedTarget = targets.find(t => t.id === u.lockedTarget);
+            const distToLocked = lockedTarget ? Math.sqrt(Math.pow(lockedTarget.x - u.x, 2) + Math.pow(lockedTarget.y - u.y, 2)) : Infinity;
+
+            // Find closest target overall
+            let closestTarget = null;
+            let minDist = Infinity;
+            targets.forEach(t => {
+              const dist = Math.sqrt(Math.pow(t.x - u.x, 2) + Math.pow(t.y - u.y, 2));
+              if (dist < minDist) {
+                minDist = dist;
+                closestTarget = t;
+              }
+            });
+
+            // If another target is SIGNIFICANTLY closer (within aggro range), switch targets
+            // This allows kiting with buildings like Cannon or Ice Golem
+            const aggroRange = actualRange + 100; // Aggro if new target is 100px closer
+            if (closestTarget && closestTarget.id !== u.lockedTarget && minDist < distToLocked - aggroRange) {
+              u.lockedTarget = closestTarget.id; // Switch to closer target
+            }
+
             // Keep locked target - filter to only include locked target
             targets = targets.filter(t => t.id === u.lockedTarget);
           }
