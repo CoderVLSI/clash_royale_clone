@@ -7980,11 +7980,11 @@ export default function App() {
   };
 
   // Enemy State
+  const initialEnemyDeck = useMemo(() => generateRandomAIDeck(), []);
   const [enemyElixir, setEnemyElixir] = useState(5);
-  const [enemyHand, setEnemyHand] = useState([allDecks[4][0], allDecks[4][1], allDecks[4][2], allDecks[4][3]]);
-  const [enemyNextCard, setEnemyNextCard] = useState(allDecks[4][4]);
-  const [enemyDeckQueue, setEnemyDeckQueue] = useState([allDecks[4][5], allDecks[4][6], allDecks[4][7]]);
-  const [enemyDeckIndex, setEnemyDeckIndex] = useState(4);
+  const [enemyHand, setEnemyHand] = useState([initialEnemyDeck[0], initialEnemyDeck[1], initialEnemyDeck[2], initialEnemyDeck[3]]);
+  const [enemyNextCard, setEnemyNextCard] = useState(initialEnemyDeck[4]);
+  const [enemyDeckQueue, setEnemyDeckQueue] = useState([initialEnemyDeck[5], initialEnemyDeck[6], initialEnemyDeck[7]]);
 
   // Tower type configuration
   const [selectedTowerType, setSelectedTowerType] = useState('princess'); // princess, cannoneer, royal_chef, dagger_duchess
@@ -7998,6 +7998,14 @@ export default function App() {
 
   const getTowerStats = (towerType) => {
     return TOWER_TYPES[towerType] || TOWER_TYPES.princess;
+  };
+
+  // Generate a random AI deck from all available cards
+  const generateRandomAIDeck = () => {
+    const availableCards = CARDS.filter(card => !card.isToken); // Exclude tokens
+    const shuffled = [...availableCards].sort(() => Math.random() - 0.5);
+    const deck = shuffled.slice(0, 8);
+    return deck;
   };
 
   const playerTowerStats = getTowerStats(selectedTowerType);
@@ -8100,11 +8108,9 @@ export default function App() {
     setNextCard(shuffledPlayerDeck[4]);
     setDeckQueue([shuffledPlayerDeck[5], shuffledPlayerDeck[6], shuffledPlayerDeck[7]]);
 
-    // Enemy AI Deck Randomization
+    // Enemy AI Deck Randomization - generate random deck from all cards
     setEnemyElixir(5);
-    const randomEnemyDeckIndex = Math.floor(Math.random() * allDecks.length);
-    setEnemyDeckIndex(randomEnemyDeckIndex);
-    const enemyDeck = allDecks[randomEnemyDeckIndex];
+    const enemyDeck = generateRandomAIDeck();
     const shuffledEnemyDeck = [...enemyDeck].sort(() => Math.random() - 0.5);
     setEnemyHand([shuffledEnemyDeck[0], shuffledEnemyDeck[1], shuffledEnemyDeck[2], shuffledEnemyDeck[3]]);
     setEnemyNextCard(shuffledEnemyDeck[4]);
@@ -13590,21 +13596,20 @@ export default function App() {
       const playerUnits = allUnits.filter(u => !u.isOpponent && u.hp > 0);
       const enemyUnits = allUnits.filter(u => u.isOpponent && u.hp > 0);
       const enemyTowers = towersRef.current.filter(t => t.isOpponent && t.hp > 0);
-      const playerTowers = towersRef.current.filter(t => !t.isOpponent && t.hp > 0);
+      const playerTowers = towersRef.current.filter(t => !t.isOpponent && t.hp > 0 && t.type === 'princess'); // Only princess towers
 
       if (!currentHand.length) return;
 
-      // --- DECK STRATEGY SETTINGS ---
-      const deckType = enemyDeckIndex; // 0: Hog, 1: Bait, 2: BridgeSpam, 3: Golem, 4: Giant
-      let elixirThreshold = 5; // Default: play cards at 5 elixir
-
-      if (deckType === 3) elixirThreshold = 9.5; // Golem AI waits for max elixir
-      if (deckType === 2) elixirThreshold = 7;   // Bridge Spam waits for decent elixir
-      if (deckType === 0) elixirThreshold = 4;   // Hog Cycle plays fast
-
-      // Always defend if under attack
+      // Check if under attack
       const isUnderAttack = playerUnits.some(u => u.y < height / 2 + 100);
-      if (isUnderAttack) elixirThreshold = Math.min(elixirThreshold, 3);
+
+      // Dynamic elixir threshold - be more aggressive with more elixir
+      let elixirThreshold = isUnderAttack ? 3 : 5;
+
+      // Push aggressively when at high elixir
+      if (currentElixir >= 8 && !isUnderAttack) {
+        elixirThreshold = 0; // Always try to play when at 8+ elixir
+      }
 
       if (currentElixir < elixirThreshold) return;
 
@@ -13613,64 +13618,145 @@ export default function App() {
       let targetX = width / 2;
       let targetY = 100;
 
-      // 1. Spell Countering (Reactive)
-      const swarmUnits = playerUnits.filter(u => ['skeleton_army', 'minions', 'minion_horde', 'skeletons', 'bats'].includes(u.spriteId));
-      if (swarmUnits.length >= 3) {
-        const spellIdx = currentHand.findIndex(c => c.type === 'spell' && ['arrows', 'zap', 'fireball', 'poison'].includes(c.id));
-        if (spellIdx !== -1) {
-          cardToPlay = currentHand[spellIdx];
-          const target = swarmUnits[Math.floor(swarmUnits.length / 2)];
-          targetX = target.x; targetY = target.y;
-        }
-      }
+      // 1. PROACTIVE: High elixir push - play big win conditions
+      if (!isUnderAttack && currentElixir >= 7) {
+        // Look for win condition cards (tanks, big spells, beatdown)
+        const winConditions = ['golem', 'giant', 'pekka', 'prince', 'balloon', 'royal_giant', 'goblin_barrel', 'x_bow', 'mortal'];
+        const winConCard = currentHand.find(c => winConditions.includes(c.id) && c.cost <= currentElixir);
 
-      // 2. Win Condition / Deck Strategy (Proactive)
-      if (!cardToPlay) {
-        if (deckType === 3 && currentElixir >= 9.5) {
-          // Golem: Spawn in back
-          const golemIdx = currentHand.findIndex(c => c.id === 'golem');
-          if (golemIdx !== -1) {
-            cardToPlay = currentHand[golemIdx];
+        if (winConCard) {
+          cardToPlay = winConCard;
+
+          if (['golem', 'giant', 'pekka'].includes(winConCard.id)) {
+            // Tanks spawn in back
             targetX = Math.random() < 0.5 ? 70 : width - 70;
-            targetY = 50; // Deep back
-          }
-        } else if (deckType === 0) {
-          // Hog: Play at bridge
-          const hogIdx = currentHand.findIndex(c => c.id === 'hog_rider');
-          if (hogIdx !== -1) {
-            cardToPlay = currentHand[hogIdx];
+            targetY = 50;
+          } else if (winConCard.id === 'goblin_barrel') {
+            // Only target princess towers, NOT king
+            if (playerTowers.length > 0) {
+              const targetTower = playerTowers[Math.floor(Math.random() * playerTowers.length)];
+              targetX = targetTower.x;
+              targetY = targetTower.y;
+            } else {
+              cardToPlay = null; // Don't barrel if no princess towers
+            }
+          } else if (winConCard.id === 'royal_giant') {
+            // Royal Giant targets player's princess tower
+            if (playerTowers.length > 0) {
+              const targetTower = playerTowers[Math.floor(Math.random() * playerTowers.length)];
+              targetX = targetTower.x;
+              targetY = height / 2 - 80;
+            }
+          } else if (winConCard.id === 'x_bow') {
+            // X-Bow on bridge
+            targetX = Math.random() < 0.5 ? width / 2 - 30 : width / 2 + 30;
+            targetY = height / 2 - 60;
+          } else {
+            // Other win conditions at bridge
             targetX = Math.random() < 0.5 ? 95 : width - 95;
-            targetY = height / 2 - 40; // Bridge
-          }
-        } else if (deckType === 1) {
-          // Bait: Goblin Barrel on tower
-          const barrelIdx = currentHand.findIndex(c => c.id === 'goblin_barrel');
-          if (barrelIdx !== -1 && playerTowers.length > 0) {
-            cardToPlay = currentHand[barrelIdx];
-            const targetTower = playerTowers[Math.floor(Math.random() * playerTowers.length)];
-            targetX = targetTower.x; targetY = targetTower.y;
+            targetY = height / 2 - 40;
           }
         }
       }
 
-      // 3. Fallback: Defend or Cycle
+      // 2. REACTIVE: Defend against swarms with spells (avoid friendly fire)
       if (!cardToPlay) {
-        // Find best affordable card
+        const swarmUnits = playerUnits.filter(u => ['skeleton_army', 'minions', 'minion_horde', 'skeletons', 'bats', 'goblin_gang'].includes(u.spriteId));
+        if (swarmUnits.length >= 3) {
+          const spellIdx = currentHand.findIndex(c => c.type === 'spell' && ['arrows', 'zap', 'fireball', 'poison', 'log'].includes(c.id));
+          if (spellIdx !== -1) {
+            const spell = currentHand[spellIdx];
+            const target = swarmUnits[Math.floor(swarmUnits.length / 2)];
+
+            // Check if spell would hit own towers (friendly fire check)
+            const splashRadius = spell.id === 'fireball' || spell.id === 'poison' ? 50 : 30;
+            const wouldHitOwnTower = enemyTowers.some(t => {
+              const dist = Math.sqrt(Math.pow(t.x - target.x, 2) + Math.pow(t.y - target.y, 2));
+              return dist < splashRadius;
+            });
+
+            if (!wouldHitOwnTower) {
+              cardToPlay = spell;
+              targetX = target.x;
+              targetY = target.y;
+            }
+          }
+        }
+      }
+
+      // 3. REACTIVE: Defend against tanks/big pushes
+      if (!cardToPlay && isUnderAttack) {
+        const bigThreats = playerUnits.filter(u => ['golem', 'giant', 'pekka', 'prince', 'baby_dragon', 'hunter'].includes(u.spriteId));
+
+        if (bigThreats.length > 0) {
+          // Use high damage single target or building to distract
+          const defender = currentHand.find(c => {
+            if (c.cost > currentElixir) return false;
+            // Use buildings to distract
+            if (c.type === 'building') return true;
+            // Use high DPS troops
+            if (['minipekka', 'inferno_tower', 'inferno_dragon'].includes(c.id)) return true;
+            return false;
+          });
+
+          if (defender) {
+            cardToPlay = defender;
+            const threat = bigThreats[0];
+            targetX = threat.x;
+            targetY = threat.y > height / 2 ? 150 : 180; // Place between towers and threat
+          }
+        }
+      }
+
+      // 4. GENERAL PLAY: Cycle cards or push with medium elixir
+      if (!cardToPlay) {
         const affordable = currentHand.filter(c => c.cost <= currentElixir);
+
         if (affordable.length > 0) {
-          // Sort: prefer cheap cards if defending, expensive if building push
-          affordable.sort((a, b) => isUnderAttack ? (a.cost - b.cost) : (b.cost - a.cost));
+          // Prefer cheaper spells for cycle, or medium units for push
+          affordable.sort((a, b) => {
+            // Prioritize: buildings > spells > win conditions > cycle cards
+            if (a.type === 'building') return -1;
+            if (b.type === 'building') return 1;
+            if (a.type === 'spell') return -1;
+            if (b.type === 'spell') return 1;
+            return a.cost - b.cost;
+          });
+
           cardToPlay = affordable[0];
 
-          if (isUnderAttack) {
-            // Deploy defensively
-            targetX = playerUnits[0].x + (Math.random() * 20 - 10);
-            targetY = 150; // In front of towers
+          if (cardToPlay.type === 'building') {
+            // Buildings behind towers
+            targetX = Math.random() < 0.5 ? 90 : width - 90;
+            targetY = 120;
+          } else if (cardToPlay.type === 'spell') {
+            // Target player units or random area
+            if (playerUnits.length > 0) {
+              const target = playerUnits[Math.floor(Math.random() * playerUnits.length)];
+              targetX = target.x;
+              targetY = target.y;
+            } else {
+              targetX = width / 2 + (Math.random() * 100 - 50);
+              targetY = height / 2 - 100;
+            }
           } else {
-            // Deploy at bridge or back based on type
+            // Regular troops
             const isTank = cardToPlay.hp > 1500;
-            targetX = Math.random() < 0.5 ? 70 : width - 70;
-            targetY = isTank ? 50 : 120;
+            const isRanged = ['archer', 'magic_archer', 'musketeer', 'wizard', 'witch'].some(id => cardToPlay.id.includes(id));
+
+            if (isTank) {
+              // Tanks in back
+              targetX = Math.random() < 0.5 ? 70 : width - 70;
+              targetY = 50;
+            } else if (isRanged) {
+              // Ranged behind tanks
+              targetX = Math.random() < 0.5 ? 100 : width - 100;
+              targetY = 100;
+            } else {
+              // Melee at bridge
+              targetX = Math.random() < 0.5 ? 95 : width - 95;
+              targetY = height / 2 - 40;
+            }
           }
         }
       }
@@ -13678,10 +13764,10 @@ export default function App() {
       if (cardToPlay) {
         spawnCard(cardToPlay, targetX, targetY, true);
       }
-    }, 1800); // Faster decision making (1.8s)
+    }, 1500); // AI decision every 1.5 seconds
 
     return () => clearInterval(aiInterval);
-  }, [inGame, gameOver, enemyDeckIndex]);
+  }, [inGame, gameOver]);
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
