@@ -9920,14 +9920,39 @@ export default function App() {
                }
                
                // Golden Knight
-               else if (u.dashChain && u.lockedTarget) {
-                  u.isDashing = true; 
-                  u.dashEndTime = now + 500;
+               else if (u.dashChain) {
+                  // Dash chain: dash to multiple nearby enemies (up to 10)
+                  const dashRange = 100; // Range to find next target
+                  const maxDashes = 10;
+                  const dashDuration = 400; // Duration of entire chain
+
+                  // Find nearby enemies
+                  const nearbyEnemies = currentUnits.filter(target =>
+                     target.isOpponent !== u.isOpponent &&
+                     target.hp > 0 &&
+                     target.id !== u.lockedTarget
+                  ).map(target => ({
+                     ...target,
+                     distance: Math.sqrt(Math.pow(target.x - u.x, 2) + Math.pow(target.y - u.y, 2))
+                  }))
+                  .filter(e => e.distance <= dashRange)
+                  .sort((a, b) => a.distance - b.distance)
+                  .slice(0, maxDashes - 1); // Leave room for current target
+
+                  // Start dash chain
+                  u.isDashing = true;
+                  u.dashEndTime = now + dashDuration;
+                  u.dashTargets = nearbyEnemies.map(e => e.id); // Store target IDs
+                  u.currentDashIndex = 0;
+                  u.dashChainActive = true;
+
                   abilityUsed = true;
+
+                  // Visual effect for dash chain start
                   setVisualEffects(prev => [...prev, {
-                     id: Date.now() + Math.random(),
+                     id: 'dash_chain_start_' + now,
                      type: 'golden_dash',
-                     x: u.x, y: u.y, radius: 40, startTime: now, duration: 500
+                     x: u.x, y: u.y, radius: 50, startTime: now, duration: dashDuration
                   }]);
                }
 
@@ -9997,16 +10022,51 @@ export default function App() {
 
                // Boss Bandit
                else if (u.getawayAbility) {
-                  const teleportDist = u.isOpponent ? -120 : 120; // Teleport backwards
-                  u.y += teleportDist;
-                  u.hidden = { active: true, visibleHp: u.hp };
-                  u.hiddenEndTime = now + 1000;
-                  abilityUsed = true;
+                  // Short cast delay, then teleport back 6 tiles (~200px)
+                  const castDelay = 300; // 300ms cast time
+                  const teleportDist = u.isOpponent ? -200 : 200; // 6 tiles backwards
+
+                  // Schedule teleport after cast delay
+                  setTimeout(() => {
+                     setUnits(prevUnits => {
+                        return prevUnits.map(unit => {
+                           if (unit.id === u.id) {
+                              const newY = unit.y + teleportDist;
+                              return {
+                                 ...unit,
+                                 y: Math.max(10, Math.min(height - 10, newY)),
+                                 hidden: { active: true, visibleHp: unit.hp },
+                                 hiddenEndTime: Date.now() + 1000
+                              };
+                           }
+                           return unit;
+                        });
+                     });
+
+                     // Smoke effect at old position
+                     setVisualEffects(prev => [...prev, {
+                        id: 'getaway_smoke_' + Date.now(),
+                        type: 'smoke_cloud',
+                        x: u.x,
+                        y: u.y,
+                        radius: 30,
+                        startTime: Date.now(),
+                        duration: 800
+                     }]);
+                  }, castDelay);
+
+                  // Pre-cast visual effect
                   setVisualEffects(prev => [...prev, {
-                      id: 'getaway_' + now,
-                      type: 'fire_explosion', // Placeholder for smoke
-                      x: u.x, y: u.y - teleportDist, radius: 40, startTime: now, duration: 500
+                     id: 'getaway_cast_' + now,
+                     type: 'charging',
+                     x: u.x,
+                     y: u.y,
+                     radius: 25,
+                     startTime: now,
+                     duration: castDelay
                   }]);
+
+                  abilityUsed = true;
                }
 
                // Goblinstein
@@ -10745,6 +10805,70 @@ export default function App() {
            const monster = currentUnits.find(m => m.id === u.monsterId);
            if (monster) {
               monster.lightningDamageBuff = 0;
+           }
+        }
+
+        // Golden Knight Dash Chain - dash to multiple enemies
+        if (u.dashChainActive && u.dashEndTime > now) {
+           const dashSpeed = 25; // Fast movement during dash
+
+           // Move towards next dash target
+           if (u.dashTargets && u.dashTargets.length > 0) {
+              const nextTargetId = u.dashTargets[u.currentDashIndex || 0];
+              const nextTarget = currentUnits.find(t => t.id === nextTargetId && t.hp > 0);
+
+              if (nextTarget) {
+                 // Move towards target
+                 const dx = nextTarget.x - u.x;
+                 const dy = nextTarget.y - u.y;
+                 const dist = Math.sqrt(dx * dx + dy * dy);
+
+                 if (dist > dashSpeed) {
+                    const angle = Math.atan2(dy, dx);
+                    u.x += Math.cos(angle) * dashSpeed;
+                    u.y += Math.sin(angle) * dashSpeed;
+                 } else {
+                    // Reached target, deal damage and move to next
+                    damageEvents.push({
+                       targetId: nextTargetId,
+                       damage: u.damage * 2, // 2x damage
+                       attacker: u,
+                       attackerId: u.id,
+                       isOpponent: u.isOpponent
+                    });
+
+                    // Move to next target
+                    u.currentDashIndex = (u.currentDashIndex || 0) + 1;
+
+                    // If no more targets, end dash chain
+                    if (u.currentDashIndex >= u.dashTargets.length) {
+                       u.dashChainActive = false;
+                       u.isDashing = false;
+                    }
+                 }
+
+                 // Visual trail during dash
+                 setVisualEffects(prev => [...prev, {
+                    id: 'dash_trail_' + u.id + '_' + Date.now(),
+                    type: 'dash_trail',
+                    x: u.x,
+                    y: u.y,
+                    radius: 25,
+                    startTime: Date.now(),
+                    duration: 200
+                 }]);
+              } else {
+                 // Target dead, skip to next
+                 u.currentDashIndex = (u.currentDashIndex || 0) + 1;
+                 if (u.currentDashIndex >= u.dashTargets.length) {
+                    u.dashChainActive = false;
+                    u.isDashing = false;
+                 }
+              }
+           } else {
+              // No more targets, end dash
+              u.dashChainActive = false;
+              u.isDashing = false;
            }
         }
 
