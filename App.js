@@ -7057,7 +7057,7 @@ const BottomNavigation = ({ activeTab, onTabChange }) => {
 const MainLobby = ({
   activeTab, onTabChange, onStartGame, currentDeck, onSwapCards,
   dragHandlers, selectedDeckIndex, setSelectedDeckIndex, allDecks,
-  chests, onUnlockChest, onOpenChest
+  chests, onUnlockChest, onOpenChest, selectedTowerType, setSelectedTowerType
 }) => {
   const [showMenu, setShowMenu] = useState(false);
 
@@ -13725,6 +13725,8 @@ export default function App() {
           onUnlockChest={handleUnlockChest}
           onOpenChest={handleOpenChest}
           onFriendlyBattle={handleFriendlyBattle}
+          selectedTowerType={selectedTowerType}
+          setSelectedTowerType={setSelectedTowerType}
         />
         {openingChest && (
           <ChestOpeningModal
