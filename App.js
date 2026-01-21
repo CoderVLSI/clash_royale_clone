@@ -10030,8 +10030,22 @@ export default function App() {
                   const castDelay = 300; // 300ms cast time
                   const teleportDist = u.isOpponent ? -200 : 200; // 6 tiles backwards
 
+                  // Pre-cast visual effect - show she's preparing to teleport
+                  setVisualEffects(prev => [...prev, {
+                     id: 'getaway_cast_' + now,
+                     type: 'queen_cloak', // Reuse cloak effect for cast prep
+                     x: u.x,
+                     y: u.y,
+                     startTime: now,
+                     duration: castDelay
+                  }]);
+
                   // Schedule teleport after cast delay
                   setTimeout(() => {
+                     // Store old position for smoke effect
+                     const oldX = u.x;
+                     const oldY = u.y;
+
                      setUnits(prevUnits => {
                         return prevUnits.map(unit => {
                            if (unit.id === u.id) {
@@ -10047,28 +10061,17 @@ export default function App() {
                         });
                      });
 
-                     // Smoke effect at old position
+                     // Smoke effect at old position (where she teleported FROM)
                      setVisualEffects(prev => [...prev, {
                         id: 'getaway_smoke_' + Date.now(),
-                        type: 'smoke_cloud',
-                        x: u.x,
-                        y: u.y,
+                        type: 'fire_explosion', // Reuse explosion as smoke puff
+                        x: oldX,
+                        y: oldY,
                         radius: 30,
                         startTime: Date.now(),
-                        duration: 800
+                        duration: 600
                      }]);
                   }, castDelay);
-
-                  // Pre-cast visual effect
-                  setVisualEffects(prev => [...prev, {
-                     id: 'getaway_cast_' + now,
-                     type: 'charging',
-                     x: u.x,
-                     y: u.y,
-                     radius: 25,
-                     startTime: now,
-                     duration: castDelay
-                  }]);
 
                   abilityUsed = true;
                }
