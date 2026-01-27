@@ -5853,11 +5853,14 @@ const Unit = ({ unit }) => {
 
   const isStealthed = unit.hidden && unit.hidden.active;
 
+  // Boss Bandit is FULLY invisible (opacity 0), others are semi-transparent (0.4)
+  const stealthOpacity = unit.spriteId === 'boss_bandit' ? 0 : 0.4;
+
   return (
     <View style={[
       styles.unit,
       { left: unit.x - unitSize / 2, top: unit.y - unitSize / 2, width: unitSize, height: unitSize },
-      isStealthed && unit.spriteId !== 'suspicious_bush' && { opacity: 0.4 }
+      isStealthed && unit.spriteId !== 'suspicious_bush' && { opacity: stealthOpacity }
     ]}>
       {/* Range Indicator Circle - Only for Buildings and Units with Spawn Damage (e.g. Mega Knight) */}
       {Boolean(unit.range && unit.range > 0 && (unit.type === 'building' || unit.spawnDamage)) && (
@@ -7492,12 +7495,18 @@ const GameBoard = ({
         <View style={styles.deckContainer}>
         {/* Champion Ability Button */}
         {(() => {
-           // Find champion card in player's deck (hand + next + queue)
-           const allDeckCards = [...(hand || []), nextCard, ...(deckQueue || [])].filter(c => c);
-           const championCard = allDeckCards.find(c => c && c.rarity === 'champion');
+           // First, check if a champion is deployed on field
+           const deployedChampion = (units || []).find(u => !u.isOpponent && u.rarity === 'champion');
 
-           // Find if champion is deployed on field
-           const deployedChampion = (units || []).find(u => !u.isOpponent && u.rarity === 'champion' && u.spriteId === championCard?.id);
+           // If champion is deployed, get their card data
+           let championCard = null;
+           if (deployedChampion) {
+              championCard = CARDS.find(c => c.id === deployedChampion.spriteId);
+           } else {
+              // If no champion deployed, look in hand/next
+              const allDeckCards = [...(hand || []), nextCard].filter(c => c);
+              championCard = allDeckCards.find(c => c && c.rarity === 'champion');
+           }
 
            if (championCard) {
               const isDeployed = !!deployedChampion;
@@ -7555,7 +7564,7 @@ const GameBoard = ({
               );
            }
            return null;
-        })}
+        })()}
           <View style={styles.nextCardContainer}>
             <Text style={styles.nextLabel}>NEXT</Text>
             {nextCard && <Card card={nextCard} isNext={true} />}
@@ -10040,12 +10049,12 @@ export default function App() {
                      duration: castDelay
                   }]);
 
+                  // Store old position for smoke effect
+                  const oldX = u.x;
+                  const oldY = u.y;
+
                   // Schedule teleport after cast delay
                   setTimeout(() => {
-                     // Store old position for smoke effect
-                     const oldX = u.x;
-                     const oldY = u.y;
-
                      setUnits(prevUnits => {
                         return prevUnits.map(unit => {
                            if (unit.id === u.id) {
@@ -10054,7 +10063,8 @@ export default function App() {
                                  ...unit,
                                  y: Math.max(10, Math.min(height - 10, newY)),
                                  hidden: { active: true, visibleHp: unit.hp },
-                                 hiddenEndTime: Date.now() + 1000
+                                 hiddenEndTime: Date.now() + 1000,
+                                 abilityActiveRequest: false // Clear flag AFTER teleport
                               };
                            }
                            return unit;
@@ -10073,7 +10083,17 @@ export default function App() {
                      }]);
                   }, castDelay);
 
-                  abilityUsed = true;
+                  // Don't set abilityUsed yet - wait for setTimeout to complete
+                  // Don't clear abilityActiveRequest yet - will clear in setTimeout
+                  u.lastAbilityTime = now; // Start cooldown immediately
+
+                  // Deduct elixir immediately
+                  if (!u.isOpponent) {
+                     setElixir(prev => Math.max(0, prev - cost));
+                  } else {
+                     setEnemyElixir(prev => Math.max(0, prev - cost));
+                  }
+                  return { ...u, lastAbilityTime: now }; // Skip the standard flag clearing
                }
 
                // Goblinstein
@@ -13435,8 +13455,14 @@ export default function App() {
 
             tower.pancakeTimer = (tower.pancakeTimer || 0) + cookProgress;
 
+            // Debug: Log cooking progress every second
+            if (Math.floor(tower.pancakeTimer / 1000) > Math.floor((tower.pancakeTimer - cookProgress) / 1000)) {
+              console.log('[ROYAL CHEF] Cooking:', Math.floor(tower.pancakeTimer / 1000), '/', Math.floor(baseCookTime / 1000), 'seconds (', Math.round(cookingMultiplier * 100), '% speed)');
+            }
+
             // Check if pancake is ready
             if (tower.pancakeTimer >= baseCookTime) {
+              console.log('[ROYAL CHEF] Pancake ready! Looking for target...');
               // Find best target: highest HP ally >33% health, not yet fed
               const allyUnits = currentUnits.filter(u =>
                 !u.isOpponent &&
@@ -13457,9 +13483,10 @@ export default function App() {
                 const newMaxHp = target.maxHp * levelMultiplier;
                 const newDamage = target.damage ? target.damage * levelMultiplier : target.damage;
 
-                // Update the unit with buff
-                currentUnits = currentUnits.map(u => {
+                // Update the unit with buff - CRITICAL: Must call setUnits to persist!
+                setUnits(prevUnits => prevUnits.map(u => {
                   if (u.id === target.id) {
+                    console.log('[ROYAL CHEF] Pancake thrown to', u.spriteId, '- HP:', u.hp, '→', newHp, 'Damage:', u.damage, '→', newDamage);
                     return {
                       ...u,
                       hp: newHp,
@@ -13469,7 +13496,7 @@ export default function App() {
                     };
                   }
                   return u;
-                });
+                }));
 
                 // Track that this unit was fed
                 if (!tower.fedUnits) tower.fedUnits = [];
@@ -13501,6 +13528,7 @@ export default function App() {
                   duration: 1000
                 }]);
               } else {
+                console.log('[ROYAL CHEF] No valid targets for pancake - waiting for units to deploy');
                 // No valid targets - keep timer at max until a unit is deployed
                 tower.pancakeTimer = baseCookTime;
               }
