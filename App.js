@@ -23,7 +23,7 @@ const FIRE_RATE_KING = 1000;
 // Card Definitions & Unit Stats
 const CARDS = [
   // Original 8 cards
-  { id: 'knight', name: 'Knight', cost: 3, color: '#f1c40f', hp: 1766, speed: 1.5, type: 'ground', range: 20, damage: 202, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common' },
+  { id: 'knight', name: 'Knight', cost: 3, color: '#f1c40f', hp: 1766, speed: 1.5, type: 'ground', range: 20, damage: 202, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common', evolvesTo: 'evolved_knight', evolutionCycles: 2 },
   { id: 'archers', name: 'Archers', cost: 3, color: '#e67e22', hp: 304, speed: 2, type: 'ground', range: 80, damage: 107, attackSpeed: 900, projectile: 'arrow', count: 2, rarity: 'common' },
   { id: 'giant', name: 'Giant', cost: 5, color: '#e74c3c', hp: 4091, speed: 1, type: 'ground', range: 20, damage: 254, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', rarity: 'rare' },
   { id: 'mini_pekka', name: 'Mini P', cost: 4, color: '#9b59b6', hp: 1361, speed: 2.5, type: 'ground', range: 25, damage: 720, attackSpeed: 1600, projectile: null, count: 1, rarity: 'rare' },
@@ -589,6 +589,27 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
         <Svg width={size} height={size} viewBox="0 0 100 100">
           <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
           <Path d="M50 20 L50 80 M30 35 L70 35" stroke="white" strokeWidth="8" strokeLinecap="round" />
+        </Svg>
+      );
+    case 'evolved_knight':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          {/* Purple evolution aura - outer glow */}
+          <Circle cx="50" cy="50" r="48" fill="none" stroke="#9b59b6" strokeWidth="3" opacity="0.8" />
+          <Circle cx="50" cy="50" r="52" fill="none" stroke="#8e44ad" strokeWidth="2" opacity="0.5" />
+          {/* Purple shimmer particles */}
+          <Circle cx="20" cy="30" r="3" fill="#e056fd" opacity="0.7" />
+          <Circle cx="80" cy="25" r="2" fill="#e056fd" opacity="0.6" />
+          <Circle cx="15" cy="70" r="2.5" fill="#be2edd" opacity="0.5" />
+          <Circle cx="85" cy="65" r="3" fill="#e056fd" opacity="0.6" />
+          <Circle cx="50" cy="10" r="2" fill="#be2edd" opacity="0.7" />
+          {/* Base knight */}
+          <Circle cx="50" cy="50" r="45" fill={color} stroke="#9b59b6" strokeWidth="3" />
+          <Path d="M50 20 L50 80 M30 35 L70 35" stroke="white" strokeWidth="8" strokeLinecap="round" />
+          {/* Evolution sparkles */}
+          <Circle cx="30" cy="20" r="2" fill="#f1c40f" />
+          <Circle cx="70" cy="20" r="2" fill="#f1c40f" />
+          <Circle cx="25" cy="50" r="1.5" fill="#f1c40f" />
         </Svg>
       );
     case 'archers':
@@ -5942,6 +5963,42 @@ const Unit = ({ unit }) => {
         <View style={{
           position: 'absolute',
           top: -2, left: -2, right: -2, bottom: -2,
+          backgroundColor: 'rgba(52, 152, 219, 0.3)',
+          borderRadius: unitSize / 2,
+          borderWidth: 2,
+          borderColor: '#3498db',
+          zIndex: 4
+        }} />
+      )}
+
+      {/* Evolution Shield Effect (Evolved Knight) */}
+      {unit.evolution && unit.damageReduction && !unit.isAttacking && (
+        <View style={{
+          position: 'absolute',
+          top: -5, left: -5, right: -5, bottom: -5,
+          borderRadius: unitSize / 2,
+          borderWidth: 3,
+          borderColor: '#9b59b6',
+          zIndex: 4,
+          opacity: 0.7
+        }}>
+          {/* Shield glow */}
+          <View style={{
+            position: 'absolute',
+            top: -10, left: -10, right: -10, bottom: -10,
+            borderRadius: unitSize / 2 + 10,
+            borderWidth: 2,
+            borderColor: '#be2edd',
+            opacity: 0.4
+          }} />
+        </View>
+      )}
+
+      {/* Ice/Slow Effect Overlay */}
+      {isSlowed && (
+        <View style={{
+          position: 'absolute',
+          top: -2, left: -2, right: -2, bottom: -2,
           backgroundColor: 'rgba(135, 206, 250, 0.4)',
           borderRadius: unitSize / 2,
           borderWidth: 1,
@@ -6617,7 +6674,7 @@ const DeckSlotSelector = memo(({ visible, onClose, cards, onSwap }) => {
   );
 });
 
-const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeckIndex, setSelectedDeckIndex, selectedTower: initialSelectedTower = 'princess', setSelectedTower: onSetSelectedTower, onRandomizeDeck }) => {
+const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeckIndex, setSelectedDeckIndex, allEvolutionSlots, setAllEvolutionSlots, selectedTower: initialSelectedTower = 'princess', setSelectedTower: onSetSelectedTower, onRandomizeDeck }) => {
   const [selectedCard, setSelectedCard] = useState(null);
   const [cardMenuCard, setCardMenuCard] = useState(null);
   const [showSlotSelector, setShowSlotSelector] = useState(null);
@@ -6800,6 +6857,57 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
             </View>
           </View>
         </Modal>
+
+        {/* EVOLUTION SLOTS - 2 slots with purple borders */}
+        <View style={styles.evolutionSlotsContainer}>
+          <Text style={styles.evolutionSlotsTitle}>EVOLUTION SLOTS</Text>
+          <View style={styles.evolutionSlotsRow}>
+            {[0, 1].map(slotIndex => {
+              const evolutionCard = allEvolutionSlots[selectedDeckIndex]?.[slotIndex];
+              return (
+                <TouchableOpacity
+                  key={slotIndex}
+                  style={[
+                    styles.evolutionSlot,
+                    { borderColor: '#9b59b6' }
+                  ]}
+                  onPress={() => {
+                    // Handle evolution slot tap
+                    if (evolutionCard) {
+                      // Remove card from evolution slot
+                      setAllEvolutionSlots(prev => {
+                        const newSlots = [...prev];
+                        newSlots[selectedDeckIndex] = [...newSlots[selectedDeckIndex]];
+                        newSlots[selectedDeckIndex][slotIndex] = null;
+                        return newSlots;
+                      });
+                    } else {
+                      // Open card selector
+                      setCardMenuCard({ type: 'evolution_slot', slotIndex });
+                      setShowSlotSelector(true);
+                    }
+                  }}
+                >
+                  {evolutionCard ? (
+                    <>
+                      <UnitSprite id={evolutionCard.id} size={30} />
+                      <View style={styles.evolutionSlotCost}>
+                        <Text style={styles.evolutionSlotCostText}>{evolutionCard.cost}</Text>
+                      </View>
+                      {/* Remove button */}
+                      <View style={styles.evolutionSlotRemove}>
+                        <Text style={{ fontSize: 16, color: '#e74c3c' }}>✕</Text>
+                      </View>
+                    </>
+                  ) : (
+                    <Text style={styles.evolutionSlotPlaceholder}>+</Text>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+          <Text style={styles.evolutionSlotsHint}>Tap to select cards to evolve</Text>
+        </View>
 
         <View style={styles.deckCardGrid}>
           <View style={styles.cardRowCompact}>
@@ -7197,6 +7305,8 @@ const MainLobby = ({
         selectedDeckIndex={selectedDeckIndex}
         setSelectedDeckIndex={setSelectedDeckIndex}
         allDecks={allDecks}
+        allEvolutionSlots={allEvolutionSlots}
+        setAllEvolutionSlots={setAllEvolutionSlots}
         selectedTower={selectedTowerType}
         setSelectedTower={setSelectedTowerType}
         onRandomizeDeck={onRandomizeDeck}
@@ -8048,8 +8158,17 @@ export default function App() {
     };
   }, []);
 
-  // Multiple deck slots - 5 decks of 8 cards each
+  // Multiple deck slots - 5 decks of 8 cards each + 2 evolution slots
   const getDeckByIds = (ids) => ids.map(id => CARDS.find(c => c.id === id)).filter(Boolean);
+
+  // Evolution requirements (cycles needed for each evolution)
+  const EVOLUTION_REQUIREMENTS = {
+    'knight': 2,
+    'archers': 3,
+    'barbarians': 3,
+    'skeletons': 2,
+    'valkyrie': 4
+  };
 
   const [allDecks, setAllDecks] = useState([
     getDeckByIds(['mother_witch', 'elixir_golem', 'ice_golem', 'ice_spirit', 'skeletons', 'fireball', 'zap', 'hog_rider']), // Test Deck
@@ -8058,6 +8177,16 @@ export default function App() {
     getDeckByIds(['golem', 'night_witch', 'baby_dragon', 'mega_minion', 'lightning', 'zap', 'elite_barbarians', 'mini_pekka']), // Golem Beatdown
     getDeckByIds(['giant', 'prince', 'archers', 'spear_goblins', 'fireball', 'zap', 'minions', 'valkyrie']) // Classic Giant
   ]);
+
+  // Evolution slots - 2 slots per deck for selecting cards to evolve
+  const [allEvolutionSlots, setAllEvolutionSlots] = useState([
+    [null, null], // Deck 0 evolution slots
+    [null, null], // Deck 1 evolution slots
+    [null, null], // Deck 2 evolution slots
+    [null, null], // Deck 3 evolution slots
+    [null, null]  // Deck 4 evolution slots
+  ]);
+
   const [selectedDeckIndex, setSelectedDeckIndex] = useState(0);
 
   // Force update Test Deck if Mother Witch is missing (handles HMR/Persistence issues)
@@ -8086,6 +8215,9 @@ export default function App() {
   const [dragPosition, setDragPosition] = useState({ x: 0, y: 0 });
   const [screenShake, setScreenShake] = useState(null);
 
+  // Evolution cycle tracking
+  const [cardCycles, setCardCycles] = useState({}); // Tracks how many times each card has been drawn
+
   const handleSwapCards = (source, toIndex) => {
     // source can be index (deck swap) or card object (collection swap)
     // toIndex is always a deck slot (0-7)
@@ -8111,6 +8243,29 @@ export default function App() {
       newDecks[selectedDeckIndex] = currentDeck;
       return newDecks;
     });
+  };
+
+  // Evolution helper: Check if card should evolve based on cycles and evolution slots
+  const checkEvolution = (card) => {
+    if (!card || !card.evolvesTo) return card;
+
+    // Check if this card is in an evolution slot
+    const evolutionSlots = allEvolutionSlots[selectedDeckIndex] || [];
+    const isInEvolutionSlot = evolutionSlots.some(slot => slot?.id === card.id);
+
+    if (!isInEvolutionSlot) return card;
+
+    // Get current cycle count for this card
+    const currentCycles = cardCycles[card.id] || 0;
+    const requiredCycles = card.evolutionCycles || 2;
+
+    // If reached required cycles, return evolved version
+    if (currentCycles >= requiredCycles) {
+      const evolvedCard = CARDS.find(c => c.id === card.evolvesTo);
+      return evolvedCard || card;
+    }
+
+    return card;
   };
 
   const handleRandomizeDeck = () => {
@@ -9043,6 +9198,10 @@ export default function App() {
             rarity: actualCard.rarity,
             abilityCost: actualCard.abilityCost,
 
+            evolution: actualCard.evolution || false,
+            damageReduction: actualCard.damageReduction || 0,
+            isAttacking: false,
+
             charge: actualCard.charge ? { active: false, distance: 0, threshold: 2 } : undefined,
             // Champion Properties
             dashChain: actualCard.dashChain || false,
@@ -9378,6 +9537,18 @@ export default function App() {
         const newNext = newQueue.shift();
 
         if (card.id !== 'mirror') newQueue.push(card);
+
+        // EVOLUTION: Track cycles - increment cycle count for the card being drawn
+        if (newNext && !isOpponent) {
+          setCardCycles(prev => {
+            const cardId = newNext.id;
+            const currentCycles = prev[cardId] || 0;
+            return {
+              ...prev,
+              [cardId]: currentCycles + 1
+            };
+          });
+        }
 
         setTargetNext(newNext);
 
@@ -11507,6 +11678,12 @@ export default function App() {
                 return { ...u, lastAttack: now, hp: 0, hidden: u.hidden, charge: u.charge ? { ...u.charge, distance: 0, active: false } : u.charge, lockedTarget: u.lockedTarget, wasPushed: false, wasStunned: u.wasStunned };
               }
 
+              // EVOLUTION: Track attack state for evolved knight shield
+              let wasAttacking = u.isAttacking || false;
+              if (u.evolution && u.damageReduction) {
+                wasAttacking = true;
+              }
+
               // Rune Giant - enhance 2 closest allies every 3rd hit (NOT a kamikaze unit)
               if (u.runeEnhancer) {
                 const currentHits = (u.runeHits || 0) + 1;
@@ -11588,12 +11765,17 @@ export default function App() {
             }
             // Reset charge when Prince attacks (consumes charge)
             const updatedCharge = u.charge ? { ...u.charge, distance: 0, active: false } : u.charge;
+
+            // EVOLUTION: Set isAttacking true when evolved unit attacks (resets after attack speed)
+            const isNowAttacking = u.evolution ? true : undefined;
+
             return {
               ...u,
               lastAttack: now,
               hidden: u.hidden,
               charge: updatedCharge,
               lockedTarget: u.lockedTarget,
+              isAttacking: isNowAttacking,
               wasPushed: false,
               wasStunned: u.wasStunned,
               // Preserve new card properties
@@ -11936,6 +12118,12 @@ export default function App() {
             isDashingNow = false;
           }
 
+          // EVOLUTION: Reset isAttacking after attack animation completes
+          let isAttackingNow = u.isAttacking || false;
+          if (isAttackingNow && u.lastAttack && (now - u.lastAttack) >= (u.attackSpeed || 1000)) {
+            isAttackingNow = false;
+          }
+
           // Track Inferno Tower target for damage ramp reset
           if (u.damageRamp && u.lockedTarget && u.lastTargetId !== u.lockedTarget) {
             // Target changed, reset damage ramp
@@ -11963,6 +12151,7 @@ export default function App() {
             wasStunned: u.wasStunned,
             isJumping: isJumpingNow,
             jumpTargetId: u.jumpTargetId,
+            isAttacking: isAttackingNow,
             // Preserve new card properties
             dashRange: u.dashRange || 80,
             isDashing: isDashingNow,
@@ -12051,6 +12240,11 @@ export default function App() {
                   newShieldHp -= remainingDamage;
                   remainingDamage = 0;
                 }
+              }
+
+              // EVOLUTION SHIELD: Evolved Knight takes 60% less damage when not attacking
+              if (unit.evolution && unit.damageReduction && !unit.isAttacking) {
+                remainingDamage = Math.floor(remainingDamage * (1 - unit.damageReduction));
               }
 
               let updatedUnit = { ...unit, hp: unit.hp - remainingDamage, currentShieldHp: newShieldHp };
@@ -17521,5 +17715,80 @@ const styles = StyleSheet.create({
     color: '#7f8c8d',
     fontWeight: 'bold',
     fontSize: 10,
+  },
+  // --- Evolution Slots Styles ---
+  evolutionSlotsContainer: {
+    width: '100%',
+    marginTop: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    backgroundColor: 'rgba(155, 89, 182, 0.1)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(155, 89, 182, 0.3)',
+  },
+  evolutionSlotsTitle: {
+    color: '#9b59b6',
+    fontSize: 11,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    textAlign: 'center',
+    letterSpacing: 1,
+  },
+  evolutionSlotsRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 15,
+  },
+  evolutionSlot: {
+    width: 60,
+    height: 70,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    borderRadius: 8,
+    borderWidth: 3,
+    borderStyle: 'dashed',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  evolutionSlotPlaceholder: {
+    fontSize: 30,
+    color: '#9b59b6',
+    fontWeight: 'bold',
+  },
+  evolutionSlotCost: {
+    position: 'absolute',
+    bottom: 2,
+    left: 2,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 8,
+    width: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  evolutionSlotCostText: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  evolutionSlotRemove: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e74c3c',
+  },
+  evolutionSlotsHint: {
+    color: '#aaa',
+    fontSize: 9,
+    textAlign: 'center',
+    marginTop: 5,
   },
 });
