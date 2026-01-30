@@ -2899,11 +2899,33 @@ const SpellInfoTooltip = ({ visible, card, onClose }) => {
   );
 };
 
-const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd, isDragging, lastPlayedCard, onLongPress }) => {
+const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd, isDragging, lastPlayedCard, onLongPress, cardCycles = {}, allEvolutionSlots, selectedDeckIndex }) => {
   // Guard against undefined card
   if (!card) {
     return null;
   }
+
+  // EVOLUTION: Calculate cycle progress for this card
+  const getCycleProgress = () => {
+    if (!card.evolvesTo || !allEvolutionSlots) return null;
+
+    // Check if this card is in an evolution slot
+    const evolutionSlots = allEvolutionSlots[selectedDeckIndex] || [];
+    const isInEvolutionSlot = evolutionSlots.some(slot => slot?.id === card.id);
+
+    if (!isInEvolutionSlot) return null;
+
+    const currentCycles = cardCycles[card.id] || 0;
+    const requiredCycles = card.evolutionCycles || 2;
+
+    return {
+      current: currentCycles,
+      required: requiredCycles,
+      ready: currentCycles >= requiredCycles
+    };
+  };
+
+  const cycleProgress = getCycleProgress();
 
   // Calculate display cost for Mirror card
   const displayCost = card.id === 'mirror' && lastPlayedCard
@@ -3108,6 +3130,30 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
       </View>
 
       {isNext && <Text style={styles.nextLabel}>Next</Text>}
+
+      {/* EVOLUTION: Cycle progress indicators */}
+      {cycleProgress && (
+        <View style={{
+          position: 'absolute',
+          bottom: -5,
+          flexDirection: 'row',
+          gap: 3
+        }}>
+          {Array.from({ length: cycleProgress.required }).map((_, index) => (
+            <View
+              key={index}
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: 4,
+                backgroundColor: index < cycleProgress.current ? '#9b59b6' : 'rgba(155, 89, 182, 0.3)',
+                borderWidth: 1,
+                borderColor: '#9b59b6'
+              }}
+            />
+          ))}
+        </View>
+      )}
     </View>
   );
 }, (prevProps, nextProps) => {
@@ -7350,7 +7396,10 @@ const GameBoard = ({
   isOvertime, showOvertimeAlert,
   isTowerDecay, showTowerDecayAlert,
   audioEnabled, setAudioEnabled, onConcede,
-  onActivateAbility
+  onActivateAbility,
+  cardCycles = {},
+  allEvolutionSlots,
+  selectedDeckIndex
 }) => {
   const [showSettings, setShowSettings] = useState(false);
   const [spellInfoCard, setSpellInfoCard] = useState(null);
@@ -7677,7 +7726,7 @@ const GameBoard = ({
         })()}
           <View style={styles.nextCardContainer}>
             <Text style={styles.nextLabel}>NEXT</Text>
-            {nextCard && <Card card={nextCard} isNext={true} />}
+            {nextCard && <Card card={nextCard} isNext={true} cardCycles={cardCycles} allEvolutionSlots={allEvolutionSlots} selectedDeckIndex={selectedDeckIndex} />}
           </View>
 
           <View style={styles.handContainer}>
@@ -7692,6 +7741,9 @@ const GameBoard = ({
                 onDragEnd={handleDragEnd}
                 onLongPress={handleSpellLongPress}
                 isDragging={draggingCard && draggingCard.id === card.id}
+                cardCycles={cardCycles}
+                allEvolutionSlots={allEvolutionSlots}
+                selectedDeckIndex={selectedDeckIndex}
               />
             ))}
           </View>
@@ -8420,6 +8472,9 @@ export default function App() {
     doubleElixirTriggeredRef.current = false;
     overtimeStartedRef.current = false;
     towerDecayStartedRef.current = false;
+
+    // EVOLUTION: Reset cycles at start of battle
+    setCardCycles({});
 
     // Player Deck Randomization
     const currentDeck = userCards || allDecks[0];
@@ -9522,7 +9577,9 @@ export default function App() {
 
         if (cardIndex !== -1) newHand.splice(cardIndex, 1);
 
-        newHand.push(nextCardToUse);
+        // EVOLUTION: Check if card should evolve before adding to hand
+        const cardToAdd = checkEvolution(nextCardToUse);
+        newHand.push(cardToAdd);
 
         return newHand;
 
@@ -9550,7 +9607,9 @@ export default function App() {
           });
         }
 
-        setTargetNext(newNext);
+        // Apply evolution to nextCard before setting it
+        const evolvedNext = !isOpponent && newNext ? checkEvolution(newNext) : newNext;
+        setTargetNext(evolvedNext);
 
         return newQueue;
 
@@ -14572,6 +14631,9 @@ export default function App() {
         setAudioEnabled={setAudioEnabled}
         onConcede={concedeGame}
         onActivateAbility={activateChampionAbility}
+        cardCycles={cardCycles}
+        allEvolutionSlots={allEvolutionSlots}
+        selectedDeckIndex={selectedDeckIndex}
       />      {globalDraggingCard && (
         <View style={[styles.dragProxy, {
           position: 'absolute',
