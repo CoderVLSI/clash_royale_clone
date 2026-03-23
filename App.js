@@ -24,7 +24,7 @@ const FIRE_RATE_KING = 1000;
 const CARDS = [
   // Original 8 cards
   { id: 'knight', name: 'Knight', cost: 3, color: '#f1c40f', hp: 1766, speed: 1.5, type: 'ground', range: 20, damage: 202, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common', evolvesTo: 'evolved_knight', evolutionCycles: 2 },
-  { id: 'archers', name: 'Archers', cost: 3, color: '#e67e22', hp: 304, speed: 2, type: 'ground', range: 80, damage: 107, attackSpeed: 900, projectile: 'arrow', count: 2, rarity: 'common' },
+  { id: 'archers', name: 'Archers', cost: 3, color: '#e67e22', hp: 304, speed: 2, type: 'ground', range: 80, damage: 107, attackSpeed: 900, projectile: 'arrow', count: 2, rarity: 'common', evolvesTo: 'evolved_archers', evolutionCycles: 2 },
   { id: 'giant', name: 'Giant', cost: 5, color: '#e74c3c', hp: 4091, speed: 1, type: 'ground', range: 20, damage: 254, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', rarity: 'rare' },
   { id: 'mini_pekka', name: 'Mini P', cost: 4, color: '#9b59b6', hp: 1361, speed: 2.5, type: 'ground', range: 25, damage: 720, attackSpeed: 1600, projectile: null, count: 1, rarity: 'rare' },
   { id: 'spear_goblins', name: 'Spear Gobs', cost: 2, color: '#2ecc71', hp: 133, speed: 3, type: 'ground', range: 110, damage: 81, attackSpeed: 1700, projectile: 'spear', count: 3, rarity: 'common' },
@@ -35,12 +35,12 @@ const CARDS = [
 
   // New cards
   { id: 'cannon', name: 'Cannon', cost: 3, color: '#8B4513', hp: 896, speed: 0, type: 'building', range: 90, damage: 212, attackSpeed: 900, projectile: 'cannonball', count: 1, lifetime: 30, rarity: 'common' },
-  { id: 'barbarians', name: 'Barbarians', cost: 5, color: '#CD853F', hp: 670, speed: 1.5, type: 'ground', range: 30, damage: 192, attackSpeed: 1300, projectile: null, count: 5, rarity: 'common' },
+  { id: 'barbarians', name: 'Barbarians', cost: 5, color: '#CD853F', hp: 670, speed: 1.5, type: 'ground', range: 30, damage: 192, attackSpeed: 1300, projectile: null, count: 5, rarity: 'common', evolvesTo: 'evolved_barbarians', evolutionCycles: 1 },
   { id: 'arrows', name: 'Arrows', cost: 3, color: '#2ecc71', type: 'spell', damage: 366, radius: 40, count: 1, rarity: 'common' },
   { id: 'zap', name: 'Zap', cost: 2, color: '#3498db', type: 'spell', damage: 192, radius: 35, count: 1, stun: 0.5, rarity: 'common' },
   { id: 'minions', name: 'Minions', cost: 3, color: '#9b59b6', hp: 230, speed: 3, type: 'flying', range: 50, damage: 102, attackSpeed: 1000, projectile: 'dark_ball', count: 3, rarity: 'common' },
   { id: 'skeleton_army', name: 'Skeleton Army', cost: 3, color: '#ecf0f1', hp: 81, speed: 2, type: 'ground', range: 25, damage: 81, attackSpeed: 1000, projectile: null, count: 15, rarity: 'epic' },
-  { id: 'skeletons', name: 'Skelly', cost: 1, color: '#bdc3c7', hp: 81, speed: 2, type: 'ground', range: 25, damage: 81, attackSpeed: 1000, projectile: null, count: 3, rarity: 'common' },
+  { id: 'skeletons', name: 'Skelly', cost: 1, color: '#bdc3c7', hp: 81, speed: 2, type: 'ground', range: 25, damage: 81, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common', evolvesTo: 'evolved_skeletons', evolutionCycles: 2 },
   { id: 'valkyrie', name: 'Valkyrie', cost: 4, color: '#e74c3c', hp: 1908, speed: 1.5, type: 'ground', range: 25, damage: 267, attackSpeed: 1500, projectile: null, count: 1, splash: true, rarity: 'rare' },
   { id: 'poison', name: 'Poison', cost: 4, color: '#27ae60', type: 'spell', damage: 91, radius: 50, count: 1, duration: 8, rarity: 'epic' },
   { id: 'minion_horde', name: 'Minion H', cost: 5, color: '#8e44ad', hp: 230, speed: 3, type: 'flying', range: 50, damage: 102, attackSpeed: 1000, projectile: 'dark_ball', count: 6, rarity: 'common' },
@@ -68,7 +68,7 @@ const CARDS = [
 
   // Super easy additions
   { id: 'three_musketeers', name: '3 Musketeers', cost: 9, color: '#34495e', hp: 720, speed: 1.5, type: 'ground', range: 100, damage: 218, attackSpeed: 1100, projectile: 'bullet', count: 3, rarity: 'rare' },
-  { id: 'royal_giant', name: 'Royal Giant', cost: 6, color: '#e67e22', hp: 3072, speed: 1.2, type: 'ground', range: 90, damage: 307, attackSpeed: 1700, projectile: 'cannonball', count: 1, targetType: 'buildings', rarity: 'rare' },
+  { id: 'royal_giant', name: 'Royal Giant', cost: 6, color: '#e67e22', hp: 3164, speed: 1.2, type: 'ground', range: 90, damage: 307, attackSpeed: 1700, projectile: 'cannonball', count: 1, targetType: 'buildings', rarity: 'common', evolvesTo: 'evolved_royal_giant', evolutionCycles: 1 },
   { id: 'rocket', name: 'Rocket', cost: 6, color: '#ff4500', type: 'spell', damage: 1484, radius: 30, count: 1, rarity: 'rare' },
 
   // Medium easy additions
@@ -105,7 +105,7 @@ const CARDS = [
 
   // 5 Easy New Cards
   { id: 'guards', name: 'Guards', cost: 3, color: '#95a5a6', hp: 108, shieldHp: 240, speed: 2, type: 'ground', range: 25, damage: 108, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common', hasShield: true },
-  { id: 'bats', name: 'Bats', cost: 2, color: '#8e44ad', hp: 81, speed: 3.5, type: 'flying', range: 50, damage: 81, attackSpeed: 1300, projectile: null, count: 5, rarity: 'common' },
+  { id: 'bats', name: 'Bats', cost: 2, color: '#8e44ad', hp: 81, speed: 3.5, type: 'flying', range: 50, damage: 81, attackSpeed: 1300, projectile: null, count: 5, rarity: 'common', evolvesTo: 'evolved_bats', evolutionCycles: 2 },
   { id: 'ram_rider', name: 'Ram Rider', cost: 5, color: '#3498db', hp: 1717, speed: 2, type: 'ground', range: 25, damage: 266, attackSpeed: 1800, projectile: null, count: 1, targetType: 'buildings', stun: 1.0, charge: true, rarity: 'rare' },
   { id: 'battle_healer', name: 'Battle Healer', cost: 4, color: '#e74c3c', hp: 1717, speed: 1.5, type: 'ground', range: 25, damage: 148, attackSpeed: 1500, projectile: null, count: 1, splash: true, healsOnAttack: 48, healRadius: 50, passiveHeal: 48, rarity: 'rare' },
   { id: 'skeleton_barrel', name: 'Skeleton B', cost: 3, color: '#bdc3c8', hp: 636, speed: 6, type: 'flying', range: 0, radius: 25, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 20, targetType: 'buildings', rarity: 'epic', deathSpawns: 'skeletons', deathSpawnCount: 8, deathDamage: 133, deathRadius: 40 },
@@ -201,7 +201,15 @@ const CARDS = [
   { id: 'boss_bandit', name: 'Boss Bandit', cost: 6, color: '#2c3e50', hp: 2624, speed: 2.5, type: 'ground', range: 25, damage: 268, attackSpeed: 1200, projectile: null, count: 1, rarity: 'champion', dashInvincible: true, dashRange: 80, getawayAbility: true, abilityCooldown: 8000, abilityCost: 1 },
   { id: 'goblinstein', name: 'Goblinstein', cost: 5, color: '#2ecc71', hp: 955, speed: 2, type: 'ground', range: 5.5, damage: 122, attackSpeed: 1800, projectile: 'electric_zap', count: 1, rarity: 'champion', stun: 0.5, monsterAbility: true, abilityCooldown: 17000, abilityCost: 2 },
   { id: 'goblinstein_monster', name: 'The Monster', cost: 0, color: '#27ae60', hp: 3169, speed: 2, type: 'ground', targetType: 'buildings', range: 1.2, damage: 169, attackSpeed: 1500, count: 1, rarity: 'champion', isToken: true },
-  { id: 'guardian', name: 'Guardian', cost: 0, color: '#f1c40f', hp: 1800, speed: 3, type: 'ground', range: 30, damage: 200, attackSpeed: 1200, count: 1, rarity: 'champion', isToken: true, knockback: 50, spawnDamage: 200 }
+  { id: 'guardian', name: 'Guardian', cost: 0, color: '#f1c40f', hp: 1800, speed: 3, type: 'ground', range: 30, damage: 200, attackSpeed: 1200, count: 1, rarity: 'champion', isToken: true, knockback: 50, spawnDamage: 200 },
+
+  // Evolutions
+  { id: 'evolved_knight', name: 'Evolved Knight', cost: 3, color: '#f1c40f', hp: 1766, speed: 1.5, type: 'ground', range: 20, damage: 202, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common', isToken: true, evolution: true, damageReduction: 0.6, evolutionAuraColor: '#9b59b6' },
+  { id: 'evolved_archers', name: 'Evolved Archers', cost: 3, color: '#e67e22', hp: 304, speed: 2, type: 'ground', range: 96, damage: 107, attackSpeed: 900, projectile: 'arrow', count: 2, rarity: 'common', isToken: true, evolution: true, powerShotMinRange: 64, powerShotMaxRange: 96, powerShotMultiplier: 1.5, evolutionAuraColor: '#f39c12' },
+  { id: 'evolved_skeletons', name: 'Evolved Skeletons', cost: 1, color: '#bdc3c7', hp: 81, speed: 2, type: 'ground', range: 25, damage: 81, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common', isToken: true, evolution: true, spawnOnHitCap: 8, evolutionAuraColor: '#00d2ff' },
+  { id: 'evolved_barbarians', name: 'Evolved Barbarians', cost: 5, color: '#CD853F', hp: 737, speed: 1.5, type: 'ground', range: 30, damage: 192, attackSpeed: 1300, projectile: null, count: 5, rarity: 'common', isToken: true, evolution: true, boostOnAttack: true, boostDuration: 3000, boostAmount: 0.3, evolutionAuraColor: '#e74c3c' },
+  { id: 'evolved_bats', name: 'Evolved Bats', cost: 2, color: '#8e44ad', hp: 122, speed: 3.5, type: 'flying', range: 50, damage: 81, attackSpeed: 1300, projectile: null, count: 5, rarity: 'common', isToken: true, evolution: true, selfHealOnAttack: 38, overhealMaxHp: 244, evolutionAuraColor: '#2ecc71' },
+  { id: 'evolved_royal_giant', name: 'Evolved Royal Giant', cost: 6, color: '#e67e22', hp: 3164, speed: 1.2, type: 'ground', range: 90, damage: 307, attackSpeed: 1700, projectile: 'cannonball', count: 1, targetType: 'buildings', rarity: 'common', isToken: true, evolution: true, recoilBlastOnAttack: true, recoilBlastDamage: 81, recoilBlastRadius: 40, recoilBlastKnockback: 16, evolutionAuraColor: '#f39c12' }
 ];
 
 const RARITY_COLORS = {
@@ -210,6 +218,30 @@ const RARITY_COLORS = {
   epic: '#9b59b6',      // Purple
   legendary: '#2ecc71', // Emerald/Rainbow substitute
   champion: '#f1c40f'   // Gold
+};
+
+const getEvolutionProgress = (card, allEvolutionSlots, selectedDeckIndex, cardCycles = {}) => {
+  if (!card || !card.evolvesTo || !allEvolutionSlots) return null;
+
+  const evolutionSlots = allEvolutionSlots[selectedDeckIndex] || [];
+  const isInEvolutionSlot = evolutionSlots.some(slot => slot?.id === card.id);
+
+  if (!isInEvolutionSlot) return null;
+
+  const currentCycles = cardCycles[card.id] || 0;
+  const requiredCycles = card.evolutionCycles || 2;
+
+  return {
+    current: currentCycles,
+    required: requiredCycles,
+    ready: currentCycles >= requiredCycles
+  };
+};
+
+const getReadyEvolutionCard = (card, allEvolutionSlots, selectedDeckIndex, cardCycles = {}) => {
+  const progress = getEvolutionProgress(card, allEvolutionSlots, selectedDeckIndex, cardCycles);
+  if (!progress?.ready) return null;
+  return CARDS.find(c => c.id === card.evolvesTo) || null;
 };
 
 // --- Main Menu Component ---
@@ -620,6 +652,19 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Path d="M30 20 L30 80" stroke="white" strokeWidth="2" />
         </Svg>
       );
+    case 'evolved_archers':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="48" fill="none" stroke="#f39c12" strokeWidth="3" opacity="0.8" />
+          <Circle cx="50" cy="50" r="43" fill={color} stroke="#fff3cd" strokeWidth="2" />
+          <Path d="M28 22 Q68 50 28 78" stroke="white" strokeWidth="5" fill="none" />
+          <Path d="M28 22 L28 78" stroke="white" strokeWidth="2" />
+          <Path d="M72 22 Q32 50 72 78" stroke="#2c3e50" strokeWidth="4" fill="none" opacity="0.8" />
+          <Path d="M72 22 L72 78" stroke="#2c3e50" strokeWidth="2" opacity="0.8" />
+          <Circle cx="20" cy="30" r="3" fill="#f1c40f" />
+          <Circle cx="80" cy="68" r="3" fill="#f1c40f" />
+        </Svg>
+      );
     case 'giant':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
@@ -745,6 +790,17 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Circle cx="57" cy="40" r="3" fill="black" />
         </Svg>
       );
+    case 'evolved_skeletons':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="46" fill="none" stroke="#00d2ff" strokeWidth="3" opacity="0.85" />
+          <Circle cx="50" cy="45" r="20" fill="#ecf0f1" stroke="#00d2ff" strokeWidth="2" />
+          <Rect x="48" y="65" width="4" height="20" fill="#ecf0f1" />
+          <Circle cx="43" cy="40" r="3" fill="black" />
+          <Circle cx="57" cy="40" r="3" fill="black" />
+          <Path d="M38 20 L50 8 L62 20" stroke="#00d2ff" strokeWidth="3" fill="none" />
+        </Svg>
+      );
     case 'skeleton_army':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
@@ -771,9 +827,10 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           </G>
         </Svg>
       );
-    case 'barbarians':
+    case 'evolved_barbarians':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="48" fill="none" stroke="#e74c3c" strokeWidth="3" opacity="0.8" />
           <Circle cx="50" cy="50" r="45" fill={color} stroke="white" strokeWidth="2" />
           {/* Angry face */}
           <Circle cx="40" cy="45" r="3" fill="white" />
@@ -1115,6 +1172,22 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Circle cx="58" cy="61" r="1.5" fill="white" />
           {/* Mustache */}
           <Path d="M38 70 Q50 75 62 70" stroke="#5d4e37" strokeWidth="3" fill="none" strokeLinecap="round" />
+        </Svg>
+      );
+    case 'evolved_royal_giant':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="48" fill="none" stroke="#f39c12" strokeWidth="3" opacity="0.85" />
+          <Circle cx="50" cy="50" r="45" fill="#e67e22" stroke="#f1c40f" strokeWidth="3" />
+          <Path d="M25 40 L35 25 L50 35 L65 25 L75 40" fill="#f1c40f" stroke="#ffffff" strokeWidth="2" />
+          <Rect x="25" y="40" width="50" height="10" fill="#f1c40f" stroke="#ffffff" strokeWidth="2" />
+          <Circle cx="50" cy="30" r="4" fill="#ffffff" />
+          <Circle cx="35" cy="32" r="3" fill="#3498db" />
+          <Circle cx="65" cy="32" r="3" fill="#3498db" />
+          <Circle cx="50" cy="65" r="20" fill="#ecf0f1" stroke="#bdc3c7" strokeWidth="2" />
+          <Circle cx="43" cy="62" r="4" fill="#2c3e50" />
+          <Circle cx="57" cy="62" r="4" fill="#2c3e50" />
+          <Rect x="20" y="62" width="22" height="10" fill="#2c3e50" rx="3" />
         </Svg>
       );
     case 'rocket':
@@ -1648,6 +1721,20 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           {/* Ears */}
           <Path d="M38 40 L42 30 L46 40" fill={color} stroke="black" strokeWidth="1" />
           <Path d="M54 40 L58 30 L62 40" fill={color} stroke="black" strokeWidth="1" />
+        </Svg>
+      );
+    case 'evolved_bats':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Circle cx="50" cy="50" r="46" fill="none" stroke="#2ecc71" strokeWidth="3" opacity="0.8" />
+          <Circle cx="50" cy="55" r="20" fill={color} stroke="#2ecc71" strokeWidth="2" />
+          <Path d="M30 50 Q10 35 15 55 Q10 65 30 55" fill={color} stroke="#2ecc71" strokeWidth="2" />
+          <Path d="M70 50 Q90 35 85 55 Q90 65 70 55" fill={color} stroke="#2ecc71" strokeWidth="2" />
+          <Circle cx="43" cy="52" r="3" fill="#2ecc71" />
+          <Circle cx="57" cy="52" r="3" fill="#2ecc71" />
+          <Circle cx="43" cy="52" r="1" fill="white" />
+          <Circle cx="57" cy="52" r="1" fill="white" />
+          <Path d="M50 18 L55 28 L65 30 L57 38 L59 48 L50 42 L41 48 L43 38 L35 30 L45 28 Z" fill="#2ecc71" opacity="0.7" />
         </Svg>
       );
     case 'ram_rider':
@@ -2905,27 +2992,8 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
     return null;
   }
 
-  // EVOLUTION: Calculate cycle progress for this card
-  const getCycleProgress = () => {
-    if (!card.evolvesTo || !allEvolutionSlots) return null;
-
-    // Check if this card is in an evolution slot
-    const evolutionSlots = allEvolutionSlots[selectedDeckIndex] || [];
-    const isInEvolutionSlot = evolutionSlots.some(slot => slot?.id === card.id);
-
-    if (!isInEvolutionSlot) return null;
-
-    const currentCycles = cardCycles[card.id] || 0;
-    const requiredCycles = card.evolutionCycles || 2;
-
-    return {
-      current: currentCycles,
-      required: requiredCycles,
-      ready: currentCycles >= requiredCycles
-    };
-  };
-
-  const cycleProgress = getCycleProgress();
+  const cycleProgress = getEvolutionProgress(card, allEvolutionSlots, selectedDeckIndex, cardCycles);
+  const readyEvolutionCard = getReadyEvolutionCard(card, allEvolutionSlots, selectedDeckIndex, cardCycles);
 
   // Calculate display cost for Mirror card
   const displayCost = card.id === 'mirror' && lastPlayedCard
@@ -2933,7 +3001,9 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
     : card.cost;
 
   // For Mirror card, get the card to mirror
-  const cardToDisplay = card.id === 'mirror' && lastPlayedCard ? lastPlayedCard : card;
+  const cardToDisplay = card.id === 'mirror' && lastPlayedCard
+    ? lastPlayedCard
+    : (readyEvolutionCard || card);
   const isMirror = card.id === 'mirror';
 
   const callbacksRef = useRef({ onDragStart, onDragMove, onDragEnd, onLongPress });
@@ -6720,10 +6790,71 @@ const DeckSlotSelector = memo(({ visible, onClose, cards, onSwap }) => {
   );
 });
 
+const EvolutionSlotSelector = memo(({ visible, onClose, cards, selectedCardId, onSelect }) => {
+  if (visible === null || visible === undefined) return null;
+
+  const eligibleCards = (cards || []).filter(card => card?.evolvesTo);
+
+  return (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={visible !== null}
+      onRequestClose={onClose}
+    >
+      <TouchableOpacity style={styles.cardMenuOverlay} activeOpacity={1} onPress={onClose}>
+        <View style={styles.slotSelectorContent}>
+          <Text style={styles.slotSelectorTitle}>Select a card to evolve</Text>
+
+          {eligibleCards.length === 0 ? (
+            <View style={{ paddingVertical: 20, alignItems: 'center' }}>
+              <Text style={{ color: '#555', textAlign: 'center' }}>
+                This deck has no cards with an evolution implemented yet.
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.slotSelectorDeck}>
+              <View style={[styles.slotSelectorSlotRow, { flexWrap: 'wrap', justifyContent: 'center' }]}>
+                {eligibleCards.map(card => (
+                  <TouchableOpacity
+                    key={card.id}
+                    style={[
+                      styles.slotSelectorSlot,
+                      selectedCardId === card.id && { borderColor: '#9b59b6', borderWidth: 2 }
+                    ]}
+                    onPress={() => onSelect(card)}
+                  >
+                    <UnitSprite id={card.id} isOpponent={false} size={45} />
+                    <Text style={styles.slotSelectorSlotName}>{card.name || 'Card'}</Text>
+                    <View style={styles.slotSelectorSlotCost}>
+                      <Text style={styles.slotSelectorSlotCostText}>{card.cost || 0}</Text>
+                    </View>
+                    <Text style={{ marginTop: 4, fontSize: 10, color: '#9b59b6', fontWeight: 'bold' }}>
+                      {card.evolutionCycles || 2} cycles
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          )}
+
+          <TouchableOpacity
+            style={styles.slotSelectorCancel}
+            onPress={onClose}
+          >
+            <Text style={styles.slotSelectorCancelText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    </Modal>
+  );
+});
+
 const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeckIndex, setSelectedDeckIndex, allEvolutionSlots, setAllEvolutionSlots, selectedTower: initialSelectedTower = 'princess', setSelectedTower: onSetSelectedTower, onRandomizeDeck }) => {
   const [selectedCard, setSelectedCard] = useState(null);
   const [cardMenuCard, setCardMenuCard] = useState(null);
   const [showSlotSelector, setShowSlotSelector] = useState(null);
+  const [showEvolutionSelector, setShowEvolutionSelector] = useState(null);
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [filterRarity, setFilterRarity] = useState('all');
   const [sortByElixir, setSortByElixir] = useState(false);
@@ -6773,6 +6904,27 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
     setCardMenuCard(null);
     setShowSlotSelector(card);
   }, []);
+
+  const handleEvolutionCardSelect = useCallback((selectedEvolutionCard) => {
+    if (showEvolutionSelector === null) return;
+
+    setAllEvolutionSlots(prev => {
+      const newSlots = prev.map(deckSlots => [...deckSlots]);
+      const currentDeckSlots = [...(newSlots[selectedDeckIndex] || [null, null])];
+
+      for (let i = 0; i < currentDeckSlots.length; i++) {
+        if (currentDeckSlots[i]?.id === selectedEvolutionCard.id) {
+          currentDeckSlots[i] = null;
+        }
+      }
+
+      currentDeckSlots[showEvolutionSelector] = selectedEvolutionCard;
+      newSlots[selectedDeckIndex] = currentDeckSlots;
+      return newSlots;
+    });
+
+    setShowEvolutionSelector(null);
+  }, [selectedDeckIndex, setAllEvolutionSlots, showEvolutionSelector]);
 
   const handleSwapFromMenu = useCallback((deckIndex) => {
     const sourceCard = showSlotSelector || cardMenuCard;
@@ -6928,9 +7080,7 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
                         return newSlots;
                       });
                     } else {
-                      // Open card selector
-                      setCardMenuCard({ type: 'evolution_slot', slotIndex });
-                      setShowSlotSelector(true);
+                      setShowEvolutionSelector(slotIndex);
                     }
                   }}
                 >
@@ -7151,6 +7301,13 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
       {/* Modals */}
       <CardMenu card={cardMenuCard} onClose={() => setCardMenuCard(null)} onInfo={handleCardInfo} onSwap={handleCardSwapRequest} />
       <DeckSlotSelector visible={showSlotSelector} onClose={() => setShowSlotSelector(null)} cards={cards} onSwap={handleSwapFromMenu} />
+      <EvolutionSlotSelector
+        visible={showEvolutionSelector}
+        onClose={() => setShowEvolutionSelector(null)}
+        cards={cards}
+        selectedCardId={showEvolutionSelector !== null ? allEvolutionSlots[selectedDeckIndex]?.[showEvolutionSelector]?.id : null}
+        onSelect={handleEvolutionCardSelect}
+      />
       <Modal animationType="fade" transparent visible={!!selectedCard} onRequestClose={() => setSelectedCard(null)}>
         <View style={styles.cardDetailModal}>
           <View style={[styles.cardDetailModalContent, { borderColor: RARITY_COLORS[selectedCard?.rarity] || '#F1C40F' }]}>
@@ -7336,6 +7493,7 @@ const BottomNavigation = ({ activeTab, onTabChange }) => {
 const MainLobby = ({
   activeTab, onTabChange, onStartGame, currentDeck, onSwapCards,
   dragHandlers, selectedDeckIndex, setSelectedDeckIndex, allDecks,
+  allEvolutionSlots, setAllEvolutionSlots,
   chests, onUnlockChest, onOpenChest, selectedTowerType, setSelectedTowerType,
   onRandomizeDeck
 }) => {
@@ -8299,25 +8457,7 @@ export default function App() {
 
   // Evolution helper: Check if card should evolve based on cycles and evolution slots
   const checkEvolution = (card) => {
-    if (!card || !card.evolvesTo) return card;
-
-    // Check if this card is in an evolution slot
-    const evolutionSlots = allEvolutionSlots[selectedDeckIndex] || [];
-    const isInEvolutionSlot = evolutionSlots.some(slot => slot?.id === card.id);
-
-    if (!isInEvolutionSlot) return card;
-
-    // Get current cycle count for this card
-    const currentCycles = cardCycles[card.id] || 0;
-    const requiredCycles = card.evolutionCycles || 2;
-
-    // If reached required cycles, return evolved version
-    if (currentCycles >= requiredCycles) {
-      const evolvedCard = CARDS.find(c => c.id === card.evolvesTo);
-      return evolvedCard || card;
-    }
-
-    return card;
+    return getReadyEvolutionCard(card, allEvolutionSlots, selectedDeckIndex, cardCycles) || card;
   };
 
   const handleRandomizeDeck = () => {
@@ -8598,7 +8738,8 @@ export default function App() {
 
     // Handle Mirror card - copy the last played card with +1 level
 
-    let actualCard = card;
+    const playedEvolutionCard = !isOpponent && card.id !== 'mirror' && checkEvolution(card).id !== card.id;
+    let actualCard = playedEvolutionCard ? checkEvolution(card) : card;
 
     let levelBoost = 0;
 
@@ -9172,6 +9313,9 @@ export default function App() {
         const lane = x < width / 2 ? 'LEFT' : 'RIGHT';
 
         const count = actualCard.count || 1;
+        const evolutionGroupId = actualCard.id === 'evolved_skeletons'
+          ? 'evolved_skeletons_' + Date.now() + '_' + Math.random()
+          : undefined;
 
         const newUnits = [];
 
@@ -9254,7 +9398,12 @@ export default function App() {
             abilityCost: actualCard.abilityCost,
 
             evolution: actualCard.evolution || false,
+            evolutionAuraColor: actualCard.evolutionAuraColor || null,
             damageReduction: actualCard.damageReduction || 0,
+            powerShotMinRange: actualCard.powerShotMinRange || 0,
+            powerShotMaxRange: actualCard.powerShotMaxRange || 0,
+            powerShotMultiplier: actualCard.powerShotMultiplier || 0,
+            spawnOnHitCap: actualCard.spawnOnHitCap || 0,
             isAttacking: false,
 
             charge: actualCard.charge ? { active: false, distance: 0, threshold: 2 } : undefined,
@@ -9275,7 +9424,11 @@ export default function App() {
 
             chargeState: actualCard.chargeTime ? { startTime: Date.now(), duration: actualCard.chargeTime, isCharged: false } : undefined,
 
-            hidden: actualCard.hidden ? { active: true, visibleHp: actualCard.hp } : undefined,
+            hidden: actualCard.hidden ? {
+              active: true,
+              visibleHp: actualCard.hp,
+              until: actualCard.hiddenDuration ? Date.now() + actualCard.hiddenDuration : undefined
+            } : undefined,
 
             burrowing: actualCard.burrows ? { active: true, startTime: Date.now(), targetX, targetY } : undefined,
 
@@ -9350,6 +9503,17 @@ export default function App() {
             monsterAbility: actualCard.monsterAbility || false,
 
             recoil: actualCard.recoil || 0,
+            projectileKnockback: actualCard.projectileKnockback || 0,
+            recoilBlastOnAttack: actualCard.recoilBlastOnAttack || false,
+            recoilBlastDamage: actualCard.recoilBlastDamage || 0,
+            recoilBlastRadius: actualCard.recoilBlastRadius || 0,
+            recoilBlastKnockback: actualCard.recoilBlastKnockback || 0,
+            selfHealOnAttack: actualCard.selfHealOnAttack || 0,
+            overhealMaxHp: actualCard.overhealMaxHp || actualCard.hp,
+            pendingSelfHeals: [],
+            boostOnAttack: actualCard.boostOnAttack || false,
+            boostDuration: actualCard.boostDuration || 0,
+            boostAmount: actualCard.boostAmount || 0.35,
 
             stopsToAttack: actualCard.stopsToAttack || false,
 
@@ -9382,10 +9546,14 @@ export default function App() {
             eggHp: actualCard.eggHp || 0,
 
             eggDuration: actualCard.eggDuration || 3000,
+            reviveOnDeath: actualCard.reviveOnDeath || false,
+            reviveDelay: actualCard.reviveDelay || 0,
+            hasRevived: false,
 
             hatchTime: actualCard.hatchDuration ? Date.now() + actualCard.hatchDuration : undefined,
 
             hatchesInto: actualCard.hatchesInto || undefined,
+            evolutionGroupId: evolutionGroupId,
 
             // Rune Giant - hit counter for enhancement
             runeHits: actualCard.runeEnhancer ? 0 : undefined
@@ -9564,8 +9732,14 @@ export default function App() {
 
 
       if (!isOpponent) setLastPlayedCard(actualCard);
-
       else setEnemyLastPlayedCard(actualCard);
+
+      if (!isOpponent && playedEvolutionCard) {
+        setCardCycles(prev => ({
+          ...prev,
+          [card.id]: 0
+        }));
+      }
 
 
 
@@ -9577,9 +9751,7 @@ export default function App() {
 
         if (cardIndex !== -1) newHand.splice(cardIndex, 1);
 
-        // EVOLUTION: Check if card should evolve before adding to hand
-        const cardToAdd = checkEvolution(nextCardToUse);
-        newHand.push(cardToAdd);
+        newHand.push(nextCardToUse);
 
         return newHand;
 
@@ -9607,9 +9779,7 @@ export default function App() {
           });
         }
 
-        // Apply evolution to nextCard before setting it
-        const evolvedNext = !isOpponent && newNext ? checkEvolution(newNext) : newNext;
-        setTargetNext(evolvedNext);
+        setTargetNext(newNext);
 
         return newQueue;
 
@@ -9915,7 +10085,8 @@ export default function App() {
       let healEvents = [];
       let chainEvents = [];
 
-      let currentUnits = (unitsRef.current || []).map(u => {
+      const sourceUnits = unitsRef.current || [];
+      let currentUnits = sourceUnits.map(u => {
         // Check if stunned
         const isCurrentlyStunned = u.stunUntil && now < u.stunUntil;
         const wasPreviouslyStunned = u.wasStunned || false;
@@ -9943,6 +10114,25 @@ export default function App() {
         const isRaged = u.rageUntil && now < u.rageUntil;
         const rageMultiplier = isRaged ? (1 + (u.rageBoost || 0.35)) : 1;
         u.currentRageMultiplier = rageMultiplier; // Store for attack speed calculation
+
+        if (u.pendingSelfHeals && u.pendingSelfHeals.length > 0) {
+          const readySelfHeals = u.pendingSelfHeals.filter(heal => heal.at <= now);
+          if (readySelfHeals.length > 0) {
+            const pendingHealAmount = readySelfHeals.reduce((total, heal) => total + heal.amount, 0);
+            u.hp = Math.min(u.overhealMaxHp || u.maxHp, u.hp + pendingHealAmount);
+            u.pendingSelfHeals = u.pendingSelfHeals.filter(heal => heal.at > now);
+
+            setVisualEffects(prev => [...prev, {
+              id: Date.now() + Math.random(),
+              type: 'heal_glow',
+              x: u.x,
+              y: u.y,
+              radius: 20,
+              startTime: Date.now(),
+              duration: 400
+            }]);
+          }
+        }
 
         // Jump Attack Processing (Spirits)
         if (u.isJumpingAttack) {
@@ -10170,7 +10360,7 @@ export default function App() {
                   const dashDuration = 400; // Duration of entire chain
 
                   // Find nearby enemies
-                  const nearbyEnemies = currentUnits.filter(target =>
+                  const nearbyEnemies = sourceUnits.filter(target =>
                      target.isOpponent !== u.isOpponent &&
                      target.hp > 0 &&
                      target.id !== u.lockedTarget
@@ -10632,6 +10822,10 @@ export default function App() {
         let actualDamage = u.damage;
         let actualRange = u.range;
         if (u.hidden) {
+          if (u.hidden.until && now >= u.hidden.until && u.spriteId !== 'tesla' && u.spriteId !== 'royal_ghost') {
+            u.hidden.active = false;
+          }
+
           if (u.spriteId === 'tesla') {
             // Tesla logic: Uncloak when enemies are near
             const detectionRange = u.range * 1.2;
@@ -11235,6 +11429,9 @@ export default function App() {
 
             // Calculate damage to deal
             let damageToDeal = actualDamage;
+            const targetDistance = Math.sqrt(
+              Math.pow(closestTarget.x - u.x, 2) + Math.pow(closestTarget.y - u.y, 2)
+            );
 
             // Uncloak if hidden (Royal Ghost)
             if (u.hidden && u.hidden.active) {
@@ -11282,6 +11479,12 @@ export default function App() {
               const timeRamping = (now - u.lastDamageRampTime) / 1000;
               u.currentDamageBonus = Math.min(350, timeRamping * 60); // Slower ramp, cap at +350
               damageToDeal = Math.floor(actualDamage + u.currentDamageBonus); // Use integer damage
+            }
+
+            if (u.powerShotMultiplier > 0 &&
+              targetDistance >= (u.powerShotMinRange || 0) &&
+              targetDistance <= (u.powerShotMaxRange || Infinity)) {
+              damageToDeal = Math.floor(damageToDeal * u.powerShotMultiplier);
             }
 
             // Hunter Shotgun Spread - damage falls off with distance
@@ -11405,15 +11608,32 @@ export default function App() {
                     isOpponent: u.isOpponent,
                     pierce: u.pierce || false,
                     chain: u.chain || 0,
+                    knockback: u.projectileKnockback || 0,
                     turnsToPig: u.turnsToPig || false
                   });
+
+                  if (u.recoilBlastOnAttack) {
+                    splashEvents.push({
+                      attacker: u,
+                      attackerX: u.x,
+                      attackerY: u.y,
+                      targetX: u.x,
+                      targetY: u.y,
+                      damage: u.recoilBlastDamage || Math.floor(damageToDeal * 0.25),
+                      knockback: u.recoilBlastKnockback || 0,
+                      groundOnly: true,
+                      skipTowerDamage: true,
+                      fullDamage: true,
+                      radius: u.recoilBlastRadius || 40
+                    });
+                  }
 
                   // Goblin Giant: Extra spear goblin attacks from his back
                   if (u.extraProjectiles > 0) {
                     const spearGoblinCard = CARDS.find(c => c.id === 'spear_goblins');
                     if (spearGoblinCard) {
                       // Find nearest enemy unit for spear goblins to target
-                      const spearTargets = currentUnits.filter(t => t.isOpponent !== u.isOpponent && t.hp > 0 && t.type !== 'building');
+                      const spearTargets = sourceUnits.filter(t => t.isOpponent !== u.isOpponent && t.hp > 0 && t.type !== 'building');
                       let closestSpearTarget = null;
                       let minSpearDist = Infinity;
                       spearTargets.forEach(t => {
@@ -11601,6 +11821,23 @@ export default function App() {
                 });
               }
 
+              if (u.selfHealOnAttack > 0) {
+                u.hp = Math.min(u.overhealMaxHp || u.maxHp, u.hp + u.selfHealOnAttack);
+                u.pendingSelfHeals = [
+                  ...(u.pendingSelfHeals || []),
+                  { at: now + 500, amount: u.selfHealOnAttack }
+                ];
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'heal_glow',
+                  x: u.x,
+                  y: u.y,
+                  radius: 20,
+                  startTime: Date.now(),
+                  duration: 400
+                }]);
+              }
+
               // Heal on Attack (Battle Healer & Heal Spirit)
               if (u.healsOnAttack > 0) {
                 healEvents.push({
@@ -11620,6 +11857,39 @@ export default function App() {
                   startTime: Date.now(),
                   duration: 600
                 }]);
+              }
+
+              if (u.boostOnAttack) {
+                u.rageUntil = now + (u.boostDuration || 3000);
+                u.rageBoost = u.boostAmount || 0.35;
+              }
+
+              if (u.spawnOnHitCap > 0 && u.evolutionGroupId) {
+                const groupCount =
+                  sourceUnits.filter(unit => unit.evolutionGroupId === u.evolutionGroupId && unit.hp > 0).length +
+                  unitsToSpawn.filter(unit => unit.evolutionGroupId === u.evolutionGroupId).length;
+
+                if (groupCount < u.spawnOnHitCap) {
+                  unitsToSpawn.push({
+                    ...u,
+                    id: 'skeleton_clone_' + Date.now() + '_' + Math.random(),
+                    x: Math.max(20, Math.min(width - 20, u.x + (Math.random() * 24 - 12))),
+                    y: Math.max(20, Math.min(height - 20, u.y + (Math.random() * 24 - 12))),
+                    hp: u.maxHp,
+                    lastAttack: 0,
+                    spawnTime: Date.now(),
+                    spawnDelay: 0,
+                    hidden: undefined,
+                    stunUntil: 0,
+                    slowUntil: 0,
+                    wasPushed: false,
+                    wasStunned: false,
+                    isAttacking: false,
+                    currentShieldHp: 0,
+                    shieldHp: 0,
+                    hasShield: false
+                  });
+                }
               }
 
               // Spirit Cards special effects (AND Battle Ram impact)
@@ -12269,7 +12539,7 @@ export default function App() {
         currentUnits = currentUnits.map(unit => {
           if (unit.isOpponent !== event.attacker.isOpponent && unit.hp > 0) {
             const dist = Math.sqrt(Math.pow(unit.x - event.targetX, 2) + Math.pow(unit.y - event.targetY, 2));
-            if (dist <= splashRadius) {
+            if (dist <= splashRadius && (!event.groundOnly || unit.type === 'ground')) {
               // For frontal splash, check if unit is in front (within 180 degrees)
               if (event.frontalSplash) {
                 const angleToUnit = Math.atan2(unit.y - event.attackerY, unit.x - event.attackerX);
@@ -12283,7 +12553,7 @@ export default function App() {
                 }
               }
 
-              const damage = Math.floor(event.damage * 0.5);
+              const damage = event.fullDamage ? event.damage : Math.floor(event.damage * 0.5);
 
               // Handle Shield
               let remainingDamage = damage;
@@ -12394,7 +12664,8 @@ export default function App() {
           return unit;
         });
         // Also splash towers
-        nextTowers = nextTowers.map(tower => {
+        if (!event.skipTowerDamage) {
+          nextTowers = nextTowers.map(tower => {
           if (tower.isOpponent !== event.attacker.isOpponent && tower.hp > 0) {
             const dist = Math.sqrt(Math.pow(tower.x - event.targetX, 2) + Math.pow(tower.y - event.targetY, 2));
             if (dist <= splashRadius + 20) {
@@ -12409,7 +12680,8 @@ export default function App() {
                 }
               }
 
-              const updatedTower = { ...tower, hp: tower.hp - Math.floor(event.damage * 0.5) };
+              const splashDamage = event.fullDamage ? event.damage : Math.floor(event.damage * 0.5);
+              const updatedTower = { ...tower, hp: tower.hp - splashDamage };
 
               // Handle stun (Ice Spirit freeze)
               if (event.stun && event.stun > 0) {
@@ -12432,7 +12704,8 @@ export default function App() {
             }
           }
           return tower;
-        });
+          });
+        }
       });
 
       // Apply heal events (Heal Spirit)
@@ -13270,6 +13543,28 @@ export default function App() {
                   updatedUnit.slowAmount = h.slow;
                 }
 
+                if (h.knockback && h.knockback > 0 && u.type !== 'building') {
+                  const angle = Math.atan2(u.y - (h.y || hitY), u.x - (h.x || hitX));
+                  let newX = u.x + Math.cos(angle) * h.knockback;
+                  let newY = u.y + Math.sin(angle) * h.knockback;
+
+                  const rY = height / 2;
+                  const distR = Math.abs(newY - rY);
+                  const bW = 60;
+                  const lBX = 95;
+                  const rBX = width - 95;
+                  const onB = (Math.abs(newX - lBX) < bW / 2) || (Math.abs(newX - rBX) < bW / 2);
+
+                  const isFlyingOrJumping = u.jumps || u.type === 'flying';
+                  if (distR < 25 && !onB && !isFlyingOrJumping) {
+                    newY = rY + (u.y < rY ? -25 : 25);
+                  }
+
+                  updatedUnit.x = Math.max(10, Math.min(width - 10, newX));
+                  updatedUnit.y = Math.max(10, Math.min(height - 10, newY));
+                  updatedUnit.wasPushed = true;
+                }
+
                 // Apply pull effect (Fisherman)
                 if (h.pull && h.attackerId) {
                    const attacker = currentUnits.find(att => att.id === h.attackerId);
@@ -14047,6 +14342,38 @@ export default function App() {
            }]);
         });
 
+        if (deadUnit.reviveOnDeath && !deadUnit.hasRevived) {
+          unitsToSpawn.push({
+            ...deadUnit,
+            id: 'revived_' + deadUnit.id + '_' + Date.now(),
+            hp: deadUnit.maxHp,
+            maxHp: deadUnit.maxHp,
+            lastAttack: 0,
+            spawnTime: Date.now(),
+            spawnDelay: deadUnit.reviveDelay || 1200,
+            hidden: deadUnit.hidden ? { ...deadUnit.hidden, active: false, until: undefined } : undefined,
+            stunUntil: 0,
+            slowUntil: 0,
+            wasPushed: false,
+            wasStunned: false,
+            isAttacking: false,
+            hasRevived: true,
+            reviveOnDeath: false
+          });
+
+          setVisualEffects(prev => [...prev, {
+            id: Date.now() + Math.random(),
+            type: 'heal_glow',
+            x: deadUnit.x,
+            y: deadUnit.y,
+            radius: 35,
+            startTime: Date.now(),
+            duration: 700
+          }]);
+
+          return;
+        }
+
         // Generic Death Spawns (Skeleton Barrel, Tombstone, Lava Hound, Golem, Elixir Golem)
         if (deadUnit.spriteId === 'tombstone' || deadUnit.deathSpawns) {
           let spawnId = deadUnit.deathSpawns || 'skeletons';
@@ -14573,6 +14900,8 @@ export default function App() {
           selectedDeckIndex={selectedDeckIndex}
           setSelectedDeckIndex={setSelectedDeckIndex}
           allDecks={allDecks}
+          allEvolutionSlots={allEvolutionSlots}
+          setAllEvolutionSlots={setAllEvolutionSlots}
           chests={chests}
           onUnlockChest={handleUnlockChest}
           onOpenChest={handleOpenChest}
