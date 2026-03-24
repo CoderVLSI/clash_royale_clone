@@ -28,27 +28,27 @@ const CARDS = [
   { id: 'giant', name: 'Giant', cost: 5, color: '#e74c3c', hp: 4091, speed: 1, type: 'ground', range: 20, damage: 254, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', rarity: 'rare' },
   { id: 'mini_pekka', name: 'Mini P', cost: 4, color: '#9b59b6', hp: 1361, speed: 2.5, type: 'ground', range: 25, damage: 720, attackSpeed: 1600, projectile: null, count: 1, rarity: 'rare' },
   { id: 'spear_goblins', name: 'Spear Gobs', cost: 2, color: '#2ecc71', hp: 133, speed: 3, type: 'ground', range: 110, damage: 81, attackSpeed: 1700, projectile: 'spear', count: 3, rarity: 'common' },
-  { id: 'musketeer', name: 'Musket', cost: 4, color: '#34495e', hp: 720, speed: 1.5, type: 'ground', range: 100, damage: 218, attackSpeed: 1100, projectile: 'bullet', count: 1, rarity: 'rare' },
-  { id: 'baby_dragon', name: 'Baby D', cost: 4, color: '#27ae60', hp: 1152, speed: 2, type: 'flying', range: 80, damage: 160, attackSpeed: 1500, projectile: 'dragon_fire', count: 1, splash: true, rarity: 'epic' },
+  { id: 'musketeer', name: 'Musket', cost: 4, color: '#34495e', hp: 720, speed: 1.5, type: 'ground', range: 100, damage: 218, attackSpeed: 1100, projectile: 'bullet', count: 1, rarity: 'rare', evolvesTo: 'evolved_musketeer', evolutionCycles: 2 },
+  { id: 'baby_dragon', name: 'Baby D', cost: 4, color: '#27ae60', hp: 1152, speed: 2, type: 'flying', range: 80, damage: 160, attackSpeed: 1500, projectile: 'dragon_fire', count: 1, splash: true, rarity: 'epic', evolvesTo: 'evolved_baby_dragon', evolutionCycles: 1 },
   { id: 'fireball', name: 'Fireball', cost: 4, color: '#ff4500', type: 'spell', damage: 689, radius: 60, count: 1, rarity: 'rare', knockback: 30 },
   { id: 'the_log', name: 'The Log', cost: 2, color: '#8B4513', type: 'spell', damage: 240, radius: 40, count: 1, rarity: 'legendary', knockback: 20 },
 
   // New cards
-  { id: 'cannon', name: 'Cannon', cost: 3, color: '#8B4513', hp: 896, speed: 0, type: 'building', range: 90, damage: 212, attackSpeed: 900, projectile: 'cannonball', count: 1, lifetime: 30, rarity: 'common' },
+  { id: 'cannon', name: 'Cannon', cost: 3, color: '#8B4513', hp: 896, speed: 0, type: 'building', range: 90, damage: 212, attackSpeed: 900, projectile: 'cannonball', count: 1, lifetime: 30, rarity: 'common', evolvesTo: 'evolved_cannon', evolutionCycles: 2 },
   { id: 'barbarians', name: 'Barbarians', cost: 5, color: '#CD853F', hp: 670, speed: 1.5, type: 'ground', range: 30, damage: 192, attackSpeed: 1300, projectile: null, count: 5, rarity: 'common', evolvesTo: 'evolved_barbarians', evolutionCycles: 1 },
   { id: 'arrows', name: 'Arrows', cost: 3, color: '#2ecc71', type: 'spell', damage: 366, radius: 40, count: 1, rarity: 'common' },
-  { id: 'zap', name: 'Zap', cost: 2, color: '#3498db', type: 'spell', damage: 192, radius: 35, count: 1, stun: 0.5, rarity: 'common' },
+  { id: 'zap', name: 'Zap', cost: 2, color: '#3498db', type: 'spell', damage: 192, radius: 35, count: 1, stun: 0.5, rarity: 'common', evolvesTo: 'evolved_zap', evolutionCycles: 2 },
   { id: 'minions', name: 'Minions', cost: 3, color: '#9b59b6', hp: 230, speed: 3, type: 'flying', range: 50, damage: 102, attackSpeed: 1000, projectile: 'dark_ball', count: 3, rarity: 'common' },
-  { id: 'skeleton_army', name: 'Skeleton Army', cost: 3, color: '#ecf0f1', hp: 81, speed: 2, type: 'ground', range: 25, damage: 81, attackSpeed: 1000, projectile: null, count: 15, rarity: 'epic' },
+  { id: 'skeleton_army', name: 'Skeleton Army', cost: 3, color: '#ecf0f1', hp: 81, speed: 2, type: 'ground', range: 25, damage: 81, attackSpeed: 1000, projectile: null, count: 15, rarity: 'epic', evolvesTo: 'evolved_skeleton_army', evolutionCycles: 1 },
   { id: 'skeletons', name: 'Skelly', cost: 1, color: '#bdc3c7', hp: 81, speed: 2, type: 'ground', range: 25, damage: 81, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common', evolvesTo: 'evolved_skeletons', evolutionCycles: 2 },
-  { id: 'valkyrie', name: 'Valkyrie', cost: 4, color: '#e74c3c', hp: 1908, speed: 1.5, type: 'ground', range: 25, damage: 267, attackSpeed: 1500, projectile: null, count: 1, splash: true, rarity: 'rare' },
+  { id: 'valkyrie', name: 'Valkyrie', cost: 4, color: '#e74c3c', hp: 1908, speed: 1.5, type: 'ground', range: 25, damage: 267, attackSpeed: 1500, projectile: null, count: 1, splash: true, rarity: 'rare', evolvesTo: 'evolved_valkyrie', evolutionCycles: 2 },
   { id: 'poison', name: 'Poison', cost: 4, color: '#27ae60', type: 'spell', damage: 91, radius: 50, count: 1, duration: 8, rarity: 'epic' },
   { id: 'minion_horde', name: 'Minion H', cost: 5, color: '#8e44ad', hp: 230, speed: 3, type: 'flying', range: 50, damage: 102, attackSpeed: 1000, projectile: 'dark_ball', count: 6, rarity: 'common' },
-  { id: 'witch', name: 'Witch', cost: 5, color: '#9b59b6', hp: 838, speed: 1.5, type: 'ground', range: 55, damage: 134, attackSpeed: 1100, projectile: 'witch_projectile', count: 1, splash: true, spawns: 'skeletons', spawnRate: 5, spawnCount: 3, rarity: 'epic' },
+  { id: 'witch', name: 'Witch', cost: 5, color: '#9b59b6', hp: 838, speed: 1.5, type: 'ground', range: 55, damage: 134, attackSpeed: 1100, projectile: 'witch_projectile', count: 1, splash: true, spawns: 'skeletons', spawnRate: 5, spawnCount: 3, rarity: 'epic', evolvesTo: 'evolved_witch', evolutionCycles: 1 },
   { id: 'hog_rider', name: 'Hog', cost: 4, color: '#e67e22', hp: 1696, speed: 3.5, type: 'ground', range: 25, damage: 318, attackSpeed: 1600, projectile: null, count: 1, targetType: 'buildings', jumps: true, rarity: 'rare' },
   { id: 'prince', name: 'Prince', cost: 5, color: '#f39c12', hp: 1920, speed: 2, type: 'ground', range: 30, damage: 392, attackSpeed: 1400, projectile: null, count: 1, charge: true, rarity: 'epic' },
-  { id: 'tesla', name: 'Tesla', cost: 4, color: '#f1c40f', hp: 1152, speed: 0, type: 'building', range: 55, damage: 230, attackSpeed: 1100, projectile: 'tesla_lightning', count: 1, lifetime: 35, hidden: true, rarity: 'common' },
-  { id: 'wizard', name: 'Wizard', cost: 5, color: '#9b59b6', hp: 720, speed: 1.5, type: 'ground', range: 60, damage: 281, attackSpeed: 1400, projectile: 'fireball_small', count: 1, splash: true, rarity: 'rare' },
+  { id: 'tesla', name: 'Tesla', cost: 4, color: '#f1c40f', hp: 1152, speed: 0, type: 'building', range: 55, damage: 230, attackSpeed: 1100, projectile: 'tesla_lightning', count: 1, lifetime: 35, hidden: true, rarity: 'common', evolvesTo: 'evolved_tesla', evolutionCycles: 2 },
+  { id: 'wizard', name: 'Wizard', cost: 5, color: '#9b59b6', hp: 720, speed: 1.5, type: 'ground', range: 60, damage: 281, attackSpeed: 1400, projectile: 'fireball_small', count: 1, splash: true, rarity: 'rare', evolvesTo: 'evolved_wizard', evolutionCycles: 1 },
   { id: 'tombstone', name: 'Tombstone', cost: 3, color: '#95a5a6', hp: 534, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 40, spawns: 'skeletons', spawnRate: 3.1, spawnCount: 2, deathSpawnCount: 4, rarity: 'rare' },
   { id: 'sword_goblins', name: 'Sword Gobs', cost: 3, color: '#2ecc71', hp: 202, speed: 3, type: 'ground', range: 25, damage: 120, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common' },
   { id: 'spear_goblins', name: 'Spear Gobs', cost: 3, color: '#2ecc71', hp: 180, speed: 3, type: 'ground', range: 50, damage: 62, attackSpeed: 1100, projectile: 'spear', count: 3, rarity: 'rare' },
@@ -60,11 +60,11 @@ const CARDS = [
   { id: 'cursed_hog', name: 'Cursed Hog', cost: 0, color: '#ff9ff3', hp: 520, speed: 3.5, type: 'ground', range: 25, damage: 52, attackSpeed: 1000, projectile: null, count: 1, targetType: 'buildings', rarity: 'common', isToken: true },
 
   // New cards to implement
-  { id: 'royal_hogs', name: 'Royal Hogs', cost: 5, color: '#e67e22', hp: 1260, speed: 3.5, type: 'ground', range: 25, damage: 240, attackSpeed: 1600, projectile: null, count: 4, targetType: 'buildings', jumps: true, rarity: 'common' },
+  { id: 'royal_hogs', name: 'Royal Hogs', cost: 5, color: '#e67e22', hp: 1260, speed: 3.5, type: 'ground', range: 25, damage: 240, attackSpeed: 1600, projectile: null, count: 4, targetType: 'buildings', jumps: true, rarity: 'common', evolvesTo: 'evolved_royal_hogs', evolutionCycles: 2 },
   { id: 'miner', name: 'Miner', cost: 3, color: '#f39c12', hp: 1600, speed: 1.5, type: 'ground', range: 25, damage: 160, attackSpeed: 1100, projectile: null, count: 1, rarity: 'legendary', burrows: true, deployAnywhere: true },
-  { id: 'goblin_cage', name: 'Goblin Cage', cost: 5, color: '#95a5a6', hp: 880, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 30, spawns: null, spawnRate: 0, spawnCount: 0, rarity: 'rare', deathSpawns: 'goblin_bruteth', deathSpawnCount: 1 },
+  { id: 'goblin_cage', name: 'Goblin Cage', cost: 5, color: '#95a5a6', hp: 880, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 30, spawns: null, spawnRate: 0, spawnCount: 0, rarity: 'rare', deathSpawns: 'goblin_bruteth', deathSpawnCount: 1, evolvesTo: 'evolved_goblin_cage', evolutionCycles: 1 },
   { id: 'goblin_bruteth', name: 'Goblin B', cost: 0, color: '#c0392b', hp: 660, speed: 2, type: 'ground', range: 25, damage: 158, attackSpeed: 1300, projectile: null, count: 1, rarity: 'common', isToken: true },
-  { id: 'goblin_giant', name: 'Goblin Giant', cost: 6, color: '#27ae60', hp: 2628, speed: 1, type: 'ground', range: 25, damage: 211, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', rarity: 'epic', deathSpawns: 'spear_goblins', deathSpawnCount: 2, extraProjectiles: 2 },
+  { id: 'goblin_giant', name: 'Goblin Giant', cost: 6, color: '#27ae60', hp: 2628, speed: 1, type: 'ground', range: 25, damage: 211, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', rarity: 'epic', deathSpawns: 'spear_goblins', deathSpawnCount: 2, extraProjectiles: 2, evolvesTo: 'evolved_goblin_giant', evolutionCycles: 1 },
 
   // Super easy additions
   { id: 'three_musketeers', name: '3 Musketeers', cost: 9, color: '#34495e', hp: 720, speed: 1.5, type: 'ground', range: 100, damage: 218, attackSpeed: 1100, projectile: 'bullet', count: 3, rarity: 'rare' },
@@ -78,8 +78,8 @@ const CARDS = [
   { id: 'golemite', name: 'Golemite', cost: 0, color: '#95a5a6', hp: 1040, speed: 1, type: 'ground', range: 20, damage: 66, attackSpeed: 2500, projectile: null, count: 1, targetType: 'buildings', rarity: 'common', isToken: true, deathDamage: 66 },
 
   // Next set of additions
-  { id: 'pekka', name: 'P.E.K.K.A', cost: 7, color: '#8e44ad', hp: 3760, speed: 1, type: 'ground', range: 25, damage: 816, attackSpeed: 1800, projectile: null, count: 1, rarity: 'epic' },
-  { id: 'mega_knight', name: 'Mega Knight', cost: 7, color: '#e67e22', hp: 3993, speed: 1.5, type: 'ground', range: 25, damage: 268, attackSpeed: 1700, projectile: null, count: 1, splash: true, spawnDamage: 536, jumps: true, rarity: 'legendary' },
+  { id: 'pekka', name: 'P.E.K.K.A', cost: 7, color: '#8e44ad', hp: 3760, speed: 1, type: 'ground', range: 25, damage: 816, attackSpeed: 1800, projectile: null, count: 1, rarity: 'epic', evolvesTo: 'evolved_pekka', evolutionCycles: 1 },
+  { id: 'mega_knight', name: 'Mega Knight', cost: 7, color: '#e67e22', hp: 3993, speed: 1.5, type: 'ground', range: 25, damage: 268, attackSpeed: 1700, projectile: null, count: 1, splash: true, spawnDamage: 536, jumps: true, rarity: 'legendary', evolvesTo: 'evolved_mega_knight', evolutionCycles: 1 },
   { id: 'electro_wizard', name: 'Electro Wiz', cost: 4, color: '#3498db', hp: 713, speed: 1.5, type: 'ground', range: 55, damage: 231, attackSpeed: 1800, projectile: 'electric_bolt', count: 1, splash: false, stun: 0.5, rarity: 'legendary', spawnDamage: 192 },
   { id: 'lightning', name: 'Lightning', cost: 6, color: '#f1c40f', type: 'spell', damage: 1056, radius: 70, count: 1, rarity: 'epic' },
   { id: 'x_bow', name: 'X-Bow', cost: 6, color: '#95a5a6', hp: 1600, speed: 0, type: 'building', range: 230, damage: 30, attackSpeed: 250, projectile: 'arrow', count: 1, lifetime: 30, rarity: 'epic', spawnDelay: 3500 },
@@ -87,71 +87,72 @@ const CARDS = [
 
   // Spirit Cards - All cost 1 Elixir and die when they attack
   { id: 'fire_spirit', name: 'Fire Spirit', cost: 1, color: '#e74c3c', hp: 230, speed: 4, type: 'ground', range: 25, damage: 207, attackSpeed: 1000, projectile: null, count: 1, splash: true, rarity: 'common', kamikaze: true },
-  { id: 'ice_spirit', name: 'Ice Spirit', cost: 1, color: '#E8F4F8', hp: 230, speed: 4, type: 'ground', range: 25, damage: 110, attackSpeed: 1000, projectile: null, count: 1, splash: true, freezeDuration: 1, rarity: 'common', kamikaze: true },
+  { id: 'ice_spirit', name: 'Ice Spirit', cost: 1, color: '#E8F4F8', hp: 230, speed: 4, type: 'ground', range: 25, damage: 110, attackSpeed: 1000, projectile: null, count: 1, splash: true, freezeDuration: 1, rarity: 'common', kamikaze: true, evolvesTo: 'evolved_ice_spirit', evolutionCycles: 1 },
   { id: 'electro_spirit', name: 'Electro Spirit', cost: 1, color: '#9b59b6', hp: 230, speed: 4, type: 'ground', range: 25, damage: 99, attackSpeed: 1000, projectile: null, count: 1, chain: 9, stun: 0.5, rarity: 'common', kamikaze: true },
   { id: 'heal_spirit', name: 'Heal Spirit', cost: 1, color: '#FFD700', hp: 450, speed: 5, type: 'ground', range: 25, damage: 0, attackSpeed: 1000, projectile: null, count: 1, splash: true, rarity: 'rare', kamikaze: true, healsOnAttack: 700, healRadius: 60 },
 
   // Additional cards for new decks
-  { id: 'bomber', name: 'Bomber', cost: 2, color: '#e67e22', hp: 398, speed: 2, type: 'ground', range: 55, damage: 222, attackSpeed: 1800, projectile: 'bomb', count: 1, splash: true, rarity: 'common' },
-  { id: 'goblin_barrel', name: 'Goblin B', cost: 3, color: '#2ecc71', type: 'spell', damage: 0, radius: 20, count: 3, spawns: 'sword_goblins', spawnCount: 3, rarity: 'epic' },
+  { id: 'bomber', name: 'Bomber', cost: 2, color: '#e67e22', hp: 398, speed: 2, type: 'ground', range: 55, damage: 222, attackSpeed: 1800, projectile: 'bomb', count: 1, splash: true, rarity: 'common', evolvesTo: 'evolved_bomber', evolutionCycles: 2 },
+  { id: 'goblin_single', name: 'Goblin', cost: 0, color: '#2ecc71', hp: 202, speed: 3, type: 'ground', range: 25, damage: 120, attackSpeed: 1100, projectile: null, count: 1, rarity: 'common', isToken: true },
+  { id: 'goblin_barrel', name: 'Goblin B', cost: 3, color: '#2ecc71', type: 'spell', damage: 0, radius: 20, count: 3, spawns: 'sword_goblins', spawnCount: 3, rarity: 'epic', evolvesTo: 'evolved_goblin_barrel', evolutionCycles: 2 },
   { id: 'elixir_collector', name: 'Elixir G', cost: 6, color: '#9b59b6', hp: 1070, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 70, rarity: 'rare', generatesElixir: true },
   { id: 'goblin_hut', name: 'Goblin Hut', cost: 5, color: '#2ecc71', hp: 1293, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 60, spawns: 'spear_goblins', spawnRate: 4.5, spawnCount: 1, rarity: 'rare' },
-  { id: 'furnace', name: 'Furnace', cost: 4, color: '#e74c3c', hp: 1003, speed: 1.5, type: 'ground', range: 50, damage: 120, attackSpeed: 1200, projectile: 'flame', count: 1, spawns: 'fire_spirit', spawnRate: 5, spawnCount: 1, rarity: 'rare' },
+  { id: 'furnace', name: 'Furnace', cost: 4, color: '#e74c3c', hp: 1003, speed: 1.5, type: 'ground', range: 50, damage: 120, attackSpeed: 1200, projectile: 'flame', count: 1, spawns: 'fire_spirit', spawnRate: 5, spawnCount: 1, rarity: 'rare', evolvesTo: 'evolved_furnace', evolutionCycles: 1 },
   { id: 'spirit_empress', name: 'Spirit Empress', cost: 3, color: '#9b59b6', hp: 1028, speed: 1.5, type: 'ground', range: 25, damage: 279, attackSpeed: 1000, projectile: null, count: 1, rarity: 'champion', dualForm: true },
   { id: 'spirit_empress_flying', name: 'Spirit Empress (Air)', cost: 6, color: '#9b59b6', hp: 1400, speed: 2, type: 'flying', range: 120, damage: 219, attackSpeed: 1200, projectile: 'spirit_bolt', count: 1, rarity: 'champion', isToken: true },
   { id: 'earthquake', name: 'Earthquake', cost: 3, color: '#7f8c8d', type: 'spell', damage: 81, radius: 70, count: 1, slow: 0.35, rarity: 'rare' },
   { id: 'graveyard', name: 'Graveyard', cost: 5, color: '#2c3e50', type: 'spell', damage: 0, radius: 80, count: 20, spawns: 'skeletons', spawnCount: 20, rarity: 'legendary' },
-  { id: 'lumberjack', name: 'Lumberjack', cost: 4, color: '#e67e22', hp: 1232, speed: 2.5, type: 'ground', range: 25, damage: 240, attackSpeed: 800, projectile: null, count: 1, splash: true, deathRage: true, rarity: 'legendary' },
+  { id: 'lumberjack', name: 'Lumberjack', cost: 4, color: '#e67e22', hp: 1232, speed: 2.5, type: 'ground', range: 25, damage: 240, attackSpeed: 800, projectile: null, count: 1, splash: true, deathRage: true, rarity: 'legendary', evolvesTo: 'evolved_lumberjack', evolutionCycles: 2 },
 
   // 5 Easy New Cards
   { id: 'guards', name: 'Guards', cost: 3, color: '#95a5a6', hp: 108, shieldHp: 240, speed: 2, type: 'ground', range: 25, damage: 108, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common', hasShield: true },
   { id: 'bats', name: 'Bats', cost: 2, color: '#8e44ad', hp: 81, speed: 3.5, type: 'flying', range: 50, damage: 81, attackSpeed: 1300, projectile: null, count: 5, rarity: 'common', evolvesTo: 'evolved_bats', evolutionCycles: 2 },
   { id: 'ram_rider', name: 'Ram Rider', cost: 5, color: '#3498db', hp: 1717, speed: 2, type: 'ground', range: 25, damage: 266, attackSpeed: 1800, projectile: null, count: 1, targetType: 'buildings', stun: 1.0, charge: true, rarity: 'rare' },
   { id: 'battle_healer', name: 'Battle Healer', cost: 4, color: '#e74c3c', hp: 1717, speed: 1.5, type: 'ground', range: 25, damage: 148, attackSpeed: 1500, projectile: null, count: 1, splash: true, healsOnAttack: 48, healRadius: 50, passiveHeal: 48, rarity: 'rare' },
-  { id: 'skeleton_barrel', name: 'Skeleton B', cost: 3, color: '#bdc3c8', hp: 636, speed: 6, type: 'flying', range: 0, radius: 25, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 20, targetType: 'buildings', rarity: 'epic', deathSpawns: 'skeletons', deathSpawnCount: 8, deathDamage: 133, deathRadius: 40 },
+  { id: 'skeleton_barrel', name: 'Skeleton B', cost: 3, color: '#bdc3c8', hp: 636, speed: 6, type: 'flying', range: 0, radius: 25, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 20, targetType: 'buildings', rarity: 'epic', deathSpawns: 'skeletons', deathSpawnCount: 8, deathDamage: 133, deathRadius: 40, evolvesTo: 'evolved_skeleton_barrel', evolutionCycles: 2 },
 
   // New Cards (Ice Golem, Mega Minion, Dart Goblin, Princess, Barbarian Hut)
   { id: 'ice_golem', name: 'Ice Golem', cost: 2, color: '#E8F4F8', hp: 1197, speed: 1.5, type: 'ground', range: 20, damage: 84, attackSpeed: 2500, projectile: null, count: 1, targetType: 'buildings', rarity: 'rare', deathDamage: 84, deathRadius: 60, deathSlow: 1.0 },
   { id: 'mega_minion', name: 'Mega Minion', cost: 3, color: '#8e44ad', hp: 830, speed: 2, type: 'flying', range: 45, damage: 300, attackSpeed: 1600, projectile: 'dark_ball_big', count: 1, rarity: 'rare' },
-  { id: 'dart_goblin', name: 'Dart Goblin', cost: 3, color: '#2ecc71', hp: 260, speed: 3.5, type: 'ground', range: 100, damage: 131, attackSpeed: 700, projectile: 'dart', count: 1, rarity: 'rare' },
+  { id: 'dart_goblin', name: 'Dart Goblin', cost: 3, color: '#2ecc71', hp: 260, speed: 3.5, type: 'ground', range: 100, damage: 131, attackSpeed: 700, projectile: 'dart', count: 1, rarity: 'rare', evolvesTo: 'evolved_dart_goblin', evolutionCycles: 2 },
   { id: 'princess', name: 'Princess', cost: 3, color: '#e67e22', hp: 261, speed: 2, type: 'ground', range: 180, damage: 250, attackSpeed: 3000, projectile: 'fire_arrows', count: 1, splash: true, rarity: 'legendary' },
   { id: 'barbarian_hut', name: 'Barb Hut', cost: 7, color: '#e67e22', hp: 1300, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 40, spawns: 'barbarians', spawnRate: 8, spawnCount: 2, deathSpawns: 'barbarians', deathSpawnCount: 2, rarity: 'rare' },
 
   // 5 New Cards
   { id: 'bandit', name: 'Bandit', cost: 3, color: '#e67e22', hp: 600, speed: 4, type: 'ground', range: 25, damage: 320, attackSpeed: 1100, projectile: null, count: 1, rarity: 'legendary', dashInvincible: true, dashRange: 80 },
-  { id: 'battle_ram', name: 'Battle Ram', cost: 4, color: '#e67e22', hp: 756, speed: 4, type: 'ground', range: 25, damage: 246, attackSpeed: 100, projectile: null, count: 1, targetType: 'buildings', charge: true, rarity: 'rare', deathSpawns: 'barbarians', deathSpawnCount: 2, kamikaze: true },
+  { id: 'battle_ram', name: 'Battle Ram', cost: 4, color: '#e67e22', hp: 756, speed: 4, type: 'ground', range: 25, damage: 246, attackSpeed: 100, projectile: null, count: 1, targetType: 'buildings', charge: true, rarity: 'rare', deathSpawns: 'barbarians', deathSpawnCount: 2, kamikaze: true, evolvesTo: 'evolved_battle_ram', evolutionCycles: 2 },
   { id: 'inferno_tower', name: 'Inferno', cost: 5, color: '#e74c3c', hp: 1100, speed: 0, type: 'building', range: 70, damage: 30, attackSpeed: 400, projectile: null, count: 1, lifetime: 35, rarity: 'rare', damageRamp: true },
   { id: 'balloon', name: 'Balloon', cost: 5, color: '#e74c3c', hp: 1500, speed: 2, type: 'flying', range: 5, damage: 400, attackSpeed: 2000, projectile: null, count: 1, targetType: 'buildings', rarity: 'epic', bombDrops: true, deathDamage: 400, deathRadius: 60, deathBombDelay: 3000 },
-  { id: 'hunter', name: 'Hunter', cost: 4, color: '#95a5a6', hp: 1050, speed: 2, type: 'ground', range: 75, damage: 180, attackSpeed: 1500, projectile: 'shotgun_blast', count: 1, splash: true, shotgunSpread: true, rarity: 'epic' },
+  { id: 'hunter', name: 'Hunter', cost: 4, color: '#95a5a6', hp: 1050, speed: 2, type: 'ground', range: 75, damage: 180, attackSpeed: 1500, projectile: 'shotgun_blast', count: 1, splash: true, shotgunSpread: true, rarity: 'epic', evolvesTo: 'evolved_hunter', evolutionCycles: 2 },
 
   // 5 More NEW Cards (not duplicates!)
   { id: 'electro_giant', name: 'Electro Giant', cost: 7, color: '#3498db', hp: 2800, speed: 1, type: 'ground', range: 25, damage: 200, attackSpeed: 1400, projectile: null, count: 1, shockOnHit: true, shockRadius: 50, shockDamage: 100, shockStun: 0.5, rarity: 'epic' },
   { id: 'night_witch', name: 'Night Witch', cost: 4, color: '#2c3e50', hp: 750, speed: 2, type: 'ground', range: 25, damage: 220, attackSpeed: 1500, projectile: null, count: 1, spawns: 'bats', spawnRate: 5, spawnCount: 2, rarity: 'legendary', deathSpawns: 'bats', deathSpawnCount: 3 },
-  { id: 'inferno_dragon', name: 'Inferno Dragon', cost: 4, color: '#e74c3c', hp: 950, speed: 2.5, type: 'flying', range: 40, damage: 30, attackSpeed: 100, projectile: null, count: 1, damageRamp: true, rarity: 'epic' },
+  { id: 'inferno_dragon', name: 'Inferno Dragon', cost: 4, color: '#e74c3c', hp: 950, speed: 2.5, type: 'flying', range: 40, damage: 30, attackSpeed: 100, projectile: null, count: 1, damageRamp: true, rarity: 'epic', evolvesTo: 'evolved_inferno_dragon', evolutionCycles: 2 },
   { id: 'elixir_golem', name: 'Elixir Golem', cost: 3, color: '#D442F5', hp: 1600, speed: 1.5, type: 'ground', range: 25, damage: 100, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', deathSpawns: 'elixir_golemite', deathSpawnCount: 2, givesOpponentElixir: true, rarity: 'epic' },
   { id: 'elixir_golemite', name: 'Elixir Golemite', cost: 0, color: '#D442F5', hp: 800, speed: 1.5, type: 'ground', range: 25, damage: 50, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', deathSpawns: 'elixir_blob', deathSpawnCount: 2, givesOpponentElixir: true, rarity: 'rare', isToken: true },
   { id: 'elixir_blob', name: 'Elixir Blob', cost: 0, color: '#D442F5', hp: 400, speed: 1.5, type: 'ground', range: 25, damage: 25, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', givesOpponentElixir: true, rarity: 'common', isToken: true },
-  { id: 'firecracker', name: 'Firecracker', cost: 3, color: '#e67e22', hp: 240, speed: 3, type: 'ground', range: 100, damage: 180, attackSpeed: 2500, projectile: 'firecracker_burst', count: 1, splash: true, stun: 0.5, recoil: 60, spreadCount: 8, spreadArc: 0.5, rarity: 'common' },
+  { id: 'firecracker', name: 'Firecracker', cost: 3, color: '#e67e22', hp: 240, speed: 3, type: 'ground', range: 100, damage: 180, attackSpeed: 2500, projectile: 'firecracker_burst', count: 1, splash: true, stun: 0.5, recoil: 60, spreadCount: 8, spreadArc: 0.5, rarity: 'common', evolvesTo: 'evolved_firecracker', evolutionCycles: 2 },
 
   // 5 More NEW Cards
   { id: 'giant_skeleton', name: 'Giant Skel', cost: 6, color: '#bdc3c7', hp: 2800, speed: 1.5, type: 'ground', range: 25, damage: 170, attackSpeed: 1500, projectile: null, count: 1, rarity: 'epic', deathDamage: 1000, deathRadius: 100, deathBombDelay: 3000 },
-  { id: 'electro_dragon', name: 'Electro D', cost: 5, color: '#3498db', hp: 1000, speed: 2, type: 'flying', range: 70, damage: 160, attackSpeed: 2100, projectile: 'electric_bolt', count: 1, rarity: 'epic', chain: 3, stun: 0.5 },
+  { id: 'electro_dragon', name: 'Electro D', cost: 5, color: '#3498db', hp: 1000, speed: 2, type: 'flying', range: 70, damage: 160, attackSpeed: 2100, projectile: 'electric_bolt', count: 1, rarity: 'epic', chain: 3, stun: 0.5, evolvesTo: 'evolved_electro_dragon', evolutionCycles: 1 },
   { id: 'magic_archer', name: 'Magic Arch', cost: 4, color: '#27ae60', hp: 440, speed: 2, type: 'ground', range: 140, damage: 111, attackSpeed: 1100, projectile: 'magic_arrow', count: 1, rarity: 'legendary', pierce: true },
-  { id: 'royal_ghost', name: 'Royal Ghost', cost: 3, color: '#ecf0f1', hp: 1000, speed: 2, type: 'ground', range: 25, damage: 216, attackSpeed: 1800, projectile: null, count: 1, rarity: 'legendary', splash: true, hidden: true },
+  { id: 'royal_ghost', name: 'Royal Ghost', cost: 3, color: '#ecf0f1', hp: 1000, speed: 2, type: 'ground', range: 25, damage: 216, attackSpeed: 1800, projectile: null, count: 1, rarity: 'legendary', splash: true, hidden: true, evolvesTo: 'evolved_royal_ghost', evolutionCycles: 1 },
   { id: 'hunter', name: 'Hunter', cost: 4, color: '#2c3e50', hp: 700, speed: 2, type: 'ground', range: 80, damage: 700, attackSpeed: 2200, projectile: 'shotgun_blast', count: 1, rarity: 'epic', shotgunSpread: true },
 
   // 5 NEW REQUESTED CARDS
   { id: 'sparky', name: 'Sparky', cost: 6, color: '#e74c3c', hp: 1750, speed: 0.7, type: 'ground', range: 55, damage: 1135, attackSpeed: 5000, projectile: 'electric_blast', count: 1, splash: true, splashRadius: 50, chargeTime: 5000, recoil: 40, stopsToAttack: true, rarity: 'legendary' },
   { id: 'mother_witch', name: 'Mother Witch', cost: 4, color: '#9b59b6', hp: 720, speed: 1.5, type: 'ground', range: 55, damage: 159, attackSpeed: 1400, projectile: 'witch_projectile', count: 1, splash: false, turnsToPig: true, pigDuration: 5000, rarity: 'legendary' },
   { id: 'bomb_tower', name: 'Bomb Tower', cost: 4, color: '#7f8c8d', hp: 1400, speed: 0, type: 'building', range: 55, damage: 200, attackSpeed: 1500, projectile: 'bomb', count: 1, lifetime: 40, deathDamage: 500, deathRadius: 60, deathBombDelay: 1000, rarity: 'rare' },
-  { id: 'mortar', name: 'Mortar', cost: 4, color: '#95a5a6', hp: 340, speed: 0, type: 'building', range: 200, damage: 228, attackSpeed: 3000, projectile: 'mortar_shell', count: 1, lifetime: 25, chargeTime: 3000, stopsToAttack: true, rarity: 'common', splashRadius: 45 },
+  { id: 'mortar', name: 'Mortar', cost: 4, color: '#95a5a6', hp: 340, speed: 0, type: 'building', range: 200, damage: 228, attackSpeed: 3000, projectile: 'mortar_shell', count: 1, lifetime: 25, chargeTime: 3000, stopsToAttack: true, rarity: 'common', splashRadius: 45, evolvesTo: 'evolved_mortar', evolutionCycles: 2 },
   { id: 'clone', name: 'Clone', cost: 3, color: '#3498db', type: 'spell', damage: 0, radius: 35, count: 1, cloneUnits: true, cloneDuration: 10, rarity: 'epic' },
 
   // REMAINING MISSING CARDS (Non-Champions)
   // Spells
   { id: 'freeze', name: 'Freeze', cost: 4, color: '#87CEEB', type: 'spell', damage: 91, radius: 50, count: 1, freezeDuration: 4, rarity: 'epic' },
   { id: 'rage', name: 'Rage', cost: 2, color: '#9b59b6', type: 'spell', damage: 0, radius: 60, count: 1, rageDuration: 7, rageBoost: 0.35, rarity: 'epic' },
-  { id: 'snowball', name: 'Snowball', cost: 2, color: '#E8F4F8', type: 'spell', damage: 159, radius: 35, count: 1, knockback: 15, slow: 0.35, slowDuration: 2.5, rarity: 'common' },
+  { id: 'snowball', name: 'Snowball', cost: 2, color: '#E8F4F8', type: 'spell', damage: 159, radius: 35, count: 1, knockback: 15, slow: 0.35, slowDuration: 2.5, rarity: 'common', evolvesTo: 'evolved_snowball', evolutionCycles: 2 },
   { id: 'barb_barrel', name: 'Barb Barrel', cost: 2, color: '#8B4513', type: 'spell', damage: 243, radius: 30, count: 1, spawns: 'barbarian_single', spawnCount: 1, knockback: 10, rarity: 'epic' },
   { id: 'barbarian_single', name: 'Barbarian', cost: 0, color: '#CD853F', hp: 670, speed: 1.5, type: 'ground', range: 30, damage: 192, attackSpeed: 1300, projectile: null, count: 1, rarity: 'common', isToken: true },
   { id: 'royal_delivery', name: 'Royal Delivery', cost: 3, color: '#3498db', type: 'spell', damage: 362, radius: 45, count: 1, spawns: 'royal_recruit_single', spawnCount: 1, spawnDelay: 3000, rarity: 'common' },
@@ -160,20 +161,20 @@ const CARDS = [
 
   // Troops - Easy
   { id: 'flying_machine', name: 'Flying Machine', cost: 4, color: '#f1c40f', hp: 510, speed: 2, type: 'flying', range: 100, damage: 152, attackSpeed: 1100, projectile: 'bullet', count: 1, rarity: 'rare' },
-  { id: 'wall_breakers', name: 'Wall Breakers', cost: 2, color: '#bdc3c7', hp: 332, speed: 4, type: 'ground', range: 5, damage: 446, attackSpeed: 1000, projectile: null, count: 2, targetType: 'buildings', kamikaze: true, splash: true, splashRadius: 40, rarity: 'epic' },
+  { id: 'wall_breakers', name: 'Wall Breakers', cost: 2, color: '#bdc3c7', hp: 332, speed: 4, type: 'ground', range: 5, damage: 446, attackSpeed: 1000, projectile: null, count: 2, targetType: 'buildings', kamikaze: true, splash: true, splashRadius: 40, rarity: 'epic', evolvesTo: 'evolved_wall_breakers', evolutionCycles: 2 },
   { id: 'skeleton_dragons', name: 'Skel Dragons', cost: 4, color: '#27ae60', hp: 596, speed: 2, type: 'flying', range: 55, damage: 106, attackSpeed: 1800, projectile: 'dragon_fire', count: 2, splash: true, rarity: 'common' },
 
   // Troops - Medium
   { id: 'bowler', name: 'Bowler', cost: 5, color: '#3498db', hp: 2350, speed: 1.5, type: 'ground', range: 50, damage: 290, attackSpeed: 2500, projectile: 'boulder', count: 1, splash: true, knockback: 25, pierce: true, rarity: 'epic' },
-  { id: 'executioner', name: 'Executioner', cost: 5, color: '#2c3e50', hp: 1150, speed: 1.5, type: 'ground', range: 70, damage: 210, attackSpeed: 2400, projectile: 'axe_boomerang', count: 1, splash: true, boomerang: true, rarity: 'epic' },
+  { id: 'executioner', name: 'Executioner', cost: 5, color: '#2c3e50', hp: 1150, speed: 1.5, type: 'ground', range: 70, damage: 210, attackSpeed: 2400, projectile: 'axe_boomerang', count: 1, splash: true, boomerang: true, rarity: 'epic', evolvesTo: 'evolved_executioner', evolutionCycles: 1 },
   { id: 'zappies', name: 'Zappies', cost: 4, color: '#f1c40f', hp: 440, speed: 1.5, type: 'ground', range: 55, damage: 85, attackSpeed: 2100, projectile: 'electric_zap', count: 3, stun: 0.5, rarity: 'rare' },
   { id: 'rascals', name: 'Rascals', cost: 5, color: '#e67e22', hp: 1281, speed: 1.5, type: 'ground', range: 25, damage: 182, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common', spawnsExtra: 'rascal_girls', extraCount: 2 },
   { id: 'rascal_girls', name: 'Rascal Girls', cost: 0, color: '#e67e22', hp: 300, speed: 2.5, type: 'ground', range: 100, damage: 107, attackSpeed: 1100, projectile: 'slingshot', count: 1, rarity: 'common', isToken: true },
-  { id: 'royal_recruits', name: 'Royal Recruits', cost: 7, color: '#3498db', hp: 630, shieldHp: 200, speed: 1.5, type: 'ground', range: 30, damage: 125, attackSpeed: 1200, projectile: null, count: 7, rarity: 'common', hasShield: true, splitSpawn: true },
+  { id: 'royal_recruits', name: 'Royal Recruits', cost: 7, color: '#3498db', hp: 630, shieldHp: 200, speed: 1.5, type: 'ground', range: 30, damage: 125, attackSpeed: 1200, projectile: null, count: 7, rarity: 'common', hasShield: true, splitSpawn: true, evolvesTo: 'evolved_royal_recruits', evolutionCycles: 1 },
 
   // Troops/Buildings - Hard
   { id: 'cannon_cart', name: 'Cannon Cart', cost: 5, color: '#7f8c8d', hp: 696, shieldHp: 590, speed: 2.5, type: 'ground', range: 70, damage: 202, attackSpeed: 1200, projectile: 'cannonball', count: 1, rarity: 'epic', hasShield: true, transformsToBuilding: true },
-  { id: 'goblin_drill', name: 'Goblin Drill', cost: 4, color: '#2ecc71', hp: 1200, speed: 2, type: 'ground', range: 25, damage: 100, attackSpeed: 1000, projectile: null, count: 1, lifetime: 20, targetType: 'buildings', spawns: 'sword_goblins', spawnRate: 1.1, spawnCount: 1, rarity: 'epic', deployAnywhere: true, deathSpawns: 'sword_goblins', deathSpawnCount: 3, burrows: true },
+  { id: 'goblin_drill', name: 'Goblin Drill', cost: 4, color: '#2ecc71', hp: 1200, speed: 2, type: 'ground', range: 25, damage: 100, attackSpeed: 1000, projectile: null, count: 1, lifetime: 20, targetType: 'buildings', spawns: 'sword_goblins', spawnRate: 1.1, spawnCount: 1, rarity: 'epic', deployAnywhere: true, deathSpawns: 'sword_goblins', deathSpawnCount: 3, burrows: true, evolvesTo: 'evolved_goblin_drill', evolutionCycles: 2 },
   { id: 'phoenix', name: 'Phoenix', cost: 4, color: '#e74c3c', hp: 1000, speed: 2.5, type: 'flying', range: 50, damage: 200, attackSpeed: 1600, projectile: 'phoenix_fire', count: 1, splash: true, rarity: 'legendary', revivesAsEgg: true, eggHp: 800, eggDuration: 3000 },
   { id: 'phoenix_egg', name: 'Phoenix Egg', cost: 0, color: '#f39c12', hp: 800, speed: 0, type: 'ground', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, rarity: 'legendary', isToken: true, hatchesInto: 'phoenix', hatchDuration: 3000 },
 
@@ -209,7 +210,40 @@ const CARDS = [
   { id: 'evolved_skeletons', name: 'Evolved Skeletons', cost: 1, color: '#bdc3c7', hp: 81, speed: 2, type: 'ground', range: 25, damage: 81, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common', isToken: true, evolution: true, spawnOnHitCap: 8, evolutionAuraColor: '#00d2ff' },
   { id: 'evolved_barbarians', name: 'Evolved Barbarians', cost: 5, color: '#CD853F', hp: 737, speed: 1.5, type: 'ground', range: 30, damage: 192, attackSpeed: 1300, projectile: null, count: 5, rarity: 'common', isToken: true, evolution: true, boostOnAttack: true, boostDuration: 3000, boostAmount: 0.3, evolutionAuraColor: '#e74c3c' },
   { id: 'evolved_bats', name: 'Evolved Bats', cost: 2, color: '#8e44ad', hp: 122, speed: 3.5, type: 'flying', range: 50, damage: 81, attackSpeed: 1300, projectile: null, count: 5, rarity: 'common', isToken: true, evolution: true, selfHealOnAttack: 38, overhealMaxHp: 244, evolutionAuraColor: '#2ecc71' },
-  { id: 'evolved_royal_giant', name: 'Evolved Royal Giant', cost: 6, color: '#e67e22', hp: 3164, speed: 1.2, type: 'ground', range: 90, damage: 307, attackSpeed: 1700, projectile: 'cannonball', count: 1, targetType: 'buildings', rarity: 'common', isToken: true, evolution: true, recoilBlastOnAttack: true, recoilBlastDamage: 81, recoilBlastRadius: 40, recoilBlastKnockback: 16, evolutionAuraColor: '#f39c12' }
+  { id: 'evolved_royal_giant', name: 'Evolved Royal Giant', cost: 6, color: '#e67e22', hp: 3164, speed: 1.2, type: 'ground', range: 90, damage: 307, attackSpeed: 1700, projectile: 'cannonball', count: 1, targetType: 'buildings', rarity: 'common', isToken: true, evolution: true, recoilBlastOnAttack: true, recoilBlastDamage: 81, recoilBlastRadius: 40, recoilBlastKnockback: 16, evolutionAuraColor: '#f39c12' },
+  { id: 'evolved_firecracker', name: 'Evolved Firecracker', cost: 3, color: '#e67e22', hp: 240, speed: 3, type: 'ground', range: 100, damage: 180, attackSpeed: 2500, projectile: 'firecracker_burst', count: 1, splash: true, stun: 0.5, recoil: 60, spreadCount: 8, spreadArc: 0.5, rarity: 'common', isToken: true, evolution: true, sparkPoisonDamage: 20, sparkPoisonDuration: 2.5, sparkPoisonRadius: 20, sparkPoisonSlow: 0.15, evolutionAuraColor: '#ff6b6b' },
+  { id: 'evolved_mortar', name: 'Evolved Mortar', cost: 4, color: '#95a5a6', hp: 340, speed: 0, type: 'building', range: 200, damage: 228, attackSpeed: 3000, projectile: 'mortar_shell', count: 1, lifetime: 25, chargeTime: 3000, stopsToAttack: true, rarity: 'common', isToken: true, evolution: true, splashRadius: 45, spawnOnAttackCardId: 'goblin_single', spawnOnAttackCount: 1, spawnOnAttackDelay: 700, evolutionAuraColor: '#16a085' },
+  { id: 'evolved_royal_recruits', name: 'Evolved Royal Recruits', cost: 7, color: '#3498db', hp: 630, shieldHp: 200, speed: 1.5, type: 'ground', range: 30, damage: 125, attackSpeed: 1200, projectile: null, count: 7, rarity: 'common', isToken: true, evolution: true, hasShield: true, splitSpawn: true, charge: true, chargeOnlyWithoutShield: true, evolutionAuraColor: '#5dade2' },
+  { id: 'evolved_ice_spirit', name: 'Evolved Ice Spirit', cost: 1, color: '#E8F4F8', hp: 230, speed: 4, type: 'ground', range: 25, damage: 110, attackSpeed: 1000, projectile: null, count: 1, splash: true, freezeDuration: 1.1, rarity: 'common', isToken: true, evolution: true, kamikaze: true, freezeRadius: 66, delayedFreezeDelay: 3000, delayedFreezeDuration: 1100, delayedFreezeRadius: 32, evolutionAuraColor: '#74b9ff' },
+  { id: 'evolved_valkyrie', name: 'Evolved Valkyrie', cost: 4, color: '#e74c3c', hp: 1908, speed: 1.5, type: 'ground', range: 25, damage: 267, attackSpeed: 1500, projectile: null, count: 1, splash: true, rarity: 'rare', isToken: true, evolution: true, tornadoOnAttack: true, tornadoRadius: 88, tornadoDuration: 500, tornadoDamage: 44, evolutionAuraColor: '#e84393' },
+  { id: 'evolved_bomber', name: 'Evolved Bomber', cost: 2, color: '#e67e22', hp: 398, speed: 2, type: 'ground', range: 55, damage: 222, attackSpeed: 1800, projectile: 'bomb', count: 1, splash: true, rarity: 'common', isToken: true, evolution: true, bounceBombCount: 2, bounceSpacing: 40, bounceRadius: 40, evolutionAuraColor: '#f39c12' },
+  { id: 'evolved_tesla', name: 'Evolved Tesla', cost: 4, color: '#f1c40f', hp: 1152, speed: 0, type: 'building', range: 55, damage: 230, attackSpeed: 1100, projectile: 'tesla_lightning', count: 1, lifetime: 35, hidden: true, rarity: 'common', isToken: true, evolution: true, spawnDamage: 111, spawnDamageRadius: 96, spawnPulseStun: 0.5, evolutionAuraColor: '#00cec9' },
+  { id: 'evolved_wizard', name: 'Evolved Wizard', cost: 5, color: '#9b59b6', hp: 720, speed: 1.5, type: 'ground', range: 60, damage: 281, attackSpeed: 1400, projectile: 'fireball_small', count: 1, splash: true, rarity: 'rare', isToken: true, evolution: true, hasShield: true, shieldHp: 281, shieldBreakDamage: 281, shieldBreakRadius: 48, shieldBreakKnockback: 24, evolutionAuraColor: '#8e44ad' },
+  { id: 'evolved_goblin_giant', name: 'Evolved Goblin Giant', cost: 6, color: '#27ae60', hp: 2628, speed: 1, type: 'ground', range: 25, damage: 211, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', rarity: 'epic', isToken: true, evolution: true, deathSpawns: 'spear_goblins', deathSpawnCount: 2, extraProjectiles: 2, lowHpSpawnCardId: 'goblin_single', lowHpSpawnThreshold: 0.5, lowHpSpawnInterval: 2200, lowHpSpawnOffset: 40, evolutionAuraColor: '#2ecc71' },
+  { id: 'evolved_pekka', name: 'Evolved P.E.K.K.A', cost: 7, color: '#8e44ad', hp: 3760, speed: 1, type: 'ground', range: 25, damage: 816, attackSpeed: 1800, projectile: null, count: 1, rarity: 'epic', isToken: true, evolution: true, healOnKillRatio: 0.25, overhealMaxHp: 6242, evolutionAuraColor: '#6c5ce7' },
+  { id: 'evolved_mega_knight', name: 'Evolved Mega Knight', cost: 7, color: '#e67e22', hp: 3993, speed: 1.5, type: 'ground', range: 25, damage: 268, attackSpeed: 1700, projectile: null, count: 1, splash: true, spawnDamage: 536, jumps: true, rarity: 'legendary', isToken: true, evolution: true, uppercutKnockback: 64, evolutionAuraColor: '#e17055' },
+  { id: 'evolved_hunter', name: 'Evolved Hunter', cost: 4, color: '#95a5a6', hp: 1050, speed: 2, type: 'ground', range: 75, damage: 180, attackSpeed: 1500, projectile: 'shotgun_blast', count: 1, splash: true, shotgunSpread: true, rarity: 'epic', isToken: true, evolution: true, rootOnAttackDuration: 3000, rootOnAttackCooldown: 5000, evolutionAuraColor: '#95a5a6' },
+  { id: 'evolved_executioner', name: 'Evolved Executioner', cost: 5, color: '#2c3e50', hp: 1150, speed: 1.5, type: 'ground', range: 70, damage: 210, attackSpeed: 2400, projectile: 'axe_boomerang', count: 1, splash: true, boomerang: true, rarity: 'epic', isToken: true, evolution: true, closeRangeDamageMultiplier: 1.5, closeRangeKnockback: 24, closeRangeThreshold: 56, evolutionAuraColor: '#34495e' },
+  { id: 'evolved_witch', name: 'Evolved Witch', cost: 5, color: '#9b59b6', hp: 838, speed: 1.5, type: 'ground', range: 55, damage: 134, attackSpeed: 1100, projectile: 'witch_projectile', count: 1, splash: true, spawns: 'skeletons', spawnRate: 5, spawnCount: 3, rarity: 'epic', isToken: true, evolution: true, healFromSummonsDeath: 100, overhealMaxHp: 1039, evolutionAuraColor: '#a29bfe' },
+  { id: 'evolved_inferno_dragon', name: 'Evolved Inferno Dragon', cost: 4, color: '#e74c3c', hp: 950, speed: 2.5, type: 'flying', range: 40, damage: 30, attackSpeed: 100, projectile: null, count: 1, damageRamp: true, rarity: 'epic', isToken: true, evolution: true, rampPersistDuration: 9000, fourthStageAfter: 20000, fourthStageMultiplier: 2, evolutionAuraColor: '#ff7675' },
+  { id: 'evolved_cannon', name: 'Evolved Cannon', cost: 3, color: '#8B4513', hp: 896, speed: 0, type: 'building', range: 90, damage: 212, attackSpeed: 900, projectile: 'cannonball', count: 1, lifetime: 30, rarity: 'common', isToken: true, evolution: true, deployBombRainCount: 9, deployBombRainDamage: 106, deployBombRainKnockback: 20, deployBombRainRadius: 40, evolutionAuraColor: '#636e72' },
+  { id: 'evolved_zap', name: 'Evolved Zap', cost: 2, color: '#3498db', type: 'spell', damage: 192, radius: 35, count: 1, stun: 0.5, rarity: 'common', isToken: true, evolution: true, lingeringZap: true, lingeringZapDuration: 4, lingeringZapInterval: 0.5, lingeringZapGrowth: 0.5, evolutionAuraColor: '#74b9ff' },
+  { id: 'evolved_snowball', name: 'Evolved Snowball', cost: 2, color: '#E8F4F8', type: 'spell', damage: 159, radius: 35, count: 1, knockback: 15, slow: 0.35, slowDuration: 2.5, rarity: 'common', isToken: true, evolution: true, pullDistance: 4.5, pullStrength: 8, evolutionAuraColor: '#dfe6e9' },
+  { id: 'evolved_dart_goblin', name: 'Evolved Dart Goblin', cost: 3, color: '#2ecc71', hp: 260, speed: 3.5, type: 'ground', range: 100, damage: 131, attackSpeed: 700, projectile: 'dart', count: 1, rarity: 'rare', isToken: true, evolution: true, poisonEffect: true, poisonStackLevel2: 4, poisonStackLevel3: 7, poisonTrailDuration: 1, poisonTrailDamage: 50, evolutionAuraColor: '#55efc4' },
+  { id: 'evolved_lumberjack', name: 'Evolved Lumberjack', cost: 4, color: '#e67e22', hp: 1232, speed: 2.5, type: 'ground', range: 25, damage: 240, attackSpeed: 800, projectile: null, count: 1, splash: true, rarity: 'legendary', isToken: true, evolution: true, deathSpawnsGhost: true, ghostDuration: 8, ghostDps: 80, evolutionAuraColor: '#ff7675' },
+  { id: 'evolved_musketeer', name: 'Evolved Musketeer', cost: 4, color: '#34495e', hp: 720, speed: 1.5, type: 'ground', range: 100, damage: 218, attackSpeed: 1100, projectile: 'bullet', count: 1, rarity: 'rare', isToken: true, evolution: true, sniperShots: 3, sniperShotDelay: 0.4, sniperDamage: 140, evolutionAuraColor: '#636e72' },
+  { id: 'evolved_electro_dragon', name: 'Evolved Electro Dragon', cost: 5, color: '#3498db', hp: 1000, speed: 2, type: 'flying', range: 70, damage: 160, attackSpeed: 2100, projectile: 'electric_bolt', count: 1, rarity: 'epic', isToken: true, evolution: true, infiniteChain: true, chainDecay: 0.4, chainRange: 60, stun: 0.3, evolutionAuraColor: '#0984e3' },
+  { id: 'evolved_skeleton_barrel', name: 'Evolved Skeleton Barrel', cost: 3, color: '#bdc3c8', hp: 636, speed: 6, type: 'flying', range: 0, radius: 25, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 20, targetType: 'buildings', rarity: 'epic', isToken: true, evolution: true, deathSpawns: 'skeletons', deathSpawnCount: 4, deathDamage: 133, deathRadius: 40, dropBarrels: true, dropBarrelsAt: [0.75, 0], evolutionAuraColor: '#b2bec3' },
+  { id: 'evolved_furnace', name: 'Evolved Furnace', cost: 4, color: '#e74c3c', hp: 1003, speed: 1.5, type: 'ground', range: 50, damage: 120, attackSpeed: 1200, projectile: 'flame', count: 1, spawns: 'fire_spirit', spawnRate: 2.4, spawnCount: 1, rarity: 'rare', isToken: true, evolution: true, alternatingSides: true, evolutionAuraColor: '#ff6b6b' },
+  { id: 'evolved_baby_dragon', name: 'Evolved Baby Dragon', cost: 4, color: '#27ae60', hp: 1152, speed: 2, type: 'flying', range: 80, damage: 160, attackSpeed: 1500, projectile: 'dragon_fire', count: 1, splash: true, rarity: 'epic', isToken: true, evolution: true, windBurst: true, windBurstWidth: 8, windBurstHeight: 9, windBurstPushback: 2, evolutionAuraColor: '#00b894' },
+  { id: 'evolved_skeleton_army', name: 'Evolved Skeleton Army', cost: 3, color: '#ecf0f1', hp: 81, speed: 2, type: 'ground', range: 25, damage: 81, attackSpeed: 1000, projectile: null, count: 15, rarity: 'epic', isToken: true, evolution: true, skeletonGeneral: true, skeletonGeneralHp: 650, skeletonsInvincibleOnDeath: true, evolutionAuraColor: '#dfe6e9' },
+  { id: 'evolved_royal_ghost', name: 'Evolved Royal Ghost', cost: 3, color: '#ecf0f1', hp: 1000, speed: 2, type: 'ground', range: 25, damage: 216, attackSpeed: 1800, projectile: null, count: 1, rarity: 'legendary', isToken: true, evolution: true, splash: true, hidden: true, revealRadius: 50, revealDamage: 270, spawnsSouldiers: true, souldiersPerAttack: 2, souldierHp: 75, souldierDamage: 40, souldierLifetime: 5, evolutionAuraColor: '#ffffff' },
+  { id: 'evolved_royal_hogs', name: 'Evolved Royal Hogs', cost: 5, color: '#e67e22', hp: 1260, speed: 3.5, type: 'ground', range: 25, damage: 240, attackSpeed: 1600, projectile: null, count: 4, targetType: 'buildings', jumps: true, rarity: 'common', isToken: true, evolution: true, flyingSpawn: true, fallDamageRadius: 30, fallDamageAmount: 100, fallStunDuration: 0.3, evolutionAuraColor: '#fdcb6e' },
+  { id: 'evolved_goblin_cage', name: 'Evolved Goblin Cage', cost: 5, color: '#95a5a6', hp: 880, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 30, spawns: null, spawnRate: 0, spawnCount: 0, rarity: 'rare', isToken: true, evolution: true, deathSpawns: 'goblin_brawler', deathSpawnCount: 1, dragTroopsIntoCage: true, dragRadius: 40, dragStrength: 5, evolutionAuraColor: '#636e72' },
+  { id: 'evolved_goblin_barrel', name: 'Evolved Goblin Barrel', cost: 3, color: '#2ecc71', type: 'spell', damage: 0, radius: 20, count: 3, spawns: 'sword_goblins', spawnCount: 3, rarity: 'epic', isToken: true, evolution: true, doubleBarrel: true, decoyBarrelDelay: 0.5, evolutionAuraColor: '#55efc4' },
+  { id: 'evolved_battle_ram', name: 'Evolved Battle Ram', cost: 4, color: '#e67e22', hp: 756, speed: 4, type: 'ground', range: 25, damage: 246, attackSpeed: 100, projectile: null, count: 1, targetType: 'buildings', charge: true, rarity: 'rare', isToken: true, evolution: true, deathSpawns: 'barbarian_brothers', deathSpawnCount: 2, kamikaze: true, chargeKnockback: 30, repeatedRammng: true, evolutionAuraColor: '#e17055' },
+  { id: 'evolved_wall_breakers', name: 'Evolved Wall Breakers', cost: 2, color: '#bdc3c7', hp: 332, speed: 4, type: 'ground', range: 5, damage: 446, attackSpeed: 1000, projectile: null, count: 2, targetType: 'buildings', kamikaze: true, splash: true, splashRadius: 40, rarity: 'epic', isToken: true, evolution: true, barrelExplosionFirst: true, barrelExplosionRadius: 30, barrelExplosionDamage: 150, thenRunToBuilding: true, evolutionAuraColor: '#dfe6e9' },
+  { id: 'evolved_goblin_drill', name: 'Evolved Goblin Drill', cost: 4, color: '#2ecc71', hp: 1200, speed: 2, type: 'ground', range: 25, damage: 100, attackSpeed: 1000, projectile: null, count: 1, lifetime: 20, targetType: 'buildings', spawns: 'sword_goblins', spawnRate: 0.8, spawnCount: 1, rarity: 'epic', isToken: true, evolution: true, deployAnywhere: true, deathSpawns: 'sword_goblins', deathSpawnCount: 5, burrows: true, rotatesAroundTower: true, rotateAtHp: [0.66, 0.33], rotateAngle: 90, evolutionAuraColor: '#00b894' }
 ];
 
 const RARITY_COLORS = {
@@ -614,6 +648,36 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
   // Check if unit is flying to add shadow
   const card = CARDS.find(c => c.id === id);
   const isFlying = card?.type === 'flying';
+  const customEvolutionSprites = new Set([
+    'evolved_knight',
+    'evolved_archers',
+    'evolved_skeletons',
+    'evolved_barbarians',
+    'evolved_royal_giant',
+    'evolved_bats'
+  ]);
+
+  if (id?.startsWith('evolved_') && !customEvolutionSprites.has(id)) {
+    const baseId = id.replace('evolved_', '');
+    return (
+      <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+        <View style={{
+          position: 'absolute',
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          borderWidth: 2,
+          borderColor: card?.evolutionAuraColor || '#9b59b6',
+          shadowColor: card?.evolutionAuraColor || '#9b59b6',
+          shadowOpacity: 0.7,
+          shadowRadius: 8,
+          shadowOffset: { width: 0, height: 0 },
+          backgroundColor: 'rgba(155, 89, 182, 0.08)'
+        }} />
+        <UnitSprite id={baseId} isOpponent={isOpponent} size={Math.max(18, size - 4)} unit={unit} />
+      </View>
+    );
+  }
 
   switch (id) {
     case 'knight':
@@ -6593,7 +6657,8 @@ const CollectionCard = memo(({ card, isInDeck, isDragging, onTap, onDragStart, o
     PanResponder.create({
       onStartShouldSetPanResponder: () => false,
       onMoveShouldSetPanResponder: (evt, gestureState) => {
-        return Math.abs(gestureState.dx) > 5 || Math.abs(gestureState.dy) > 5;
+        const isIntentionalUpwardDrag = gestureState.dy < -12 && Math.abs(gestureState.dy) > Math.abs(gestureState.dx);
+        return isIntentionalUpwardDrag;
       },
       onPanResponderGrant: (evt, gestureState) => {
         onDragStart(card, gestureState, componentRef.current);
@@ -6982,6 +7047,13 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
 
   return (
     <View style={styles.deckTabContainer}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: 100 }}
+        showsVerticalScrollIndicator={false}
+        scrollEnabled={scrollEnabled}
+        keyboardShouldPersistTaps="handled"
+      >
       {/* Header Deck Grid (Persistent) */}
       <View style={styles.deckGridContainer}>
         <View style={styles.deckHeaderRow}>
@@ -7293,10 +7365,11 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
         keyExtractor={item => item.id}
         numColumns={4}
         renderItem={renderCollectionCard}
-        scrollEnabled={scrollEnabled}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        scrollEnabled={false}
+        contentContainerStyle={{ paddingBottom: 20 }}
         columnWrapperStyle={{ justifyContent: 'space-between' }}
       />
+      </ScrollView>
 
       {/* Modals */}
       <CardMenu card={cardMenuCard} onClose={() => setCardMenuCard(null)} onInfo={handleCardInfo} onSwap={handleCardSwapRequest} />
@@ -8885,7 +8958,7 @@ export default function App() {
 
           }
 
-        } else if (actualCard.id === 'zap') {
+        } else if (actualCard.id === 'zap' || actualCard.id === 'evolved_zap') {
 
           spellType = 'zap_spell';
 
@@ -8894,6 +8967,12 @@ export default function App() {
           const zapDamage = actualCard.damage;
 
           const zapStun = (actualCard.stun || 0.5) * 1000;
+
+          const isEvolved = actualCard.id === 'evolved_zap';
+
+          const lingeringZapDuration = (actualCard.lingeringZapDuration || 0) * 1000;
+          const lingeringZapInterval = (actualCard.lingeringZapInterval || 0.5) * 1000;
+          const lingeringZapGrowth = actualCard.lingeringZapGrowth || 0.5; // tiles per interval
 
 
 
@@ -8907,7 +8986,18 @@ export default function App() {
 
               if (dist <= zapRadius) {
 
-                return { ...u, hp: u.hp - zapDamage, stunUntil: Date.now() + zapStun, wasStunned: true };
+                return {
+                  ...u,
+                  hp: u.hp - zapDamage,
+                  stunUntil: Date.now() + zapStun,
+                  wasStunned: true,
+                  ...(isEvolved ? {
+                    lingeringZap: true,
+                    lingeringZapEndTime: Date.now() + lingeringZapDuration,
+                    zapOriginX: x,
+                    zapOriginY: y
+                  } : {})
+                };
 
               }
 
@@ -8929,7 +9019,18 @@ export default function App() {
 
                 const towerDamage = Math.floor(zapDamage * 0.3);
 
-                return { ...t, hp: t.hp - towerDamage, stunUntil: Date.now() + zapStun, wasStunned: true };
+                return {
+                  ...t,
+                  hp: t.hp - towerDamage,
+                  stunUntil: Date.now() + zapStun,
+                  wasStunned: true,
+                  ...(isEvolved ? {
+                    lingeringZap: true,
+                    lingeringZapEndTime: Date.now() + lingeringZapDuration,
+                    zapOriginX: x,
+                    zapOriginY: y
+                  } : {})
+                };
 
               }
 
@@ -8955,7 +9056,14 @@ export default function App() {
 
             startTime: Date.now(),
 
-            duration: 500
+            duration: isEvolved ? lingeringZapDuration : 500,
+
+            isEvolved: isEvolved,
+
+            ...(isEvolved ? {
+              lingeringZapInterval,
+              lingeringZapGrowth
+            } : {})
 
           }]);
 
@@ -9018,7 +9126,7 @@ export default function App() {
 
           spellSpeed = 12;
 
-        } else if (actualCard.id === 'goblin_barrel') {
+        } else if (actualCard.id === 'goblin_barrel' || actualCard.id === 'evolved_goblin_barrel') {
 
           spellType = 'goblin_barrel_spell';
 
@@ -9026,17 +9134,31 @@ export default function App() {
 
           startX = x; startY = isOpponent ? 0 : 0;
 
-          setProjectiles(prev => [...prev, {
+          // Evolved Goblin Barrel: 2 barrels (real + decoy)
+          const isEvolved = actualCard.id === 'evolved_goblin_barrel';
+          const barrelCount = isEvolved ? 2 : 1;
+          const decoyDelay = (actualCard.decoyBarrelDelay || 0.5) * 1000;
 
-            id: Date.now(), x: startX, y: startY, targetX: x, targetY: y,
+          for (let i = 0; i < barrelCount; i++) {
+            const isDecoy = isEvolved && i === 1; // Second barrel is decoy
+            const delayOffset = isDecoy ? decoyDelay : 0;
 
-            speed: spellSpeed, damage: 0, radius: actualCard.radius,
+            setProjectiles(prev => [...prev, {
 
-            type: spellType, isSpell: true, hit: false, spawnTime: Date.now(),
+              id: Date.now() + i, x: startX, y: startY, targetX: x, targetY: y,
 
-            isGoblinBarrel: true, spawns: actualCard.spawns, spawnCount: actualCard.spawnCount || 3, isOpponent
+              speed: spellSpeed, damage: 0, radius: actualCard.radius,
 
-          }]);
+              type: spellType, isSpell: true, hit: false, spawnTime: Date.now() + delayOffset,
+
+              isGoblinBarrel: true, spawns: actualCard.spawns, spawnCount: isDecoy ? 0 : (actualCard.spawnCount || 3), isOpponent,
+
+              isDecoy: isDecoy, // Decoy barrel spawns no goblins
+
+              delayedSpawn: isDecoy // Delayed spawn for decoy
+
+            }]);
+          }
 
         } else if (actualCard.id === 'earthquake') {
 
@@ -9302,7 +9424,15 @@ export default function App() {
 
             splash: actualCard.id === 'fireball' || actualCard.id === 'the_log', // These spells do splash damage
 
-            y: startY // Store starting Y for knockback calculation
+            y: startY, // Store starting Y for knockback calculation
+
+            // Evolved Snowball pull properties
+            ...(actualCard.id === 'evolved_snowball' || actualCard.id === 'snowball' ? {
+              pullDistance: actualCard.pullDistance || 0,
+              pullStrength: actualCard.pullStrength || 0,
+              slow: actualCard.slow,
+              slowDuration: (actualCard.slowDuration || 2.5) * 1000
+            } : {})
 
           }]);
 
@@ -9404,6 +9534,16 @@ export default function App() {
             powerShotMaxRange: actualCard.powerShotMaxRange || 0,
             powerShotMultiplier: actualCard.powerShotMultiplier || 0,
             spawnOnHitCap: actualCard.spawnOnHitCap || 0,
+            sparkPoisonDamage: actualCard.sparkPoisonDamage || 0,
+            sparkPoisonDuration: actualCard.sparkPoisonDuration || 0,
+            sparkPoisonRadius: actualCard.sparkPoisonRadius || 0,
+            sparkPoisonSlow: actualCard.sparkPoisonSlow || 0,
+            spawnOnAttackCardId: actualCard.spawnOnAttackCardId || null,
+            spawnOnAttackCount: actualCard.spawnOnAttackCount || 0,
+            spawnOnAttackDelay: actualCard.spawnOnAttackDelay || 0,
+            bounceBombCount: actualCard.bounceBombCount || 0,
+            bounceSpacing: actualCard.bounceSpacing || 0,
+            bounceRadius: actualCard.bounceRadius || 0,
             isAttacking: false,
 
             charge: actualCard.charge ? { active: false, distance: 0, threshold: 2 } : undefined,
@@ -9439,6 +9579,8 @@ export default function App() {
             frontalSplash: actualCard.frontalSplash || false,
 
             spawnDamage: actualCard.spawnDamage || undefined,
+            spawnDamageRadius: actualCard.spawnDamageRadius || 50,
+            spawnPulseStun: actualCard.spawnPulseStun || 0,
 
             spawns: actualCard.spawns || undefined,
 
@@ -9511,10 +9653,109 @@ export default function App() {
             selfHealOnAttack: actualCard.selfHealOnAttack || 0,
             overhealMaxHp: actualCard.overhealMaxHp || actualCard.hp,
             pendingSelfHeals: [],
+            pendingMultiShots: [],
+            tornadoOnAttack: actualCard.tornadoOnAttack || false,
+            tornadoRadius: actualCard.tornadoRadius || 0,
+            tornadoDuration: actualCard.tornadoDuration || 0,
+            tornadoDamage: actualCard.tornadoDamage || 0,
             boostOnAttack: actualCard.boostOnAttack || false,
             boostDuration: actualCard.boostDuration || 0,
             boostAmount: actualCard.boostAmount || 0.35,
-
+            chargeOnlyWithoutShield: actualCard.chargeOnlyWithoutShield || false,
+            shieldBreakDamage: actualCard.shieldBreakDamage || 0,
+            shieldBreakRadius: actualCard.shieldBreakRadius || 0,
+            shieldBreakKnockback: actualCard.shieldBreakKnockback || 0,
+            lowHpSpawnCardId: actualCard.lowHpSpawnCardId || null,
+            lowHpSpawnThreshold: actualCard.lowHpSpawnThreshold || 0,
+            lowHpSpawnInterval: actualCard.lowHpSpawnInterval || 0,
+            lowHpSpawnOffset: actualCard.lowHpSpawnOffset || 0,
+            lastLowHpSpawn: 0,
+            healOnKillRatio: actualCard.healOnKillRatio || 0,
+            uppercutKnockback: actualCard.uppercutKnockback || 0,
+            rootOnAttackDuration: actualCard.rootOnAttackDuration || 0,
+            rootOnAttackCooldown: actualCard.rootOnAttackCooldown || 0,
+            lastRootAttack: 0,
+            closeRangeDamageMultiplier: actualCard.closeRangeDamageMultiplier || 0,
+            closeRangeKnockback: actualCard.closeRangeKnockback || 0,
+            closeRangeThreshold: actualCard.closeRangeThreshold || 0,
+            healFromSummonsDeath: actualCard.healFromSummonsDeath || 0,
+            rampPersistDuration: actualCard.rampPersistDuration || 0,
+            fourthStageAfter: actualCard.fourthStageAfter || 0,
+            fourthStageMultiplier: actualCard.fourthStageMultiplier || 0,
+            freezeRadius: actualCard.freezeRadius || 0,
+            delayedFreezeDelay: actualCard.delayedFreezeDelay || 0,
+            delayedFreezeDuration: actualCard.delayedFreezeDuration || 0,
+            delayedFreezeRadius: actualCard.delayedFreezeRadius || 0,
+            pendingFreezePulse: null,
+            deployBombRainCount: actualCard.deployBombRainCount || 0,
+            deployBombRainDamage: actualCard.deployBombRainDamage || 0,
+            deployBombRainKnockback: actualCard.deployBombRainKnockback || 0,
+            deployBombRainRadius: actualCard.deployBombRainRadius || 0,
+            lingeringZap: actualCard.lingeringZap || false,
+            lingeringZapDuration: actualCard.lingeringZapDuration || 0,
+            lingeringZapInterval: actualCard.lingeringZapInterval || 0.5,
+            lingeringZapGrowth: actualCard.lingeringZapGrowth || 0.5,
+            lingeringZapEndTime: 0,
+            pullDistance: actualCard.pullDistance || 0,
+            pullStrength: actualCard.pullStrength || 8,
+            poisonEffect: actualCard.poisonEffect || false,
+            poisonStackLevel2: actualCard.poisonStackLevel2 || 4,
+            poisonStackLevel3: actualCard.poisonStackLevel3 || 7,
+            poisonTrailDuration: actualCard.poisonTrailDuration || 0,
+            poisonTrailDamage: actualCard.poisonTrailDamage || 0,
+            poisonStacks: 0,
+            deathSpawnsGhost: actualCard.deathSpawnsGhost || false,
+            ghostDuration: actualCard.ghostDuration || 0,
+            ghostDps: actualCard.ghostDps || 0,
+            ghostEndTime: 0,
+            sniperShots: actualCard.sniperShots || 0,
+            sniperShotDelay: actualCard.sniperShotDelay || 0,
+            sniperDamage: actualCard.sniperDamage || 0,
+            pendingSniperShots: 0,
+            lastSniperShotTime: 0,
+            infiniteChain: actualCard.infiniteChain || false,
+            chainDecay: actualCard.chainDecay || 0,
+            chainRange: actualCard.chainRange || 0,
+            dropBarrels: actualCard.dropBarrels || false,
+            dropBarrelsAt: actualCard.dropBarrelsAt || [],
+            droppedBarrels: [],
+            alternatingSides: actualCard.alternatingSides || false,
+            spawnSideAlternator: 0,
+            windBurst: actualCard.windBurst || false,
+            windBurstWidth: actualCard.windBurstWidth || 8,
+            windBurstHeight: actualCard.windBurstHeight || 9,
+            windBurstPushback: actualCard.windBurstPushback || 0,
+            skeletonGeneral: actualCard.skeletonGeneral || false,
+            skeletonGeneralHp: actualCard.skeletonGeneralHp || 0,
+            skeletonsInvincibleOnDeath: actualCard.skeletonsInvincibleOnDeath || false,
+            isSkeletonGeneral: false,
+            isInvincibleSkeleton: false,
+            skeletonGeneralId: null,
+            spawnsSouldiers: actualCard.spawnsSouldiers || false,
+            souldiersPerAttack: actualCard.souldiersPerAttack || 0,
+            souldierHp: actualCard.souldierHp || 0,
+            souldierDamage: actualCard.souldierDamage || 0,
+            souldierLifetime: actualCard.souldierLifetime || 0,
+            flyingSpawn: actualCard.flyingSpawn || false,
+            fallDamageRadius: actualCard.fallDamageRadius || 0,
+            fallDamageAmount: actualCard.fallDamageAmount || 0,
+            fallStunDuration: actualCard.fallStunDuration || 0,
+            hasFallen: false,
+            dragTroopsIntoCage: actualCard.dragTroopsIntoCage || false,
+            dragRadius: actualCard.dragRadius || 0,
+            dragStrength: actualCard.dragStrength || 0,
+            doubleBarrel: actualCard.doubleBarrel || false,
+            decoyBarrelDelay: actualCard.decoyBarrelDelay || 0,
+            repeatedRammng: actualCard.repeatedRammng || false,
+            barrelExplosionFirst: actualCard.barrelExplosionFirst || false,
+            barrelExploded: false,
+            barrelExplosionRadius: actualCard.barrelExplosionRadius || 0,
+            barrelExplosionDamage: actualCard.barrelExplosionDamage || 0,
+            thenRunToBuilding: actualCard.thenRunToBuilding || false,
+            rotatesAroundTower: actualCard.rotatesAroundTower || false,
+            rotateAtHp: actualCard.rotateAtHp || [],
+            rotatedAtHp: [],
+            rotateAngle: actualCard.rotateAngle || 90,
             stopsToAttack: actualCard.stopsToAttack || false,
 
             turnsToPig: actualCard.turnsToPig || false,
@@ -9567,6 +9808,51 @@ export default function App() {
         }
 
         setUnits(prev => [...(prev || []), ...newUnits]);
+
+        // Evolved Skeleton Army: Spawn Skeleton General
+        if (actualCard.id === 'evolved_skeleton_army') {
+          const skeletonGeneralCard = CARDS.find(c => c.id === 'skeleton_general');
+          if (skeletonGeneralCard) {
+            const generalId = 'skeleton_general_' + Date.now();
+            setUnits(prev => {
+              // Link all spawned skeletons to this general
+              const skeletonsWithGeneral = (prev || []).map(u => {
+                // Only link skeletons that were just spawned (same approximate time)
+                const wasJustSpawned = u.id >= Date.now() - 1000 && u.spriteId === 'skeletons' && u.isOpponent === isOpponent;
+                if (wasJustSpawned) {
+                  return {
+                    ...u,
+                    isInvincibleSkeleton: true,
+                    skeletonGeneralId: generalId
+                  };
+                }
+                return u;
+              });
+
+              // Add the Skeleton General
+              return [...skeletonsWithGeneral, {
+                id: generalId,
+                x: x,
+                y: y,
+                hp: actualCard.skeletonGeneralHp || 650,
+                maxHp: actualCard.skeletonGeneralHp || 650,
+                isOpponent: isOpponent,
+                speed: 2,
+                lane: lane,
+                lastAttack: 0,
+                spriteId: 'skeleton_general',
+                type: 'ground',
+                range: 25,
+                damage: 81,
+                attackSpeed: 1000,
+                projectile: null,
+                isSkeletonGeneral: true,
+                evolution: true,
+                evolutionAuraColor: '#dfe6e9'
+              }];
+            });
+          }
+        }
 
         // Goblinstein - spawn Monster in front of the Doctor
         if (actualCard.id === 'goblinstein') {
@@ -9669,7 +9955,7 @@ export default function App() {
 
           const stunDuration = actualCard.stun || (actualCard.id === 'mega_knight' ? 0 : 0.5);
 
-          const knockbackForce = actualCard.id === 'mega_knight' ? 40 : 0;
+          const knockbackForce = (actualCard.id === 'mega_knight' || actualCard.id === 'evolved_mega_knight') ? 40 : 0;
 
           setUnits(prevUnits => prevUnits.map(u => {
 
@@ -10134,6 +10420,173 @@ export default function App() {
           }
         }
 
+        // Handle lingering Zap effect from Evolved Zap
+        // The radius stays in the arena, growing 0.5 tiles each interval, doing same stun and damage
+        if (u.lingeringZap && u.lingeringZapEndTime > now) {
+          const zapCard = CARDS.find(c => c.id === 'evolved_zap');
+          if (zapCard) {
+            const originX = u.zapOriginX || 0;
+            const originY = u.zapOriginY || 0;
+            const intervalMs = (zapCard.lingeringZapInterval || 0.5) * 1000;
+            const elapsed = now - (u.lingeringZapEndTime - (zapCard.lingeringZapDuration || 4) * 1000);
+            const currentRadius = zapCard.radius + (Math.floor(elapsed / intervalMs) * (zapCard.lingeringZapGrowth || 0.5) * TILE_SIZE);
+
+            // Check if this unit is in the Zap radius
+            const dist = Math.sqrt(Math.pow(u.x - originX, 2) + Math.pow(u.y - originY, 2));
+            if (dist <= currentRadius) {
+              // Apply damage and stun on each interval
+              const lastZapTime = u.lastLingeringZapTime || 0;
+              if (now - lastZapTime >= intervalMs) {
+                const zapDamage = zapCard.damage || 192;
+                const zapStunMs = (zapCard.stun || 0.5) * 1000;
+                u.hp = Math.max(0, u.hp - zapDamage);
+                u.stunUntil = now + zapStunMs;
+                u.wasStunned = true;
+                u.lastLingeringZapTime = now;
+              }
+            }
+          }
+        }
+
+        // Evolved Skeleton Barrel: Drop barrels at HP thresholds
+        if (u.dropBarrels && u.droppedBarrels && u.dropBarrelsAt && u.dropBarrelsAt.length > 0) {
+          const maxHp = u.maxHp || u.hp;
+          const currentHpPercent = u.hp / maxHp;
+
+          u.dropBarrelsAt.forEach((threshold, index) => {
+            // Check if we've crossed this threshold and haven't dropped a barrel for it yet
+            const previousHpPercent = (u.hp + (h?.damage || 0)) / maxHp; // Approximate previous HP
+            if (previousHpPercent > threshold && currentHpPercent <= threshold && !u.droppedBarrels[index]) {
+              // Drop a barrel!
+              u.droppedBarrels[index] = true;
+
+              // Create a projectile that will spawn skeletons when it lands
+              setProjectiles(prev => [...prev, {
+                id: 'skeleton_barrel_drop_' + Date.now() + '_' + index,
+                x: u.x,
+                y: u.y,
+                targetX: u.x,
+                targetY: u.y + 50, // Fall down slightly
+                speed: 8,
+                damage: 0,
+                radius: 25,
+                type: 'skeleton_barrel_drop',
+                isSpell: true,
+                hit: false,
+                spawnTime: Date.now(),
+                isOpponent: u.isOpponent,
+                spawns: 'skeletons',
+                spawnCount: 3,
+                falls: true
+              }]);
+            }
+          });
+        }
+
+        // Handle Evolved Dart Goblin poison trail
+        // Poison effect that lasts until target is defeated, leaves poison trail when walking
+        // Poison level increases to 2 after 4 hits, level 3 after 7 hits
+        if (u.poisonEffect && u.poisonStacks > 0) {
+          const dartGoblinCard = CARDS.find(c => c.id === 'evolved_dart_goblin');
+          if (dartGoblinCard) {
+            // Apply damage over time based on poison level
+            const level1Dps = dartGoblinCard.poisonTrailDamage || 50;
+            const dpsPerTick = level1Dps * (u.poisonStacks === 1 ? 1 : u.poisonStacks === 2 ? 2 : 4);
+            u.hp = Math.max(0, u.hp - dpsPerTick * 0.05); // 50ms tick
+
+            // Create poison trail at current position
+            if (!u.poisonTrails) u.poisonTrails = [];
+            const trailX = Math.round(u.x / 5) * 5;
+            const trailY = Math.round(u.y / 5) * 5;
+            const existingTrail = u.poisonTrails.find(t => t.x === trailX && t.y === trailY);
+            if (!existingTrail) {
+              u.poisonTrails.push({
+                x: trailX,
+                y: trailY,
+                endTime: now + (dartGoblinCard.poisonTrailDuration || 1) * 1000,
+                poisonLevel: u.poisonStacks
+              });
+            }
+
+            // Clean up old trails
+            u.poisonTrails = u.poisonTrails.filter(t => t.endTime > now);
+
+            // Damage other units in poison trail
+            sourceUnits.forEach(other => {
+              if (other.id !== u.id && other.isOpponent === u.isOpponent && other.hp > 0) {
+                u.poisonTrails.forEach(trail => {
+                  const dist = Math.sqrt(Math.pow(other.x - trail.x, 2) + Math.pow(other.y - trail.y, 2));
+                  if (dist <= 15) {
+                    const trailDamage = (dartGoblinCard.poisonTrailDamage || 50) * 0.05 * trail.poisonLevel;
+                    other.hp = Math.max(0, other.hp - trailDamage);
+                  }
+                });
+              }
+            });
+          }
+        }
+
+        if (u.pendingFreezePulse && u.pendingFreezePulse.at <= now) {
+          const freezeRadius = u.pendingFreezePulse.radius || 32;
+          const freezeDurationMs = u.pendingFreezePulse.duration || 1100;
+          const pulseX = u.pendingFreezePulse.x;
+          const pulseY = u.pendingFreezePulse.y;
+
+          sourceUnits.forEach(unit => {
+            if (unit.isOpponent !== u.isOpponent && unit.hp > 0) {
+              const dist = Math.sqrt(Math.pow(unit.x - pulseX, 2) + Math.pow(unit.y - pulseY, 2));
+              if (dist <= freezeRadius) {
+                unit.stunUntil = now + freezeDurationMs;
+                unit.wasStunned = true;
+                unit.freezeUntil = now + freezeDurationMs;
+              }
+            }
+          });
+
+          nextTowers.forEach(tower => {
+            if (tower.isOpponent !== u.isOpponent && tower.hp > 0) {
+              const dist = Math.sqrt(Math.pow(tower.x - pulseX, 2) + Math.pow(tower.y - pulseY, 2));
+              if (dist <= freezeRadius + 20) {
+                tower.stunUntil = now + freezeDurationMs;
+                tower.freezeUntil = now + freezeDurationMs;
+              }
+            }
+          });
+
+          setVisualEffects(prev => [...prev, {
+            id: Date.now() + Math.random(),
+            type: 'ice_freeze',
+            x: pulseX,
+            y: pulseY,
+            radius: freezeRadius,
+            startTime: Date.now(),
+            duration: 800
+          }]);
+
+          u.pendingFreezePulse = null;
+        }
+
+        // Evolved Goblin Cage: Drag troops into cage
+        if (u.dragTroopsIntoCage && u.type === 'building' && u.hp > 0) {
+          const dragRadius = u.dragRadius || 40;
+          const dragStrength = u.dragStrength || 5;
+
+          sourceUnits.forEach(enemy => {
+            if (enemy.isOpponent !== u.isOpponent && enemy.hp > 0 && enemy.type !== 'building') {
+              const dist = Math.sqrt(Math.pow(enemy.x - u.x, 2) + Math.pow(enemy.y - u.y, 2));
+              if (dist <= dragRadius && dist > 20) {
+                // Pull enemy toward cage center
+                const angle = Math.atan2(u.y - enemy.y, u.x - enemy.x);
+                const pullAmount = Math.min(dragStrength, dist - 20);
+
+                enemy.x += Math.cos(angle) * pullAmount;
+                enemy.y += Math.sin(angle) * pullAmount;
+                enemy.wasPushed = true;
+              }
+            }
+          });
+        }
+
         // Jump Attack Processing (Spirits)
         if (u.isJumpingAttack) {
           const jumpDuration = 300; // ms
@@ -10199,7 +10652,7 @@ export default function App() {
             // Ice Spirit Freeze (stun)
             if (u.stun && u.stun > 0) {
               // Apply to area if splash, or target
-              const affectRadius = 50;
+              const affectRadius = u.freezeRadius || 50;
               const isIceSpirit = u.spriteId === 'ice_spirit';
               // Units
               currentUnits.forEach(unit => {
@@ -10238,6 +10691,16 @@ export default function App() {
                 startTime: Date.now(),
                 duration: 800
               }]);
+
+              if (u.delayedFreezeDelay > 0) {
+                u.pendingFreezePulse = {
+                  at: now + u.delayedFreezeDelay,
+                  x: hitX,
+                  y: hitY,
+                  radius: u.delayedFreezeRadius || 32,
+                  duration: u.delayedFreezeDuration || 1100
+                };
+              }
             }
 
             // Heal Spirit
@@ -10657,6 +11120,14 @@ export default function App() {
                     offsetX = Math.sin(angle) * distance;
                     // Spawn toward enemy: player buildings spawn up (-Y), opponent buildings spawn down (+Y)
                     offsetY = u.isOpponent ? distance * Math.cos(angle) : -distance * Math.cos(angle);
+                  } else if (u.alternatingSides) {
+                    // Evolved Furnace: alternate spawn sides
+                    const side = u.spawnSideAlternator || 0; // 0 = right, 1 = left
+                    const sideOffset = side === 0 ? 40 : -40;
+                    offsetX = sideOffset;
+                    offsetY = u.isOpponent ? -40 : 40; // Spawn toward enemy
+                    // Toggle side for next spawn
+                    u.spawnSideAlternator = side === 0 ? 1 : 0;
                   } else {
                     // Moving unit (Witch) - spawn around with minimum distance
                     const minOffset = 50;
@@ -10690,6 +11161,8 @@ export default function App() {
                     damage: spawnCard.damage,
                     attackSpeed: spawnCard.attackSpeed,
                     projectile: spawnCard.projectile,
+                    summonerId: u.id,
+                    summonerSpriteId: u.spriteId,
                     lockedTarget: null,
                     wasPushed: false,
                     wasStunned: false,
@@ -10721,6 +11194,83 @@ export default function App() {
           }
         }
 
+        if (
+          u.lowHpSpawnCardId &&
+          u.lowHpSpawnThreshold > 0 &&
+          u.hp > 0 &&
+          u.hp <= u.maxHp * u.lowHpSpawnThreshold &&
+          (!u.lastLowHpSpawn || now - u.lastLowHpSpawn >= u.lowHpSpawnInterval)
+        ) {
+          const lowHpSpawnCard = CARDS.find(c => c.id === u.lowHpSpawnCardId);
+          if (lowHpSpawnCard) {
+            const spawnOffset = u.lowHpSpawnOffset || 40;
+            const spawnDirection = u.isOpponent ? -1 : 1;
+            unitsToSpawn.push({
+              id: 'low_hp_spawn_' + now + '_' + Math.random(),
+              x: u.x,
+              y: Math.max(20, Math.min(height - 20, u.y + (spawnOffset * spawnDirection))),
+              hp: lowHpSpawnCard.hp,
+              maxHp: lowHpSpawnCard.hp,
+              isOpponent: u.isOpponent,
+              speed: lowHpSpawnCard.speed,
+              lane: u.lane,
+              lastAttack: 0,
+              spriteId: lowHpSpawnCard.id,
+              type: lowHpSpawnCard.type,
+              range: lowHpSpawnCard.range,
+              damage: lowHpSpawnCard.damage,
+              attackSpeed: lowHpSpawnCard.attackSpeed,
+              projectile: lowHpSpawnCard.projectile,
+              lockedTarget: null,
+              wasPushed: false,
+              wasStunned: false,
+              stunUntil: 0,
+              baseDamage: lowHpSpawnCard.damage
+            });
+            u.lastLowHpSpawn = now;
+          }
+        }
+
+        // Evolved Goblin Drill: Rotate 90° around tower at 66% and 33% HP
+        if (u.rotatesAroundTower && u.rotateAtHp && u.rotateAtHp.length > 0) {
+          const maxHp = u.maxHp || u.hp;
+          const currentHpPercent = u.hp / maxHp;
+
+          u.rotateAtHp.forEach((threshold, index) => {
+            // Check if we've crossed this threshold and haven't rotated for it yet
+            if (currentHpPercent <= threshold && !u.rotatedAtHp?.includes(index)) {
+              // Rotate 90° around the nearest tower!
+              const targetTower = nextTowers.find(t => t.isOpponent !== u.isOpponent && t.hp > 0);
+              if (targetTower) {
+                // Calculate new position after 90° rotation around tower
+                const dx = u.x - targetTower.x;
+                const dy = u.y - targetTower.y;
+                const angle = Math.atan2(dy, dx);
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const newAngle = angle + (Math.PI / 2 * (u.isOpponent ? -1 : 1)); // 90° rotation
+
+                u.x = targetTower.x + Math.cos(newAngle) * distance;
+                u.y = targetTower.y + Math.sin(newAngle) * distance;
+
+                // Mark this rotation as done
+                if (!u.rotatedAtHp) u.rotatedAtHp = [];
+                u.rotatedAtHp.push(index);
+
+                // Visual effect for rotation
+                setVisualEffects(prev => [...prev, {
+                  id: Date.now() + Math.random(),
+                  type: 'drill_rotation',
+                  x: u.x,
+                  y: u.y,
+                  radius: 30,
+                  startTime: Date.now(),
+                  duration: 500
+                }]);
+              }
+            }
+          });
+        }
+
         // Handle spawn damage (one-time effect on spawn)
         if (u.spawnDamage && !u.spawnEffectProcessed) {
           u.spawnEffectProcessed = true;
@@ -10730,7 +11280,9 @@ export default function App() {
             targetX: u.x,
             targetY: u.y,
             damage: u.spawnDamage,
-            slow: u.slow
+            slow: u.slow,
+            radius: u.spawnDamageRadius || 50,
+            stun: u.spawnPulseStun || 0
           });
 
           // Mega Knight spawn slam visual effect
@@ -10745,6 +11297,32 @@ export default function App() {
               duration: 600
             }]);
           }
+        }
+
+        if (u.deployBombRainCount > 0 && !u.deployBombRainProcessed) {
+          u.deployBombRainProcessed = true;
+          const bombPositions = [
+            { x: width * 0.2, y: height * 0.18 },
+            { x: width * 0.4, y: height * 0.22 },
+            { x: width * 0.6, y: height * 0.18 },
+            { x: width * 0.8, y: height * 0.22 },
+            { x: width * 0.15, y: height * 0.5 },
+            { x: width * 0.35, y: height * 0.48 },
+            { x: width * 0.5, y: height * 0.5 },
+            { x: width * 0.65, y: height * 0.48 },
+            { x: width * 0.85, y: height * 0.5 }
+          ];
+
+          bombPositions.slice(0, u.deployBombRainCount).forEach(position => {
+            splashEvents.push({
+              attacker: u,
+              targetX: position.x,
+              targetY: position.y,
+              damage: u.deployBombRainDamage,
+              knockback: u.deployBombRainKnockback,
+              radius: u.deployBombRainRadius
+            });
+          });
         }
 
         // Handle Phoenix Egg hatching
@@ -10789,6 +11367,47 @@ export default function App() {
           }
           // Remove the egg (whether it hatched or died)
           return null;
+        }
+
+        // Evolved Wall Breakers: Barrel explosion first, then run to building
+        if (u.barrelExplosionFirst && !u.barrelExploded && u.type === 'ground') {
+          // Check if Wall Breaker is close to a target building
+          const targetBuilding = (towersRef.current || []).find(t =>
+            t.isOpponent !== u.isOpponent && t.hp > 0 && t.type === 'princess'
+          ) || (towersRef.current || []).find(t =>
+            t.isOpponent !== u.isOpponent && t.hp > 0 && t.type === 'king'
+          );
+
+          if (targetBuilding) {
+            const dist = Math.sqrt(Math.pow(u.x - targetBuilding.x, 2) + Math.pow(u.y - targetBuilding.y, 2));
+            // Explode barrel when getting close to target (but not at target yet)
+            if (dist <= 80) {
+              // Barrel explosion!
+              u.barrelExploded = true;
+
+              splashEvents.push({
+                attacker: u,
+                targetX: u.x,
+                targetY: u.y,
+                damage: u.barrelExplosionDamage || 150,
+                radius: u.barrelExplosionRadius || 30,
+                groundOnly: true,
+                skipTowerDamage: false,
+                fullDamage: true
+              });
+
+              // Visual effect for barrel explosion
+              setVisualEffects(prev => [...prev, {
+                id: Date.now() + Math.random(),
+                type: 'fire_explosion',
+                x: u.x,
+                y: u.y,
+                radius: u.barrelExplosionRadius || 30,
+                startTime: Date.now(),
+                duration: 600
+              }]);
+            }
+          }
         }
 
         // Handle Cannon Cart transform to building
@@ -10897,8 +11516,13 @@ export default function App() {
 
         // Handle Prince charge
         if (u.charge) {
+          if (u.chargeOnlyWithoutShield && u.currentShieldHp > 0) {
+            u.charge.distance = 0;
+            u.charge.active = false;
+          }
+
           // Activate charge after traveling 2 tiles
-          if (u.charge.distance >= u.charge.threshold && !u.charge.active) {
+          if ((!u.chargeOnlyWithoutShield || u.currentShieldHp <= 0) && u.charge.distance >= u.charge.threshold && !u.charge.active) {
             u.charge.active = true;
           }
 
@@ -11479,12 +12103,22 @@ export default function App() {
               const timeRamping = (now - u.lastDamageRampTime) / 1000;
               u.currentDamageBonus = Math.min(350, timeRamping * 60); // Slower ramp, cap at +350
               damageToDeal = Math.floor(actualDamage + u.currentDamageBonus); // Use integer damage
+              if (u.rampPersistDuration > 0) {
+                u.rampHoldUntil = now + u.rampPersistDuration;
+              }
+              if (u.fourthStageAfter > 0 && (now - u.lastDamageRampTime) >= u.fourthStageAfter) {
+                damageToDeal = Math.floor(damageToDeal * (u.fourthStageMultiplier || 2));
+              }
             }
 
             if (u.powerShotMultiplier > 0 &&
               targetDistance >= (u.powerShotMinRange || 0) &&
               targetDistance <= (u.powerShotMaxRange || Infinity)) {
               damageToDeal = Math.floor(damageToDeal * u.powerShotMultiplier);
+            }
+
+            if (u.closeRangeDamageMultiplier > 0 && targetDistance <= (u.closeRangeThreshold || 0)) {
+              damageToDeal = Math.floor(damageToDeal * u.closeRangeDamageMultiplier);
             }
 
             // Hunter Shotgun Spread - damage falls off with distance
@@ -11500,6 +12134,28 @@ export default function App() {
             const targetsToAttack = [closestTarget];
             if (u.spriteId === 'electro_wizard' && closestTarget2 && minDist2 <= actualRange + 25) {
               targetsToAttack.push(closestTarget2);
+            }
+
+            if (u.tornadoOnAttack) {
+              nextProjectiles.push({
+                id: now + Math.random(),
+                x: u.x,
+                y: u.y,
+                targetX: u.x,
+                targetY: u.y,
+                radius: u.tornadoRadius || 88,
+                damage: u.tornadoDamage || 44,
+                duration: (u.tornadoDuration || 500) / 1000,
+                hit: true,
+                spawnTime: now,
+                isTornado: true,
+                isOpponent: u.isOpponent
+              });
+            }
+
+            if (u.rootOnAttackDuration > 0 && typeof closestTarget.id === 'string' && (!u.lastRootAttack || now - u.lastRootAttack >= u.rootOnAttackCooldown)) {
+              closestTarget.rootUntil = now + u.rootOnAttackDuration;
+              u.lastRootAttack = now;
             }
 
             if (u.projectile) {
@@ -11570,13 +12226,17 @@ export default function App() {
                       damage: Math.floor(damageToDeal / pelletCount), // Divide damage by rocket count
                       type: 'firecracker',
                       splash: true,
-                      splashRadius: 25,
-                      stun: u.stun || 0,
-                      attackerId: u.id,
-                      isOpponent: u.isOpponent
-                    });
-                  }
-                } else if (u.projectile === 'hook') {
+                    splashRadius: 25,
+                    stun: u.stun || 0,
+                    attackerId: u.id,
+                    isOpponent: u.isOpponent,
+                    poisonTrailDamage: u.sparkPoisonDamage || 0,
+                    poisonTrailDuration: u.sparkPoisonDuration || 0,
+                    poisonTrailRadius: u.sparkPoisonRadius || 0,
+                    poisonTrailSlow: u.sparkPoisonSlow || 0
+                  });
+                }
+              } else if (u.projectile === 'hook') {
                     nextProjectiles.push({
                       id: now + Math.random(),
                       x: u.x, y: u.y,
@@ -11609,8 +12269,183 @@ export default function App() {
                     pierce: u.pierce || false,
                     chain: u.chain || 0,
                     knockback: u.projectileKnockback || 0,
-                    turnsToPig: u.turnsToPig || false
+                    turnsToPig: u.turnsToPig || false,
+                    bounceBombCount: u.bounceBombCount || 0,
+                    bounceSpacing: u.bounceSpacing || 0,
+                    bounceRadius: u.bounceRadius || 0,
+                    poisonTrailDamage: u.sparkPoisonDamage || 0,
+                    poisonTrailDuration: u.sparkPoisonDuration || 0,
+                    poisonTrailRadius: u.sparkPoisonRadius || 0,
+                    poisonTrailSlow: u.sparkPoisonSlow || 0
                   });
+
+                  // Evolved Dart Goblin: Multi-shot
+                  if (u.multiShotCount > 1) {
+                    const multiShotDelay = u.multiShotDelay || 100;
+                    for (let i = 1; i < u.multiShotCount; i++) {
+                      u.pendingMultiShots = u.pendingMultiShots || [];
+                      u.pendingMultiShots.push({
+                        at: now + (multiShotDelay * i),
+                        targetId: target.id,
+                        targetX: target.x,
+                        targetY: target.y,
+                        damage: damageToDeal,
+                        type: projectileType
+                      });
+                    }
+                  }
+
+                  // Evolved Baby Dragon: Wind burst after attack
+                  if (u.windBurst) {
+                    const burstWidth = (u.windBurstWidth || 8) * TILE_SIZE;
+                    const burstHeight = (u.windBurstHeight || 9) * TILE_SIZE;
+                    const pushback = (u.windBurstPushback || 2) * TILE_SIZE;
+
+                    // Push enemies in front of Baby Dragon
+                    const direction = u.isOpponent ? 1 : -1; // Player attacks up, opponent attacks down
+
+                    sourceUnits.forEach(enemy => {
+                      if (enemy.isOpponent !== u.isOpponent && enemy.hp > 0 && enemy.type !== 'building') {
+                        const dx = Math.abs(enemy.x - u.x);
+                        const dy = (enemy.y - u.y) * direction; // Positive if in front
+
+                        // Check if enemy is in wind burst area
+                        if (dx <= burstWidth / 2 && dy > 0 && dy <= burstHeight) {
+                          // Push enemy back
+                          enemy.y += pushback * direction;
+                          enemy.wasPushed = true;
+                        }
+                      }
+                    });
+                  }
+
+                  // Evolved Musketeer: Sniper shots after attack
+                  if (u.sniperShots > 0) {
+                    const sniperShotDelay = (u.sniperShotDelay || 0.4) * 1000;
+                    const sniperDamage = u.sniperDamage || 140;
+
+                    for (let shot = 0; shot < u.sniperShots; shot++) {
+                      const shotTime = now + sniperShotDelay * (shot + 1);
+                      u.pendingSniperShots = (u.pendingSniperShots || 0) + 1;
+
+                      setTimeout(() => {
+                        // Check if target still exists and is alive
+                        const currentUnits = unitsRef.current || [];
+                        const currentTarget = currentUnits.find(targ => targ.id === target.id) ||
+                          (towersRef.current || []).find(t => t.id === target.id);
+
+                        if (currentTarget && currentTarget.hp > 0) {
+                          setProjectiles(prev => [...prev, {
+                            id: Date.now() + Math.random() + '_sniper',
+                            x: u.x,
+                            y: u.y,
+                            targetId: target.id,
+                            targetX: currentTarget.x,
+                            targetY: currentTarget.y,
+                            speed: 18,
+                            damage: sniperDamage,
+                            type: 'bullet',
+                            splash: false,
+                            attackerId: u.id,
+                            isOpponent: u.isOpponent,
+                            isSniper: true
+                          }]);
+                        }
+
+                        // Decrement pending shots
+                        setUnits(prevUnits => prevUnits.map(unit => {
+                          if (unit.id === u.id && unit.pendingSniperShots > 0) {
+                            return { ...unit, pendingSniperShots: unit.pendingSniperShots - 1 };
+                          }
+                          return unit;
+                        }));
+                      }, sniperShotDelay * (shot + 1));
+                    }
+                  }
+
+                  if (u.spawnOnAttackCardId && typeof target.id === 'string') {
+                    const spawnAttackCard = CARDS.find(c => c.id === u.spawnOnAttackCardId);
+                    if (spawnAttackCard) {
+                      const spawnCount = u.spawnOnAttackCount || 1;
+                      for (let spawnIndex = 0; spawnIndex < spawnCount; spawnIndex++) {
+                        unitsToSpawn.push({
+                          id: 'attack_spawn_' + now + '_' + spawnIndex + '_' + Math.random(),
+                          x: Math.max(20, Math.min(width - 20, target.x + (Math.random() * 20 - 10))),
+                          y: Math.max(20, Math.min(height - 20, target.y + (Math.random() * 20 - 10))),
+                          hp: spawnAttackCard.hp,
+                          maxHp: spawnAttackCard.hp,
+                          isOpponent: u.isOpponent,
+                          speed: spawnAttackCard.speed,
+                          lane: u.lane,
+                          lastAttack: 0,
+                          spriteId: spawnAttackCard.id,
+                          type: spawnAttackCard.type,
+                          range: spawnAttackCard.range,
+                          damage: spawnAttackCard.damage,
+                          attackSpeed: spawnAttackCard.attackSpeed,
+                          projectile: spawnAttackCard.projectile,
+                          spawnTime: now,
+                          spawnDelay: u.spawnOnAttackDelay || 0
+                        });
+                      }
+                    }
+                  }
+
+                  // Evolved Royal Ghost: Spawn Souldiers on attack
+                  if (u.spawnsSouldiers) {
+                    const souldierCount = u.souldiersPerAttack || 2;
+                    for (let s = 0; s < souldierCount; s++) {
+                      const angle = (Math.PI * 2 * s) / souldierCount;
+                      const spawnRadius = 30;
+                      const spawnX = u.x + Math.cos(angle) * spawnRadius;
+                      const spawnY = u.y + Math.sin(angle) * spawnRadius;
+
+                      unitsToSpawn.push({
+                        id: 'souldier_' + now + '_' + s + '_' + Math.random(),
+                        x: Math.max(20, Math.min(width - 20, spawnX)),
+                        y: Math.max(20, Math.min(height - 20, spawnY)),
+                        hp: u.souldierHp || 75,
+                        maxHp: u.souldierHp || 75,
+                        isOpponent: u.isOpponent,
+                        speed: 2,
+                        lane: u.lane,
+                        lastAttack: 0,
+                        spriteId: 'souldier',
+                        type: 'ground',
+                        range: 25,
+                        damage: u.souldierDamage || 40,
+                        attackSpeed: 1000,
+                        projectile: null,
+                        spawnTime: now,
+                        lifetime: (u.souldierLifetime || 5) * 1000,
+                        expiresAt: now + (u.souldierLifetime || 5) * 1000
+                      });
+                    }
+                  }
+
+                  // Evolved Royal Hogs: Fall damage on first attack
+                  if (u.flyingSpawn && !u.hasFallen) {
+                    const fallRadius = u.fallDamageRadius || 30;
+                    const fallDamage = u.fallDamageAmount || 100;
+                    const fallStun = (u.fallStunDuration || 0.3) * 1000;
+
+                    // Deal damage and stun to enemies in radius
+                    splashEvents.push({
+                      attacker: u,
+                      attackerX: u.x,
+                      attackerY: u.y,
+                      targetX: u.x,
+                      targetY: u.y,
+                      damage: fallDamage,
+                      radius: fallRadius,
+                      stun: fallStun / 1000,
+                      groundOnly: true,
+                      skipTowerDamage: false,
+                      fullDamage: true
+                    });
+
+                    u.hasFallen = true;
+                  }
 
                   if (u.recoilBlastOnAttack) {
                     splashEvents.push({
@@ -11742,6 +12577,21 @@ export default function App() {
                   damage: damageToDeal,
                   attackerId: u.id
                 });
+
+                if (u.uppercutKnockback > 0) {
+                  splashEvents.push({
+                    attacker: u,
+                    attackerX: u.x,
+                    attackerY: u.y,
+                    targetX: closestTarget.x,
+                    targetY: closestTarget.y,
+                    damage: 0,
+                    knockback: u.uppercutKnockback,
+                    radius: 18,
+                    skipTowerDamage: true,
+                    fullDamage: true
+                  });
+                }
 
                 // Reset charge if Prince gets attacked - handled in damage application
                 /* Note: We handle charge reset when applying damage */
@@ -12455,14 +13305,18 @@ export default function App() {
 
           // Track Inferno Tower target for damage ramp reset
           if (u.damageRamp && u.lockedTarget && u.lastTargetId !== u.lockedTarget) {
-            // Target changed, reset damage ramp
-            u.lastDamageRampTime = now;
-            u.currentDamageBonus = 0;
+            // Target changed, reset damage ramp unless this evolution preserves the stage briefly
+            if (!u.rampPersistDuration || !u.rampHoldUntil || now > u.rampHoldUntil) {
+              u.lastDamageRampTime = now;
+              u.currentDamageBonus = 0;
+            }
             u.lastTargetId = u.lockedTarget;
           } else if (u.damageRamp && !u.lockedTarget) {
-            // No target, reset
-            u.lastDamageRampTime = now;
-            u.currentDamageBonus = 0;
+            // No target, reset unless this evolution preserves the stage briefly
+            if (!u.rampPersistDuration || !u.rampHoldUntil || now > u.rampHoldUntil) {
+              u.lastDamageRampTime = now;
+              u.currentDamageBonus = 0;
+            }
           }
 
           // Clamp position to map bounds - prevent units from walking out
@@ -12576,11 +13430,23 @@ export default function App() {
                 remainingDamage = Math.floor(remainingDamage * (1 - unit.damageReduction));
               }
 
-              let updatedUnit = { ...unit, hp: unit.hp - remainingDamage, currentShieldHp: newShieldHp };
+              let updatedUnit = { ...unit, hp: unit.hp - remainingDamage, currentShieldHp: newShieldHp, lastHitBy: event.attackerId || unit.lastHitBy };
 
               // Shield Break Visual
               if (shieldBroken) {
                 updatedUnit.hasShield = false;
+                if (unit.shieldBreakDamage > 0) {
+                  splashEvents.push({
+                    attacker: unit,
+                    targetX: unit.x,
+                    targetY: unit.y,
+                    damage: unit.shieldBreakDamage,
+                    radius: unit.shieldBreakRadius || 48,
+                    knockback: unit.shieldBreakKnockback || 0,
+                    skipTowerDamage: true,
+                    fullDamage: true
+                  });
+                }
                 if (unit.spriteId === 'guards') updatedUnit.spriteId = 'skeletons';
                 setVisualEffects(prev => [...prev, {
                   id: Date.now() + Math.random(),
@@ -12732,16 +13598,22 @@ export default function App() {
         });
       });
 
-      // Apply chain events (Electro Spirit)
+      // Apply chain events (Electro Spirit & Evolved Electro Dragon)
       chainEvents.forEach(event => {
         const attacker = currentUnits.find(u => u.id === event.attackerId);
         if (!attacker) return; // Attacker died before chain could complete
 
+        // Check if this is an Evolved Electro Dragon with infinite chain
+        const isInfiniteChain = attacker.infiniteChain || false;
+        const chainDecay = attacker.chainDecay || 0.4; // 40% damage decay per hop
+        const chainRange = attacker.chainRange || 60;
+
         let chainedTargets = [event.primaryTarget];
-        let remainingChains = event.chainCount;
+        let remainingChains = isInfiniteChain ? 999 : event.chainCount; // Infinite for evolved
+        let currentDamage = event.damage;
 
         // Find additional targets to chain to
-        while (remainingChains > 0) {
+        while (remainingChains > 0 && currentDamage > 10) { // Stop if damage too low
           let lastTarget = chainedTargets[chainedTargets.length - 1];
           let closestDist = Infinity;
           let closestTarget = null;
@@ -12750,7 +13622,8 @@ export default function App() {
           currentUnits.forEach(unit => {
             if (unit.isOpponent !== event.isOpponent && unit.hp > 0 && !chainedTargets.find(t => t.id === unit.id) && !unit.isZone) {
               const dist = Math.sqrt(Math.pow(unit.x - lastTarget.x, 2) + Math.pow(unit.y - lastTarget.y, 2));
-              if (dist < closestDist && dist < 80) { // Max chain distance: 80
+              const maxChainDist = isInfiniteChain ? chainRange : 80;
+              if (dist < closestDist && dist < maxChainDist) {
                 closestDist = dist;
                 closestTarget = unit;
               }
@@ -12759,19 +13632,32 @@ export default function App() {
 
           if (closestTarget) {
             chainedTargets.push(closestTarget);
-            remainingChains--;
+            if (!isInfiniteChain) {
+              remainingChains--;
+            } else {
+              // Infinite chain: reduce damage by decay factor
+              currentDamage = Math.floor(currentDamage * chainDecay);
+              if (currentDamage < 10) break; // Minimum damage threshold
+            }
           } else {
             break; // No more targets in range
           }
         }
 
         // Apply damage and stun to all chained targets (except the first one which was already hit)
-        chainedTargets.slice(1).forEach(target => {
-          damageEvents.push({
-            targetId: target.id,
-            damage: event.damage,
-            attackerId: event.attackerId
-          });
+        let damageForNext = event.damage;
+        chainedTargets.slice(1).forEach((target, index) => {
+          if (isInfiniteChain && index > 0) {
+            // Apply damage decay for infinite chain
+            damageForNext = Math.floor(damageForNext * chainDecay);
+          }
+          if (damageForNext > 0) {
+            damageEvents.push({
+              targetId: target.id,
+              damage: damageForNext,
+              attackerId: event.attackerId
+            });
+          }
           // Apply stun
           if (event.stun > 0) {
             const targetUnit = currentUnits.find(u => u.id === target.id);
@@ -12789,7 +13675,8 @@ export default function App() {
             type: 'chain_lightning',
             targets: chainedTargets.map(t => ({ x: t.x, y: t.y })),
             startTime: Date.now(),
-            duration: 400
+            duration: 400,
+            isInfinite: isInfiniteChain
           }]);
         }
       });
@@ -13014,6 +13901,41 @@ export default function App() {
             h.damageDealt = true;
           }
 
+          if (!h.isSpell && !h.isLog) {
+            if (h.poisonTrailDamage > 0) {
+              activeProjectiles.push({
+                id: now + Math.random(),
+                x: h.targetX || h.x,
+                y: h.targetY || h.y,
+                targetX: h.targetX || h.x,
+                targetY: h.targetY || h.y,
+                radius: h.poisonTrailRadius || 20,
+                damage: h.poisonTrailDamage,
+                duration: h.poisonTrailDuration || 2.5,
+                hit: true,
+                spawnTime: now,
+                isPoison: true,
+                isOpponent: h.isOpponent,
+                slow: h.poisonTrailSlow || 0
+              });
+            }
+
+            if (h.bounceBombCount > 0) {
+              const bounceAngle = Math.atan2((h.targetY || h.y) - h.y, (h.targetX || h.x) - h.x);
+              const spacing = h.bounceSpacing || 40;
+              for (let bounceIndex = 1; bounceIndex <= h.bounceBombCount; bounceIndex++) {
+                splashEvents.push({
+                  attackerId: h.attackerId,
+                  targetX: (h.targetX || h.x) + Math.cos(bounceAngle) * spacing * bounceIndex,
+                  targetY: (h.targetY || h.y) + Math.sin(bounceAngle) * spacing * bounceIndex,
+                  damage: h.damage,
+                  radius: h.bounceRadius || 40,
+                  skipTowerDamage: false
+                });
+              }
+            }
+          }
+
           // Handle Log-type projectiles (The Log, Barb Barrel) BEFORE spell split
           if (h.isLog) {
             const logWidth = 40;
@@ -13081,7 +14003,12 @@ export default function App() {
                     const isEnemy = u.isOpponent !== (h.isOpponent || false);
                     const dist = Math.sqrt(Math.pow(u.x - h.x, 2) + Math.pow(u.y - h.y, 2));
                     if (isEnemy && dist < h.radius) {
-                      return { ...u, hp: u.hp - h.damage };
+                      return {
+                        ...u,
+                        hp: u.hp - h.damage,
+                        slowUntil: h.slow ? Date.now() + 500 : u.slowUntil,
+                        slowAmount: h.slow || u.slowAmount
+                      };
                     }
                     return u;
                   });
@@ -13223,11 +14150,23 @@ export default function App() {
                     }
                   }
 
-                  let updatedUnit = { ...u, hp: u.hp - remainingDamage, currentShieldHp: newShieldHp };
+                  let updatedUnit = { ...u, hp: u.hp - remainingDamage, currentShieldHp: newShieldHp, lastHitBy: h.attackerId || u.lastHitBy };
 
                   // Shield Break Visual
                   if (shieldBroken) {
                     updatedUnit.hasShield = false;
+                    if (u.shieldBreakDamage > 0) {
+                      splashEvents.push({
+                        attacker: u,
+                        targetX: u.x,
+                        targetY: u.y,
+                        damage: u.shieldBreakDamage,
+                        radius: u.shieldBreakRadius || 48,
+                        knockback: u.shieldBreakKnockback || 0,
+                        skipTowerDamage: true,
+                        fullDamage: true
+                      });
+                    }
                     if (u.spriteId === 'guards') updatedUnit.spriteId = 'skeletons';
                     setVisualEffects(prev => [...prev, {
                       id: Date.now() + Math.random(),
@@ -13511,11 +14450,38 @@ export default function App() {
                   }
                 }
 
-                let updatedUnit = { ...u, hp: u.hp - remainingDamage, currentShieldHp: newShieldHp };
+                let updatedUnit = { ...u, hp: u.hp - remainingDamage, currentShieldHp: newShieldHp, lastHitBy: h.attackerId || u.lastHitBy };
+
+                // Evolved Dart Goblin poison stacking
+                if (h.attackerId) {
+                  const attacker = currentUnits.find(att => att.id === h.attackerId);
+                  if (attacker && attacker.poisonEffect) {
+                    // Initialize poison stacks if not present
+                    const currentStacks = updatedUnit.poisonStacks || 0;
+                    const newStacks = Math.min(currentStacks + 1, 3);
+                    const dartGoblinCard = CARDS.find(c => c.id === 'evolved_dart_goblin');
+                    if (dartGoblinCard) {
+                      updatedUnit.poisonStacks = newStacks;
+                      updatedUnit.poisonEffect = true;
+                    }
+                  }
+                }
 
                 // Shield Break Visual
                 if (shieldBroken) {
                   updatedUnit.hasShield = false;
+                  if (u.shieldBreakDamage > 0) {
+                    splashEvents.push({
+                      attacker: u,
+                      targetX: u.x,
+                      targetY: u.y,
+                      damage: u.shieldBreakDamage,
+                      radius: u.shieldBreakRadius || 48,
+                      knockback: u.shieldBreakKnockback || 0,
+                      skipTowerDamage: true,
+                      fullDamage: true
+                    });
+                  }
                   if (u.spriteId === 'guards') updatedUnit.spriteId = 'skeletons';
                   setVisualEffects(prev => [...prev, {
                     id: Date.now() + Math.random(),
@@ -13563,6 +14529,32 @@ export default function App() {
                   updatedUnit.x = Math.max(10, Math.min(width - 10, newX));
                   updatedUnit.y = Math.max(10, Math.min(height - 10, newY));
                   updatedUnit.wasPushed = true;
+                }
+
+                // Evolved Snowball pull effect - pulls enemies toward impact point
+                if (h.pullDistance && h.pullDistance > 0 && h.type === 'snowball_spell') {
+                  const pullDistanceTiles = h.pullDistance * TILE_SIZE; // Convert tiles to pixels
+                  const impactX = h.targetX || (h.x || 0);
+                  const impactY = h.targetY || (h.y || 0);
+                  const angle = Math.atan2(impactY - u.y, impactX - u.x);
+                  const distToImpact = Math.sqrt(Math.pow(impactX - u.x, 2) + Math.pow(impactY - u.y, 2));
+
+                  // Pull toward impact point, but not past it
+                  const actualPull = Math.min(pullDistanceTiles, distToImpact - 10);
+                  if (actualPull > 0) {
+                    const newX = u.x + Math.cos(angle) * actualPull;
+                    const newY = u.y + Math.sin(angle) * actualPull;
+
+                    updatedUnit.x = Math.max(10, Math.min(width - 10, newX));
+                    updatedUnit.y = Math.max(10, Math.min(height - 10, newY));
+                    updatedUnit.wasPushed = true;
+                  }
+
+                  // Apply slow effect
+                  if (h.slow && h.slowDuration) {
+                    updatedUnit.slowUntil = now + h.slowDuration;
+                    updatedUnit.slowAmount = h.slow;
+                  }
                 }
 
                 // Apply pull effect (Fisherman)
@@ -14214,12 +15206,25 @@ export default function App() {
               ...u,
               hp: u.hp - remainingDamage,
               currentShieldHp: newShieldHp,
-              charge: updatedCharge
+              charge: updatedCharge,
+              lastHitBy: events[events.length - 1]?.attackerId || u.lastHitBy
             };
 
             // If shield just broke, Guards transform to skeletons (Dark Prince just loses shield)
             if (shieldBroken) {
               updatedUnit.hasShield = false;
+              if (u.shieldBreakDamage > 0) {
+                splashEvents.push({
+                  attacker: u,
+                  targetX: u.x,
+                  targetY: u.y,
+                  damage: u.shieldBreakDamage,
+                  radius: u.shieldBreakRadius || 48,
+                  knockback: u.shieldBreakKnockback || 0,
+                  skipTowerDamage: true,
+                  fullDamage: true
+                });
+              }
 
               // Guards transform to regular skeletons when shield breaks
               if (u.spriteId === 'guards') {
@@ -14257,6 +15262,57 @@ export default function App() {
       // Handle death spawns
       unitsThatDied.forEach(deadUnit => {
         console.log('[DEATH]', deadUnit.spriteId, 'deathSpawns:', deadUnit.deathSpawns);
+
+        // Evolved Skeleton Army: Skeleton General death - make skeletons invisible and invincible
+        if (deadUnit.isSkeletonGeneral) {
+          currentUnits = currentUnits.map(unit => {
+            if (unit.skeletonGeneralId === deadUnit.id && unit.hp > 0) {
+              // Skeletons become invisible and invincible when General dies
+              return {
+                ...unit,
+                isHidden: true,
+                isInvincible: true,
+                hiddenUntil: null // Never becomes visible again until they die
+              };
+            }
+            return unit;
+          });
+        }
+
+        // Invincible skeletons die when their Skeleton General dies
+        if (deadUnit.isInvincibleSkeleton && deadUnit.isHidden) {
+          // Find the Skeleton General for this skeleton
+          const general = currentUnits.find(u => u.id === deadUnit.skeletonGeneralId);
+          if (!general || general.hp <= 0) {
+            // General is dead, this skeleton can now be removed
+            // Already processed in unitsThatDied, so no action needed
+          }
+        }
+
+        if (deadUnit.lastHitBy) {
+          currentUnits = currentUnits.map(unit => {
+            if (unit.id === deadUnit.lastHitBy && unit.healOnKillRatio > 0 && unit.hp > 0) {
+              const healAmount = Math.max(1, Math.floor((deadUnit.maxHp || deadUnit.hp || 0) * unit.healOnKillRatio));
+              return {
+                ...unit,
+                hp: Math.min(unit.overhealMaxHp || unit.maxHp, unit.hp + healAmount)
+              };
+            }
+            return unit;
+          });
+        }
+
+        if (deadUnit.summonerId) {
+          currentUnits = currentUnits.map(unit => {
+            if (unit.id === deadUnit.summonerId && unit.healFromSummonsDeath > 0 && unit.hp > 0) {
+              return {
+                ...unit,
+                hp: Math.min(unit.overhealMaxHp || unit.maxHp, unit.hp + unit.healFromSummonsDeath)
+              };
+            }
+            return unit;
+          });
+        }
 
         // Goblin Hut death spawn - 3 Spear Goblins
         if (deadUnit.spriteId === 'goblin_hut' && deadUnit.isOpponent === false) {
@@ -14469,6 +15525,62 @@ export default function App() {
           }
         }
 
+        // Evolved Skeleton Army: Spawn skeletons after death
+        if (deadUnit.spawnOnDeath && !deadUnit.spawnOnDeathProcessed && deadUnit.spawnOnDeathCount > 0) {
+          const skeletonCard = CARDS.find(c => c.id === 'skeletons');
+          if (skeletonCard) {
+            const spawnDelay = deadUnit.spawnOnDeathDelay || 1000;
+            for (let i = 0; i < deadUnit.spawnOnDeathCount; i++) {
+              unitsToSpawn.push({
+                id: 'skeleton_army_spawn_' + Date.now() + '_' + i + '_' + Math.random(),
+                x: deadUnit.x + (Math.random() * 40 - 20),
+                y: deadUnit.y + (Math.random() * 40 - 20),
+                hp: skeletonCard.hp,
+                maxHp: skeletonCard.hp,
+                isOpponent: deadUnit.isOpponent,
+                speed: skeletonCard.speed,
+                lane: deadUnit.lane,
+                lastAttack: 0,
+                spriteId: 'skeletons',
+                type: skeletonCard.type,
+                range: skeletonCard.range,
+                damage: skeletonCard.damage,
+                attackSpeed: skeletonCard.attackSpeed,
+                projectile: skeletonCard.projectile,
+                spawnTime: Date.now(),
+                spawnDelay: spawnDelay,
+                spawnOnDeathProcessed: true
+              });
+            }
+          }
+        }
+
+        // Evolved Lumberjack: Spawn Ghost on death
+        if (deadUnit.deathSpawnsGhost && !deadUnit.ghostSpawned) {
+          const ghostDuration = (deadUnit.ghostDuration || 8) * 1000;
+          const ghostDps = deadUnit.ghostDps || 80;
+
+          // Ghost is a stationary area damage effect
+          setProjectiles(prev => [...prev, {
+            id: 'lumberjack_ghost_' + Date.now(),
+            x: deadUnit.x,
+            y: deadUnit.y,
+            targetX: deadUnit.x,
+            targetY: deadUnit.y,
+            speed: 0,
+            damage: ghostDps * 0.05, // Damage per tick (50ms)
+            radius: 50,
+            type: 'lumberjack_ghost_zone',
+            isSpell: true,
+            hit: true,
+            spawnTime: Date.now(),
+            duration: ghostDuration / 1000,
+            isOpponent: deadUnit.isOpponent,
+            isGhost: true,
+            ghostEndTime: Date.now() + ghostDuration
+          }]);
+        }
+
         // Death visual effects
         if (deadUnit.spriteId === 'golem' || deadUnit.spriteId === 'golemite' || deadUnit.spriteId === 'elixir_golem' || deadUnit.spriteId === 'elixir_golemite') {
           setVisualEffects(prev => [...prev, {
@@ -14661,6 +15773,15 @@ export default function App() {
       const allUnits = [...currentUnits, ...unitsToSpawn];
       setUnits(allUnits);
       setProjectiles(activeProjectiles);
+
+      // Apply lingering field damage to towers
+      nextTowers = nextTowers.map(tower => {
+        if (tower.lingeringFieldDamage > 0 && tower.lingeringFieldEndTime > 0 && now < tower.lingeringFieldEndTime) {
+          return { ...tower, hp: Math.max(0, tower.hp - tower.lingeringFieldDamage) };
+        }
+        return tower;
+      });
+
       setTowers(nextTowers);
 
     }, 50);
