@@ -7784,7 +7784,7 @@ const GameBoard = ({
 
           return (
             <View key={tower.id} style={[styles.towerContainer, styleObj]}>
-              <TowerSprite type={tower.type} isOpponent={tower.isOpponent} size={size} towerSubType={tower.towerSubType} />
+              <MemoizedTowerSprite type={tower.type} isOpponent={tower.isOpponent} size={size} towerSubType={tower.towerSubType} />
               {isSlowed && (
                 <View style={{
                   position: 'absolute',
@@ -7840,8 +7840,8 @@ const GameBoard = ({
           <View style={[styles.bridge, { right: 65 }]} />
         </View>
 
-        {(units || []).filter(u => u != null).map(u => <Unit key={u.id} unit={u} />)}
-        {(projectiles || []).map(p => <Projectile key={p.id} type={p.type} position={p} />)}
+        {(units || []).filter(u => u != null).map(u => <MemoizedUnit key={u.id} unit={u} />)}
+        {(projectiles || []).map(p => <MemoizedProjectile key={p.id} type={p.type} position={p} />)}
         <VisualEffects effects={visualEffects} setEffects={setVisualEffects} />
 
         {/* Emote Button */}
@@ -8388,6 +8388,26 @@ const FriendlyBattleModal = ({ visible, onClose, socket }) => {
     </Modal>
   );
 };
+
+const MemoizedUnit = memo(Unit, (prev, next) => {
+  if (!prev.unit || !next.unit) return false;
+  return prev.unit.x === next.unit.x &&
+         prev.unit.y === next.unit.y &&
+         prev.unit.hp === next.unit.hp &&
+         prev.unit.action === next.unit.action &&
+         prev.unit.spriteId === next.unit.spriteId &&
+         prev.unit.isFrozen === next.unit.isFrozen &&
+         prev.unit.isCurrentlyStunned === next.unit.isCurrentlyStunned &&
+         prev.unit.hidden?.active === next.unit.hidden?.active;
+});
+
+const MemoizedProjectile = memo(Projectile, (prev, next) => {
+  if (!prev.position || !next.position) return false;
+  return prev.position.x === next.position.x &&
+         prev.position.y === next.position.y;
+});
+
+const MemoizedTowerSprite = memo(TowerSprite);
 
 export default function App() {
   // Main App Entry Point
@@ -15784,7 +15804,7 @@ export default function App() {
 
       setTowers(nextTowers);
 
-    }, 50);
+    }, 66);
 
     return () => clearInterval(loop);
   }, [inGame, gameOver]);
