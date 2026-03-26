@@ -7727,7 +7727,7 @@ const GameBoard = ({
         {/* Score & Time Board */}
         <View style={styles.scoreBoard}>
           <View style={styles.crownContainer}>
-            <Text style={styles.crownIcon}>👑</Text>
+            <Text style={styles.crownIcon}>?</Text>
             <Text style={styles.scoreText}>{score[1]}</Text>
           </View>
           <View style={styles.timerContainer}>
@@ -7747,13 +7747,13 @@ const GameBoard = ({
           </View>
           <View style={styles.crownContainer}>
             <Text style={styles.scoreText}>{score[0]}</Text>
-            <Text style={styles.crownIcon}>👑</Text>
+            <Text style={styles.crownIcon}>?</Text>
           </View>
         </View>
 
         {/* Settings Button */}
         <TouchableOpacity style={styles.settingsButton} onPress={() => setShowSettings(true)}>
-          <Text style={{ fontSize: 20 }}>⚙️</Text>
+          <Text style={styles.settingsButtonIcon}>?</Text>
         </TouchableOpacity>
 
         <Modal
@@ -17106,7 +17106,7 @@ const styles = StyleSheet.create({
   },
   gameBoard: {
     flex: 1,
-    backgroundColor: '#639c3e', // Better grass green
+    backgroundColor: '#6ea43b',
     position: 'relative',
     overflow: 'hidden',
   },
@@ -17425,11 +17425,11 @@ const styles = StyleSheet.create({
   },
   elixirBarBack: {
     flex: 1,
-    height: 20,
-    backgroundColor: '#1a1a2e',
-    borderRadius: 10,
+    height: 22,
+    backgroundColor: '#381d53',
+    borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#0f0f1a',
+    borderColor: '#f5d67b',
     overflow: 'hidden',
     position: 'relative',
     shadowColor: '#000',
@@ -17439,8 +17439,8 @@ const styles = StyleSheet.create({
   },
   elixirBarFill: {
     height: '100%',
-    backgroundColor: '#D442F5',
-    borderRadius: 8,
+    backgroundColor: '#d14dff',
+    borderRadius: 10,
   },
   elixirTick: {
     position: 'absolute',
@@ -17471,16 +17471,21 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   timerContainer: {
-    position: 'absolute',
-    top: 10,
-    right: 20,
-    backgroundColor: 'rgba(0,0,0,0.75)',
-    padding: 8,
-    paddingHorizontal: 15,
-    borderRadius: 8,
+    minWidth: 108,
+    backgroundColor: '#244d9c',
+    paddingVertical: 7,
+    paddingHorizontal: 16,
+    borderRadius: 14,
     zIndex: 50,
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderWidth: 3,
+    borderColor: '#f6d56b',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#0b1f4c',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.45,
+    shadowRadius: 6,
+    elevation: 8,
   },
   timerText: {
     color: '#fff',
@@ -18213,9 +18218,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     left: 10,
+    right: 58,
     zIndex: 20,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
   bottomInfoBar: {
     position: 'absolute',
@@ -18226,11 +18233,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   playerInfoContainer: {
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 5,
+    backgroundColor: 'rgba(24, 39, 74, 0.88)',
+    paddingVertical: 7,
+    paddingHorizontal: 12,
+    borderRadius: 14,
     marginRight: 10,
+    borderWidth: 2,
+    borderColor: '#f6d56b',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.35,
+    shadowRadius: 5,
+    elevation: 6,
   },
   playerName: {
     color: '#fff',
@@ -18240,9 +18254,41 @@ const styles = StyleSheet.create({
     textShadowRadius: 2,
   },
   clanName: {
-    color: '#ccc',
+    color: '#d8e7ff',
     fontSize: 10,
-    fontStyle: 'italic',
+    fontWeight: '700',
+  },
+  enemyElixirHud: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(39, 22, 61, 0.9)',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: '#f6d56b',
+    minWidth: 104,
+  },
+  enemyElixirLabel: {
+    color: '#f6d56b',
+    fontWeight: '900',
+    fontSize: 10,
+    marginRight: 8,
+    letterSpacing: 0.6,
+  },
+  enemyElixirBarShell: {
+    flex: 1,
+    height: 10,
+    backgroundColor: '#1d1231',
+    borderRadius: 6,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  enemyElixirBarFill: {
+    height: '100%',
+    backgroundColor: '#d14dff',
+    borderRadius: 6,
   },
   trophyContainer: {
     backgroundColor: 'rgba(241, 196, 15, 0.2)',
@@ -18258,7 +18304,7 @@ const styles = StyleSheet.create({
   },
   scoreBoard: {
     position: 'absolute',
-    top: 5,
+    top: 8,
     left: 0,
     right: 0,
     flexDirection: 'row',
@@ -18269,11 +18315,18 @@ const styles = StyleSheet.create({
   crownContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: 15,
+    marginHorizontal: 12,
+    backgroundColor: 'rgba(25, 45, 84, 0.92)',
+    borderRadius: 14,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderWidth: 2,
+    borderColor: '#f6d56b',
   },
   crownIcon: {
     fontSize: 18,
-    marginHorizontal: 2,
+    marginHorizontal: 4,
+    color: '#f6d56b',
   },
   scoreText: {
     fontSize: 24,
@@ -18287,13 +18340,87 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     right: 10,
-    width: 35,
-    height: 35,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    width: 38,
+    height: 38,
+    backgroundColor: 'rgba(25, 45, 84, 0.96)',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 5,
+    borderRadius: 12,
     zIndex: 60,
+    borderWidth: 2,
+    borderColor: '#f6d56b',
+    elevation: 8,
+  },
+  settingsButtonIcon: {
+    color: '#ffffff',
+    fontSize: 17,
+    fontWeight: '900',
+    lineHeight: 18,
+  },
+  settingsModalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(7, 12, 25, 0.62)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  settingsModalPanel: {
+    width: '100%',
+    maxWidth: 320,
+    backgroundColor: '#204694',
+    padding: 20,
+    borderRadius: 18,
+    alignItems: 'center',
+    borderWidth: 4,
+    borderColor: '#f6d56b',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.45,
+    shadowRadius: 18,
+    elevation: 14,
+  },
+  settingsModalTitle: {
+    fontSize: 24,
+    fontWeight: '900',
+    marginBottom: 18,
+    color: '#ffffff',
+    letterSpacing: 0.4,
+  },
+  settingsActionButton: {
+    width: '100%',
+    alignItems: 'center',
+    borderRadius: 14,
+    marginBottom: 10,
+    paddingVertical: 14,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.22)',
+  },
+  settingsActionBlue: {
+    backgroundColor: '#2f75ff',
+  },
+  settingsActionGold: {
+    backgroundColor: '#d89a20',
+  },
+  settingsActionRed: {
+    backgroundColor: '#d84a3a',
+  },
+  settingsActionMuted: {
+    backgroundColor: '#5f6f94',
+  },
+  settingsActionText: {
+    color: '#ffffff',
+    fontWeight: '900',
+    fontSize: 16,
+  },
+  settingsCloseButton: {
+    marginTop: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+  },
+  settingsCloseText: {
+    color: '#dbe7ff',
+    fontSize: 15,
+    fontWeight: '800',
   },
   emoteButton: {
     position: 'absolute',
