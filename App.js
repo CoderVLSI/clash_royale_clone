@@ -7,6 +7,7 @@ import { io } from "socket.io-client";
 const { width, height } = Dimensions.get('window');
 
 // --- Constants ---
+const TILE_SIZE = 20;
 const KING_TOWER_SIZE = 65;
 const PRINCESS_TOWER_SIZE = 50;
 const TOWER_RANGE = 150;
@@ -19,6 +20,15 @@ const PROJECTILE_SPEED_ARROW = 12;
 const PROJECTILE_SPEED_CANNON = 8;
 const FIRE_RATE_PRINCESS = 800;
 const FIRE_RATE_KING = 1000;
+const NORMAL_EFFECT_LIMIT = 60;
+const LOW_PERFORMANCE_EFFECT_LIMIT = 18;
+const LOW_PERFORMANCE_PROJECTILE_RENDER_LIMIT = 35;
+const UNIT_GRID_CELL_SIZE = 120;
+
+const capVisualEffectList = (effects, lowPerformanceMode = false) => {
+  const maxEffects = lowPerformanceMode ? LOW_PERFORMANCE_EFFECT_LIMIT : NORMAL_EFFECT_LIMIT;
+  return effects.length > maxEffects ? effects.slice(-maxEffects) : effects;
+};
 
 // Card Definitions & Unit Stats
 const CARDS = [
@@ -29,7 +39,7 @@ const CARDS = [
   { id: 'mini_pekka', name: 'Mini P', cost: 4, color: '#9b59b6', hp: 1361, speed: 2.5, type: 'ground', range: 25, damage: 720, attackSpeed: 1600, projectile: null, count: 1, rarity: 'rare' },
   { id: 'spear_goblins', name: 'Spear Gobs', cost: 2, color: '#2ecc71', hp: 133, speed: 3, type: 'ground', range: 110, damage: 81, attackSpeed: 1700, projectile: 'spear', count: 3, rarity: 'common' },
   { id: 'musketeer', name: 'Musket', cost: 4, color: '#34495e', hp: 720, speed: 1.5, type: 'ground', range: 100, damage: 218, attackSpeed: 1100, projectile: 'bullet', count: 1, rarity: 'rare', evolvesTo: 'evolved_musketeer', evolutionCycles: 2 },
-  { id: 'baby_dragon', name: 'Baby D', cost: 4, color: '#27ae60', hp: 1152, speed: 2, type: 'flying', range: 80, damage: 160, attackSpeed: 1500, projectile: 'dragon_fire', count: 1, splash: true, rarity: 'epic', evolvesTo: 'evolved_baby_dragon', evolutionCycles: 1 },
+  { id: 'baby_dragon', name: 'Baby D', cost: 4, color: '#27ae60', hp: 1152, speed: 2, type: 'flying', range: 80, damage: 160, attackSpeed: 1500, projectile: 'dragon_fire', count: 1, splash: true, rarity: 'epic', evolvesTo: 'evolved_baby_dragon', evolutionCycles: 2 },
   { id: 'fireball', name: 'Fireball', cost: 4, color: '#ff4500', type: 'spell', damage: 689, radius: 60, count: 1, rarity: 'rare', knockback: 30 },
   { id: 'the_log', name: 'The Log', cost: 2, color: '#8B4513', type: 'spell', damage: 240, radius: 40, count: 1, rarity: 'legendary', knockback: 20 },
 
@@ -39,7 +49,7 @@ const CARDS = [
   { id: 'arrows', name: 'Arrows', cost: 3, color: '#2ecc71', type: 'spell', damage: 366, radius: 40, count: 1, rarity: 'common' },
   { id: 'zap', name: 'Zap', cost: 2, color: '#3498db', type: 'spell', damage: 192, radius: 35, count: 1, stun: 0.5, rarity: 'common', evolvesTo: 'evolved_zap', evolutionCycles: 2 },
   { id: 'minions', name: 'Minions', cost: 3, color: '#9b59b6', hp: 230, speed: 3, type: 'flying', range: 50, damage: 102, attackSpeed: 1000, projectile: 'dark_ball', count: 3, rarity: 'common' },
-  { id: 'skeleton_army', name: 'Skeleton Army', cost: 3, color: '#ecf0f1', hp: 81, speed: 2, type: 'ground', range: 25, damage: 81, attackSpeed: 1000, projectile: null, count: 15, rarity: 'epic', evolvesTo: 'evolved_skeleton_army', evolutionCycles: 1 },
+  { id: 'skeleton_army', name: 'Skeleton Army', cost: 3, color: '#ecf0f1', hp: 81, speed: 2, type: 'ground', range: 25, damage: 81, attackSpeed: 1000, projectile: null, count: 15, rarity: 'epic', evolvesTo: 'evolved_skeleton_army', evolutionCycles: 2 },
   { id: 'skeletons', name: 'Skelly', cost: 1, color: '#bdc3c7', hp: 81, speed: 2, type: 'ground', range: 25, damage: 81, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common', evolvesTo: 'evolved_skeletons', evolutionCycles: 2 },
   { id: 'valkyrie', name: 'Valkyrie', cost: 4, color: '#e74c3c', hp: 1908, speed: 1.5, type: 'ground', range: 25, damage: 267, attackSpeed: 1500, projectile: null, count: 1, splash: true, rarity: 'rare', evolvesTo: 'evolved_valkyrie', evolutionCycles: 2 },
   { id: 'poison', name: 'Poison', cost: 4, color: '#27ae60', type: 'spell', damage: 91, radius: 50, count: 1, duration: 8, rarity: 'epic' },
@@ -51,6 +61,7 @@ const CARDS = [
   { id: 'wizard', name: 'Wizard', cost: 5, color: '#9b59b6', hp: 720, speed: 1.5, type: 'ground', range: 60, damage: 281, attackSpeed: 1400, projectile: 'fireball_small', count: 1, splash: true, rarity: 'rare', evolvesTo: 'evolved_wizard', evolutionCycles: 1 },
   { id: 'tombstone', name: 'Tombstone', cost: 3, color: '#95a5a6', hp: 534, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 40, spawns: 'skeletons', spawnRate: 3.1, spawnCount: 2, deathSpawnCount: 4, rarity: 'rare' },
   { id: 'sword_goblins', name: 'Sword Gobs', cost: 3, color: '#2ecc71', hp: 202, speed: 3, type: 'ground', range: 25, damage: 120, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common' },
+  { id: 'decoy_goblin', name: 'Decoy Gob', cost: 0, color: '#58d68d', hp: 81, speed: 3, type: 'ground', range: 25, damage: 360, attackSpeed: 1100, projectile: null, count: 1, rarity: 'common', isToken: true },
   { id: 'spear_goblins', name: 'Spear Gobs', cost: 3, color: '#2ecc71', hp: 180, speed: 3, type: 'ground', range: 50, damage: 62, attackSpeed: 1100, projectile: 'spear', count: 3, rarity: 'rare' },
   { id: 'ice_wizard', name: 'Ice Wiz', cost: 3, color: '#3498db', hp: 688, speed: 1.5, type: 'ground', range: 55, damage: 91, attackSpeed: 1700, projectile: 'ice_shard', count: 1, splash: true, rarity: 'legendary', slow: 0.35, spawnDamage: 91 },
 
@@ -60,10 +71,11 @@ const CARDS = [
   { id: 'cursed_hog', name: 'Cursed Hog', cost: 0, color: '#ff9ff3', hp: 520, speed: 3.5, type: 'ground', range: 25, damage: 52, attackSpeed: 1000, projectile: null, count: 1, targetType: 'buildings', rarity: 'common', isToken: true },
 
   // New cards to implement
-  { id: 'royal_hogs', name: 'Royal Hogs', cost: 5, color: '#e67e22', hp: 1260, speed: 3.5, type: 'ground', range: 25, damage: 240, attackSpeed: 1600, projectile: null, count: 4, targetType: 'buildings', jumps: true, rarity: 'common', evolvesTo: 'evolved_royal_hogs', evolutionCycles: 2 },
+  { id: 'royal_hogs', name: 'Royal Hogs', cost: 5, color: '#e67e22', hp: 1260, speed: 3.5, type: 'ground', range: 25, damage: 240, attackSpeed: 1600, projectile: null, count: 4, targetType: 'buildings', jumps: true, rarity: 'rare', evolvesTo: 'evolved_royal_hogs', evolutionCycles: 2 },
   { id: 'miner', name: 'Miner', cost: 3, color: '#f39c12', hp: 1600, speed: 1.5, type: 'ground', range: 25, damage: 160, attackSpeed: 1100, projectile: null, count: 1, rarity: 'legendary', burrows: true, deployAnywhere: true },
-  { id: 'goblin_cage', name: 'Goblin Cage', cost: 5, color: '#95a5a6', hp: 880, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 30, spawns: null, spawnRate: 0, spawnCount: 0, rarity: 'rare', deathSpawns: 'goblin_bruteth', deathSpawnCount: 1, evolvesTo: 'evolved_goblin_cage', evolutionCycles: 1 },
+  { id: 'goblin_cage', name: 'Goblin Cage', cost: 4, color: '#95a5a6', hp: 880, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 20, spawns: null, spawnRate: 0, spawnCount: 0, rarity: 'rare', deathSpawns: 'goblin_bruteth', deathSpawnCount: 1, evolvesTo: 'evolved_goblin_cage', evolutionCycles: 1 },
   { id: 'goblin_bruteth', name: 'Goblin B', cost: 0, color: '#c0392b', hp: 660, speed: 2, type: 'ground', range: 25, damage: 158, attackSpeed: 1300, projectile: null, count: 1, rarity: 'common', isToken: true },
+  { id: 'goblin_brawler', name: 'Goblin Brawler', cost: 0, color: '#c0392b', hp: 660, speed: 2, type: 'ground', range: 25, damage: 158, attackSpeed: 1300, projectile: null, count: 1, rarity: 'common', isToken: true },
   { id: 'goblin_giant', name: 'Goblin Giant', cost: 6, color: '#27ae60', hp: 2628, speed: 1, type: 'ground', range: 25, damage: 211, attackSpeed: 1500, projectile: null, count: 1, targetType: 'buildings', rarity: 'epic', deathSpawns: 'spear_goblins', deathSpawnCount: 2, extraProjectiles: 2, evolvesTo: 'evolved_goblin_giant', evolutionCycles: 1 },
 
   // Super easy additions
@@ -87,7 +99,7 @@ const CARDS = [
 
   // Spirit Cards - All cost 1 Elixir and die when they attack
   { id: 'fire_spirit', name: 'Fire Spirit', cost: 1, color: '#e74c3c', hp: 230, speed: 4, type: 'ground', range: 25, damage: 207, attackSpeed: 1000, projectile: null, count: 1, splash: true, rarity: 'common', kamikaze: true },
-  { id: 'ice_spirit', name: 'Ice Spirit', cost: 1, color: '#E8F4F8', hp: 230, speed: 4, type: 'ground', range: 25, damage: 110, attackSpeed: 1000, projectile: null, count: 1, splash: true, freezeDuration: 1, rarity: 'common', kamikaze: true, evolvesTo: 'evolved_ice_spirit', evolutionCycles: 1 },
+  { id: 'ice_spirit', name: 'Ice Spirit', cost: 1, color: '#E8F4F8', hp: 230, speed: 4, type: 'ground', range: 25, damage: 110, attackSpeed: 1000, projectile: null, count: 1, splash: true, freezeDuration: 1, rarity: 'common', kamikaze: true, evolvesTo: 'evolved_ice_spirit', evolutionCycles: 2 },
   { id: 'electro_spirit', name: 'Electro Spirit', cost: 1, color: '#9b59b6', hp: 230, speed: 4, type: 'ground', range: 25, damage: 99, attackSpeed: 1000, projectile: null, count: 1, chain: 9, stun: 0.5, rarity: 'common', kamikaze: true },
   { id: 'heal_spirit', name: 'Heal Spirit', cost: 1, color: '#FFD700', hp: 450, speed: 5, type: 'ground', range: 25, damage: 0, attackSpeed: 1000, projectile: null, count: 1, splash: true, rarity: 'rare', kamikaze: true, healsOnAttack: 700, healRadius: 60 },
 
@@ -138,7 +150,7 @@ const CARDS = [
   { id: 'giant_skeleton', name: 'Giant Skel', cost: 6, color: '#bdc3c7', hp: 2800, speed: 1.5, type: 'ground', range: 25, damage: 170, attackSpeed: 1500, projectile: null, count: 1, rarity: 'epic', deathDamage: 1000, deathRadius: 100, deathBombDelay: 3000 },
   { id: 'electro_dragon', name: 'Electro D', cost: 5, color: '#3498db', hp: 1000, speed: 2, type: 'flying', range: 70, damage: 160, attackSpeed: 2100, projectile: 'electric_bolt', count: 1, rarity: 'epic', chain: 3, stun: 0.5, evolvesTo: 'evolved_electro_dragon', evolutionCycles: 1 },
   { id: 'magic_archer', name: 'Magic Arch', cost: 4, color: '#27ae60', hp: 440, speed: 2, type: 'ground', range: 140, damage: 111, attackSpeed: 1100, projectile: 'magic_arrow', count: 1, rarity: 'legendary', pierce: true },
-  { id: 'royal_ghost', name: 'Royal Ghost', cost: 3, color: '#ecf0f1', hp: 1000, speed: 2, type: 'ground', range: 25, damage: 216, attackSpeed: 1800, projectile: null, count: 1, rarity: 'legendary', splash: true, hidden: true, evolvesTo: 'evolved_royal_ghost', evolutionCycles: 1 },
+  { id: 'royal_ghost', name: 'Royal Ghost', cost: 3, color: '#ecf0f1', hp: 1000, speed: 2, type: 'ground', range: 25, damage: 216, attackSpeed: 1800, projectile: null, count: 1, rarity: 'legendary', splash: true, hidden: true, evolvesTo: 'evolved_royal_ghost', evolutionCycles: 2 },
   { id: 'hunter', name: 'Hunter', cost: 4, color: '#2c3e50', hp: 700, speed: 2, type: 'ground', range: 80, damage: 700, attackSpeed: 2200, projectile: 'shotgun_blast', count: 1, rarity: 'epic', shotgunSpread: true },
 
   // 5 NEW REQUESTED CARDS
@@ -155,6 +167,7 @@ const CARDS = [
   { id: 'snowball', name: 'Snowball', cost: 2, color: '#E8F4F8', type: 'spell', damage: 159, radius: 35, count: 1, knockback: 15, slow: 0.35, slowDuration: 2.5, rarity: 'common', evolvesTo: 'evolved_snowball', evolutionCycles: 2 },
   { id: 'barb_barrel', name: 'Barb Barrel', cost: 2, color: '#8B4513', type: 'spell', damage: 243, radius: 30, count: 1, spawns: 'barbarian_single', spawnCount: 1, knockback: 10, rarity: 'epic' },
   { id: 'barbarian_single', name: 'Barbarian', cost: 0, color: '#CD853F', hp: 670, speed: 1.5, type: 'ground', range: 30, damage: 192, attackSpeed: 1300, projectile: null, count: 1, rarity: 'common', isToken: true },
+  { id: 'barbarian_brothers', name: 'Barbarian Brother', cost: 0, color: '#CD853F', hp: 670, speed: 1.5, type: 'ground', range: 30, damage: 192, attackSpeed: 1300, projectile: null, count: 1, rarity: 'common', isToken: true },
   { id: 'royal_delivery', name: 'Royal Delivery', cost: 3, color: '#3498db', type: 'spell', damage: 362, radius: 45, count: 1, spawns: 'royal_recruit_single', spawnCount: 1, spawnDelay: 3000, rarity: 'common' },
   { id: 'royal_recruit_single', name: 'Royal Recruit', cost: 0, color: '#3498db', hp: 1281, shieldHp: 240, speed: 1.5, type: 'ground', range: 30, damage: 190, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common', isToken: true, hasShield: true },
   { id: 'tornado', name: 'Tornado', cost: 3, color: '#7f8c8d', type: 'spell', damage: 44, radius: 60, count: 1, duration: 1, pullStrength: 100, rarity: 'epic' },
@@ -235,11 +248,11 @@ const CARDS = [
   { id: 'evolved_electro_dragon', name: 'Evolved Electro Dragon', cost: 5, color: '#3498db', hp: 1000, speed: 2, type: 'flying', range: 70, damage: 160, attackSpeed: 2100, projectile: 'electric_bolt', count: 1, rarity: 'epic', isToken: true, evolution: true, infiniteChain: true, chainDecay: 0.4, chainRange: 60, stun: 0.3, evolutionAuraColor: '#0984e3' },
   { id: 'evolved_skeleton_barrel', name: 'Evolved Skeleton Barrel', cost: 3, color: '#bdc3c8', hp: 636, speed: 6, type: 'flying', range: 0, radius: 25, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 20, targetType: 'buildings', rarity: 'epic', isToken: true, evolution: true, deathSpawns: 'skeletons', deathSpawnCount: 4, deathDamage: 133, deathRadius: 40, dropBarrels: true, dropBarrelsAt: [0.75, 0], evolutionAuraColor: '#b2bec3' },
   { id: 'evolved_furnace', name: 'Evolved Furnace', cost: 4, color: '#e74c3c', hp: 1003, speed: 1.5, type: 'ground', range: 50, damage: 120, attackSpeed: 1200, projectile: 'flame', count: 1, spawns: 'fire_spirit', spawnRate: 2.4, spawnCount: 1, rarity: 'rare', isToken: true, evolution: true, alternatingSides: true, evolutionAuraColor: '#ff6b6b' },
-  { id: 'evolved_baby_dragon', name: 'Evolved Baby Dragon', cost: 4, color: '#27ae60', hp: 1152, speed: 2, type: 'flying', range: 80, damage: 160, attackSpeed: 1500, projectile: 'dragon_fire', count: 1, splash: true, rarity: 'epic', isToken: true, evolution: true, windBurst: true, windBurstWidth: 8, windBurstHeight: 9, windBurstPushback: 2, evolutionAuraColor: '#00b894' },
+  { id: 'evolved_baby_dragon', name: 'Evolved Baby Dragon', cost: 4, color: '#27ae60', hp: 1152, speed: 2, type: 'flying', range: 80, damage: 160, attackSpeed: 1500, projectile: 'dragon_fire', count: 1, splash: true, rarity: 'epic', isToken: true, evolution: true, draftRadius: 72, draftDuration: 3.5, draftEnemySlow: 0.35, draftAllySpeedBoost: 0.35, draftLingerDuration: 2, evolutionAuraColor: '#00b894' },
   { id: 'evolved_skeleton_army', name: 'Evolved Skeleton Army', cost: 3, color: '#ecf0f1', hp: 81, speed: 2, type: 'ground', range: 25, damage: 81, attackSpeed: 1000, projectile: null, count: 15, rarity: 'epic', isToken: true, evolution: true, skeletonGeneral: true, skeletonGeneralHp: 650, skeletonsInvincibleOnDeath: true, evolutionAuraColor: '#dfe6e9' },
-  { id: 'evolved_royal_ghost', name: 'Evolved Royal Ghost', cost: 3, color: '#ecf0f1', hp: 1000, speed: 2, type: 'ground', range: 25, damage: 216, attackSpeed: 1800, projectile: null, count: 1, rarity: 'legendary', isToken: true, evolution: true, splash: true, hidden: true, revealRadius: 50, revealDamage: 270, spawnsSouldiers: true, souldiersPerAttack: 2, souldierHp: 75, souldierDamage: 40, souldierLifetime: 5, evolutionAuraColor: '#ffffff' },
-  { id: 'evolved_royal_hogs', name: 'Evolved Royal Hogs', cost: 5, color: '#e67e22', hp: 1260, speed: 3.5, type: 'ground', range: 25, damage: 240, attackSpeed: 1600, projectile: null, count: 4, targetType: 'buildings', jumps: true, rarity: 'common', isToken: true, evolution: true, flyingSpawn: true, fallDamageRadius: 30, fallDamageAmount: 100, fallStunDuration: 0.3, evolutionAuraColor: '#fdcb6e' },
-  { id: 'evolved_goblin_cage', name: 'Evolved Goblin Cage', cost: 5, color: '#95a5a6', hp: 880, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 30, spawns: null, spawnRate: 0, spawnCount: 0, rarity: 'rare', isToken: true, evolution: true, deathSpawns: 'goblin_brawler', deathSpawnCount: 1, dragTroopsIntoCage: true, dragRadius: 40, dragStrength: 5, evolutionAuraColor: '#636e72' },
+  { id: 'evolved_royal_ghost', name: 'Evolved Royal Ghost', cost: 3, color: '#ecf0f1', hp: 1000, speed: 2, type: 'ground', range: 25, damage: 216, attackSpeed: 1800, projectile: null, count: 1, rarity: 'legendary', isToken: true, evolution: true, splash: true, hidden: true, revealRadius: 50, revealDamage: 270, spawnsSouldiers: true, souldiersPerReveal: 2, souldierHp: 75, souldierDamage: 40, souldierLifetime: 5, evolutionAuraColor: '#ffffff' },
+  { id: 'evolved_royal_hogs', name: 'Evolved Royal Hogs', cost: 5, color: '#e67e22', hp: 1260, speed: 3.5, type: 'ground', range: 25, damage: 240, attackSpeed: 1600, projectile: null, count: 4, targetType: 'buildings', jumps: true, rarity: 'rare', isToken: true, evolution: true, flyingSpawn: true, fallDamageRadius: 30, fallDamageAmount: 100, fallStunDuration: 0.3, evolutionAuraColor: '#fdcb6e' },
+  { id: 'evolved_goblin_cage', name: 'Evolved Goblin Cage', cost: 4, color: '#95a5a6', hp: 880, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 20, spawns: null, spawnRate: 0, spawnCount: 0, rarity: 'rare', isToken: true, evolution: true, deathSpawns: 'goblin_brawler', deathSpawnCount: 1, dragTroopsIntoCage: true, dragRadius: 40, dragStrength: 5, evolutionAuraColor: '#636e72' },
   { id: 'evolved_goblin_barrel', name: 'Evolved Goblin Barrel', cost: 3, color: '#2ecc71', type: 'spell', damage: 0, radius: 20, count: 3, spawns: 'sword_goblins', spawnCount: 3, rarity: 'epic', isToken: true, evolution: true, doubleBarrel: true, decoyBarrelDelay: 0.5, evolutionAuraColor: '#55efc4' },
   { id: 'evolved_battle_ram', name: 'Evolved Battle Ram', cost: 4, color: '#e67e22', hp: 756, speed: 4, type: 'ground', range: 25, damage: 246, attackSpeed: 100, projectile: null, count: 1, targetType: 'buildings', charge: true, rarity: 'rare', isToken: true, evolution: true, deathSpawns: 'barbarian_brothers', deathSpawnCount: 2, kamikaze: true, chargeKnockback: 30, repeatedRammng: true, evolutionAuraColor: '#e17055' },
   { id: 'evolved_wall_breakers', name: 'Evolved Wall Breakers', cost: 2, color: '#bdc3c7', hp: 332, speed: 4, type: 'ground', range: 5, damage: 446, attackSpeed: 1000, projectile: null, count: 2, targetType: 'buildings', kamikaze: true, splash: true, splashRadius: 40, rarity: 'epic', isToken: true, evolution: true, barrelExplosionFirst: true, barrelExplosionRadius: 30, barrelExplosionDamage: 150, thenRunToBuilding: true, evolutionAuraColor: '#dfe6e9' },
@@ -3333,20 +3346,24 @@ const HealthBar = ({ current, max, isOpponent, hasShield, shieldHp, shieldMax })
   );
 };
 
-const VisualEffects = ({ effects, setEffects }) => {
+const VisualEffects = ({ effects, setEffects, lowPerformanceMode = false }) => {
   const now = Date.now();
 
   // Clean up expired effects using useEffect with a timer (not every render)
   useEffect(() => {
+    const cleanupIntervalMs = lowPerformanceMode ? 1000 : 500;
     const cleanupTimer = setInterval(() => {
       const cleanupTime = Date.now();
       setEffects(prev => prev.filter(e => cleanupTime - e.startTime < e.duration));
-    }, 500); // Clean up every 500ms instead of every render
+    }, cleanupIntervalMs);
 
     return () => clearInterval(cleanupTimer);
-  }, [setEffects]);
+  }, [setEffects, lowPerformanceMode]);
 
-  const activeEffects = effects.filter(e => now - e.startTime < e.duration);
+  const activeEffects = capVisualEffectList(
+    effects.filter(e => now - e.startTime < e.duration),
+    lowPerformanceMode
+  );
 
   return (
     <>
@@ -5974,7 +5991,7 @@ const Projectile = ({ type, position }) => {
   return <View style={[styles.cannonball, { left: position.x, top: position.y }]} />;
 };
 
-const Unit = ({ unit }) => {
+const Unit = ({ unit, lowPerformanceMode = false }) => {
   if (!unit) return null;
 
   const spriteId = unit.spriteId || 'knight';
@@ -5993,6 +6010,12 @@ const Unit = ({ unit }) => {
   const bounceAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    if (lowPerformanceMode) {
+      rotationAnim.stopAnimation();
+      rotationAnim.setValue(0);
+      return;
+    }
+
     if (isSpawning) {
       Animated.loop(
         Animated.timing(rotationAnim, {
@@ -6004,10 +6027,16 @@ const Unit = ({ unit }) => {
     } else {
       rotationAnim.setValue(0);
     }
-  }, [isSpawning]);
+  }, [isSpawning, lowPerformanceMode]);
 
   // Jumping Animation for Spirits
   useEffect(() => {
+    if (lowPerformanceMode) {
+      bounceAnim.stopAnimation();
+      bounceAnim.setValue(0);
+      return;
+    }
+
     if (unit.kamikaze && !unit.isJumpingAttack) {
       Animated.loop(
         Animated.sequence([
@@ -6028,7 +6057,7 @@ const Unit = ({ unit }) => {
       bounceAnim.setValue(0);
       bounceAnim.stopAnimation();
     }
-  }, [unit.kamikaze, unit.isJumpingAttack]);
+  }, [unit.kamikaze, unit.isJumpingAttack, lowPerformanceMode]);
 
   let verticalOffset = bounceAnim;
 
@@ -7626,7 +7655,7 @@ const GameBoard = ({
   isDoubleElixir, showDoubleElixirAlert,
   isOvertime, showOvertimeAlert,
   isTowerDecay, showTowerDecayAlert,
-  audioEnabled, setAudioEnabled, onConcede,
+  audioEnabled, setAudioEnabled, lowPerformanceMode, setLowPerformanceMode, onConcede,
   onActivateAbility,
   cardCycles = {},
   allEvolutionSlots,
@@ -7634,6 +7663,9 @@ const GameBoard = ({
 }) => {
   const [showSettings, setShowSettings] = useState(false);
   const [spellInfoCard, setSpellInfoCard] = useState(null);
+  const visibleProjectiles = lowPerformanceMode
+    ? (projectiles || []).slice(-LOW_PERFORMANCE_PROJECTILE_RENDER_LIMIT)
+    : (projectiles || []);
 
   const handleSpellLongPress = (card) => {
     // Only show info for spells
@@ -7742,6 +7774,13 @@ const GameBoard = ({
               </TouchableOpacity>
 
               <TouchableOpacity
+                style={{ padding: 15, backgroundColor: lowPerformanceMode ? '#f39c12' : '#7f8c8d', width: '100%', alignItems: 'center', borderRadius: 5, marginBottom: 10 }}
+                onPress={() => setLowPerformanceMode(!lowPerformanceMode)}
+              >
+                <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>Performance Mode: {lowPerformanceMode ? 'ON' : 'OFF'}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
                 style={{ padding: 15, backgroundColor: '#3498db', width: '100%', alignItems: 'center', borderRadius: 5, marginBottom: 10 }}
                 onPress={() => { setShowSettings(false); onRestart('game'); }}
               >
@@ -7840,9 +7879,9 @@ const GameBoard = ({
           <View style={[styles.bridge, { right: 65 }]} />
         </View>
 
-        {(units || []).filter(u => u != null).map(u => <MemoizedUnit key={u.id} unit={u} />)}
-        {(projectiles || []).map(p => <MemoizedProjectile key={p.id} type={p.type} position={p} />)}
-        <VisualEffects effects={visualEffects} setEffects={setVisualEffects} />
+        {(units || []).filter(u => u != null).map(u => <MemoizedUnit key={u.id} unit={u} lowPerformanceMode={lowPerformanceMode} />)}
+        {visibleProjectiles.map(p => <MemoizedProjectile key={p.id} type={p.type} position={p} />)}
+        <VisualEffects effects={visualEffects} setEffects={setVisualEffects} lowPerformanceMode={lowPerformanceMode} />
 
         {/* Emote Button */}
         <TouchableOpacity style={styles.emoteButton}>
@@ -8398,7 +8437,8 @@ const MemoizedUnit = memo(Unit, (prev, next) => {
          prev.unit.spriteId === next.unit.spriteId &&
          prev.unit.isFrozen === next.unit.isFrozen &&
          prev.unit.isCurrentlyStunned === next.unit.isCurrentlyStunned &&
-         prev.unit.hidden?.active === next.unit.hidden?.active;
+         prev.unit.hidden?.active === next.unit.hidden?.active &&
+         prev.lowPerformanceMode === next.lowPerformanceMode;
 });
 
 const MemoizedProjectile = memo(Projectile, (prev, next) => {
@@ -8427,6 +8467,7 @@ export default function App() {
   const [isTowerDecay, setIsTowerDecay] = useState(false);
   const [showTowerDecayAlert, setShowTowerDecayAlert] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(true);
+  const [lowPerformanceMode, setLowPerformanceMode] = useState(true);
   const doubleElixirTriggeredRef = useRef(false);
   const overtimeStartedRef = useRef(false);
     const towerDecayStartedRef = useRef(false);
@@ -8623,7 +8664,7 @@ export default function App() {
 
   const [units, setUnits] = useState([]);
   const [projectiles, setProjectiles] = useState([]);
-  const [visualEffects, setVisualEffects] = useState([]); // Temporary visual effects (explosions, heals, etc.)
+  const [visualEffects, setVisualEffectsState] = useState([]); // Temporary visual effects (explosions, heals, etc.)
   const [lastPlayedCard, setLastPlayedCard] = useState(null);
   const [enemyLastPlayedCard, setEnemyLastPlayedCard] = useState(null);
 
@@ -8638,6 +8679,32 @@ export default function App() {
   const lastPlayedCardRef = useRef(lastPlayedCard);
   const enemyLastPlayedCardRef = useRef(enemyLastPlayedCard);
   const scoreRef = useRef(score);
+  const lowPerformanceModeRef = useRef(lowPerformanceMode);
+  const pendingVisualEffectUpdatesRef = useRef([]);
+  const visualEffectsFlushScheduledRef = useRef(false);
+
+  const setVisualEffects = useCallback((updater) => {
+    pendingVisualEffectUpdatesRef.current.push(updater);
+
+    if (visualEffectsFlushScheduledRef.current) return;
+
+    visualEffectsFlushScheduledRef.current = true;
+    requestAnimationFrame(() => {
+      visualEffectsFlushScheduledRef.current = false;
+      const queuedUpdates = pendingVisualEffectUpdatesRef.current;
+      pendingVisualEffectUpdatesRef.current = [];
+
+      setVisualEffectsState(prev => {
+        let next = prev;
+
+        queuedUpdates.forEach(update => {
+          next = typeof update === 'function' ? update(next) : update;
+        });
+
+        return capVisualEffectList(next, lowPerformanceModeRef.current);
+      });
+    });
+  }, []);
 
   useEffect(() => { towersRef.current = towers; }, [towers]);
   useEffect(() => { unitsRef.current = units; }, [units]);
@@ -8650,6 +8717,7 @@ export default function App() {
   useEffect(() => { enemyDeckQueueRef.current = enemyDeckQueue; }, [enemyDeckQueue]);
   useEffect(() => { lastPlayedCardRef.current = lastPlayedCard; }, [lastPlayedCard]);
   useEffect(() => { enemyLastPlayedCardRef.current = enemyLastPlayedCard; }, [enemyLastPlayedCard]);
+  useEffect(() => { lowPerformanceModeRef.current = lowPerformanceMode; }, [lowPerformanceMode]);
 
   // Update player towers when tower type changes
   useEffect(() => {
@@ -9162,6 +9230,8 @@ export default function App() {
           for (let i = 0; i < barrelCount; i++) {
             const isDecoy = isEvolved && i === 1; // Second barrel is decoy
             const delayOffset = isDecoy ? decoyDelay : 0;
+            const spawnCardId = isDecoy ? 'decoy_goblin' : actualCard.spawns;
+            const spawnCount = isDecoy ? 3 : (actualCard.spawnCount || 3);
 
             setProjectiles(prev => [...prev, {
 
@@ -9171,9 +9241,9 @@ export default function App() {
 
               type: spellType, isSpell: true, hit: false, spawnTime: Date.now() + delayOffset,
 
-              isGoblinBarrel: true, spawns: actualCard.spawns, spawnCount: isDecoy ? 0 : (actualCard.spawnCount || 3), isOpponent,
+              isGoblinBarrel: true, spawns: spawnCardId, spawnCount: spawnCount, isOpponent,
 
-              isDecoy: isDecoy, // Decoy barrel spawns no goblins
+              isDecoy: isDecoy,
 
               delayedSpawn: isDecoy // Delayed spawn for decoy
 
@@ -9718,6 +9788,11 @@ export default function App() {
             lingeringZapEndTime: 0,
             pullDistance: actualCard.pullDistance || 0,
             pullStrength: actualCard.pullStrength || 8,
+            draftRadius: actualCard.draftRadius || 0,
+            draftDuration: actualCard.draftDuration || 0,
+            draftEnemySlow: actualCard.draftEnemySlow || 0,
+            draftAllySpeedBoost: actualCard.draftAllySpeedBoost || 0,
+            draftLingerDuration: actualCard.draftLingerDuration || 0,
             poisonEffect: actualCard.poisonEffect || false,
             poisonStackLevel2: actualCard.poisonStackLevel2 || 4,
             poisonStackLevel3: actualCard.poisonStackLevel3 || 7,
@@ -9752,10 +9827,11 @@ export default function App() {
             isInvincibleSkeleton: false,
             skeletonGeneralId: null,
             spawnsSouldiers: actualCard.spawnsSouldiers || false,
-            souldiersPerAttack: actualCard.souldiersPerAttack || 0,
+            souldiersPerReveal: actualCard.souldiersPerReveal || 0,
             souldierHp: actualCard.souldierHp || 0,
             souldierDamage: actualCard.souldierDamage || 0,
             souldierLifetime: actualCard.souldierLifetime || 0,
+            hasSpawnedSouldiersThisCloak: false,
             flyingSpawn: actualCard.flyingSpawn || false,
             fallDamageRadius: actualCard.fallDamageRadius || 0,
             fallDamageAmount: actualCard.fallDamageAmount || 0,
@@ -10391,7 +10467,68 @@ export default function App() {
       let healEvents = [];
       let chainEvents = [];
 
+      const queueRoyalGhostSouldiers = (unit, spawnAt = unit) => {
+        const souldierCount = unit.souldiersPerReveal || 2;
+        for (let s = 0; s < souldierCount; s++) {
+          const angle = (Math.PI * 2 * s) / souldierCount;
+          const spawnRadius = 30;
+          const spawnX = spawnAt.x + Math.cos(angle) * spawnRadius;
+          const spawnY = spawnAt.y + Math.sin(angle) * spawnRadius;
+
+          unitsToSpawn.push({
+            id: 'souldier_' + now + '_' + s + '_' + Math.random(),
+            x: Math.max(20, Math.min(width - 20, spawnX)),
+            y: Math.max(20, Math.min(height - 20, spawnY)),
+            hp: unit.souldierHp || 75,
+            maxHp: unit.souldierHp || 75,
+            isOpponent: unit.isOpponent,
+            speed: 2,
+            lane: unit.lane,
+            lastAttack: 0,
+            spriteId: 'souldier',
+            type: 'ground',
+            range: 25,
+            damage: unit.souldierDamage || 40,
+            attackSpeed: 1000,
+            projectile: null,
+            spawnTime: now,
+            lifetime: (unit.souldierLifetime || 5) * 1000,
+            expiresAt: now + (unit.souldierLifetime || 5) * 1000
+          });
+        }
+      };
+
       const sourceUnits = unitsRef.current || [];
+      const sourceUnitGrid = new Map();
+      sourceUnits.forEach(unit => {
+        const cellX = Math.floor(unit.x / UNIT_GRID_CELL_SIZE);
+        const cellY = Math.floor(unit.y / UNIT_GRID_CELL_SIZE);
+        const cellKey = `${cellX},${cellY}`;
+        if (!sourceUnitGrid.has(cellKey)) {
+          sourceUnitGrid.set(cellKey, []);
+        }
+        sourceUnitGrid.get(cellKey).push(unit);
+      });
+
+      const getNearbySourceUnits = (x, y, radius) => {
+        const minCellX = Math.floor((x - radius) / UNIT_GRID_CELL_SIZE);
+        const maxCellX = Math.floor((x + radius) / UNIT_GRID_CELL_SIZE);
+        const minCellY = Math.floor((y - radius) / UNIT_GRID_CELL_SIZE);
+        const maxCellY = Math.floor((y + radius) / UNIT_GRID_CELL_SIZE);
+        const nearbyUnits = [];
+
+        for (let cellX = minCellX; cellX <= maxCellX; cellX++) {
+          for (let cellY = minCellY; cellY <= maxCellY; cellY++) {
+            const bucket = sourceUnitGrid.get(`${cellX},${cellY}`);
+            if (bucket) {
+              nearbyUnits.push(...bucket);
+            }
+          }
+        }
+
+        return nearbyUnits;
+      };
+
       let currentUnits = sourceUnits.map(u => {
         // Check if stunned
         const isCurrentlyStunned = u.stunUntil && now < u.stunUntil;
@@ -10843,7 +10980,7 @@ export default function App() {
                   const dashDuration = 400; // Duration of entire chain
 
                   // Find nearby enemies
-                  const nearbyEnemies = sourceUnits.filter(target =>
+                  const nearbyEnemies = getNearbySourceUnits(u.x, u.y, dashRange).filter(target =>
                      target.isOpponent !== u.isOpponent &&
                      target.hp > 0 &&
                      target.id !== u.lockedTarget
@@ -11512,6 +11649,10 @@ export default function App() {
               // If hidden, reveal when attackable target is nearby
               if (enemyInRange || towerInRange) {
                 u.hidden.active = false;
+                if (u.spawnsSouldiers && !u.hasSpawnedSouldiersThisCloak) {
+                  queueRoyalGhostSouldiers(u);
+                  u.hasSpawnedSouldiersThisCloak = true;
+                }
               }
             } else {
               // If visible, re-cloak only when 4 tiles (~100px) away from ALL attackable targets
@@ -11529,6 +11670,7 @@ export default function App() {
 
               if (allEnemiesFar && allTowersFar) {
                 u.hidden.active = true;
+                u.hasSpawnedSouldiersThisCloak = false;
               }
             }
           }
@@ -11580,7 +11722,7 @@ export default function App() {
            const sourceUnits = unitsRef.current || [];
            u.enchantedUnits = (u.enchantedUnits || []).filter(id => sourceUnits.some(unit => unit.id === id && unit.hp > 0));
            if (u.enchantedUnits.length < 2) {
-              const potentialTargets = sourceUnits.filter(unit => 
+              const potentialTargets = getNearbySourceUnits(u.x, u.y, 180).filter(unit => 
                  unit.isOpponent === u.isOpponent && unit.id !== u.id && unit.hp > 0 &&
                  unit.type !== 'building' && !unit.isEnchanted
               );
@@ -11671,7 +11813,7 @@ export default function App() {
             // Spear goblins attack every 1100ms (their attack speed), independent of Giant
             if (timeSinceSpearAttack >= spearGoblinCard.attackSpeed) {
               // Find nearest enemy unit for spear goblins to target
-              const spearTargets = (unitsRef.current || []).filter(t => t.isOpponent !== u.isOpponent && t.hp > 0 && t.type !== 'building');
+              const spearTargets = getNearbySourceUnits(u.x, u.y, 220).filter(t => t.isOpponent !== u.isOpponent && t.hp > 0 && t.type !== 'building');
               let closestSpearTarget = null;
               let minSpearDist = Infinity;
               spearTargets.forEach(t => {
@@ -11748,7 +11890,8 @@ export default function App() {
 
         // ADD BUILDINGS to targets (Cannon, Furnace, etc.) - CRITICAL FOR KITING
         // Buildings like Cannon should distract enemy troops
-        const buildingTargets = (unitsRef.current || []).filter(targetUnit =>
+        const nearbyCandidateTargets = getNearbySourceUnits(u.x, u.y, Math.max(actualRange + 160, 220));
+        const buildingTargets = nearbyCandidateTargets.filter(targetUnit =>
           targetUnit.isOpponent !== u.isOpponent &&
           targetUnit.hp > 0 &&
           targetUnit.type === 'building' &&
@@ -11762,7 +11905,7 @@ export default function App() {
           // Use unitsRef.current instead of currentUnits to avoid circular reference
           // Exclude hidden Teslas from targets (they're underground and untargetable)
           // Exclude zones (graveyard) from targets (they're untargetable)
-          const unitTargets = (unitsRef.current || []).filter(targetUnit =>
+          const unitTargets = nearbyCandidateTargets.filter(targetUnit =>
             targetUnit.isOpponent !== u.isOpponent &&
             targetUnit.hp > 0 &&
             targetUnit.type !== 'building' && // Buildings already added above
@@ -12315,27 +12458,25 @@ export default function App() {
                     }
                   }
 
-                  // Evolved Baby Dragon: Wind burst after attack
-                  if (u.windBurst) {
-                    const burstWidth = (u.windBurstWidth || 8) * TILE_SIZE;
-                    const burstHeight = (u.windBurstHeight || 9) * TILE_SIZE;
-                    const pushback = (u.windBurstPushback || 2) * TILE_SIZE;
-
-                    // Push enemies in front of Baby Dragon
-                    const direction = u.isOpponent ? 1 : -1; // Player attacks up, opponent attacks down
-
-                    sourceUnits.forEach(enemy => {
-                      if (enemy.isOpponent !== u.isOpponent && enemy.hp > 0 && enemy.type !== 'building') {
-                        const dx = Math.abs(enemy.x - u.x);
-                        const dy = (enemy.y - u.y) * direction; // Positive if in front
-
-                        // Check if enemy is in wind burst area
-                        if (dx <= burstWidth / 2 && dy > 0 && dy <= burstHeight) {
-                          // Push enemy back
-                          enemy.y += pushback * direction;
-                          enemy.wasPushed = true;
-                        }
-                      }
+                  // Evolved Baby Dragon: draft zone slows enemies and speeds allies
+                  if (u.draftRadius > 0 && u.draftDuration > 0 && target) {
+                    nextProjectiles.push({
+                      id: 'baby_dragon_draft_' + now + '_' + Math.random(),
+                      x: target.x,
+                      y: target.y,
+                      targetX: target.x,
+                      targetY: target.y,
+                      speed: 0,
+                      damage: 0,
+                      radius: u.draftRadius,
+                      type: 'baby_dragon_draft',
+                      isSpell: true,
+                      hit: true,
+                      spawnTime: now,
+                      duration: u.draftDuration,
+                      isOpponent: u.isOpponent,
+                      allySpeedBoost: u.draftAllySpeedBoost || 0.35,
+                      enemySlow: u.draftEnemySlow || 0.35
                     });
                   }
 
@@ -12411,38 +12552,6 @@ export default function App() {
                     }
                   }
 
-                  // Evolved Royal Ghost: Spawn Souldiers on attack
-                  if (u.spawnsSouldiers) {
-                    const souldierCount = u.souldiersPerAttack || 2;
-                    for (let s = 0; s < souldierCount; s++) {
-                      const angle = (Math.PI * 2 * s) / souldierCount;
-                      const spawnRadius = 30;
-                      const spawnX = u.x + Math.cos(angle) * spawnRadius;
-                      const spawnY = u.y + Math.sin(angle) * spawnRadius;
-
-                      unitsToSpawn.push({
-                        id: 'souldier_' + now + '_' + s + '_' + Math.random(),
-                        x: Math.max(20, Math.min(width - 20, spawnX)),
-                        y: Math.max(20, Math.min(height - 20, spawnY)),
-                        hp: u.souldierHp || 75,
-                        maxHp: u.souldierHp || 75,
-                        isOpponent: u.isOpponent,
-                        speed: 2,
-                        lane: u.lane,
-                        lastAttack: 0,
-                        spriteId: 'souldier',
-                        type: 'ground',
-                        range: 25,
-                        damage: u.souldierDamage || 40,
-                        attackSpeed: 1000,
-                        projectile: null,
-                        spawnTime: now,
-                        lifetime: (u.souldierLifetime || 5) * 1000,
-                        expiresAt: now + (u.souldierLifetime || 5) * 1000
-                      });
-                    }
-                  }
-
                   // Evolved Royal Hogs: Fall damage on first attack
                   if (u.flyingSpawn && !u.hasFallen) {
                     const fallRadius = u.fallDamageRadius || 30;
@@ -12488,7 +12597,7 @@ export default function App() {
                     const spearGoblinCard = CARDS.find(c => c.id === 'spear_goblins');
                     if (spearGoblinCard) {
                       // Find nearest enemy unit for spear goblins to target
-                      const spearTargets = sourceUnits.filter(t => t.isOpponent !== u.isOpponent && t.hp > 0 && t.type !== 'building');
+                      const spearTargets = getNearbySourceUnits(u.x, u.y, 220).filter(t => t.isOpponent !== u.isOpponent && t.hp > 0 && t.type !== 'building');
                       let closestSpearTarget = null;
                       let minSpearDist = Infinity;
                       spearTargets.forEach(t => {
@@ -14898,6 +15007,38 @@ export default function App() {
           });
         });
 
+        activeProjectiles.filter(p => p.type === 'baby_dragon_draft' && (now - p.spawnTime) / 1000 < p.duration).forEach(draftZone => {
+          const draftRadius = draftZone.radius || 72;
+          const remainingDuration = (draftZone.duration * 1000) - (now - draftZone.spawnTime);
+          const allySpeedBoost = draftZone.allySpeedBoost || 0.35;
+          const enemySlow = draftZone.enemySlow || 0.35;
+
+          currentUnits = currentUnits.map(unit => {
+            if (unit.hp <= 0) return unit;
+
+            const dx = unit.x - draftZone.x;
+            const dy = unit.y - draftZone.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist > draftRadius) return unit;
+
+            if (unit.isOpponent === draftZone.isOpponent) {
+              const newRageUntil = now + Math.min(remainingDuration + 500, 2000);
+              return {
+                ...unit,
+                rageUntil: Math.max(unit.rageUntil || 0, newRageUntil),
+                rageBoost: Math.max(unit.rageBoost || 0, allySpeedBoost)
+              };
+            }
+
+            return {
+              ...unit,
+              slowUntil: Math.max(unit.slowUntil || 0, now + 250),
+              slowAmount: Math.max(unit.slowAmount || 0, enemySlow)
+            };
+          });
+        });
+
         // Process Void Spell - damage scales inversely with target count
         activeProjectiles.filter(p => p.isVoid && (now - p.spawnTime) / 1000 < p.duration).forEach(voidZone => {
           if (now - (voidZone.lastTick || voidZone.spawnTime) < 1500) return;
@@ -15282,6 +15423,27 @@ export default function App() {
       // Handle death spawns
       unitsThatDied.forEach(deadUnit => {
         console.log('[DEATH]', deadUnit.spriteId, 'deathSpawns:', deadUnit.deathSpawns);
+
+        if (deadUnit.draftLingerDuration > 0 && deadUnit.draftRadius > 0) {
+          activeProjectiles.push({
+            id: 'baby_dragon_draft_death_' + Date.now() + '_' + Math.random(),
+            x: deadUnit.x,
+            y: deadUnit.y,
+            targetX: deadUnit.x,
+            targetY: deadUnit.y,
+            speed: 0,
+            damage: 0,
+            radius: deadUnit.draftRadius,
+            type: 'baby_dragon_draft',
+            isSpell: true,
+            hit: true,
+            spawnTime: now,
+            duration: deadUnit.draftLingerDuration,
+            isOpponent: deadUnit.isOpponent,
+            allySpeedBoost: deadUnit.draftAllySpeedBoost || 0.35,
+            enemySlow: deadUnit.draftEnemySlow || 0.35
+          });
+        }
 
         // Evolved Skeleton Army: Skeleton General death - make skeletons invisible and invincible
         if (deadUnit.isSkeletonGeneral) {
@@ -15766,8 +15928,9 @@ export default function App() {
       });
 
       // Show purple circle visual above all currently cursed units
-      currentUnits.forEach(unit => {
-        if (unit.cursedUntil && Date.now() < unit.cursedUntil && !unit.isPig && unit.type !== 'building') {
+      if (!lowPerformanceModeRef.current) {
+        currentUnits.forEach(unit => {
+          if (unit.cursedUntil && Date.now() < unit.cursedUntil && !unit.isPig && unit.type !== 'building') {
           // Create/update purple circle visual for this cursed unit
           // We use a unique ID based on unit ID to avoid duplicates
           const curseVisualId = `curse_${unit.id}`;
@@ -15786,8 +15949,9 @@ export default function App() {
               duration: 100
             }];
           });
-        }
-      });
+          }
+        });
+      }
 
       // Update state
       const allUnits = [...currentUnits, ...unitsToSpawn];
@@ -15804,27 +15968,31 @@ export default function App() {
 
       setTowers(nextTowers);
 
-    }, 66);
+    }, lowPerformanceMode ? 83 : 66);
 
     return () => clearInterval(loop);
-  }, [inGame, gameOver]);
+  }, [inGame, gameOver, lowPerformanceMode]);
 
   useEffect(() => {
     if (!inGame || gameOver) return;
+    const elixirTickMs = lowPerformanceMode ? 200 : 100;
+    const elixirGain = (isDoubleElixir ? 0.07 : 0.035) * (elixirTickMs / 100);
     const interval = setInterval(() => {
-      setElixir(prev => Math.min(prev + (isDoubleElixir ? 0.07 : 0.035), 10));
-    }, 100);
+      setElixir(prev => Math.min(prev + elixirGain, 10));
+    }, elixirTickMs);
     return () => clearInterval(interval);
-  }, [inGame, gameOver, isDoubleElixir]);
+  }, [inGame, gameOver, isDoubleElixir, lowPerformanceMode]);
 
   // Enemy Elixir Generation
   useEffect(() => {
     if (!inGame || gameOver) return;
+    const elixirTickMs = lowPerformanceMode ? 200 : 100;
+    const elixirGain = (isDoubleElixir ? 0.07 : 0.035) * (elixirTickMs / 100);
     const interval = setInterval(() => {
-      setEnemyElixir(prev => Math.min(prev + (isDoubleElixir ? 0.07 : 0.035), 10));
-    }, 100);
+      setEnemyElixir(prev => Math.min(prev + elixirGain, 10));
+    }, elixirTickMs);
     return () => clearInterval(interval);
-  }, [inGame, gameOver, isDoubleElixir]);
+  }, [inGame, gameOver, isDoubleElixir, lowPerformanceMode]);
 
   // Enemy AI - Play Cards Automatically
   useEffect(() => {
@@ -16005,10 +16173,10 @@ export default function App() {
       if (cardToPlay) {
         spawnCard(cardToPlay, targetX, targetY, true);
       }
-    }, 1500); // AI decision every 1.5 seconds
+    }, lowPerformanceMode ? 2200 : 1500);
 
     return () => clearInterval(aiInterval);
-  }, [inGame, gameOver]);
+  }, [inGame, gameOver, lowPerformanceMode]);
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -16099,6 +16267,8 @@ export default function App() {
         showTowerDecayAlert={showTowerDecayAlert}
         audioEnabled={audioEnabled}
         setAudioEnabled={setAudioEnabled}
+        lowPerformanceMode={lowPerformanceMode}
+        setLowPerformanceMode={setLowPerformanceMode}
         onConcede={concedeGame}
         onActivateAbility={activateChampionAbility}
         cardCycles={cardCycles}
