@@ -149,7 +149,7 @@ const CARDS = [
   // 5 More NEW Cards
   { id: 'giant_skeleton', name: 'Giant Skel', cost: 6, color: '#bdc3c7', hp: 2800, speed: 1.5, type: 'ground', range: 25, damage: 170, attackSpeed: 1500, projectile: null, count: 1, rarity: 'epic', deathDamage: 1000, deathRadius: 100, deathBombDelay: 3000 },
   { id: 'electro_dragon', name: 'Electro D', cost: 5, color: '#3498db', hp: 1000, speed: 2, type: 'flying', range: 70, damage: 160, attackSpeed: 2100, projectile: 'electric_bolt', count: 1, rarity: 'epic', chain: 3, stun: 0.5, evolvesTo: 'evolved_electro_dragon', evolutionCycles: 1 },
-  { id: 'magic_archer', name: 'Magic Arch', cost: 4, color: '#27ae60', hp: 440, speed: 2, type: 'ground', range: 140, damage: 111, attackSpeed: 1100, projectile: 'magic_arrow', count: 1, rarity: 'legendary', pierce: true, heroVariantId: 'hero_magic_archer' },
+  { id: 'magic_archer', name: 'Magic Arch', cost: 4, color: '#27ae60', hp: 440, speed: 2, type: 'ground', range: 140, damage: 111, attackSpeed: 1100, projectile: 'magic_arrow', count: 1, rarity: 'legendary', pierce: true, projectileTravelDistance: 220, heroVariantId: 'hero_magic_archer' },
   { id: 'royal_ghost', name: 'Royal Ghost', cost: 3, color: '#ecf0f1', hp: 1000, speed: 2, type: 'ground', range: 25, damage: 216, attackSpeed: 1800, projectile: null, count: 1, rarity: 'legendary', splash: true, hidden: true, evolvesTo: 'evolved_royal_ghost', evolutionCycles: 2 },
   { id: 'hunter', name: 'Hunter', cost: 4, color: '#2c3e50', hp: 700, speed: 2, type: 'ground', range: 80, damage: 700, attackSpeed: 2200, projectile: 'shotgun_blast', count: 1, rarity: 'epic', shotgunSpread: true },
 
@@ -216,13 +216,13 @@ const CARDS = [
   { id: 'goblinstein', name: 'Goblinstein', cost: 5, color: '#2ecc71', hp: 955, speed: 2, type: 'ground', range: 5.5, damage: 122, attackSpeed: 1800, projectile: 'electric_zap', count: 1, rarity: 'champion', stun: 0.5, monsterAbility: true, abilityCooldown: 17000, abilityCost: 2 },
   { id: 'goblinstein_monster', name: 'The Monster', cost: 0, color: '#27ae60', hp: 3169, speed: 2, type: 'ground', targetType: 'buildings', range: 1.2, damage: 169, attackSpeed: 1500, count: 1, rarity: 'champion', isToken: true },
   { id: 'guardian', name: 'Guardian', cost: 0, color: '#f1c40f', hp: 1800, speed: 3, type: 'ground', range: 30, damage: 200, attackSpeed: 1200, count: 1, rarity: 'champion', isToken: true, knockback: 50, spawnDamage: 200 },
-  { id: 'hero_magic_archer', name: 'Hero Magic Arch', cost: 4, color: '#16a085', hp: 440, speed: 2, type: 'ground', range: 140, damage: 111, attackSpeed: 1100, projectile: 'magic_arrow', count: 1, rarity: 'hero', isToken: true, pierce: true, heroTripleThreatAbility: true, heroCastDelay: 1000, heroRetreatDistance: 165, heroDecoyDuration: 7000, heroDecoyHpMultiplier: 1.185, heroTripleShotDuration: 7000, heroTripleShotCount: 3, abilityCooldown: 25000, abilityCost: 1 },
+  { id: 'hero_magic_archer', name: 'Hero Magic Arch', cost: 4, color: '#16a085', hp: 440, speed: 2, type: 'ground', range: 140, damage: 111, attackSpeed: 1100, projectile: 'magic_arrow', count: 1, rarity: 'hero', isToken: true, pierce: true, projectileTravelDistance: 220, heroTripleThreatAbility: true, heroCastDelay: 1000, heroRetreatDistance: 165, heroDecoyDuration: 7000, heroDecoyHpMultiplier: 1.185, heroTripleShotDuration: 7000, heroTripleShotCount: 3, heroTripleShotTravelDistance: 310, abilityCooldown: 25000, abilityCost: 1 },
 
   // Evolutions
   { id: 'evolved_knight', name: 'Evolved Knight', cost: 3, color: '#f1c40f', hp: 1766, speed: 1.5, type: 'ground', range: 20, damage: 202, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common', isToken: true, evolution: true, damageReduction: 0.6, evolutionAuraColor: '#9b59b6' },
   { id: 'evolved_archers', name: 'Evolved Archers', cost: 3, color: '#e67e22', hp: 304, speed: 2, type: 'ground', range: 96, damage: 107, attackSpeed: 900, projectile: 'arrow', count: 2, rarity: 'common', isToken: true, evolution: true, powerShotMinRange: 64, powerShotMaxRange: 96, powerShotMultiplier: 1.5, evolutionAuraColor: '#f39c12' },
   { id: 'evolved_skeletons', name: 'Evolved Skeletons', cost: 1, color: '#bdc3c7', hp: 81, speed: 2, type: 'ground', range: 25, damage: 81, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common', isToken: true, evolution: true, spawnOnHitCap: 8, evolutionAuraColor: '#00d2ff' },
-  { id: 'evolved_barbarians', name: 'Evolved Barbarians', cost: 5, color: '#CD853F', hp: 737, speed: 1.5, type: 'ground', range: 30, damage: 192, attackSpeed: 1300, projectile: null, count: 5, rarity: 'common', isToken: true, evolution: true, boostOnAttack: true, boostDuration: 3000, boostAmount: 0.3, evolutionAuraColor: '#e74c3c' },
+  { id: 'evolved_barbarians', name: 'Evolved Barbarians', cost: 5, color: '#CD853F', hp: 737, speed: 1.5, type: 'ground', range: 30, damage: 192, attackSpeed: 1300, projectile: null, count: 5, rarity: 'common', isToken: true, evolution: true, boostOnAttack: true, boostDuration: 3000, boostAmount: 0.35, evolutionAuraColor: '#e74c3c' },
   { id: 'evolved_bats', name: 'Evolved Bats', cost: 2, color: '#8e44ad', hp: 122, speed: 3.5, type: 'flying', range: 50, damage: 81, attackSpeed: 1300, projectile: null, count: 5, rarity: 'common', isToken: true, evolution: true, selfHealOnAttack: 38, overhealMaxHp: 244, evolutionAuraColor: '#2ecc71' },
   { id: 'evolved_royal_giant', name: 'Evolved Royal Giant', cost: 6, color: '#e67e22', hp: 3164, speed: 1.2, type: 'ground', range: 90, damage: 307, attackSpeed: 1700, projectile: 'cannonball', count: 1, targetType: 'buildings', rarity: 'common', isToken: true, evolution: true, recoilBlastOnAttack: true, recoilBlastDamage: 81, recoilBlastRadius: 40, recoilBlastKnockback: 16, evolutionAuraColor: '#f39c12' },
   { id: 'evolved_firecracker', name: 'Evolved Firecracker', cost: 3, color: '#e67e22', hp: 240, speed: 3, type: 'ground', range: 100, damage: 180, attackSpeed: 2500, projectile: 'firecracker_burst', count: 1, splash: true, stun: 0.5, recoil: 60, spreadCount: 8, spreadArc: 0.5, rarity: 'common', isToken: true, evolution: true, sparkPoisonDamage: 20, sparkPoisonDuration: 2.5, sparkPoisonRadius: 20, sparkPoisonSlow: 0.15, evolutionAuraColor: '#ff6b6b' },
@@ -249,13 +249,13 @@ const CARDS = [
   { id: 'evolved_electro_dragon', name: 'Evolved Electro Dragon', cost: 5, color: '#3498db', hp: 1000, speed: 2, type: 'flying', range: 70, damage: 160, attackSpeed: 2100, projectile: 'electric_bolt', count: 1, rarity: 'epic', isToken: true, evolution: true, infiniteChain: true, chainDecay: 0.4, chainRange: 60, stun: 0.3, evolutionAuraColor: '#0984e3' },
   { id: 'evolved_skeleton_barrel', name: 'Evolved Skeleton Barrel', cost: 3, color: '#bdc3c8', hp: 636, speed: 6, type: 'flying', range: 0, radius: 25, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 20, targetType: 'buildings', rarity: 'epic', isToken: true, evolution: true, deathSpawns: 'skeletons', deathSpawnCount: 4, deathDamage: 133, deathRadius: 40, dropBarrels: true, dropBarrelsAt: [0.75, 0], evolutionAuraColor: '#b2bec3' },
   { id: 'evolved_furnace', name: 'Evolved Furnace', cost: 4, color: '#e74c3c', hp: 1003, speed: 1.5, type: 'ground', range: 50, damage: 120, attackSpeed: 1200, projectile: 'flame', count: 1, spawns: 'fire_spirit', spawnRate: 2.4, spawnCount: 1, rarity: 'rare', isToken: true, evolution: true, alternatingSides: true, evolutionAuraColor: '#ff6b6b' },
-  { id: 'evolved_baby_dragon', name: 'Evolved Baby Dragon', cost: 4, color: '#27ae60', hp: 1152, speed: 2, type: 'flying', range: 80, damage: 160, attackSpeed: 1500, projectile: 'dragon_fire', count: 1, splash: true, rarity: 'epic', isToken: true, evolution: true, draftRadius: 72, draftDuration: 3.5, draftEnemySlow: 0.35, draftAllySpeedBoost: 0.35, draftLingerDuration: 2, evolutionAuraColor: '#00b894' },
+  { id: 'evolved_baby_dragon', name: 'Evolved Baby Dragon', cost: 4, color: '#27ae60', hp: 1152, speed: 2, type: 'flying', range: 80, damage: 160, attackSpeed: 1500, projectile: 'dragon_fire', count: 1, splash: true, rarity: 'epic', isToken: true, evolution: true, draftRadius: 72, draftDuration: 3.5, draftEnemySlow: 0.3, draftAllySpeedBoost: 0.5, draftLingerDuration: 2, evolutionAuraColor: '#00b894' },
   { id: 'evolved_skeleton_army', name: 'Evolved Skeleton Army', cost: 3, color: '#ecf0f1', hp: 81, speed: 2, type: 'ground', range: 25, damage: 81, attackSpeed: 1000, projectile: null, count: 15, rarity: 'epic', isToken: true, evolution: true, skeletonGeneral: true, skeletonGeneralHp: 650, skeletonsInvincibleOnDeath: true, evolutionAuraColor: '#dfe6e9' },
   { id: 'evolved_royal_ghost', name: 'Evolved Royal Ghost', cost: 3, color: '#ecf0f1', hp: 1000, speed: 2, type: 'ground', range: 25, damage: 216, attackSpeed: 1800, projectile: null, count: 1, rarity: 'legendary', isToken: true, evolution: true, splash: true, hidden: true, revealRadius: 50, revealDamage: 270, spawnsSouldiers: true, souldiersPerReveal: 2, souldierHp: 75, souldierDamage: 40, souldierLifetime: 5, evolutionAuraColor: '#ffffff' },
-  { id: 'evolved_royal_hogs', name: 'Evolved Royal Hogs', cost: 5, color: '#e67e22', hp: 1260, speed: 3.5, type: 'ground', range: 25, damage: 240, attackSpeed: 1600, projectile: null, count: 4, targetType: 'buildings', jumps: true, rarity: 'rare', isToken: true, evolution: true, flyingSpawn: true, fallDamageRadius: 30, fallDamageAmount: 100, fallStunDuration: 0.3, evolutionAuraColor: '#fdcb6e' },
+  { id: 'evolved_royal_hogs', name: 'Evolved Royal Hogs', cost: 5, color: '#e67e22', hp: 1260, speed: 3.5, type: 'ground', range: 25, damage: 240, attackSpeed: 1600, projectile: null, count: 4, targetType: 'buildings', jumps: true, rarity: 'rare', isToken: true, evolution: true, flyingSpawn: true, fallDamageRadius: 30, fallDamageAmount: 372, fallStunDuration: 0.3, evolutionAuraColor: '#fdcb6e' },
   { id: 'evolved_goblin_cage', name: 'Evolved Goblin Cage', cost: 4, color: '#95a5a6', hp: 880, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 20, spawns: null, spawnRate: 0, spawnCount: 0, rarity: 'rare', isToken: true, evolution: true, deathSpawns: 'goblin_brawler', deathSpawnCount: 1, dragTroopsIntoCage: true, dragRadius: 40, dragStrength: 5, evolutionAuraColor: '#636e72' },
   { id: 'evolved_goblin_barrel', name: 'Evolved Goblin Barrel', cost: 3, color: '#2ecc71', type: 'spell', damage: 0, radius: 20, count: 3, spawns: 'sword_goblins', spawnCount: 3, rarity: 'epic', isToken: true, evolution: true, doubleBarrel: true, decoyBarrelDelay: 0.5, evolutionAuraColor: '#55efc4' },
-  { id: 'evolved_battle_ram', name: 'Evolved Battle Ram', cost: 4, color: '#e67e22', hp: 756, speed: 4, type: 'ground', range: 25, damage: 246, attackSpeed: 100, projectile: null, count: 1, targetType: 'buildings', charge: true, rarity: 'rare', isToken: true, evolution: true, deathSpawns: 'barbarian_brothers', deathSpawnCount: 2, kamikaze: true, chargeKnockback: 30, repeatedRammng: true, evolutionAuraColor: '#e17055' },
+  { id: 'evolved_battle_ram', name: 'Evolved Battle Ram', cost: 4, color: '#e67e22', hp: 756, speed: 4, type: 'ground', range: 25, damage: 246, attackSpeed: 100, projectile: null, count: 1, targetType: 'buildings', charge: true, rarity: 'rare', isToken: true, evolution: true, deathSpawns: 'evolved_barbarians', deathSpawnCount: 2, kamikaze: true, chargeKnockback: 30, repeatedRammng: true, evolutionAuraColor: '#e17055' },
   { id: 'evolved_wall_breakers', name: 'Evolved Wall Breakers', cost: 2, color: '#bdc3c7', hp: 332, speed: 4, type: 'ground', range: 5, damage: 446, attackSpeed: 1000, projectile: null, count: 2, targetType: 'buildings', kamikaze: true, splash: true, splashRadius: 40, rarity: 'epic', isToken: true, evolution: true, barrelExplosionFirst: true, barrelExplosionRadius: 30, barrelExplosionDamage: 150, thenRunToBuilding: true, evolutionAuraColor: '#dfe6e9' },
   { id: 'evolved_goblin_drill', name: 'Evolved Goblin Drill', cost: 4, color: '#2ecc71', hp: 1200, speed: 2, type: 'ground', range: 25, damage: 100, attackSpeed: 1000, projectile: null, count: 1, lifetime: 20, targetType: 'buildings', spawns: 'sword_goblins', spawnRate: 0.8, spawnCount: 1, rarity: 'epic', isToken: true, evolution: true, deployAnywhere: true, deathSpawns: 'sword_goblins', deathSpawnCount: 5, burrows: true, rotatesAroundTower: true, rotateAtHp: [0.66, 0.33], rotateAngle: 90, evolutionAuraColor: '#00b894' }
 ];
@@ -2391,6 +2391,32 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
         </Svg>
       );
     case 'hero_magic_archer':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Defs>
+            <LinearGradient id="heroMagicArcherBg" x1="0" y1="0" x2="1" y2="1">
+              <Stop offset="0%" stopColor="#5de6ff" />
+              <Stop offset="55%" stopColor="#1ab9c9" />
+              <Stop offset="100%" stopColor="#0f7f8a" />
+            </LinearGradient>
+            <LinearGradient id="heroMagicArcherGold" x1="0" y1="0" x2="1" y2="1">
+              <Stop offset="0%" stopColor="#fff6b5" />
+              <Stop offset="45%" stopColor="#ffd54a" />
+              <Stop offset="100%" stopColor="#d48b00" />
+            </LinearGradient>
+          </Defs>
+          <Circle cx="50" cy="50" r="46" fill="#ffe88a" opacity="0.3" />
+          <Circle cx="50" cy="50" r="44" fill="url(#heroMagicArcherBg)" stroke="url(#heroMagicArcherGold)" strokeWidth="4" />
+          <Path d="M22 54 Q50 14 78 54 L78 82 L22 82 Z" fill="#1f6d73" />
+          <Circle cx="50" cy="48" r="24" fill="#f6cfae" />
+          <Path d="M32 56 Q50 78 68 56" fill="#fff7de" />
+          <Path d="M31 40 Q50 18 69 40" fill="#e0a93d" />
+          <Circle cx="42" cy="48" r="4.5" fill="#ffd54a" />
+          <Circle cx="58" cy="48" r="4.5" fill="#ffd54a" />
+          <Path d="M18 63 Q50 95 82 63" stroke="url(#heroMagicArcherGold)" strokeWidth="4" fill="none" />
+          <Path d="M16 79 L84 21" stroke="#fff2b3" strokeWidth="6" opacity="0.55" />
+        </Svg>
+      );
     case 'magic_archer':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
@@ -3223,46 +3249,55 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
     >
       {isAbilityCard && (
         <Svg width={isNext ? "40" : "60"} height={isNext ? "50" : "75"} viewBox="0 0 60 75" style={{ position: 'absolute', top: 0, left: 0 }}>
-           <Defs>
-             <LinearGradient id="goldGradient" x1="0" y1="0" x2="1" y2="1">
-               <Stop offset="0%" stopColor={isHero ? "#7fe7ff" : "#FFD700"} />
-               <Stop offset="50%" stopColor={isHero ? "#00bcd4" : "#f1c40f"} />
-               <Stop offset="100%" stopColor={isHero ? "#00838f" : "#d4af37"} />
-             </LinearGradient>
-             <LinearGradient id="innerBevel" x1="0" y1="0" x2="0" y2="1">
-               <Stop offset="0%" stopColor="#ffffff" stopOpacity="0.3" />
-               <Stop offset="100%" stopColor="#000000" stopOpacity="0.1" />
-             </LinearGradient>
-           </Defs>
-           {/* Shadow/Outline */}
-           <Path 
-             d="M30,0 L56,12 L56,66 L30,75 L4,66 L4,12 Z" 
-             fill="rgba(0,0,0,0.3)" 
-             transform="translate(2,2)"
-           />
-           {/* Main Body - Champion Shape (Pointed top and bottom, but with rounded ornate sides) */}
-           <Path 
-             d="M30,2 L58,16 L58,62 L30,73 L2,62 L2,16 Z" 
-             fill="#ecf0f1" 
-             stroke="url(#goldGradient)" 
-             strokeWidth="3" 
-           />
-           {/* Inner Bevel Detail */}
-           <Path 
-             d="M30,5 L54,18 L54,60 L30,70 L6,60 L6,18 Z" 
-             fill="none" 
-             stroke="url(#innerBevel)" 
-             strokeWidth="1" 
-           />
-           {/* Top "Crown" Gem - The distinctive champion card feature */}
-           <View style={{ position: 'absolute', top: -10, left: 21 }}>
-             <Svg width="18" height="18" viewBox="0 0 20 20">
-               <Rect x="5" y="5" width="10" height="10" fill="#f1c40f" stroke="#d4af37" strokeWidth="2" transform="rotate(45 10 10)" />
-               <Rect x="8" y="8" width="4" height="4" fill="#ffffff" transform="rotate(45 10 10)" opacity="0.8" />
-             </Svg>
-           </View>
-           {/* Golden corners */}
-           <Path d="M2,16 L12,8 M48,8 L58,16" stroke="#f1c40f" strokeWidth="2" />
+          <Defs>
+            <LinearGradient id="abilityFrameGold" x1="0" y1="0" x2="1" y2="1">
+              <Stop offset="0%" stopColor="#fff7b8" />
+              <Stop offset="45%" stopColor="#ffd347" />
+              <Stop offset="100%" stopColor="#d89000" />
+            </LinearGradient>
+            <LinearGradient id="heroGlass" x1="0" y1="0" x2="1" y2="1">
+              <Stop offset="0%" stopColor="#7ee8ff" />
+              <Stop offset="100%" stopColor="#24b9ca" />
+            </LinearGradient>
+            <LinearGradient id="abilityInnerLight" x1="0" y1="0" x2="0" y2="1">
+              <Stop offset="0%" stopColor="#ffffff" stopOpacity="0.45" />
+              <Stop offset="100%" stopColor="#000000" stopOpacity="0.08" />
+            </LinearGradient>
+          </Defs>
+          {isHero ? (
+            <>
+              <Rect x="3" y="5" width="54" height="66" rx="12" fill="#ffe66d" opacity="0.22" />
+              <Rect x="5" y="7" width="50" height="62" rx="11" fill="none" stroke="#ffd84f" strokeWidth="5" opacity="0.55" />
+              <Rect x="7" y="9" width="46" height="58" rx="10" fill="url(#heroGlass)" stroke="url(#abilityFrameGold)" strokeWidth="3.5" />
+              <Rect x="10" y="12" width="40" height="52" rx="8" fill="none" stroke="url(#abilityInnerLight)" strokeWidth="1.2" />
+              <Path d="M12 58 L48 22" stroke="#fff1a6" strokeWidth="3.2" opacity="0.55" />
+              <Path d="M20 66 L52 34" stroke="#fff9d1" strokeWidth="1.6" opacity="0.35" />
+              <Path d="M30 2 L40 11 L30 20 L20 11 Z" fill="url(#abilityFrameGold)" stroke="#fff6c6" strokeWidth="1.4" />
+              <Path d="M30 6 L35 11 L30 16 L25 11 Z" fill="#fff8d8" opacity="0.7" />
+            </>
+          ) : (
+            <>
+              <Path
+                d="M30,0 L56,12 L56,66 L30,75 L4,66 L4,12 Z"
+                fill="rgba(0,0,0,0.3)"
+                transform="translate(2,2)"
+              />
+              <Path
+                d="M30,2 L58,16 L58,62 L30,73 L2,62 L2,16 Z"
+                fill="#ecf0f1"
+                stroke="url(#abilityFrameGold)"
+                strokeWidth="3"
+              />
+              <Path
+                d="M30,5 L54,18 L54,60 L30,70 L6,60 L6,18 Z"
+                fill="none"
+                stroke="url(#abilityInnerLight)"
+                strokeWidth="1"
+              />
+              <Path d="M30 1 L39 10 L30 19 L21 10 Z" fill="url(#abilityFrameGold)" stroke="#fff6c6" strokeWidth="1.2" />
+              <Path d="M2,16 L12,8 M48,8 L58,16" stroke="#f1c40f" strokeWidth="2" />
+            </>
+          )}
         </Svg>
       )}
       {isLegendary && (
@@ -9960,6 +9995,7 @@ export default function App() {
             heroDecoyHpMultiplier: actualCard.heroDecoyHpMultiplier || 1,
             heroTripleShotDuration: actualCard.heroTripleShotDuration || 0,
             heroTripleShotCount: actualCard.heroTripleShotCount || 0,
+            heroTripleShotTravelDistance: actualCard.heroTripleShotTravelDistance || 0,
             heroTripleShotReady: false,
             heroTripleShotExpiresAt: 0,
             isHeroDecoy: actualCard.isHeroDecoy || false,
@@ -9997,6 +10033,7 @@ export default function App() {
             delayedFreezeDelay: actualCard.delayedFreezeDelay || 0,
             delayedFreezeDuration: actualCard.delayedFreezeDuration || 0,
             delayedFreezeRadius: actualCard.delayedFreezeRadius || 0,
+            projectileTravelDistance: actualCard.projectileTravelDistance || 0,
             pendingFreezePulse: null,
             deployBombRainCount: actualCard.deployBombRainCount || 0,
             deployBombRainDamage: actualCard.deployBombRainDamage || 0,
@@ -12809,7 +12846,7 @@ export default function App() {
                     const baseAngle = Math.atan2(target.y - u.y, target.x - u.x);
                     const shotCount = u.heroTripleShotCount || 3;
                     const shotSpread = 0.12;
-                    const shotDistance = 280;
+                    const shotDistance = u.heroTripleShotTravelDistance || 310;
                     const baseArrowDamage = Math.floor(damageToDeal / shotCount);
 
                     for (let shotIndex = 0; shotIndex < shotCount; shotIndex++) {
@@ -12835,6 +12872,7 @@ export default function App() {
                         attackerId: u.id,
                         isOpponent: u.isOpponent,
                         pierce: true,
+                        projectileTravelDistance: shotDistance,
                         chain: 0,
                         knockback: 0
                       });
@@ -12859,6 +12897,7 @@ export default function App() {
                       attackerId: u.id,
                       isOpponent: u.isOpponent,
                       pierce: u.pierce || false,
+                      projectileTravelDistance: u.projectileTravelDistance || 0,
                       chain: u.chain || 0,
                       knockback: u.projectileKnockback || 0,
                       turnsToPig: u.turnsToPig || false,
@@ -14318,11 +14357,11 @@ export default function App() {
           const nextY = p.y + Math.sin(angle) * p.speed;
           const hitIds = p.hitIds || [];
           const maxHits = 5; // Maximum number of targets to pierce through
+          const maxTravelDistance = p.projectileTravelDistance || (dist + 100);
 
           // Check if projectile has traveled past its target by significant distance
           const distTraveled = Math.sqrt(Math.pow(nextX - p.x, 2) + Math.pow(nextY - p.y, 2));
           const totalDistTraveled = (p.totalDistTraveled || 0) + distTraveled;
-          const distToTarget = Math.sqrt(Math.pow(p.targetX - p.x, 2) + Math.pow(p.targetY - p.y, 2));
 
           // Check for collisions
           const targets = [
@@ -14349,9 +14388,9 @@ export default function App() {
 
           // Remove projectile if:
           // 1. Hit max number of targets
-          // 2. Traveled 100 pixels past target
+          // 2. Reached its designed travel distance
           // 3. Out of bounds
-          if (hitIds.length >= maxHits || (distToTarget < 100 && totalDistTraveled > distToTarget + 100) ||
+          if (hitIds.length >= maxHits || totalDistTraveled >= maxTravelDistance ||
             nextX < -50 || nextX > width + 50 || nextY < -50 || nextY > height + 50) {
             return { ...p, damageDealt: true, hit: true }; // Mark for removal
           }
