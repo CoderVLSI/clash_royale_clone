@@ -177,6 +177,11 @@ const useGameLoop = (gameState) => {
       let chainEvents = [];
 
       let currentUnits = (unitsRef.current || []).map(u => {
+        // Check if unit has expired (Souldiers have lifetime)
+        if (u.expiresAt && now >= u.expiresAt) {
+          return { ...u, hp: 0 }; // Unit expires by setting HP to 0
+        }
+
         // Check if stunned
         const isCurrentlyStunned = u.stunUntil && now < u.stunUntil;
         const wasPreviouslyStunned = u.wasStunned || false;

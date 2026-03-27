@@ -149,7 +149,7 @@ const CARDS = [
   // 5 More NEW Cards
   { id: 'giant_skeleton', name: 'Giant Skel', cost: 6, color: '#bdc3c7', hp: 2800, speed: 1.5, type: 'ground', range: 25, damage: 170, attackSpeed: 1500, projectile: null, count: 1, rarity: 'epic', deathDamage: 1000, deathRadius: 100, deathBombDelay: 3000 },
   { id: 'electro_dragon', name: 'Electro D', cost: 5, color: '#3498db', hp: 1000, speed: 2, type: 'flying', range: 70, damage: 160, attackSpeed: 2100, projectile: 'electric_bolt', count: 1, rarity: 'epic', chain: 3, stun: 0.5, evolvesTo: 'evolved_electro_dragon', evolutionCycles: 1 },
-  { id: 'magic_archer', name: 'Magic Arch', cost: 4, color: '#27ae60', hp: 440, speed: 2, type: 'ground', range: 140, damage: 111, attackSpeed: 1100, projectile: 'magic_arrow', count: 1, rarity: 'legendary', pierce: true },
+  { id: 'magic_archer', name: 'Magic Arch', cost: 4, color: '#27ae60', hp: 440, speed: 2, type: 'ground', range: 140, damage: 111, attackSpeed: 1100, projectile: 'magic_arrow', count: 1, rarity: 'legendary', pierce: true, heroVariantId: 'hero_magic_archer' },
   { id: 'royal_ghost', name: 'Royal Ghost', cost: 3, color: '#ecf0f1', hp: 1000, speed: 2, type: 'ground', range: 25, damage: 216, attackSpeed: 1800, projectile: null, count: 1, rarity: 'legendary', splash: true, hidden: true, evolvesTo: 'evolved_royal_ghost', evolutionCycles: 2 },
   { id: 'hunter', name: 'Hunter', cost: 4, color: '#2c3e50', hp: 700, speed: 2, type: 'ground', range: 80, damage: 700, attackSpeed: 2200, projectile: 'shotgun_blast', count: 1, rarity: 'epic', shotgunSpread: true },
 
@@ -216,6 +216,7 @@ const CARDS = [
   { id: 'goblinstein', name: 'Goblinstein', cost: 5, color: '#2ecc71', hp: 955, speed: 2, type: 'ground', range: 5.5, damage: 122, attackSpeed: 1800, projectile: 'electric_zap', count: 1, rarity: 'champion', stun: 0.5, monsterAbility: true, abilityCooldown: 17000, abilityCost: 2 },
   { id: 'goblinstein_monster', name: 'The Monster', cost: 0, color: '#27ae60', hp: 3169, speed: 2, type: 'ground', targetType: 'buildings', range: 1.2, damage: 169, attackSpeed: 1500, count: 1, rarity: 'champion', isToken: true },
   { id: 'guardian', name: 'Guardian', cost: 0, color: '#f1c40f', hp: 1800, speed: 3, type: 'ground', range: 30, damage: 200, attackSpeed: 1200, count: 1, rarity: 'champion', isToken: true, knockback: 50, spawnDamage: 200 },
+  { id: 'hero_magic_archer', name: 'Hero Magic Arch', cost: 4, color: '#16a085', hp: 440, speed: 2, type: 'ground', range: 140, damage: 111, attackSpeed: 1100, projectile: 'magic_arrow', count: 1, rarity: 'hero', isToken: true, pierce: true, heroTripleThreatAbility: true, heroCastDelay: 1000, heroRetreatDistance: 165, heroDecoyDuration: 7000, heroDecoyHpMultiplier: 1.185, heroTripleShotDuration: 7000, heroTripleShotCount: 3, abilityCooldown: 25000, abilityCost: 1 },
 
   // Evolutions
   { id: 'evolved_knight', name: 'Evolved Knight', cost: 3, color: '#f1c40f', hp: 1766, speed: 1.5, type: 'ground', range: 20, damage: 202, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common', isToken: true, evolution: true, damageReduction: 0.6, evolutionAuraColor: '#9b59b6' },
@@ -243,7 +244,7 @@ const CARDS = [
   { id: 'evolved_zap', name: 'Evolved Zap', cost: 2, color: '#3498db', type: 'spell', damage: 192, radius: 35, count: 1, stun: 0.5, rarity: 'common', isToken: true, evolution: true, lingeringZap: true, lingeringZapDuration: 4, lingeringZapInterval: 0.5, lingeringZapGrowth: 0.5, evolutionAuraColor: '#74b9ff' },
   { id: 'evolved_snowball', name: 'Evolved Snowball', cost: 2, color: '#E8F4F8', type: 'spell', damage: 159, radius: 35, count: 1, knockback: 15, slow: 0.35, slowDuration: 2.5, rarity: 'common', isToken: true, evolution: true, pullDistance: 4.5, pullStrength: 8, evolutionAuraColor: '#dfe6e9' },
   { id: 'evolved_dart_goblin', name: 'Evolved Dart Goblin', cost: 3, color: '#2ecc71', hp: 260, speed: 3.5, type: 'ground', range: 100, damage: 131, attackSpeed: 700, projectile: 'dart', count: 1, rarity: 'rare', isToken: true, evolution: true, poisonEffect: true, poisonStackLevel2: 4, poisonStackLevel3: 7, poisonTrailDuration: 1, poisonTrailDamage: 50, evolutionAuraColor: '#55efc4' },
-  { id: 'evolved_lumberjack', name: 'Evolved Lumberjack', cost: 4, color: '#e67e22', hp: 1232, speed: 2.5, type: 'ground', range: 25, damage: 240, attackSpeed: 800, projectile: null, count: 1, splash: true, rarity: 'legendary', isToken: true, evolution: true, deathSpawnsGhost: true, ghostDuration: 8, ghostDps: 80, evolutionAuraColor: '#ff7675' },
+  { id: 'evolved_lumberjack', name: 'Evolved Lumberjack', cost: 4, color: '#e67e22', hp: 1232, speed: 2.5, type: 'ground', range: 25, damage: 240, attackSpeed: 800, projectile: null, count: 1, splash: true, rarity: 'legendary', isToken: true, evolution: true, deathRage: true, deathSpawnsGhost: true, ghostDuration: 8, ghostDps: 80, evolutionAuraColor: '#ff7675' },
   { id: 'evolved_musketeer', name: 'Evolved Musketeer', cost: 4, color: '#34495e', hp: 720, speed: 1.5, type: 'ground', range: 100, damage: 218, attackSpeed: 1100, projectile: 'bullet', count: 1, rarity: 'rare', isToken: true, evolution: true, sniperShots: 3, sniperShotDelay: 0.4, sniperDamage: 140, evolutionAuraColor: '#636e72' },
   { id: 'evolved_electro_dragon', name: 'Evolved Electro Dragon', cost: 5, color: '#3498db', hp: 1000, speed: 2, type: 'flying', range: 70, damage: 160, attackSpeed: 2100, projectile: 'electric_bolt', count: 1, rarity: 'epic', isToken: true, evolution: true, infiniteChain: true, chainDecay: 0.4, chainRange: 60, stun: 0.3, evolutionAuraColor: '#0984e3' },
   { id: 'evolved_skeleton_barrel', name: 'Evolved Skeleton Barrel', cost: 3, color: '#bdc3c8', hp: 636, speed: 6, type: 'flying', range: 0, radius: 25, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 20, targetType: 'buildings', rarity: 'epic', isToken: true, evolution: true, deathSpawns: 'skeletons', deathSpawnCount: 4, deathDamage: 133, deathRadius: 40, dropBarrels: true, dropBarrelsAt: [0.75, 0], evolutionAuraColor: '#b2bec3' },
@@ -264,7 +265,8 @@ const RARITY_COLORS = {
   rare: '#f39c12',      // Orange
   epic: '#9b59b6',      // Purple
   legendary: '#2ecc71', // Emerald/Rainbow substitute
-  champion: '#f1c40f'   // Gold
+  champion: '#f1c40f',  // Gold
+  hero: '#00bcd4'       // Cyan
 };
 
 const getEvolutionProgress = (card, allEvolutionSlots, selectedDeckIndex, cardCycles = {}) => {
@@ -289,6 +291,23 @@ const getReadyEvolutionCard = (card, allEvolutionSlots, selectedDeckIndex, cardC
   const progress = getEvolutionProgress(card, allEvolutionSlots, selectedDeckIndex, cardCycles);
   if (!progress?.ready) return null;
   return CARDS.find(c => c.id === card.evolvesTo) || null;
+};
+
+const getReadyHeroCard = (card, allHeroSlots, selectedDeckIndex) => {
+  if (!card?.heroVariantId || !allHeroSlots) return null;
+
+  const heroSlotCard = allHeroSlots[selectedDeckIndex];
+  if (heroSlotCard?.id !== card.id) return null;
+
+  return CARDS.find(c => c.id === card.heroVariantId) || null;
+};
+
+const getReadyBattleCard = (card, allEvolutionSlots, allHeroSlots, selectedDeckIndex, cardCycles = {}) => {
+  return (
+    getReadyEvolutionCard(card, allEvolutionSlots, selectedDeckIndex, cardCycles) ||
+    getReadyHeroCard(card, allHeroSlots, selectedDeckIndex) ||
+    card
+  );
 };
 
 // --- Main Menu Component ---
@@ -2371,6 +2390,7 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Rect x="65" y="52" width="25" height="4" fill="#2c3e50" />
         </Svg>
       );
+    case 'hero_magic_archer':
     case 'magic_archer':
       return (
         <Svg width={size} height={size} viewBox="0 0 100 100">
@@ -3063,7 +3083,7 @@ const SpellInfoTooltip = ({ visible, card, onClose }) => {
   );
 };
 
-const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd, isDragging, lastPlayedCard, onLongPress, cardCycles = {}, allEvolutionSlots, selectedDeckIndex }) => {
+const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd, isDragging, lastPlayedCard, onLongPress, cardCycles = {}, allEvolutionSlots, allHeroSlots, selectedDeckIndex }) => {
   // Guard against undefined card
   if (!card) {
     return null;
@@ -3071,6 +3091,7 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
 
   const cycleProgress = getEvolutionProgress(card, allEvolutionSlots, selectedDeckIndex, cardCycles);
   const readyEvolutionCard = getReadyEvolutionCard(card, allEvolutionSlots, selectedDeckIndex, cardCycles);
+  const readyHeroCard = getReadyHeroCard(card, allHeroSlots, selectedDeckIndex);
 
   // Calculate display cost for Mirror card
   const displayCost = card.id === 'mirror' && lastPlayedCard
@@ -3080,7 +3101,7 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
   // For Mirror card, get the card to mirror
   const cardToDisplay = card.id === 'mirror' && lastPlayedCard
     ? lastPlayedCard
-    : (readyEvolutionCard || card);
+    : (readyEvolutionCard || readyHeroCard || card);
   const isMirror = card.id === 'mirror';
 
   const callbacksRef = useRef({ onDragStart, onDragMove, onDragEnd, onLongPress });
@@ -3185,26 +3206,28 @@ const Card = memo(({ card, isNext, canAfford, onDragStart, onDragMove, onDragEnd
   const handlers = !isNext ? panResponder.panHandlers : {};
   const isLegendary = cardToDisplay.rarity === 'legendary';
   const isChampion = cardToDisplay.rarity === 'champion';
+  const isHero = cardToDisplay.rarity === 'hero';
+  const isAbilityCard = isChampion || isHero;
 
   return (
     <View
       style={[
         styles.card,
-        !isLegendary && !isChampion && { borderColor: RARITY_COLORS[cardToDisplay.rarity] || '#000' },
-        (isLegendary || isChampion) && { backgroundColor: 'transparent', borderWidth: 0 },
+        !isLegendary && !isAbilityCard && { borderColor: RARITY_COLORS[cardToDisplay.rarity] || '#000' },
+        (isLegendary || isAbilityCard) && { backgroundColor: 'transparent', borderWidth: 0 },
         isNext && styles.nextCard,
         (!canAfford && !isNext) && styles.disabledCard,
         isDragging && styles.hiddenCard
       ]}
       {...handlers}
     >
-      {isChampion && (
+      {isAbilityCard && (
         <Svg width={isNext ? "40" : "60"} height={isNext ? "50" : "75"} viewBox="0 0 60 75" style={{ position: 'absolute', top: 0, left: 0 }}>
            <Defs>
              <LinearGradient id="goldGradient" x1="0" y1="0" x2="1" y2="1">
-               <Stop offset="0%" stopColor="#FFD700" />
-               <Stop offset="50%" stopColor="#f1c40f" />
-               <Stop offset="100%" stopColor="#d4af37" />
+               <Stop offset="0%" stopColor={isHero ? "#7fe7ff" : "#FFD700"} />
+               <Stop offset="50%" stopColor={isHero ? "#00bcd4" : "#f1c40f"} />
+               <Stop offset="100%" stopColor={isHero ? "#00838f" : "#d4af37"} />
              </LinearGradient>
              <LinearGradient id="innerBevel" x1="0" y1="0" x2="0" y2="1">
                <Stop offset="0%" stopColor="#ffffff" stopOpacity="0.3" />
@@ -4484,6 +4507,51 @@ const VisualEffects = ({ effects, setEffects, lowPerformanceMode = false }) => {
                 {/* Energy waves */}
                 <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.6} fill="none" stroke="#9b59b6" strokeWidth="2" opacity={1 - progress} />
                 <Circle cx={effect.radius} cy={effect.radius} r={effect.radius * 0.8} fill="none" stroke="#8e44ad" strokeWidth="1.5" opacity={0.8 - progress * 0.8} />
+              </Svg>
+            </View>
+          );
+        }
+
+        if (effect.type === 'lumberjack_ghost') {
+          // Evolved Lumberjack Ghost - pale translucent ghost
+          const ghostPulse = Math.sin(progress * Math.PI * 4) * 0.2 + 0.8; // Pulsing opacity
+          return (
+            <View key={effect.id} style={{
+              position: 'absolute',
+              left: effect.x - 30,
+              top: effect.y - 30,
+              width: 60,
+              height: 60,
+              opacity: ghostPulse * opacity,
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Svg width="60" height="60" viewBox="0 0 100 100">
+                {/* Ghostly aura */}
+                <Circle cx="50" cy="50" r="45" fill="rgba(155, 89, 182, 0.2)" stroke="rgba(155, 89, 182, 0.4)" strokeWidth="2">
+                  <animate
+                    attributeName="r"
+                    values="45;50;45"
+                    dur="1s"
+                    repeatCount="indefinite"
+                  />
+                </Circle>
+                {/* Ghost body - pale translucent */}
+                <Circle cx="50" cy="50" r="35" fill="rgba(236, 240, 241, 0.4)" stroke="white" strokeWidth="1" />
+                {/* Pale hat */}
+                <Rect x="32" y="22" width="36" height="14" fill="rgba(155, 89, 182, 0.5)" stroke="rgba(155, 89, 182, 0.7)" strokeWidth="2" rx="3" />
+                {/* Evolution symbol */}
+                <Path d="M45 26 L50 22 L55 26 L50 32 Z" fill="#00d2ff" opacity="0.9" />
+                {/* Cyan ghostly axe */}
+                <Rect x="72" y="38" width="7" height="35" fill="rgba(139, 69, 19, 0.5)" transform="rotate(20 74 55)" />
+                <Path d="M72 38 L79 33 L83 42 Z" fill="rgba(0, 212, 255, 0.7)" transform="rotate(20 74 55)" />
+                {/* Hollow eyes */}
+                <Circle cx="42" cy="45" r="3" fill="rgba(52, 73, 94, 0.5)" />
+                <Circle cx="58" cy="45" r="3" fill="rgba(52, 73, 94, 0.5)" />
+                {/* White ghostly beard */}
+                <Path d="M38 55 Q50 72 62 55" fill="rgba(236, 240, 241, 0.5)" />
+                {/* DPS zone indicator */}
+                <Circle cx="50" cy="50" r="50" fill="none" stroke="rgba(155, 89, 182, 0.2)" strokeWidth="1" strokeDasharray="3 3" />
               </Svg>
             </View>
           );
@@ -6944,11 +7012,75 @@ const EvolutionSlotSelector = memo(({ visible, onClose, cards, selectedCardId, o
   );
 });
 
-const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeckIndex, setSelectedDeckIndex, allEvolutionSlots, setAllEvolutionSlots, selectedTower: initialSelectedTower = 'princess', setSelectedTower: onSetSelectedTower, onRandomizeDeck }) => {
+const HeroSlotSelector = memo(({ visible, onClose, cards, selectedCardId, onSelect }) => {
+  if (!visible) return null;
+
+  const eligibleCards = (cards || []).filter(card => card?.heroVariantId);
+
+  return (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={visible}
+      onRequestClose={onClose}
+    >
+      <TouchableOpacity style={styles.cardMenuOverlay} activeOpacity={1} onPress={onClose}>
+        <View style={styles.slotSelectorContent}>
+          <Text style={styles.slotSelectorTitle}>Select a hero card</Text>
+
+          {eligibleCards.length === 0 ? (
+            <View style={{ paddingVertical: 20, alignItems: 'center' }}>
+              <Text style={{ color: '#555', textAlign: 'center' }}>
+                This deck has no supported hero conversions yet.
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.slotSelectorDeck}>
+              <View style={[styles.slotSelectorSlotRow, { flexWrap: 'wrap', justifyContent: 'center' }]}>
+                {eligibleCards.map(card => {
+                  const heroCard = CARDS.find(c => c.id === card.heroVariantId);
+                  return (
+                    <TouchableOpacity
+                      key={card.id}
+                      style={[
+                        styles.slotSelectorSlot,
+                        selectedCardId === card.id && { borderColor: '#00bcd4', borderWidth: 2 }
+                      ]}
+                      onPress={() => onSelect(card)}
+                    >
+                      <UnitSprite id={heroCard?.id || card.id} isOpponent={false} size={45} />
+                      <Text style={styles.slotSelectorSlotName}>{heroCard?.name || card.name || 'Hero'}</Text>
+                      <View style={styles.slotSelectorSlotCost}>
+                        <Text style={styles.slotSelectorSlotCostText}>{card.cost || 0}</Text>
+                      </View>
+                      <Text style={{ marginTop: 4, fontSize: 10, color: '#00bcd4', fontWeight: 'bold' }}>
+                        1 hero slot
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+          )}
+
+          <TouchableOpacity
+            style={styles.slotSelectorCancel}
+            onPress={onClose}
+          >
+            <Text style={styles.slotSelectorCancelText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    </Modal>
+  );
+});
+
+const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeckIndex, setSelectedDeckIndex, allEvolutionSlots, setAllEvolutionSlots, allHeroSlots, setAllHeroSlots, selectedTower: initialSelectedTower = 'princess', setSelectedTower: onSetSelectedTower, onRandomizeDeck }) => {
   const [selectedCard, setSelectedCard] = useState(null);
   const [cardMenuCard, setCardMenuCard] = useState(null);
   const [showSlotSelector, setShowSlotSelector] = useState(null);
   const [showEvolutionSelector, setShowEvolutionSelector] = useState(null);
+  const [showHeroSelector, setShowHeroSelector] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [filterRarity, setFilterRarity] = useState('all');
   const [sortByElixir, setSortByElixir] = useState(false);
@@ -7019,6 +7151,15 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
 
     setShowEvolutionSelector(null);
   }, [selectedDeckIndex, setAllEvolutionSlots, showEvolutionSelector]);
+
+  const handleHeroCardSelect = useCallback((selectedHeroCard) => {
+    setAllHeroSlots(prev => {
+      const newSlots = [...prev];
+      newSlots[selectedDeckIndex] = selectedHeroCard;
+      return newSlots;
+    });
+    setShowHeroSelector(false);
+  }, [selectedDeckIndex, setAllHeroSlots]);
 
   const handleSwapFromMenu = useCallback((deckIndex) => {
     const sourceCard = showSlotSelector || cardMenuCard;
@@ -7204,6 +7345,51 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
             })}
           </View>
           <Text style={styles.evolutionSlotsHint}>Tap to select cards to evolve</Text>
+        </View>
+
+        <View style={styles.heroSlotContainer}>
+          <Text style={styles.heroSlotTitle}>HERO SLOT</Text>
+          {(() => {
+            const heroBaseCard = allHeroSlots?.[selectedDeckIndex];
+            const heroCard = heroBaseCard ? (CARDS.find(c => c.id === heroBaseCard.heroVariantId) || heroBaseCard) : null;
+            return (
+              <TouchableOpacity
+                style={[
+                  styles.heroSlot,
+                  { borderColor: '#00bcd4' }
+                ]}
+                onPress={() => {
+                  if (heroBaseCard) {
+                    setAllHeroSlots(prev => {
+                      const newSlots = [...prev];
+                      newSlots[selectedDeckIndex] = null;
+                      return newSlots;
+                    });
+                  } else {
+                    setShowHeroSelector(true);
+                  }
+                }}
+              >
+                {heroCard ? (
+                  <>
+                    <UnitSprite id={heroCard.id} size={36} />
+                    <Text style={styles.heroSlotName}>{heroCard.name}</Text>
+                    <View style={styles.heroSlotBadge}>
+                      <Text style={styles.heroSlotBadgeText}>H</Text>
+                    </View>
+                    <View style={styles.evolutionSlotRemove}>
+                      <Text style={{ color: '#e74c3c', fontWeight: 'bold', fontSize: 12 }}>X</Text>
+                    </View>
+                  </>
+                ) : (
+                  <>
+                    <Text style={styles.heroSlotPlaceholder}>+</Text>
+                    <Text style={styles.heroSlotEmptyText}>Tap to assign a hero</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            );
+          })()}
         </View>
 
         <View style={styles.deckCardGrid}>
@@ -7410,6 +7596,13 @@ const DeckTab = ({ cards = [], onSwapCards, dragHandlers, allDecks, selectedDeck
         selectedCardId={showEvolutionSelector !== null ? allEvolutionSlots[selectedDeckIndex]?.[showEvolutionSelector]?.id : null}
         onSelect={handleEvolutionCardSelect}
       />
+      <HeroSlotSelector
+        visible={showHeroSelector}
+        onClose={() => setShowHeroSelector(false)}
+        cards={cards}
+        selectedCardId={allHeroSlots?.[selectedDeckIndex]?.id || null}
+        onSelect={handleHeroCardSelect}
+      />
       <Modal animationType="fade" transparent visible={!!selectedCard} onRequestClose={() => setSelectedCard(null)}>
         <View style={styles.cardDetailModal}>
           <View style={[styles.cardDetailModalContent, { borderColor: RARITY_COLORS[selectedCard?.rarity] || '#F1C40F' }]}>
@@ -7596,6 +7789,7 @@ const MainLobby = ({
   activeTab, onTabChange, onStartGame, currentDeck, onSwapCards,
   dragHandlers, selectedDeckIndex, setSelectedDeckIndex, allDecks,
   allEvolutionSlots, setAllEvolutionSlots,
+  allHeroSlots, setAllHeroSlots,
   chests, onUnlockChest, onOpenChest, selectedTowerType, setSelectedTowerType,
   onRandomizeDeck
 }) => {
@@ -7613,6 +7807,8 @@ const MainLobby = ({
         allDecks={allDecks}
         allEvolutionSlots={allEvolutionSlots}
         setAllEvolutionSlots={setAllEvolutionSlots}
+        allHeroSlots={allHeroSlots}
+        setAllHeroSlots={setAllHeroSlots}
         selectedTower={selectedTowerType}
         setSelectedTower={setSelectedTowerType}
         onRandomizeDeck={onRandomizeDeck}
@@ -7659,6 +7855,7 @@ const GameBoard = ({
   onActivateAbility,
   cardCycles = {},
   allEvolutionSlots,
+  allHeroSlots,
   selectedDeckIndex
 }) => {
   const [showSettings, setShowSettings] = useState(false);
@@ -7922,42 +8119,43 @@ const GameBoard = ({
 
       <View style={styles.footerContainer}>
         <View style={styles.deckContainer}>
-        {/* Champion Ability Button */}
+        {/* Hero / Champion Ability Button */}
         {(() => {
-           // First, check if a champion is deployed on field
-           const deployedChampion = (units || []).find(u => !u.isOpponent && u.rarity === 'champion');
+           const deployedAbilityUnit = (units || []).find(u => !u.isOpponent && ['hero', 'champion'].includes(u.rarity) && !u.isHeroDecoy);
 
-           // If champion is deployed, get their card data
-           let championCard = null;
-           if (deployedChampion) {
-              championCard = CARDS.find(c => c.id === deployedChampion.spriteId);
+           let abilityCard = null;
+           if (deployedAbilityUnit) {
+              abilityCard = CARDS.find(c => c.id === deployedAbilityUnit.spriteId);
            } else {
-              // If no champion deployed, look in hand/next
               const allDeckCards = [...(hand || []), nextCard].filter(c => c);
-              championCard = allDeckCards.find(c => c && c.rarity === 'champion');
+              const baseAbilityCard = allDeckCards.find(c => c && (['hero', 'champion'].includes(c.rarity) || c.heroVariantId));
+              abilityCard = baseAbilityCard?.heroVariantId
+                ? (getReadyHeroCard(baseAbilityCard, allHeroSlots, selectedDeckIndex) || baseAbilityCard)
+                : baseAbilityCard;
            }
 
-           if (championCard) {
-              const isDeployed = !!deployedChampion;
-              const cooldownReady = isDeployed && (Date.now() - (deployedChampion.lastAbilityTime || 0)) >= (deployedChampion.abilityCooldown || 0);
-              const cost = championCard.abilityCost || 1;
+           if (abilityCard) {
+              const isDeployed = !!deployedAbilityUnit;
+              const cooldownReady = isDeployed && (Date.now() - (deployedAbilityUnit.lastAbilityTime || 0)) >= (deployedAbilityUnit.abilityCooldown || 0);
+              const cost = abilityCard.abilityCost || 1;
               const canAfford = elixir >= cost;
               const opacity = (isDeployed && cooldownReady && canAfford) ? 1 : (isDeployed ? 0.5 : 0.3);
 
-              const championIcons = {
-                 golden_knight: '✨',
-                 skeleton_king: '💀',
-                 archer_queen: '🏹',
-                 monk: '🛡️',
-                 mighty_miner: '💣',
-                 little_prince: '💂',
-                 boss_bandit: '🗡️',
-                 goblinstein: '🧟'
+              const abilityIcons = {
+                 golden_knight: 'GK',
+                 skeleton_king: 'SK',
+                 archer_queen: 'AQ',
+                 monk: 'MN',
+                 mighty_miner: 'MM',
+                 little_prince: 'LP',
+                 boss_bandit: 'BB',
+                 goblinstein: 'GB',
+                 hero_magic_archer: 'MA'
               };
 
               return (
                  <TouchableOpacity
-                    key={`ability-${championCard.id}`}
+                    key={`ability-${abilityCard.id}`}
                     style={{
                        position: 'absolute',
                        right: 20,
@@ -7969,20 +8167,20 @@ const GameBoard = ({
                        justifyContent: 'center',
                        alignItems: 'center',
                        borderWidth: 2,
-                       borderColor: isDeployed ? '#f1c40f' : '#7f8c8d',
+                       borderColor: isDeployed ? (abilityCard.rarity === 'hero' ? '#00bcd4' : '#f1c40f') : '#7f8c8d',
                        opacity: opacity,
                        zIndex: 20
                     }}
-                    onPress={() => isDeployed && onActivateAbility(deployedChampion.id)}
+                    onPress={() => isDeployed && onActivateAbility(deployedAbilityUnit.id)}
                     disabled={!isDeployed || !cooldownReady || !canAfford}
                  >
-                    <Text style={{fontSize: 24}}>
-                       {championIcons[championCard.id] || '⚡'}
+                    <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#fff' }}>
+                       {abilityIcons[abilityCard.id] || 'AB'}
                     </Text>
                     <View style={{
                        position: 'absolute',
                        top: -5, right: -5,
-                       backgroundColor: isDeployed ? '#f1c40f' : '#7f8c8d',
+                       backgroundColor: isDeployed ? (abilityCard.rarity === 'hero' ? '#00bcd4' : '#f1c40f') : '#7f8c8d',
                        borderRadius: 10,
                        width: 20, height: 20,
                        justifyContent: 'center', alignItems: 'center'
@@ -7996,7 +8194,7 @@ const GameBoard = ({
         })()}
           <View style={styles.nextCardContainer}>
             <Text style={styles.nextLabel}>NEXT</Text>
-            {nextCard && <Card card={nextCard} isNext={true} cardCycles={cardCycles} allEvolutionSlots={allEvolutionSlots} selectedDeckIndex={selectedDeckIndex} />}
+            {nextCard && <Card card={nextCard} isNext={true} cardCycles={cardCycles} allEvolutionSlots={allEvolutionSlots} allHeroSlots={allHeroSlots} selectedDeckIndex={selectedDeckIndex} />}
           </View>
 
           <View style={styles.handContainer}>
@@ -8013,6 +8211,7 @@ const GameBoard = ({
                 isDragging={draggingCard && draggingCard.id === card.id}
                 cardCycles={cardCycles}
                 allEvolutionSlots={allEvolutionSlots}
+                allHeroSlots={allHeroSlots}
                 selectedDeckIndex={selectedDeckIndex}
               />
             ))}
@@ -8530,6 +8729,7 @@ export default function App() {
     [null, null], // Deck 3 evolution slots
     [null, null]  // Deck 4 evolution slots
   ]);
+  const [allHeroSlots, setAllHeroSlots] = useState([null, null, null, null, null]);
 
   const [selectedDeckIndex, setSelectedDeckIndex] = useState(0);
 
@@ -8592,6 +8792,14 @@ export default function App() {
   // Evolution helper: Check if card should evolve based on cycles and evolution slots
   const checkEvolution = (card) => {
     return getReadyEvolutionCard(card, allEvolutionSlots, selectedDeckIndex, cardCycles) || card;
+  };
+
+  const checkHero = (card) => {
+    return getReadyHeroCard(card, allHeroSlots, selectedDeckIndex) || card;
+  };
+
+  const checkBattleCard = (card) => {
+    return getReadyBattleCard(card, allEvolutionSlots, allHeroSlots, selectedDeckIndex, cardCycles);
   };
 
   const handleRandomizeDeck = () => {
@@ -8900,7 +9108,7 @@ export default function App() {
     // Handle Mirror card - copy the last played card with +1 level
 
     const playedEvolutionCard = !isOpponent && card.id !== 'mirror' && checkEvolution(card).id !== card.id;
-    let actualCard = playedEvolutionCard ? checkEvolution(card) : card;
+    let actualCard = !isOpponent && card.id !== 'mirror' ? checkBattleCard(card) : card;
 
     let levelBoost = 0;
 
@@ -9647,6 +9855,7 @@ export default function App() {
             attackCount: 0,
             stealthAbility: actualCard.stealthAbility || false,
             reflectAbility: actualCard.reflectAbility || false,
+            heroTripleThreatAbility: actualCard.heroTripleThreatAbility || false,
             abilityCooldown: actualCard.abilityCooldown || 0,
             lastAbilityTime: Date.now() - (actualCard.abilityCooldown || 0), // Start ready
             souls: 0,
@@ -9743,6 +9952,18 @@ export default function App() {
             selfHealOnAttack: actualCard.selfHealOnAttack || 0,
             overhealMaxHp: actualCard.overhealMaxHp || actualCard.hp,
             pendingSelfHeals: [],
+            multiShotCount: actualCard.multiShotCount || 1,
+            multiShotDelay: actualCard.multiShotDelay || 0,
+            heroCastDelay: actualCard.heroCastDelay || 0,
+            heroRetreatDistance: actualCard.heroRetreatDistance || 0,
+            heroDecoyDuration: actualCard.heroDecoyDuration || 0,
+            heroDecoyHpMultiplier: actualCard.heroDecoyHpMultiplier || 1,
+            heroTripleShotDuration: actualCard.heroTripleShotDuration || 0,
+            heroTripleShotCount: actualCard.heroTripleShotCount || 0,
+            heroTripleShotReady: false,
+            heroTripleShotExpiresAt: 0,
+            isHeroDecoy: actualCard.isHeroDecoy || false,
+            decoyExpireAt: actualCard.decoyExpireAt || 0,
             pendingMultiShots: [],
             tornadoOnAttack: actualCard.tornadoOnAttack || false,
             tornadoRadius: actualCard.tornadoRadius || 0,
@@ -10457,6 +10678,84 @@ export default function App() {
 
       let nextProjectiles = [...projectilesRef.current];
 
+      // Process Lumberjack Ghost projectiles - deal continuous damage in radius
+      const ghostProjectiles = nextProjectiles.filter(p => p.isGhost && p.ghostEndTime && now < p.ghostEndTime);
+      ghostProjectiles.forEach(ghost => {
+        const ghostRadius = ghost.radius || 50;
+        const ghostDamage = ghost.damage || 4; // Damage per tick
+
+        // Find all enemies in range and deal damage
+        const unitsInGhostRange = (unitsRef.current || []).filter(u =>
+          u.isOpponent !== ghost.isOpponent &&
+          u.hp > 0 &&
+          Math.sqrt(Math.pow(u.x - ghost.x, 2) + Math.pow(u.y - ghost.y, 2)) <= ghostRadius
+        );
+
+        unitsInGhostRange.forEach(unit => {
+          damageEvents.push({
+            targetId: unit.id,
+            damage: ghostDamage,
+            attackerId: ghost.id,
+            attackerX: ghost.x,
+            attackerY: ghost.y,
+            isSpell: true
+          });
+        });
+      });
+
+      // Remove expired ghost projectiles
+      nextProjectiles = nextProjectiles.filter(p => !p.isGhost || !p.ghostEndTime || now < p.ghostEndTime);
+
+      // Process Rage spell projectiles (from Lumberjack death or Rage spell) - apply rage effect to allies
+      const rageProjectiles = nextProjectiles.filter(p => p.isRage);
+      rageProjectiles.forEach(rage => {
+        const rageRadius = rage.radius || 50;
+        const rageDuration = (rage.duration || 6) * 1000;
+        const rageBoost = rage.rageBoost || 0.35;
+
+        // Apply rage to all friendly units in radius (only once when spawned)
+        if (!rage.rageApplied) {
+          setUnits(prevUnits => {
+            return prevUnits.map(u => {
+              if (u.isOpponent === rage.isOpponent) {
+                const dist = Math.sqrt(Math.pow(u.x - rage.x, 2) + Math.pow(u.y - rage.y, 2));
+                if (dist <= rageRadius) {
+                  return { ...u, rageUntil: now + rageDuration, rageBoost: rageBoost };
+                }
+              }
+              return u;
+            });
+          });
+          rage.rageApplied = true;
+        }
+      });
+
+      // Add visual effect for rage spell projectiles that don't have one yet
+      rageProjectiles.forEach(rage => {
+        if (!rage.visualEffectAdded) {
+          setVisualEffects(prev => [...prev, {
+            id: 'rage_zone_' + Date.now() + Math.random(),
+            type: 'rage_spell',
+            x: rage.x,
+            y: rage.y,
+            radius: rage.radius || 50,
+            startTime: Date.now(),
+            duration: (rage.duration || 6) * 1000
+          }]);
+          rage.visualEffectAdded = true;
+        }
+      });
+
+      // Remove expired rage projectiles
+      nextProjectiles = nextProjectiles.filter(p => {
+        if (p.isRage) {
+          const age = now - p.spawnTime;
+          const duration = (p.duration || 6) * 1000;
+          return age < duration;
+        }
+        return true;
+      });
+
       // Collect splash damage events to apply after unit updates
       let splashEvents = [];
       // Collect units to spawn (will be added at the end)
@@ -10900,7 +11199,16 @@ export default function App() {
           return { ...u, x: newX, y: newY };
         }
 
-        // CHAMPION ABILITIES
+        if (u.decoyExpireAt && u.decoyExpireAt <= now) {
+          return { ...u, hp: 0 };
+        }
+
+        if (u.heroTripleShotReady && u.heroTripleShotExpiresAt && u.heroTripleShotExpiresAt <= now) {
+          u.heroTripleShotReady = false;
+          u.heroTripleShotExpiresAt = 0;
+        }
+
+        // CHAMPION / HERO ABILITIES
         if (now - (u.lastAbilityTime || 0) >= u.abilityCooldown && u.abilityCooldown > 0) {
            const cost = u.abilityCost || 0;
            const currentElixir = u.isOpponent ? enemyElixirRef.current : elixirRef.current;
@@ -10910,8 +11218,91 @@ export default function App() {
            if (shouldTrigger && currentElixir >= cost) {
                let abilityUsed = false;
 
+               if (u.heroTripleThreatAbility) {
+                  const castDelay = u.heroCastDelay || 1000;
+                  const retreatDistance = u.heroRetreatDistance || 165;
+                  const tripleShotDuration = u.heroTripleShotDuration || 7000;
+                  const decoyDuration = u.heroDecoyDuration || 7000;
+                  const decoyHpMultiplier = u.heroDecoyHpMultiplier || 1.185;
+                  const oldX = u.x;
+                  const oldY = u.y;
+
+                  setVisualEffects(prev => [...prev, {
+                     id: 'hero_magic_archer_cast_' + now,
+                     type: 'queen_cloak',
+                     x: u.x, y: u.y, radius: 30, startTime: now, duration: castDelay
+                  }]);
+
+                  setTimeout(() => {
+                    setUnits(prevUnits => {
+                      let resolvedUnit = null;
+                      const updatedUnits = prevUnits.map(unit => {
+                        if (unit.id !== u.id || unit.hp <= 0) return unit;
+
+                        const nextY = Math.max(20, Math.min(height - 20, unit.y + (unit.isOpponent ? -retreatDistance : retreatDistance)));
+                        resolvedUnit = {
+                          ...unit,
+                          y: nextY,
+                          lockedTarget: null,
+                          heroTripleShotReady: true,
+                          heroTripleShotExpiresAt: Date.now() + tripleShotDuration,
+                          abilityActiveRequest: false
+                        };
+                        return resolvedUnit;
+                      });
+
+                      if (!resolvedUnit) return prevUnits;
+
+                      updatedUnits.push({
+                        id: 'hero_magic_archer_decoy_' + Date.now() + '_' + Math.random(),
+                        x: oldX,
+                        y: oldY,
+                        hp: Math.floor((u.maxHp || u.hp) * decoyHpMultiplier),
+                        maxHp: Math.floor((u.maxHp || u.hp) * decoyHpMultiplier),
+                        isOpponent: u.isOpponent,
+                        speed: 0,
+                        lane: u.lane,
+                        lastAttack: 0,
+                        spriteId: 'magic_archer',
+                        type: 'ground',
+                        rarity: 'hero',
+                        range: 0,
+                        damage: 0,
+                        attackSpeed: 999999,
+                        projectile: null,
+                        spawnTime: Date.now(),
+                        decoyExpireAt: Date.now() + decoyDuration,
+                        isHeroDecoy: true,
+                        lockedTarget: null,
+                        wasPushed: false,
+                        wasStunned: false,
+                        stunUntil: 0,
+                        baseDamage: 0
+                      });
+
+                      return updatedUnits;
+                    });
+
+                    setVisualEffects(prev => [...prev, {
+                      id: 'hero_magic_archer_blink_' + Date.now(),
+                      type: 'dash_trail',
+                      x: oldX, y: oldY, radius: 30, startTime: Date.now(), duration: 350
+                    }]);
+                  }, castDelay);
+
+                  u.lastAbilityTime = now + castDelay + tripleShotDuration;
+                  u.abilityActiveRequest = false;
+                  u.stunUntil = Math.max(u.stunUntil || 0, now + castDelay);
+                  if (!u.isOpponent) {
+                     setElixir(prev => Math.max(0, prev - cost));
+                  } else {
+                     setEnemyElixir(prev => Math.max(0, prev - cost));
+                  }
+                  return { ...u, lastAbilityTime: now + castDelay + tripleShotDuration, abilityActiveRequest: false, stunUntil: Math.max(u.stunUntil || 0, now + castDelay) };
+               }
+
                // Skeleton King
-               if (u.collectsSouls) {
+               else if (u.collectsSouls) {
                   // Minimum 6 skeletons, +1 per soul collected (up to ~16 total)
                   const collectedSouls = u.souls || 0;
                   const spawnCount = Math.min(6 + collectedSouls, 16);
@@ -12399,7 +12790,7 @@ export default function App() {
                     poisonTrailSlow: u.sparkPoisonSlow || 0
                   });
                 }
-              } else if (u.projectile === 'hook') {
+                } else if (u.projectile === 'hook') {
                     nextProjectiles.push({
                       id: now + Math.random(),
                       x: u.x, y: u.y,
@@ -12414,33 +12805,72 @@ export default function App() {
                       pullSlowDuration: u.pullSlowDuration
                     });
                 } else {
-                  nextProjectiles.push({
-                    id: now + Math.random() + target.id,
-                    x: u.x,
-                    y: u.y,
-                    targetId: target.id,
-                    targetX: target.x,
-                    targetY: target.y,
-                    speed: projectileSpeed,
-                    damage: damageToDeal,
-                    type: projectileType,
-                    splash: u.splash,
-                    slow: u.slow,
-                    stun: u.stun,
-                    attackerId: u.id,
-                    isOpponent: u.isOpponent,
-                    pierce: u.pierce || false,
-                    chain: u.chain || 0,
-                    knockback: u.projectileKnockback || 0,
-                    turnsToPig: u.turnsToPig || false,
-                    bounceBombCount: u.bounceBombCount || 0,
-                    bounceSpacing: u.bounceSpacing || 0,
-                    bounceRadius: u.bounceRadius || 0,
-                    poisonTrailDamage: u.sparkPoisonDamage || 0,
-                    poisonTrailDuration: u.sparkPoisonDuration || 0,
-                    poisonTrailRadius: u.sparkPoisonRadius || 0,
-                    poisonTrailSlow: u.sparkPoisonSlow || 0
-                  });
+                  if (u.heroTripleShotReady && u.heroTripleShotCount > 0) {
+                    const baseAngle = Math.atan2(target.y - u.y, target.x - u.x);
+                    const shotCount = u.heroTripleShotCount || 3;
+                    const shotSpread = 0.12;
+                    const shotDistance = 280;
+                    const baseArrowDamage = Math.floor(damageToDeal / shotCount);
+
+                    for (let shotIndex = 0; shotIndex < shotCount; shotIndex++) {
+                      const angleOffset = shotCount === 1 ? 0 : (-shotSpread + ((shotSpread * 2) * shotIndex / (shotCount - 1)));
+                      const angle = baseAngle + angleOffset;
+                      const arrowDamage = shotIndex === shotCount - 1
+                        ? Math.max(1, damageToDeal - (baseArrowDamage * (shotCount - 1)))
+                        : Math.max(1, baseArrowDamage);
+
+                      nextProjectiles.push({
+                        id: now + Math.random() + target.id + '_' + shotIndex,
+                        x: u.x,
+                        y: u.y,
+                        targetId: null,
+                        targetX: u.x + Math.cos(angle) * shotDistance,
+                        targetY: u.y + Math.sin(angle) * shotDistance,
+                        speed: projectileSpeed,
+                        damage: arrowDamage,
+                        type: projectileType,
+                        splash: false,
+                        slow: u.slow,
+                        stun: u.stun,
+                        attackerId: u.id,
+                        isOpponent: u.isOpponent,
+                        pierce: true,
+                        chain: 0,
+                        knockback: 0
+                      });
+                    }
+
+                    u.heroTripleShotReady = false;
+                    u.heroTripleShotExpiresAt = 0;
+                  } else {
+                    nextProjectiles.push({
+                      id: now + Math.random() + target.id,
+                      x: u.x,
+                      y: u.y,
+                      targetId: target.id,
+                      targetX: target.x,
+                      targetY: target.y,
+                      speed: projectileSpeed,
+                      damage: damageToDeal,
+                      type: projectileType,
+                      splash: u.splash,
+                      slow: u.slow,
+                      stun: u.stun,
+                      attackerId: u.id,
+                      isOpponent: u.isOpponent,
+                      pierce: u.pierce || false,
+                      chain: u.chain || 0,
+                      knockback: u.projectileKnockback || 0,
+                      turnsToPig: u.turnsToPig || false,
+                      bounceBombCount: u.bounceBombCount || 0,
+                      bounceSpacing: u.bounceSpacing || 0,
+                      bounceRadius: u.bounceRadius || 0,
+                      poisonTrailDamage: u.sparkPoisonDamage || 0,
+                      poisonTrailDuration: u.sparkPoisonDuration || 0,
+                      poisonTrailRadius: u.sparkPoisonRadius || 0,
+                      poisonTrailSlow: u.sparkPoisonSlow || 0
+                    });
+                  }
 
                   // Evolved Dart Goblin: Multi-shot
                   if (u.multiShotCount > 1) {
@@ -15546,7 +15976,23 @@ export default function App() {
         }
 
         // Lumberjack death - drops Rage spell
-        if (deadUnit.deathRage && deadUnit.spriteId === 'lumberjack') {
+        if (deadUnit.deathRage && (deadUnit.spriteId === 'lumberjack' || deadUnit.spriteId === 'evolved_lumberjack')) {
+          const rageDuration = 6; // 6 seconds
+          const rageBoost = 0.35; // 35% speed and damage boost
+          const rageRadius = 50;
+
+          // Add visual effect
+          setVisualEffects(prev => [...prev, {
+            id: 'rage_zone_' + Date.now() + Math.random(),
+            type: 'rage_spell',
+            x: deadUnit.x,
+            y: deadUnit.y,
+            radius: rageRadius,
+            startTime: Date.now(),
+            duration: rageDuration * 1000
+          }]);
+
+          // Create rage projectile
           setProjectiles(prev => [...prev, {
             id: Date.now() + Math.random(),
             x: deadUnit.x,
@@ -15555,13 +16001,16 @@ export default function App() {
             targetY: deadUnit.y,
             speed: 0,
             damage: 0,
-            radius: 50,
+            radius: rageRadius,
             type: 'rage_spell',
             isSpell: true,
             isRage: true,
             hit: true,
-            spawnTime: now,
-            duration: 6,
+            spawnTime: Date.now(),
+            duration: rageDuration,
+            rageBoost: rageBoost,
+            rageApplied: false, // Will apply rage effect to nearby units
+            visualEffectAdded: true, // Visual effect already added
             isOpponent: deadUnit.isOpponent
           }]);
         }
@@ -15742,9 +16191,20 @@ export default function App() {
           const ghostDuration = (deadUnit.ghostDuration || 8) * 1000;
           const ghostDps = deadUnit.ghostDps || 80;
 
+          // Add visual effect for the ghost
+          setVisualEffects(prev => [...prev, {
+            id: 'lumberjack_ghost_' + Date.now(),
+            type: 'lumberjack_ghost',
+            x: deadUnit.x,
+            y: deadUnit.y,
+            radius: 50,
+            startTime: Date.now(),
+            duration: ghostDuration
+          }]);
+
           // Ghost is a stationary area damage effect
           setProjectiles(prev => [...prev, {
-            id: 'lumberjack_ghost_' + Date.now(),
+            id: 'lumberjack_ghost_zone_' + Date.now(),
             x: deadUnit.x,
             y: deadUnit.y,
             targetX: deadUnit.x,
@@ -16211,6 +16671,8 @@ export default function App() {
           allDecks={allDecks}
           allEvolutionSlots={allEvolutionSlots}
           setAllEvolutionSlots={setAllEvolutionSlots}
+          allHeroSlots={allHeroSlots}
+          setAllHeroSlots={setAllHeroSlots}
           chests={chests}
           onUnlockChest={handleUnlockChest}
           onOpenChest={handleOpenChest}
@@ -16273,6 +16735,7 @@ export default function App() {
         onActivateAbility={activateChampionAbility}
         cardCycles={cardCycles}
         allEvolutionSlots={allEvolutionSlots}
+        allHeroSlots={allHeroSlots}
         selectedDeckIndex={selectedDeckIndex}
       />      {globalDraggingCard && (
         <View style={[styles.dragProxy, {
@@ -19620,4 +20083,76 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 5,
   },
+  heroSlotContainer: {
+    width: '100%',
+    marginTop: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    backgroundColor: 'rgba(0, 188, 212, 0.12)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 188, 212, 0.35)',
+    alignItems: 'center',
+  },
+  heroSlotTitle: {
+    color: '#00bcd4',
+    fontSize: 11,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    textAlign: 'center',
+    letterSpacing: 1,
+  },
+  heroSlot: {
+    width: 92,
+    minHeight: 84,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    borderRadius: 10,
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+  },
+  heroSlotPlaceholder: {
+    fontSize: 28,
+    color: '#00bcd4',
+    fontWeight: 'bold',
+  },
+  heroSlotEmptyText: {
+    marginTop: 4,
+    fontSize: 10,
+    color: '#bfeef4',
+    textAlign: 'center',
+  },
+  heroSlotName: {
+    marginTop: 4,
+    fontSize: 10,
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  heroSlotBadge: {
+    position: 'absolute',
+    top: 4,
+    left: 4,
+    backgroundColor: '#00bcd4',
+    borderRadius: 8,
+    minWidth: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  heroSlotBadgeText: {
+    color: '#06262c',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
 });
+
+
+
+
+

@@ -943,6 +943,27 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
                     <Path d="M35 55 Q50 75 65 55" fill="#e67e22" />
                 </Svg>
             );
+        case 'lumberjack_ghost':
+            return (
+                <Svg width={size} height={size} viewBox="0 0 100 100">
+                    {/* Ghostly transparent body */}
+                    <Circle cx="50" cy="50" r="45" fill="rgba(231, 76, 60, 0.2)" stroke="rgba(231, 76, 60, 0.5)" strokeWidth="2" />
+                    {/* Pale ghostly hat */}
+                    <Rect x="30" y="20" width="40" height="15" fill="rgba(155, 89, 182, 0.4)" stroke="rgba(155, 89, 182, 0.6)" strokeWidth="2" rx="3" />
+                    {/* Evolution symbol on hat */}
+                    <Path d="M45 24 L50 20 L55 24 L50 30 Z" fill="#00d2ff" opacity="0.8" />
+                    {/* Ghostly cyan axe */}
+                    <Rect x="70" y="35" width="8" height="40" fill="rgba(139, 69, 19, 0.5)" transform="rotate(20 74 55)" />
+                    <Path d="M70 35 L78 30 L82 40 Z" fill="rgba(0, 212, 255, 0.6)" transform="rotate(20 74 55)" />
+                    {/* Pale ghostly face - hollow eyes */}
+                    <Circle cx="45" cy="45" r="3" fill="rgba(52, 73, 94, 0.5)" />
+                    <Circle cx="55" cy="45" r="3" fill="rgba(52, 73, 94, 0.5)" />
+                    {/* White ghostly beard */}
+                    <Path d="M35 55 Q50 75 65 55" fill="rgba(236, 240, 241, 0.5)" />
+                    {/* Ghostly glow effect */}
+                    <Circle cx="50" cy="50" r="50" fill="none" stroke="rgba(155, 89, 182, 0.3)" strokeWidth="2" strokeDasharray="5 5" />
+                </Svg>
+            );
         case 'goblin_barrel_spell':
             return (
                 <Svg width={size} height={size} viewBox="0 0 100 100">
@@ -1557,6 +1578,19 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
                     <Path d="M40 20 L50 10 L60 20 Z" fill="#f1c40f" />
                     {/* Ghostly Sword */}
                     <Path d="M70 50 L90 30" stroke="#bdc3c7" strokeWidth="4" opacity="0.7" />
+                </Svg>
+            );
+        case 'souldier':
+            return (
+                <Svg width={size} height={size} viewBox="0 0 100 100">
+                    <Circle cx="50" cy="50" r="40" fill="rgba(236, 240, 241, 0.5)" stroke="white" strokeWidth="1" />
+                    {/* Mini ghost hood */}
+                    <Path d="M30 45 Q50 20 70 45 Q70 80 50 85 Q30 80 30 45" fill="white" opacity="0.7" />
+                    {/* Hollow eyes */}
+                    <Circle cx="42" cy="48" r="3" fill="#34495e" />
+                    <Circle cx="58" cy="48" r="3" fill="#34495e" />
+                    {/* Small crown */}
+                    <Path d="M42 25 L50 18 L58 25 Z" fill="#f1c40f" opacity="0.8" />
                 </Svg>
             );
         case 'sparky':
