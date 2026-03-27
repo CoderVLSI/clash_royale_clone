@@ -58,7 +58,7 @@ const CARDS = [
   { id: 'hog_rider', name: 'Hog', cost: 4, color: '#e67e22', hp: 1696, speed: 3.5, type: 'ground', range: 25, damage: 318, attackSpeed: 1600, projectile: null, count: 1, targetType: 'buildings', jumps: true, rarity: 'rare' },
   { id: 'prince', name: 'Prince', cost: 5, color: '#f39c12', hp: 1920, speed: 2, type: 'ground', range: 30, damage: 392, attackSpeed: 1400, projectile: null, count: 1, charge: true, rarity: 'epic' },
   { id: 'tesla', name: 'Tesla', cost: 4, color: '#f1c40f', hp: 1152, speed: 0, type: 'building', range: 55, damage: 230, attackSpeed: 1100, projectile: 'tesla_lightning', count: 1, lifetime: 35, hidden: true, rarity: 'common', evolvesTo: 'evolved_tesla', evolutionCycles: 2 },
-  { id: 'wizard', name: 'Wizard', cost: 5, color: '#9b59b6', hp: 720, speed: 1.5, type: 'ground', range: 60, damage: 281, attackSpeed: 1400, projectile: 'fireball_small', count: 1, splash: true, rarity: 'rare', evolvesTo: 'evolved_wizard', evolutionCycles: 1 },
+  { id: 'wizard', name: 'Wizard', cost: 5, color: '#9b59b6', hp: 720, speed: 1.5, type: 'ground', range: 60, damage: 281, attackSpeed: 1400, projectile: 'fireball_small', count: 1, splash: true, rarity: 'rare', evolvesTo: 'evolved_wizard', evolutionCycles: 1, heroVariantId: 'hero_wizard' },
   { id: 'tombstone', name: 'Tombstone', cost: 3, color: '#95a5a6', hp: 534, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 40, spawns: 'skeletons', spawnRate: 3.1, spawnCount: 2, deathSpawnCount: 4, rarity: 'rare' },
   { id: 'sword_goblins', name: 'Sword Gobs', cost: 3, color: '#2ecc71', hp: 202, speed: 3, type: 'ground', range: 25, damage: 120, attackSpeed: 1100, projectile: null, count: 3, rarity: 'common' },
   { id: 'decoy_goblin', name: 'Decoy Gob', cost: 0, color: '#58d68d', hp: 81, speed: 3, type: 'ground', range: 25, damage: 360, attackSpeed: 1100, projectile: null, count: 1, rarity: 'common', isToken: true },
@@ -217,6 +217,7 @@ const CARDS = [
   { id: 'goblinstein_monster', name: 'The Monster', cost: 0, color: '#27ae60', hp: 3169, speed: 2, type: 'ground', targetType: 'buildings', range: 1.2, damage: 169, attackSpeed: 1500, count: 1, rarity: 'champion', isToken: true },
   { id: 'guardian', name: 'Guardian', cost: 0, color: '#f1c40f', hp: 1800, speed: 3, type: 'ground', range: 30, damage: 200, attackSpeed: 1200, count: 1, rarity: 'champion', isToken: true, knockback: 50, spawnDamage: 200 },
   { id: 'hero_magic_archer', name: 'Hero Magic Arch', cost: 4, color: '#16a085', hp: 440, speed: 2, type: 'ground', range: 140, damage: 111, attackSpeed: 1100, projectile: 'magic_arrow', count: 1, rarity: 'hero', isToken: true, pierce: true, projectileTravelDistance: 220, heroTripleThreatAbility: true, heroCastDelay: 1000, heroRetreatDistance: 165, heroDecoyDuration: 7000, heroDecoyHpMultiplier: 1.185, heroTripleShotDuration: 7000, heroTripleShotCount: 3, heroTripleShotTravelDistance: 310, abilityCooldown: 25000, abilityCost: 1 },
+  { id: 'hero_wizard', name: 'Hero Wizard', cost: 5, color: '#9b59b6', hp: 720, speed: 1.5, type: 'ground', range: 60, damage: 281, attackSpeed: 1400, projectile: 'fireball_small', count: 1, splash: true, rarity: 'hero', isToken: true, heroFieryFlightAbility: true, heroCastDelay: 1000, heroFlightDuration: 5000, heroFlightMoveBoost: 0.5, heroFlightShots: 3, heroFlightTornadoRadius: 40, heroFlightTornadoDuration: 0.5, heroFlightTornadoPullStrength: 2, heroFlightTornadoTickInterval: 170, heroFlightTornadoTroopTickDamage: 43, heroFlightTornadoTowerTickDamage: 38, heroFlightTornadoOffset: 20, abilityCooldown: 20000, abilityCost: 1 },
 
   // Evolutions
   { id: 'evolved_knight', name: 'Evolved Knight', cost: 3, color: '#f1c40f', hp: 1766, speed: 1.5, type: 'ground', range: 20, damage: 202, attackSpeed: 1200, projectile: null, count: 1, rarity: 'common', isToken: true, evolution: true, damageReduction: 0.6, evolutionAuraColor: '#9b59b6' },
@@ -245,7 +246,7 @@ const CARDS = [
   { id: 'evolved_snowball', name: 'Evolved Snowball', cost: 2, color: '#E8F4F8', type: 'spell', damage: 159, radius: 35, count: 1, knockback: 15, slow: 0.35, slowDuration: 2.5, rarity: 'common', isToken: true, evolution: true, pullDistance: 4.5, pullStrength: 8, evolutionAuraColor: '#dfe6e9' },
   { id: 'evolved_dart_goblin', name: 'Evolved Dart Goblin', cost: 3, color: '#2ecc71', hp: 260, speed: 3.5, type: 'ground', range: 100, damage: 131, attackSpeed: 700, projectile: 'dart', count: 1, rarity: 'rare', isToken: true, evolution: true, poisonEffect: true, poisonStackLevel2: 4, poisonStackLevel3: 7, poisonTrailDuration: 1, poisonTrailDamage: 50, evolutionAuraColor: '#55efc4' },
   { id: 'evolved_lumberjack', name: 'Evolved Lumberjack', cost: 4, color: '#e67e22', hp: 1232, speed: 2.5, type: 'ground', range: 25, damage: 240, attackSpeed: 800, projectile: null, count: 1, splash: true, rarity: 'legendary', isToken: true, evolution: true, deathRage: true, deathSpawnsGhost: true, ghostDuration: 8, ghostDps: 80, evolutionAuraColor: '#ff7675' },
-  { id: 'evolved_musketeer', name: 'Evolved Musketeer', cost: 4, color: '#34495e', hp: 720, speed: 1.5, type: 'ground', range: 100, damage: 218, attackSpeed: 1100, projectile: 'bullet', count: 1, rarity: 'rare', isToken: true, evolution: true, sniperShots: 3, sniperShotDelay: 0.4, sniperDamage: 140, evolutionAuraColor: '#636e72' },
+  { id: 'evolved_musketeer', name: 'Evolved Musketeer', cost: 4, color: '#34495e', hp: 720, speed: 1.5, type: 'ground', range: 100, damage: 218, attackSpeed: 1100, projectile: 'bullet', count: 1, rarity: 'rare', isToken: true, evolution: true, sniperShots: 3, sniperShotDelay: 0.4, sniperDamage: 392, evolutionAuraColor: '#636e72' },
   { id: 'evolved_electro_dragon', name: 'Evolved Electro Dragon', cost: 5, color: '#3498db', hp: 1000, speed: 2, type: 'flying', range: 70, damage: 160, attackSpeed: 2100, projectile: 'electric_bolt', count: 1, rarity: 'epic', isToken: true, evolution: true, infiniteChain: true, chainDecay: 0.4, chainRange: 60, stun: 0.3, evolutionAuraColor: '#0984e3' },
   { id: 'evolved_skeleton_barrel', name: 'Evolved Skeleton Barrel', cost: 3, color: '#bdc3c8', hp: 636, speed: 6, type: 'flying', range: 0, radius: 25, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 20, targetType: 'buildings', rarity: 'epic', isToken: true, evolution: true, deathSpawns: 'skeletons', deathSpawnCount: 4, deathDamage: 133, deathRadius: 40, dropBarrels: true, dropBarrelsAt: [0.75, 0], evolutionAuraColor: '#b2bec3' },
   { id: 'evolved_furnace', name: 'Evolved Furnace', cost: 4, color: '#e74c3c', hp: 1003, speed: 1.5, type: 'ground', range: 50, damage: 120, attackSpeed: 1200, projectile: 'flame', count: 1, spawns: 'fire_spirit', spawnRate: 2.4, spawnCount: 1, rarity: 'rare', isToken: true, evolution: true, alternatingSides: true, evolutionAuraColor: '#ff6b6b' },
@@ -256,7 +257,7 @@ const CARDS = [
   { id: 'evolved_goblin_cage', name: 'Evolved Goblin Cage', cost: 4, color: '#95a5a6', hp: 880, speed: 0, type: 'building', range: 0, damage: 0, attackSpeed: 0, projectile: null, count: 1, lifetime: 20, spawns: null, spawnRate: 0, spawnCount: 0, rarity: 'rare', isToken: true, evolution: true, deathSpawns: 'goblin_brawler', deathSpawnCount: 1, dragTroopsIntoCage: true, dragRadius: 40, dragStrength: 5, evolutionAuraColor: '#636e72' },
   { id: 'evolved_goblin_barrel', name: 'Evolved Goblin Barrel', cost: 3, color: '#2ecc71', type: 'spell', damage: 0, radius: 20, count: 3, spawns: 'sword_goblins', spawnCount: 3, rarity: 'epic', isToken: true, evolution: true, doubleBarrel: true, decoyBarrelDelay: 0.5, evolutionAuraColor: '#55efc4' },
   { id: 'evolved_battle_ram', name: 'Evolved Battle Ram', cost: 4, color: '#e67e22', hp: 756, speed: 4, type: 'ground', range: 25, damage: 246, attackSpeed: 100, projectile: null, count: 1, targetType: 'buildings', charge: true, rarity: 'rare', isToken: true, evolution: true, deathSpawns: 'evolved_barbarians', deathSpawnCount: 2, kamikaze: true, chargeKnockback: 30, repeatedRammng: true, evolutionAuraColor: '#e17055' },
-  { id: 'evolved_wall_breakers', name: 'Evolved Wall Breakers', cost: 2, color: '#bdc3c7', hp: 332, speed: 4, type: 'ground', range: 5, damage: 446, attackSpeed: 1000, projectile: null, count: 2, targetType: 'buildings', kamikaze: true, splash: true, splashRadius: 40, rarity: 'epic', isToken: true, evolution: true, barrelExplosionFirst: true, barrelExplosionRadius: 30, barrelExplosionDamage: 150, thenRunToBuilding: true, evolutionAuraColor: '#dfe6e9' },
+  { id: 'evolved_wall_breakers', name: 'Evolved Wall Breakers', cost: 2, color: '#bdc3c7', hp: 332, speed: 4, type: 'ground', range: 5, damage: 446, attackSpeed: 1000, projectile: null, count: 2, targetType: 'buildings', kamikaze: true, splash: true, splashRadius: 40, rarity: 'epic', isToken: true, evolution: true, barrelExplosionFirst: true, barrelExplosionRadius: 30, barrelExplosionDamage: 150, thenRunToBuilding: true, runningDamageMultiplier: 0.5, evolutionAuraColor: '#dfe6e9' },
   { id: 'evolved_goblin_drill', name: 'Evolved Goblin Drill', cost: 4, color: '#2ecc71', hp: 1200, speed: 2, type: 'ground', range: 25, damage: 100, attackSpeed: 1000, projectile: null, count: 1, lifetime: 20, targetType: 'buildings', spawns: 'sword_goblins', spawnRate: 0.8, spawnCount: 1, rarity: 'epic', isToken: true, evolution: true, deployAnywhere: true, deathSpawns: 'sword_goblins', deathSpawnCount: 5, burrows: true, rotatesAroundTower: true, rotateAtHp: [0.66, 0.33], rotateAngle: 90, evolutionAuraColor: '#00b894' }
 ];
 
@@ -1101,6 +1102,27 @@ const UnitSprite = ({ id, isOpponent, size = 30, unit }) => {
           <Rect x="30" y="60" width="40" height="30" fill="#95a5a6" />
           <Rect x="45" y="20" width="10" height="40" fill="#3498db" />
           <Circle cx="50" cy="20" r="10" fill="#f1c40f" />
+        </Svg>
+      );
+    case 'hero_wizard':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 100 100">
+          <Defs>
+            <LinearGradient id="heroWizardFlame" x1="0" y1="0" x2="1" y2="1">
+              <Stop offset="0%" stopColor="#ffd25f" />
+              <Stop offset="60%" stopColor="#ff8a2a" />
+              <Stop offset="100%" stopColor="#d94a00" />
+            </LinearGradient>
+          </Defs>
+          <Circle cx="50" cy="50" r="45" fill="#8e44ad" stroke="#ffd25f" strokeWidth="3" />
+          <Path d="M18 28 L50 6 L82 28" fill="#2e86de" />
+          <Path d="M24 32 Q8 18 18 54 Q28 46 34 36" fill="url(#heroWizardFlame)" opacity="0.85" />
+          <Path d="M76 32 Q92 18 82 54 Q72 46 66 36" fill="url(#heroWizardFlame)" opacity="0.85" />
+          <Circle cx="50" cy="52" r="20" fill="#f5c7a9" />
+          <Circle cx="42" cy="49" r="3.5" fill="#ffd25f" />
+          <Circle cx="58" cy="49" r="3.5" fill="#ffd25f" />
+          <Path d="M65 62 C76 44 80 36 72 26" stroke="url(#heroWizardFlame)" strokeWidth="7" strokeLinecap="round" fill="none" />
+          <Circle cx="72" cy="24" r="6" fill="#ffcf56" />
         </Svg>
       );
     case 'wizard':
@@ -8185,7 +8207,8 @@ const GameBoard = ({
                  little_prince: 'LP',
                  boss_bandit: 'BB',
                  goblinstein: 'GB',
-                 hero_magic_archer: 'MA'
+                 hero_magic_archer: 'MA',
+                 hero_wizard: 'WZ'
               };
 
               return (
@@ -9938,7 +9961,7 @@ export default function App() {
 
             slow: actualCard.slow || 0,
 
-            slowUntil: 0, stunUntil: 0, baseDamage: actualCard.damage,
+            slowUntil: 0, stunUntil: 0, baseDamage: actualCard.damage, baseType: actualCard.type, baseSpeed: actualCard.speed,
 
             lockedTarget: null, wasPushed: false, wasStunned: false,
 
@@ -9990,6 +10013,19 @@ export default function App() {
             multiShotCount: actualCard.multiShotCount || 1,
             multiShotDelay: actualCard.multiShotDelay || 0,
             heroCastDelay: actualCard.heroCastDelay || 0,
+            heroFieryFlightAbility: actualCard.heroFieryFlightAbility || false,
+            heroFlightDuration: actualCard.heroFlightDuration || 0,
+            heroFlightMoveBoost: actualCard.heroFlightMoveBoost || 0,
+            heroFlightShots: actualCard.heroFlightShots || 0,
+            heroFlightShotsRemaining: 0,
+            heroFlightUntil: 0,
+            heroFlightTornadoRadius: actualCard.heroFlightTornadoRadius || 0,
+            heroFlightTornadoDuration: actualCard.heroFlightTornadoDuration || 0,
+            heroFlightTornadoPullStrength: actualCard.heroFlightTornadoPullStrength || 0,
+            heroFlightTornadoTickInterval: actualCard.heroFlightTornadoTickInterval || 0,
+            heroFlightTornadoTroopTickDamage: actualCard.heroFlightTornadoTroopTickDamage || 0,
+            heroFlightTornadoTowerTickDamage: actualCard.heroFlightTornadoTowerTickDamage || 0,
+            heroFlightTornadoOffset: actualCard.heroFlightTornadoOffset || 0,
             heroRetreatDistance: actualCard.heroRetreatDistance || 0,
             heroDecoyDuration: actualCard.heroDecoyDuration || 0,
             heroDecoyHpMultiplier: actualCard.heroDecoyHpMultiplier || 1,
@@ -11240,6 +11276,13 @@ export default function App() {
           return { ...u, hp: 0 };
         }
 
+        if (u.heroFlightUntil && u.heroFlightUntil <= now && u.type === 'flying') {
+          u.type = u.baseType || 'ground';
+          u.speed = u.baseSpeed || u.speed;
+          u.heroFlightUntil = 0;
+          u.heroFlightShotsRemaining = 0;
+        }
+
         if (u.heroTripleShotReady && u.heroTripleShotExpiresAt && u.heroTripleShotExpiresAt <= now) {
           u.heroTripleShotReady = false;
           u.heroTripleShotExpiresAt = 0;
@@ -11255,7 +11298,44 @@ export default function App() {
            if (shouldTrigger && currentElixir >= cost) {
                let abilityUsed = false;
 
-               if (u.heroTripleThreatAbility) {
+               if (u.heroFieryFlightAbility) {
+                  const castDelay = u.heroCastDelay || 1000;
+                  const flightDuration = u.heroFlightDuration || 5000;
+                  const moveBoost = u.heroFlightMoveBoost || 0.5;
+                  const boostedSpeed = (u.baseSpeed || u.speed || 1.5) * (1 + moveBoost);
+
+                  setVisualEffects(prev => [...prev, {
+                     id: 'hero_wizard_cast_' + now,
+                     type: 'fire_explosion',
+                     x: u.x, y: u.y, radius: 32, startTime: now, duration: castDelay
+                  }]);
+
+                  setTimeout(() => {
+                    setUnits(prevUnits => prevUnits.map(unit => {
+                      if (unit.id !== u.id || unit.hp <= 0) return unit;
+                      return {
+                        ...unit,
+                        type: 'flying',
+                        speed: boostedSpeed,
+                        heroFlightUntil: Date.now() + flightDuration,
+                        heroFlightShotsRemaining: unit.heroFlightShots || 3,
+                        abilityActiveRequest: false
+                      };
+                    }));
+                  }, castDelay);
+
+                  u.lastAbilityTime = now + castDelay + flightDuration;
+                  u.abilityActiveRequest = false;
+                  u.stunUntil = Math.max(u.stunUntil || 0, now + castDelay);
+                  if (!u.isOpponent) {
+                     setElixir(prev => Math.max(0, prev - cost));
+                  } else {
+                     setEnemyElixir(prev => Math.max(0, prev - cost));
+                  }
+                  return { ...u, lastAbilityTime: now + castDelay + flightDuration, abilityActiveRequest: false, stunUntil: Math.max(u.stunUntil || 0, now + castDelay) };
+               }
+
+               else if (u.heroTripleThreatAbility) {
                   const castDelay = u.heroCastDelay || 1000;
                   const retreatDistance = u.heroRetreatDistance || 165;
                   const tripleShotDuration = u.heroTripleShotDuration || 7000;
@@ -12122,6 +12202,11 @@ export default function App() {
           }
         }
 
+        // EVOLUTION: Evolved Wall Breakers deal 50% damage after barrel explosion
+        if (u.barrelExploded && u.runningDamageMultiplier) {
+          actualDamage = u.damage * u.runningDamageMultiplier;
+        }
+
         // Handle spawn delay (Golem, Golemite) - unit cannot move or attack during spawn delay
         if (u.spawnDelay && u.spawnTime) {
           const timeSinceSpawn = now - u.spawnTime;
@@ -12881,6 +12966,7 @@ export default function App() {
                     u.heroTripleShotReady = false;
                     u.heroTripleShotExpiresAt = 0;
                   } else {
+                    const fieryFlightActive = u.heroFlightUntil && u.heroFlightUntil > now && u.heroFlightShotsRemaining > 0 && projectileType === 'fireball_small';
                     nextProjectiles.push({
                       id: now + Math.random() + target.id,
                       x: u.x,
@@ -12904,11 +12990,22 @@ export default function App() {
                       bounceBombCount: u.bounceBombCount || 0,
                       bounceSpacing: u.bounceSpacing || 0,
                       bounceRadius: u.bounceRadius || 0,
+                      heroFlightTornadoRadius: fieryFlightActive ? (u.heroFlightTornadoRadius || 40) : 0,
+                      heroFlightTornadoDuration: fieryFlightActive ? (u.heroFlightTornadoDuration || 0.5) : 0,
+                      heroFlightTornadoPullStrength: fieryFlightActive ? (u.heroFlightTornadoPullStrength || 2) : 0,
+                      heroFlightTornadoTickInterval: fieryFlightActive ? (u.heroFlightTornadoTickInterval || 170) : 0,
+                      heroFlightTornadoTroopTickDamage: fieryFlightActive ? (u.heroFlightTornadoTroopTickDamage || 43) : 0,
+                      heroFlightTornadoTowerTickDamage: fieryFlightActive ? (u.heroFlightTornadoTowerTickDamage || 38) : 0,
+                      heroFlightTornadoOffset: fieryFlightActive ? (u.heroFlightTornadoOffset || 20) : 0,
                       poisonTrailDamage: u.sparkPoisonDamage || 0,
                       poisonTrailDuration: u.sparkPoisonDuration || 0,
                       poisonTrailRadius: u.sparkPoisonRadius || 0,
                       poisonTrailSlow: u.sparkPoisonSlow || 0
                     });
+
+                    if (fieryFlightActive) {
+                      u.heroFlightShotsRemaining = Math.max(0, (u.heroFlightShotsRemaining || 0) - 1);
+                    }
                   }
 
                   // Evolved Dart Goblin: Multi-shot
@@ -14500,6 +14597,29 @@ export default function App() {
           }
 
           if (!h.isSpell && !h.isLog) {
+            if (h.heroFlightTornadoRadius > 0) {
+              const impactAngle = Math.atan2((h.targetY || h.y) - h.y, (h.targetX || h.x) - h.x);
+              const tornadoOffset = h.heroFlightTornadoOffset || 20;
+              activeProjectiles.push({
+                id: 'hero_wizard_tornado_' + now + '_' + Math.random(),
+                x: (h.targetX || h.x) - Math.cos(impactAngle) * tornadoOffset,
+                y: (h.targetY || h.y) - Math.sin(impactAngle) * tornadoOffset,
+                targetX: (h.targetX || h.x) - Math.cos(impactAngle) * tornadoOffset,
+                targetY: (h.targetY || h.y) - Math.sin(impactAngle) * tornadoOffset,
+                radius: h.heroFlightTornadoRadius || 40,
+                damage: 0,
+                duration: h.heroFlightTornadoDuration || 0.5,
+                hit: true,
+                spawnTime: now,
+                isTornado: true,
+                isOpponent: h.isOpponent,
+                tornadoPullStrengthPerTick: h.heroFlightTornadoPullStrength || 2,
+                tornadoTickInterval: h.heroFlightTornadoTickInterval || 170,
+                tornadoDamagePerTickTroops: h.heroFlightTornadoTroopTickDamage || 43,
+                tornadoDamagePerTickTowers: h.heroFlightTornadoTowerTickDamage || 38
+              });
+            }
+
             if (h.poisonTrailDamage > 0) {
               activeProjectiles.push({
                 id: now + Math.random(),
@@ -15424,7 +15544,12 @@ export default function App() {
         // Process tornado pull effect on enemies
         activeProjectiles.filter(p => p.isTornado && (now - p.spawnTime) / 1000 < p.duration).forEach(tornado => {
           const pullRadius = tornado.radius || 60;
-          const pullStrengthPerTick = 2; // Fixed pull strength per tick (not using delta)
+          const pullStrengthPerTick = tornado.tornadoPullStrengthPerTick || 2;
+          const tickInterval = tornado.tornadoTickInterval || 170;
+          const shouldTickDamage = !tornado.lastTickTime || (now - tornado.lastTickTime) >= tickInterval;
+          if (shouldTickDamage) {
+            tornado.lastTickTime = now;
+          }
 
           // Pull enemy units toward tornado center
           currentUnits = currentUnits.map(unit => {
@@ -15441,12 +15566,26 @@ export default function App() {
                   ...unit,
                   x: unit.x + pullX,
                   y: unit.y + pullY,
-                  hp: unit.hp - 1 // Small fixed damage per tick
+                  hp: unit.hp - (shouldTickDamage ? (tornado.tornadoDamagePerTickTroops || 1) : 0)
                 };
               }
             }
             return unit;
           });
+
+          if (shouldTickDamage && (tornado.tornadoDamagePerTickTowers || 0) > 0) {
+            nextTowers = nextTowers.map(tower => {
+              if (tower.isOpponent !== tornado.isOpponent && tower.hp > 0) {
+                const dx = tower.x - tornado.x;
+                const dy = tower.y - tornado.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist <= pullRadius + 20) {
+                  return { ...tower, hp: tower.hp - (tornado.tornadoDamagePerTickTowers || 0) };
+                }
+              }
+              return tower;
+            });
+          }
         });
 
         // Process rage zone continuous refresh - units inside get rageUntil refreshed
