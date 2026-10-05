@@ -1,0 +1,31 @@
+# Clash Royale 3D (Godot 4.3 port)
+
+A 3D port of the React Native game in the repo root. The simulation is a direct port of the `App.js` game loop;
+the 2D sprites were replaced with 3D models authored in Blender.
+
+* **Engine**: Godot 4.3, GL Compatibility renderer, portrait, Android arm64.
+* **Data**: `data/cards.json` is extracted verbatim from `App.js` (181 cards, original field names).
+* **Sim** (`scripts/sim.gd`, `mechanics.gd`, `abilities.gd`, `evo_mechanics.gd`): fixed 15 Hz tick; elixir,
+  double elixir, overtime, tower decay, deck cycling, evolution cycles, hero slot, deploy rules, targeting + aggro,
+  lane/bridge/river steering, projectiles, splash, spells (all 24), death spawns, champion/hero abilities,
+  ~35 evolution mechanics, enemy AI.
+* **3D** (`arena_view.gd`, `model_factory.gd`, `assets/models/*.glb`): arena, towers, units, projectiles, effects.
+  Models come from `../tools/blender/make_models.py` (run through the Blender MCP).
+* **UI** (`lobby.gd`, `battle.gd`, `loading_screen.gd`): loading screen, 5-tab lobby, deck builder with
+  evolution/hero slots, shop, chests, social, events; battle HUD with drag-to-deploy and ability buttons.
+
+## Run / test
+    godot --path godot                              # play
+    godot --headless --path godot -s tests/all_cards.gd      # smoke-test all 181 cards
+    godot --headless --path godot -s tests/headless_sim.gd -- 1   # AI-vs-AI full match
+    godot --headless --path godot -s tests/balance.gd        # side-bias check
+    ./tools/build_apk.sh                            # signed debug APK -> release/
+
+## Intentional differences from the 2D app
+* **Symmetric arena.** The 2D layout was skewed by the on-screen card tray (player towers sat much closer to the
+  river than the enemy's). The 3D arena mirrors the enemy half onto the player's, like real Clash Royale.
+* **Hand cycling replaces the played slot** (like the real game) instead of shifting the hand.
+* Charge distance threshold is 2 tiles (40 px); the 2D app's `threshold: 2` was effectively 2 px.
+* Friendly battle has no network play yet (the repo's `server.js` is socket.io); the modal starts a local match.
+* Some multi-part evolution mechanics are approximations of the wiki behaviour (Skeleton Army general,
+  Goblin Drill rotation, Snowball pull, Skeleton Barrel drops). See `evo_mechanics.gd`.
