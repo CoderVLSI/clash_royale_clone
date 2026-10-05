@@ -213,7 +213,9 @@ func _build_battle() -> Control:
 	fill.size = Vector2(170, 14)
 	track.add_child(fill)
 	br.add_child(UI.label("6/10", 14))
-	br.add_child(UI.icon("chest", Color("c39b4a"), Vector2(28, 28)))
+	var cb := ChestView.new()
+	br.add_child(cb)
+	cb.setup("CROWN", Vector2(44, 36))
 	root.add_child(bar)
 	# arena title + trophy road
 	var title := UI.label("ARENA 11", 28, Color("ffe08a"))
@@ -328,7 +330,7 @@ func _chest_slots() -> Control:
 			if int(c["slot"]) == i:
 				chest = c
 		var slot := Button.new()
-		slot.custom_minimum_size = Vector2(0, 74)
+		slot.custom_minimum_size = Vector2(0, 92)
 		slot.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		slot.add_theme_font_size_override("font_size", 12)
 		if chest == null:
@@ -337,8 +339,13 @@ func _chest_slots() -> Control:
 			slot.add_theme_stylebox_override("disabled", UI.style(Color(0, 0, 0, 0.35), 10, Color(1, 1, 1, 0.12), 2))
 		else:
 			var cc := _chest_color(str(chest["type"]))
-			slot.text = "%s\nOPEN!" % str(chest["type"])
+			slot.text = "\n\n\n%s" % str(chest["type"]).substr(0, 5)
+			slot.add_theme_font_size_override("font_size", 11)
 			slot.add_theme_color_override("font_color", cc)
+			var cv := ChestView.new()
+			slot.add_child(cv)
+			cv.setup(str(chest["type"]), Vector2(84, 62))
+			cv.position = Vector2(2, 2)
 			slot.add_theme_stylebox_override("normal", UI.style(Color(0.08, 0.1, 0.2, 0.9), 10, cc, 2))
 			slot.add_theme_stylebox_override("hover", UI.style(Color(0.12, 0.15, 0.28, 0.95), 10, cc, 2))
 			slot.add_theme_stylebox_override("pressed", UI.style(Color(0.05, 0.07, 0.15), 10, cc, 2))
@@ -699,7 +706,9 @@ func _build_shop() -> Control:
 		pc2.add_theme_stylebox_override("panel", UI.style(Color(0, 0, 0, 0.4), 12, _chest_color(entry[1]), 2))
 		var bx := UI.vbox(4)
 		pc2.add_child(bx)
-		bx.add_child(UI.icon("chest", _chest_color(entry[1]), Vector2(40, 40)))
+		var cv2 := ChestView.new()
+		bx.add_child(cv2)
+		cv2.setup(str(entry[1]), Vector2(64, 50))
 		bx.add_child(UI.label(entry[0], 12))
 		bx.add_child(UI.button("%d gems" % (entry[2] / 20), Color("2e86de"), _buy_chest.bind(entry), Vector2(0, 32), 12))
 		ch.add_child(pc2)
@@ -886,50 +895,21 @@ func _open_friendly() -> void:
 
 func _open_chest(chest: Dictionary) -> void:
 	var rewards := _gen_rewards(str(chest["type"]))
-	var m := _modal("%s CHEST" % str(chest["type"]))
-	var icon_holder := CenterContainer.new()
-	icon_holder.add_child(UI.icon("chest", _chest_color(str(chest["type"])), Vector2(110, 110)))
-	m["body"].add_child(icon_holder)
-	var list := UI.vbox(4)
-	m["body"].add_child(list)
-	var btn: Button = UI.button("TAP TO OPEN", Color("f39c12"), func(): pass, Vector2(0, 50), 20)
-	m["body"].add_child(btn)
-	var state := ["closed"]
-	btn.pressed.connect(func():
-		if state[0] == "closed":
-			state[0] = "opening"
-			btn.disabled = true
-			Sfx.play("chest_open")
-			var tw := create_tween()
-			tw.tween_property(icon_holder, "rotation", 0.15, 0.08)
-			tw.tween_property(icon_holder, "rotation", -0.15, 0.08)
-			tw.set_loops(4)
-			var shown := 0
-			for r in rewards:
-				var line := UI.label("+%d %s" % [r["value"], r["label"]], 18, Color("ffe08a"))
-				line.modulate.a = 0.0
-				list.add_child(line)
-				var t2 := create_tween()
-				t2.tween_interval(0.5 + shown * 0.25)
-				t2.tween_property(line, "modulate:a", 1.0, 0.3)
-				shown += 1
-			var t3 := create_tween()
-			t3.tween_interval(0.6 + shown * 0.25)
-			t3.tween_callback(func():
-				btn.disabled = false
-				btn.text = "COLLECT"
-				state[0] = "collect")
-		elif state[0] == "collect":
-			Sfx.play("coins")
-			for r in rewards:
-				if r["type"] == "GOLD":
-					save.gold += int(r["value"])
-				elif r["type"] == "GEM":
-					save.gems += int(r["value"])
-			save.chests = save.chests.filter(func(c): return c["id"] != chest["id"])
-			save.save_file()
-			_close_modal(m)
-			_show_tab(tab))
+	var ov := ChestOpening.new()
+	ov.setup(str(chest["type"]), rewards)
+	modal_layer.mouse_filter = Control.MOUSE_FILTER_PASS
+	modal_layer.add_child(ov)
+	ov.collected.connect(func():
+		for r in rewards:
+			if r["type"] == "GOLD":
+				save.gold += int(r["value"])
+			elif r["type"] == "GEM":
+				save.gems += int(r["value"])
+		save.chests = save.chests.filter(func(c): return c["id"] != chest["id"])
+		save.save_file()
+		ov.queue_free()
+		modal_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_show_tab(tab))
 
 func _gen_rewards(type: String) -> Array:
 	var gold := 100
@@ -952,7 +932,7 @@ func _gen_rewards(type: String) -> Array:
 		var pool: Array = CardDB.all.filter(func(c): return not c.get("isToken", false) and str(c.get("rarity", "")) == rarity)
 		if pool.size() > 0:
 			var c: Dictionary = pool[randi() % pool.size()]
-			out.append({"type": "CARD", "value": count, "label": str(c["name"])})
+			out.append({"type": "CARD", "value": count, "label": str(c["name"]), "card": c})
 	match type:
 		"SILVER": pick.call("common", total)
 		"GOLD":

@@ -455,32 +455,58 @@ func _sync_units(delta: float) -> void:
 		elif rec["first"]:
 			node.rotation.y = 0.0 if not u["opp"] else PI
 			rec["first"] = false
-		# bob walk animation
+		# ---- procedural animation (legs / arms / wings via shader; body bob, lean, lunge, hover on the node) ----
 		var model: Node3D = node.get_node("Model")
-		var moving := mv.length() > 0.004
+		var spd: float = mv.length() / maxf(delta, 0.001)            # world units / s
+		rec["spd"] = lerpf(rec["spd"], spd, 1.0 - exp(-10.0 * delta))
+		var moving: bool = rec["spd"] > 0.25
 		var ph: float = rec["phase"]
-		if u["type"] == "flying":
-			model.position.y = 2.2 + sin(_time * 3.0 + ph) * 0.18
-			var wl = model.get_node_or_null("WingL")
-			var wr = model.get_node_or_null("WingR")
-			if wl:
-				wl.rotation.z = sin(_time * 14.0 + ph) * 0.5
-				wr.rotation.z = -sin(_time * 14.0 + ph) * 0.5
+		var flying_u: bool = u["type"] == "flying"
+		var charging: bool = rec["spd"] > 7.0
+		rec["walk"] = lerpf(rec["walk"], 1.0 if moving else 0.0, 1.0 - exp(-12.0 * delta))
+		var freq := clampf(5.0 + rec["spd"] * 1.1, 5.0, 17.0)
+		_anim_param(rec, "walk", snappedf(rec["walk"] if not flying_u else 0.0, 0.05))
+		_anim_param(rec, "freq", snappedf(freq, 0.5))
+		_anim_param(rec, "flap", 15.0 if flying_u else 0.0)
+		# attack swing (arm strike) + body lunge, triggered by the sim's attack events
+		var swing := 0.0
+		var lunge_fwd := 0.0
+		if rec["swing_t"] < 1.0:
+			rec["swing_t"] = minf(1.0, rec["swing_t"] + delta / 0.3)
+			swing = sin(rec["swing_t"] * PI)
+			lunge_fwd = swing
+		_anim_param(rec, "swing", snappedf(swing, 0.05))
+		var fwd := Vector3(0, 0, -1)   # model forward (node is yawed toward its target)
+		var hover := 0.0
+		var lean := 0.0
+		var roll := 0.0
+		var squash := 1.0
+		if flying_u:
+			hover = 2.2 + sin(_time * 3.0 + ph) * 0.2 + (0.15 if moving else 0.0)
+			lean = -0.16 if moving else 0.0          # pitch into the direction of travel
+			roll = sin(_time * 2.2 + ph) * (0.1 if moving else 0.05)
 		elif u["type"] != "building":
-			model.position.y = absf(sin(_time * 9.0 + ph)) * 0.1 if moving else 0.0
-		# stun / slow tint via scale wobble
+			var bobf := 2.0 if charging else 1.0
+			var bob: float = absf(sin(_time * freq * 0.5 + ph)) * (0.14 if charging else 0.09) * rec["walk"]
+			hover = bob
+			lean = -(0.38 if charging else 0.1) * rec["walk"]
+			roll = sin(_time * freq * 0.5 + ph) * 0.06 * rec["walk"] * bobf
+			# idle breathing
+			squash = 1.0 + sin(_time * 2.4 + ph) * 0.02 * (1.0 - rec["walk"])
+		else:
+			squash = 1.0 + (swing * -0.06)           # towers / buildings recoil when firing
+		model.position = Vector3(0, hover, 0) + fwd * lunge_fwd * 0.55 * (0.0 if u["type"] == "building" else 1.0)
+		model.rotation.x = lean - lunge_fwd * 0.28
 		if u["stunUntil"] > sim.now:
 			model.rotation.z = sin(_time * 30.0) * 0.12
 		else:
-			model.rotation.z = lerpf(model.rotation.z, 0.0, 0.3)
-		# attack lunge
-		if rec["lunge"] > 0.0:
-			rec["lunge"] = maxf(0.0, rec["lunge"] - delta * 4.0)
-			var f := Vector3(0, 0, -1).rotated(Vector3.UP, node.rotation.y)
-			model.position += f * sin(rec["lunge"] * PI) * 0.45 * 0.0
-			model.scale = Vector3.ONE * (1.0 + sin(rec["lunge"] * PI) * 0.18)
-		else:
-			model.scale = Vector3.ONE
+			model.rotation.z = lerpf(model.rotation.z, roll, 0.3)
+		model.scale = Vector3(1.0 + lunge_fwd * 0.05, squash - lunge_fwd * 0.1, 1.0 + lunge_fwd * 0.12)
+		# shadow: flyers cast a darker, smaller shadow the higher they hover
+		var shd: Variant = rec.get("shadow")
+		if shd != null:
+			var hh: float = 1.0 if not flying_u else clampf(1.15 - (hover - 2.0) * 0.5, 0.7, 1.15)
+			(shd as Node3D).scale = Vector3(hh, 1.0, hh)
 		# status markers + cloaking
 		var st: Node3D = rec["status"]
 		st.get_node("Ice").visible = u["stunUntil"] > sim.now and float(u.get("frozenUntil", 0.0)) > sim.now
@@ -506,8 +532,16 @@ func _sync_units(delta: float) -> void:
 	for id in unit_nodes.keys():
 		if not alive.has(id):
 			var rec: Dictionary = unit_nodes[id]
-			rec["node"].queue_free()
+			var dn: Node3D = rec["node"]
+			rec["bar"].visible = false
 			unit_nodes.erase(id)
+			# death animation: topple back, shrink and sink, then free
+			var mdl := dn.get_node_or_null("Model") as Node3D
+			var tw := create_tween().set_parallel(true)
+			if mdl != null:
+				tw.tween_property(mdl, "rotation:x", 1.2, 0.35).set_ease(Tween.EASE_IN)
+			tw.tween_property(dn, "scale", Vector3(1.2, 0.05, 1.2), 0.38).set_ease(Tween.EASE_IN)
+			tw.chain().tween_callback(dn.queue_free)
 
 func _make_unit_node(u: Dictionary) -> Dictionary:
 	var node := ModelFactory.build_unit(u)
@@ -524,7 +558,69 @@ func _make_unit_node(u: Dictionary) -> Dictionary:
 	tw.tween_property(node, "scale", Vector3.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	var status := _make_status(s, u["type"] == "flying")
 	node.add_child(status)
-	return {"node": node, "fg": bar["fg"], "w": w, "bar": bar["root"], "phase": randf() * TAU, "lunge": 0.0, "first": true, "face_to": null, "status": status}
+	var rec := {"node": node, "fg": bar["fg"], "w": w, "bar": bar["root"], "phase": randf() * TAU, "lunge": 0.0, "first": true, "face_to": null, "status": status,
+		"meshes": [], "walk": 0.0, "swing_t": 1.0, "last_pos": node.position, "spd": 0.0, "anim_cache": {}}
+	_setup_anim(rec, node, u)
+	# ground shadow: dark blob under every walker, bigger + sharper under flyers so they read as airborne
+	if u["type"] != "building":
+		var fly: bool = u["type"] == "flying"
+		var rad := (0.5 + 0.45 * s) * (1.1 if fly else 0.8)
+		var sh := ModelFactory.cyl(rad, rad, 0.02, Color.BLACK, Vector3(0, 0.035, 0), 20)
+		sh.material_override = ModelFactory.mat(Color(0, 0, 0, 0.5 if fly else 0.28), 1.0, 0.0, true)
+		sh.name = "Shadow"
+		node.add_child(sh)
+		rec["shadow"] = sh
+		rec["shadow_r"] = rad
+	return rec
+
+func _setup_anim(rec: Dictionary, node: Node3D, u: Dictionary) -> void:
+	var meshes: Array = []
+	var stack: Array = [node.get_node("Model")]
+	while not stack.is_empty():
+		var n: Node = stack.pop_back()
+		if n is MeshInstance3D and (n as MeshInstance3D).mesh != null and not (n.name in ["Shadow", "Ice", "Rage", "Shield", "Curse"]):
+			var mat_ok := false
+			for i in (n as MeshInstance3D).mesh.get_surface_count():
+				if (n as MeshInstance3D).get_surface_override_material(i) is ShaderMaterial:
+					mat_ok = true
+			if mat_ok:
+				meshes.append(n)
+		stack.append_array(n.get_children())
+	rec["meshes"] = meshes
+	if meshes.is_empty():
+		return
+	var box: AABB = (meshes[0] as MeshInstance3D).get_aabb()
+	for m in meshes:
+		box = box.merge((m as MeshInstance3D).get_aabb())
+	var flying: bool = u["type"] == "flying"
+	var h := box.size.y
+	var wide := maxf(box.size.x, box.size.z)
+	var upright := h > 0.9 * wide
+	var leg_h := h * (0.3 if upright else 0.45)
+	var arms := 1.0 if (upright and not flying and u["type"] != "building") else 0.0
+	var mats: Array = []
+	for m in meshes:
+		var mi := m as MeshInstance3D
+		for i in mi.mesh.get_surface_count():
+			var sm := mi.get_surface_override_material(i) as ShaderMaterial
+			if sm != null:
+				var dup := sm.duplicate() as ShaderMaterial
+				mi.set_surface_override_material(i, dup)
+				mats.append(dup)
+	rec["mats"] = mats
+	for dm in mats:
+		(dm as ShaderMaterial).set_shader_parameter("phase", rec["phase"])
+		(dm as ShaderMaterial).set_shader_parameter("leg_h", leg_h)
+		(dm as ShaderMaterial).set_shader_parameter("arm_x", maxf(box.size.x * 0.28, 0.2))
+		(dm as ShaderMaterial).set_shader_parameter("arms", arms)
+
+func _anim_param(rec: Dictionary, name: String, v: float) -> void:
+	var cache: Dictionary = rec["anim_cache"]
+	if cache.get(name, -999.0) == v:
+		return
+	cache[name] = v
+	for dm in rec.get("mats", []):
+		(dm as ShaderMaterial).set_shader_parameter(name, v)
 
 func _make_status(s: float, flying: bool) -> Node3D:
 	var root := Node3D.new()
@@ -631,6 +727,7 @@ func _drain_fx() -> void:
 				var rec: Variant = unit_nodes.get(e["id"])
 				if rec != null:
 					rec["lunge"] = 1.0
+					rec["swing_t"] = 0.0
 					var dir := to3(e["tx"], e["ty"]) - to3(e["x"], e["y"])
 					rec["face_to"] = atan2(-dir.x, -dir.z)
 			"hit":

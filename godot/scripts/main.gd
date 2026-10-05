@@ -46,9 +46,12 @@ func _show_lobby() -> void:
 	var detail := ""
 	var detail_page := 0
 	var detail_mode := ""
+	var chest_taps := -1
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--detail="):
 			detail = a.substr(9)
+		if a.begins_with("--chest-taps="):
+			chest_taps = int(a.substr(13))
 		if a.begins_with("--detail-mode="):
 			detail_mode = a.substr(14)
 		if a.begins_with("--detail-page="):
@@ -68,6 +71,12 @@ func _show_lobby() -> void:
 		if detail_mode != "":
 			cd._switch_mode(detail_mode)
 		cd._show_page(detail_page)
+	if chest_taps >= 0:
+		lobby._open_chest(save.chests[int(save.chests.size() / 2)])
+		var ov := lobby.modal_layer.get_child(lobby.modal_layer.get_child_count() - 1) as ChestOpening
+		for i in chest_taps:
+			ov._tap()
+			await get_tree().create_timer(2.2).timeout
 	if shot != "":
 		await get_tree().create_timer(2.5 if detail != "" else 1.2).timeout
 		await RenderingServer.frame_post_draw

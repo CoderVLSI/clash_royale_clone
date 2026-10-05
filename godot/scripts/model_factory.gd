@@ -76,7 +76,7 @@ static func team_color(opp: bool) -> Color:
 # Authored by tools/blender/make_models.py (Blender MCP). Material slots named TINT / TEAM are recoloured here.
 static var _scenes: Dictionary = {}
 
-static func glb(name: String, tint: Color, team: Color) -> Node3D:
+static func glb(name: String, tint: Color, team: Color, animated: bool = true) -> Node3D:
 	var path := "res://assets/models/%s.glb" % name
 	if not _scenes.has(name):
 		_scenes[name] = load(path) if ResourceLoader.exists(path) else null
@@ -84,7 +84,7 @@ static func glb(name: String, tint: Color, team: Color) -> Node3D:
 	if ps == null:
 		return null
 	var root := ps.instantiate() as Node3D
-	_recolor(root, tint, team)
+	_recolor(root, tint, team, animated)
 	return root
 
 const CARD_SCALE := {"elixir_golem": 0.8, "golem": 0.78, "ice_golem": 0.85, "magic_archer": 0.9, "pekka": 1.1, "hog_rider": 1.0, "ice_spirit": 1.15,
@@ -141,19 +141,106 @@ static func glb_mesh(name: String) -> Mesh:
 	root.free()
 	return found
 
-static func _recolor(n: Node, tint: Color, team: Color) -> void:
+## Vertex-animated material: legs swing, arms swing / strike, wings flap - driven by uniforms set per unit in arena_view (materials are duplicated per unit: gl_compatibility has no instance uniforms).
+const ANIM_SHADER_CODE := """
+shader_type spatial;
+render_mode cull_back;
+uniform vec4 albedo : source_color = vec4(1.0);
+uniform vec4 emis : source_color = vec4(0.0);
+uniform float emis_energy = 0.0;
+uniform float rough = 0.8;
+uniform float walk = 0.0;
+uniform float flap = 0.0;
+uniform float freq = 9.0;
+uniform float phase = 0.0;
+uniform float leg_h = 0.9;
+uniform float arm_x = 0.4;
+uniform float arms = 0.0;
+uniform float swing = 0.0;
+void vertex() {
+	float t = TIME * freq + phase;
+	float ax = abs(VERTEX.x);
+	if (walk > 0.0) {
+		float side = VERTEX.x > 0.0 ? 0.0 : PI;
+		float ph = side + (abs(VERTEX.z) > 0.3 ? (VERTEX.z > 0.0 ? PI : 0.0) : 0.0);
+		float leg = clamp(1.0 - VERTEX.y / leg_h, 0.0, 1.0);
+		VERTEX.z += sin(t + ph) * 0.34 * leg * walk;
+		VERTEX.y += max(0.0, cos(t + ph)) * 0.14 * leg * walk;
+		float arm = arms * step(leg_h, VERTEX.y) * smoothstep(arm_x, arm_x * 1.3, ax);
+		VERTEX.z += sin(t + ph + PI) * 0.2 * arm * walk;
+	}
+	if (swing > 0.0) {
+		float rarm = arms * step(leg_h, VERTEX.y) * smoothstep(arm_x, arm_x * 1.3, VERTEX.x);
+		VERTEX.z -= swing * 0.8 * rarm;
+		VERTEX.y += sin(swing * 3.14159) * 0.55 * rarm;
+	}
+	if (flap > 0.0) {
+		float w = smoothstep(arm_x, arm_x * 1.6, ax);
+		VERTEX.y += sin(TIME * flap + phase) * w * ax * 0.5;
+	}
+}
+void fragment() {
+	ALBEDO = albedo.rgb;
+	ROUGHNESS = rough;
+	EMISSION = emis.rgb * emis_energy;
+	ALPHA = albedo.a;
+}
+"""
+
+static var _anim_shader: Shader
+static var _anim_shader_alpha: Shader
+static var _anim_mats: Dictionary = {}
+
+static func anim_mat(albedo: Color, emis: Color, emis_energy: float, rough: float) -> ShaderMaterial:
+	var alpha := albedo.a < 0.999
+	var key := "%s_%s_%s_%s" % [albedo.to_html(true), emis.to_html(false), emis_energy, rough]
+	if _anim_mats.has(key):
+		return _anim_mats[key]
+	if _anim_shader == null:
+		_anim_shader = Shader.new()
+		_anim_shader.code = ANIM_SHADER_CODE
+		_anim_shader_alpha = Shader.new()
+		_anim_shader_alpha.code = ANIM_SHADER_CODE.replace("render_mode cull_back;", "render_mode cull_back, blend_mix, depth_draw_always;")
+	var m := ShaderMaterial.new()
+	m.shader = _anim_shader_alpha if alpha else _anim_shader
+	m.set_shader_parameter("albedo", albedo)
+	m.set_shader_parameter("emis", emis)
+	m.set_shader_parameter("emis_energy", emis_energy)
+	m.set_shader_parameter("rough", rough)
+	_anim_mats[key] = m
+	return m
+
+static func _from_std(sm: Material) -> ShaderMaterial:
+	var std := sm as StandardMaterial3D
+	if std == null:
+		return null
+	var e := std.emission if std.emission_enabled else Color(0, 0, 0)
+	return anim_mat(std.albedo_color, e, std.emission_energy_multiplier if std.emission_enabled else 0.0, std.roughness)
+
+static func _recolor(n: Node, tint: Color, team: Color, animated: bool = true) -> void:
 	if n is MeshInstance3D:
 		var mi := n as MeshInstance3D
 		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		for i in mi.mesh.get_surface_count():
 			var sm: Material = mi.mesh.surface_get_material(i)
 			var nm := sm.resource_name if sm != null else ""
+			var am: ShaderMaterial = null
+			if not animated:
+				if nm == "TINT":
+					mi.set_surface_override_material(i, mat(tint, 0.8))
+				elif nm == "TEAM":
+					mi.set_surface_override_material(i, mat(team, 0.7, 0.15))
+				continue
 			if nm == "TINT":
-				mi.set_surface_override_material(i, mat(tint, 0.8))
+				am = anim_mat(tint, Color(0, 0, 0), 0.0, 0.8)
 			elif nm == "TEAM":
-				mi.set_surface_override_material(i, mat(team, 0.7, 0.15))
+				am = anim_mat(team, team, 0.15, 0.7)
+			else:
+				am = _from_std(sm)
+			if am != null:
+				mi.set_surface_override_material(i, am)
 	for c in n.get_children():
-		_recolor(c, tint, team)
+		_recolor(c, tint, team, animated)
 
 static func archetype(u: Dictionary) -> String:
 	var id := str(u["spriteId"])
@@ -188,7 +275,7 @@ static func archetype(u: Dictionary) -> String:
 # ----------------------------------------------------------------------------- towers
 
 static func build_tower(king: bool, opp: bool, sub: String = "princess") -> Node3D:
-	var model := glb("tower_king" if king else "tower_princess", Color("b9b2a4"), team_color(opp))
+	var model := glb("tower_king" if king else "tower_princess", Color("b9b2a4"), team_color(opp), false)
 	if model != null:
 		var holder := Node3D.new()
 		holder.add_child(model)

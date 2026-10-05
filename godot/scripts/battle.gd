@@ -10,6 +10,7 @@ const TRAY_H := 150.0
 var sim: Sim
 var view: ArenaView
 var cam: Camera3D
+var emotes: Emotes
 var hud: CanvasLayer
 var acc := 0.0
 var speed := 1.0
@@ -247,6 +248,12 @@ func _build_hud() -> void:
 			dot.size = Vector2(8, 8)
 			chat.add_child(dot)
 	tray.add_child(chat)
+	var chat_hit := Button.new()
+	chat_hit.flat = true
+	chat_hit.position = chat.position
+	chat_hit.size = chat.size
+	chat_hit.pressed.connect(func(): if emotes != null: emotes.toggle_picker())
+	tray.add_child(chat_hit)
 	var nxt := _label("Next:", 15, Color.WHITE)
 	nxt.position = Vector2(14, 62)
 	tray.add_child(nxt)
@@ -309,6 +316,15 @@ func _build_hud() -> void:
 	osb.bg_color = Color(0, 0, 0, 0.8)
 	over_panel.add_theme_stylebox_override("panel", osb)
 	root.add_child(over_panel)
+	emotes = Emotes.new()
+	hud.add_child(emotes)
+	emotes.setup(self, cam, sim)
+	for a in OS.get_cmdline_user_args():
+		if a == "--picker":
+			emotes.toggle_picker()
+		elif a.begins_with("--emote="):
+			emotes.show_emote(false, a.substr(8))
+			emotes.show_emote(true, "angry")
 
 func _crown_column(root: Control, y: float, color: Color) -> Array:
 	var arr: Array = []
