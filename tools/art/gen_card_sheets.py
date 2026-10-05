@@ -24,6 +24,27 @@ EST_PER_IMAGE = 0.045            # includes margin over the ~$0.034 observed pri
 GRID = 9
 PRIORITY = ['hog_rider', 'ice_spirit', 'battle_ram', 'magic_archer', 'princess']
 
+import colorsys
+HERO_DESC = {
+ 'hero_wizard': "a HERO wizard: stern dark-haired mustached wizard with spiky blond-grey lightning-shaped hair, glowing yellow eyes, blue-and-gold robes with white fur collar, crackling golden lightning around his hands, heroic dramatic pose",
+ 'hero_magic_archer': "a HERO magic archer: a hooded archer in glowing teal and gold armor with a huge luminous energy bow, holographic decoy copy behind him, heroic dramatic pose, golden hero aura",
+}
+def hue_name(hexcol):
+    r, g, b = [int(hexcol[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+    h, s, v = colorsys.rgb_to_hsv(r, g, b)
+    h *= 360
+    for lim, n in ((20, 'red'), (50, 'orange'), (70, 'golden yellow'), (160, 'green'), (200, 'cyan'), (260, 'blue'), (300, 'purple'), (340, 'magenta'), (361, 'red')):
+        if h < lim:
+            return n
+
+def evo_desc(c, byid):
+    if c['id'] in HERO_DESC:
+        return HERO_DESC[c['id']]
+    base = next((x for x in byid.values() if x.get('evolvesTo') == c['id']), None)
+    d = DESC.get(base['id']) if base else None
+    col = hue_name(c.get('evolutionAuraColor', '#b66cff'))
+    return f"an EVOLVED, more powerful, upgraded version of: {d or c['name']} -- radiating a glowing {col} energy aura with sparkling power particles, intensified glowing details, menacing heroic pose"
+
 def key():
     return os.environ['OPENROUTER_API_KEY']
 
@@ -93,10 +114,18 @@ def main():
     ap.add_argument('--max-spend', type=float, default=0.60)
     ap.add_argument('--only', default='')
     ap.add_argument('--dry-run', action='store_true')
+    ap.add_argument('--evo', action='store_true', help='generate evolution + hero portraits instead of base cards')
     ap.add_argument('--first-test', action='store_true', help='generate just ONE sheet, then stop so you can inspect it')
     a = ap.parse_args()
     os.makedirs(OUT, exist_ok=True); os.makedirs(RAW, exist_ok=True)
-    cards = [c for c in json.load(open(os.path.join(ROOT, 'godot', 'data', 'cards.json'))) if not c.get('isToken')]
+    allc = json.load(open(os.path.join(ROOT, 'godot', 'data', 'cards.json')))
+    byid = {c['id']: c for c in allc}
+    if a.evo:
+        cards = [c for c in allc if c.get('evolution') or c.get('rarity') == 'hero']
+        for c in cards:
+            DESC[c['id']] = evo_desc(c, byid)
+    else:
+        cards = [c for c in allc if not c.get('isToken')]
     seen = set(); cards = [c for c in cards if not (c['id'] in seen or seen.add(c['id']))]
     if a.only:
         want = a.only.split(','); cards = [c for c in cards if c['id'] in want]

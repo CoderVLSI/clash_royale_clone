@@ -17,9 +17,18 @@ static func _build_map() -> void:
 		if c.get("heroVariantId") != null:
 			_base_of[str(c["heroVariantId"])] = str(c["id"])
 
+static func base_id(card: Dictionary) -> String:
+	## Base card of an evolution / hero variant (used to find the 3D model).
+	_build_map()
+	var id := str(card["id"])
+	return _base_of.get(id, id)
+
 static func art_id(card: Dictionary) -> String:
 	_build_map()
 	var id := str(card["id"])
+	# evolutions / heroes use their own generated portrait when one exists
+	if ResourceLoader.exists("res://assets/art/cards/%s.jpg" % id):
+		return id
 	return _base_of.get(id, id)
 
 static func texture(card: Dictionary) -> Texture2D:

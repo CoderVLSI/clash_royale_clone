@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/musketeer.jpg-87b2ca33e9d335043b39fd2ff323fe1
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.5
+compress/lossy_quality=0.6
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0

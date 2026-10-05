@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/wizard.jpg-8768b182e6058c25ab0bce25e43d1528.c
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.5
+compress/lossy_quality=0.6
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0

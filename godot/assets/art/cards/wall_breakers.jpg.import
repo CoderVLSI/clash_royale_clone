@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/wall_breakers.jpg-f698eb93f51b7c3254fbc194ff1
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.5
+compress/lossy_quality=0.6
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0

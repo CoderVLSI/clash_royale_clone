@@ -946,6 +946,23 @@ def goblinstein():
         p.append(K('E_CYAN', 0.06, 0.5, sx * 1.4, 0.4, 2.4, 0, 0, sx * -0.8))
     return p
 
+
+@card
+def hero_wizard():
+    p = person('BLUE_M', 'BLUE_D', boots='DARK', sleeves='BLUE_M', bulk=1.0) + [B('FURW', 0.9, 0.5, 0.14, 0, 0, 1.7), B('FURW', 0.1, 0.5, 0.8, -0.38, 0, 1.3), B('FURW', 0.1, 0.5, 0.8, 0.38, 0, 1.3), B('GOLD', 0.84, 0.5, 0.12, 0, 0, 0.9), B('GOLD', 0.1, 0.52, 0.8, -0.2, 0.02, 1.3), B('GOLD', 0.1, 0.52, 0.8, 0.2, 0.02, 1.3)]
+    p += [S('GREY_B', 0.34, 0, -0.02, HZ + 0.1, 1, 1, 0.8), S('E_YELLOW', 0.06, -0.1, 0.27, HZ + 0.04), S('E_YELLOW', 0.06, 0.1, 0.27, HZ + 0.04)] + mustache('BLACK_H', HZ - 0.02, 0.4, 0.3) + beard('BLACK_H', HZ, 0.3, 0.3, 0.3)
+    for i in range(5):
+        p.append(K('YELLOW' if i % 2 else 'GREY_B', 0.09, 0.6, (i - 2) * 0.14, 0.0, HZ + 0.55 + (2 - abs(i - 2)) * 0.08, 0, 0, (i - 2) * 0.25, 5))
+    p += [T('GOLD', 0.2, 0.05, -0.55, 0.15, 1.4, Z, 0, 0), T('GOLD', 0.2, 0.05, 0.62, 0.45, 1.5, Z, 0, 0), K('E_YELLOW', 0.07, 0.5, -0.5, 0.35, 1.9, 0, 0, 0.5), K('E_YELLOW', 0.07, 0.5, 0.8, 0.5, 1.9, 0, 0, -0.5)]
+    return p
+
+@card
+def hero_magic_archer():
+    p = person('TEAL_X', 'BLUE_D', boots='GOLD', sleeves='TEAL_X', bulk=1.0) if False else person('CRYS', 'BLUE_D', boots='GOLD', sleeves='CRYS', bulk=1.0)
+    p += hood('CRYS', HZ, 0.3, 0.35) + [B('GOLD', 0.5, 0.06, 0.1, 0, 0.26, HZ + 0.18), B('GOLD', 0.84, 0.5, 0.1, 0, 0, 1.75), S('GOLD', 0.2, -0.55, 0, 1.75), S('GOLD', 0.2, 0.55, 0, 1.75)]
+    p += [B('CRYS', 0.9, 0.06, 1.2, 0, -0.34, 1.6, 0.12)] + item_bow(0.55, 0.55, 1.45, 'E_CYAN', 1.6) + [K('E_CYAN', 0.08, 0.6, 0.55, 1.0, 1.45, -Z, 0, 0)]
+    return p
+
 # ------------------------------------------------------------------ build
 def finish2(name, parts, sz=1.0):
     bpy.ops.object.select_all(action='DESELECT')

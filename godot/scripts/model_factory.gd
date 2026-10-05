@@ -95,7 +95,7 @@ const MODEL_ALIAS := {"skeleton_army": ["skeletons", 1.0], "minion_horde": ["min
 	"barbarian_brothers": ["barbarians", 1.0], "royal_recruit_single": ["royal_recruits", 1.0], "rascal_girls": ["rascals", 1.0], "lava_pups": ["lava_hound", 0.45],
 	"golemite": ["golem", 0.55], "elixir_golemite": ["elixir_golem", 0.6], "elixir_blob": ["elixir_golem", 0.4], "goblin_single": ["spear_goblins", 1.0], "decoy_goblin": ["spear_goblins", 1.0],
 	"goblin_brawler": ["sword_goblins", 1.0], "goblin_bruteth": ["goblin_giant", 0.8], "cursed_hog": ["royal_hogs", 1.0], "goblinstein_monster": ["goblinstein", 1.0], "guardian": ["guards", 1.0],
-	"spirit_empress_flying": ["spirit_empress", 1.0], "hero_wizard": ["wizard", 1.0], "hero_magic_archer": ["magic_archer", 1.0]}
+	"spirit_empress_flying": ["spirit_empress", 1.0]}
 
 static var _batch2: Dictionary = {}
 static var _batch2_loaded := false
@@ -264,7 +264,9 @@ static func build_unit(u: Dictionary) -> Node3D:
 	root.add_child(model)
 	var base_r := 0.55 * s
 	var arch := archetype(u)
-	var cid := CardArt.art_id({"id": str(u.get("cid", u["spriteId"]))})
+	var cid := str(u.get("cid", u["spriteId"]))
+	if not ResourceLoader.exists("res://assets/models/cards/%s.glb" % cid):
+		cid = CardArt.base_id({"id": cid})
 	var alias_mult := 1.0
 	if MODEL_ALIAS.has(cid):
 		alias_mult = float(MODEL_ALIAS[cid][1])

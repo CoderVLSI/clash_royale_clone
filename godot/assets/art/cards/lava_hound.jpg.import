@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/lava_hound.jpg-f9d6368ef6307bdbc749a3b8551569
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.5
+compress/lossy_quality=0.6
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0

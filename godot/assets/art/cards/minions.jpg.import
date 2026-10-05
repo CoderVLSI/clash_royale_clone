@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/minions.jpg-628c10f1a67ae24aad8b65a3687d56b9.
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.5
+compress/lossy_quality=0.6
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0

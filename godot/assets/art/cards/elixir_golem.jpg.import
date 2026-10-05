@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/elixir_golem.jpg-096e1db4a5fd36ef1c9fba25094b
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.5
+compress/lossy_quality=0.6
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
