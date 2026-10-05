@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/trophy.png-c72d7b19d29c4c00c3b881e6e09d5634.c
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.42
+compress/lossy_quality=0.35
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0

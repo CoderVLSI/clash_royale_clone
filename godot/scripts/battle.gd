@@ -302,8 +302,8 @@ func _build_hud() -> void:
 	tray.add_child(mx)
 	ability_row = HBoxContainer.new()
 	ability_row.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	ability_row.offset_top = -TRAY_H - 52
-	ability_row.offset_bottom = -TRAY_H - 6
+	ability_row.offset_top = -TRAY_H - 96
+	ability_row.offset_bottom = -TRAY_H - 8
 	ability_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	ability_row.add_theme_constant_override("separation", 8)
 	ability_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -325,6 +325,11 @@ func _build_hud() -> void:
 	hud.add_child(emotes)
 	emotes.setup(self, cam, sim)
 	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--spawn-hero="):
+			for hid in a.substr(13).split(","):
+				var hu := sim.make_unit(CardDB.get_card(hid), 120 + 70 * sim.units.size(), 600, false, "LEFT")
+				sim.units.append(hu)
+				sim.mech.on_spawn(hu)
 		if a == "--picker":
 			emotes.toggle_picker()
 		elif a.begins_with("--emote="):
@@ -567,6 +572,11 @@ func _update_hud() -> void:
 	_fill_card(next_panel, p["next"], true)
 	next_panel.modulate.a = 0.75
 
+const ABILITY_NAMES := {"hero_knight": "Taunt", "hero_giant": "Hurl", "hero_mini_pekka": "Breakfast", "hero_musketeer": "Turret", "hero_ice_golem": "Snowstorm", "hero_goblins": "Banner",
+	"hero_mega_minion": "Warp", "hero_barbarian_single": "Reroll", "hero_bowler": "Swish", "hero_tombstone": "Revival", "hero_balloon": "Coffin", "hero_dark_prince": "Dismount",
+	"hero_valkyrie": "Whirlwind", "hero_berserker": "Savage", "hero_ice_wizard": "Frosty", "hero_wizard": "Flight", "hero_magic_archer": "Triple", "hero_electro_wizard": "Surge",
+	"golden_knight": "Dash", "skeleton_king": "Souls", "archer_queen": "Cloak", "monk": "Shield", "mighty_miner": "Escape", "little_prince": "Rescue", "boss_bandit": "Getaway", "goblinstein": "Link"}
+
 func _update_abilities() -> void:
 	var seen := {}
 	for u in sim.units:
@@ -575,20 +585,19 @@ func _update_abilities() -> void:
 		if u.get("isHeroDecoy", false) or u.get("abilityUsed", false):
 			continue
 		seen[u["id"]] = true
-		var btn: Button = ability_btns.get(u["id"])
+		var btn: AbilityButton = ability_btns.get(u["id"])
 		if btn == null:
-			btn = UI.button("", Color("8e44ad"), func(): sim.request_ability(u["id"]), Vector2(0, 46), 14)
-			btn.custom_minimum_size = Vector2(150, 46)
+			btn = AbilityButton.new()
+			var icon_path := "res://assets/art/abilities/%s.jpg" % str(u.get("cid", u["id"]))
+			var icon: Texture2D = load(icon_path) if ResourceLoader.exists(icon_path) else null
+			btn.setup(icon, int(Sim._v(u, "abilityCost", 0)), str(ABILITY_NAMES.get(str(u.get("cid", "")), "")))
+			var uid: int = u["id"]
+			btn.pressed.connect(func(): sim.request_ability(uid))
 			ability_row.add_child(btn)
 			ability_btns[u["id"]] = btn
-		var left := (sim.mech.abilities.ready_at(u) - sim.now) / 1000.0
 		var cost := int(Sim._v(u, "abilityCost", 0))
-		if left > 0.0:
-			btn.text = "%s  %.0fs" % [str(u["name"]).substr(0, 10), left]
-			btn.disabled = true
-		else:
-			btn.text = "%s  (%d)" % [str(u["name"]).substr(0, 10), cost]
-			btn.disabled = sim.players[0]["elixir"] < cost
+		var left := (sim.mech.abilities.ready_at(u) - sim.now) / 1000.0
+		btn.set_state(left <= 0.0 and sim.players[0]["elixir"] >= cost, cost)
 	for id in ability_btns.keys():
 		if not seen.has(id):
 			ability_btns[id].queue_free()
