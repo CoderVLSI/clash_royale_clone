@@ -119,12 +119,36 @@ static func card_widget(card: Dictionary, size: Vector2 = Vector2(72, 92), dim: 
 	p.custom_minimum_size = size
 	p.size = size
 	p.add_theme_stylebox_override("panel", style(Color("353b52"), 10, rarity_color(str(card.get("rarity", "common"))), 3))
-	var sw := ColorRect.new()
-	sw.color = Color(str(card.get("color", "#888888")))
-	sw.position = Vector2(size.x * 0.18, size.y * 0.1)
-	sw.size = Vector2(size.x * 0.64, size.y * 0.5)
-	sw.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	p.add_child(sw)
+	var art := CardArt.texture(card)
+	if art != null:
+		var tr := TextureRect.new()
+		tr.texture = art
+		tr.position = Vector2(3, 3)
+		tr.size = size - Vector2(6, 6)
+		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		p.add_child(tr)
+		var shade := ColorRect.new()
+		shade.color = Color(0, 0, 0, 0.45)
+		shade.position = Vector2(3, size.y - 28)
+		shade.size = Vector2(size.x - 6, 25)
+		shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		p.add_child(shade)
+		if card.get("evolution", false) or card.get("rarity", "") == "hero":
+			var tint := ColorRect.new()
+			tint.color = Color(Color(str(card.get("evolutionAuraColor", "#00bcd4"))), 0.22)
+			tint.position = Vector2(3, 3)
+			tint.size = size - Vector2(6, 6)
+			tint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			p.add_child(tint)
+	else:
+		var sw := ColorRect.new()
+		sw.color = Color(str(card.get("color", "#888888")))
+		sw.position = Vector2(size.x * 0.18, size.y * 0.1)
+		sw.size = Vector2(size.x * 0.64, size.y * 0.5)
+		sw.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		p.add_child(sw)
 	var tlabel := label(str(card.get("name", "?")), 11 if size.x < 80 else 13, Color.WHITE, 4)
 	tlabel.position = Vector2(2, size.y - 26)
 	tlabel.size = Vector2(size.x - 4, 22)

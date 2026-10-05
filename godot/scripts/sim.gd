@@ -577,7 +577,7 @@ func _moves_while_attacking(u: Dictionary) -> bool:
 func _attack(u: Dictionary, target: Dictionary, base_damage: float, tdist: float, dmg: Array, splash: Array) -> void:
 	var damage := mech.modify_damage(u, target, base_damage, tdist)
 	u["isAttacking"] = true
-	fx.append({"t": "attack", "id": u["id"], "x": u["x"], "y": u["y"], "tx": target["x"], "ty": target["y"]})
+	fx.append({"t": "attack", "id": u["id"], "x": u["x"], "y": u["y"], "tx": target["x"], "ty": target["y"], "p": str(u["projectile"]) if u.get("projectile") != null else ""})
 	if u.get("projectile") != null:
 		var ptype := str(u["projectile"])
 		var spd := 12.0

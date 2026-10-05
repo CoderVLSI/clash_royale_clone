@@ -29,3 +29,13 @@ the 2D sprites were replaced with 3D models authored in Blender.
 * Friendly battle has no network play yet (the repo's `server.js` is socket.io); the modal starts a local match.
 * Some multi-part evolution mechanics are approximations of the wiki behaviour (Skeleton Army general,
   Goblin Drill rotation, Snowball pull, Skeleton Barrel drops). See `evo_mechanics.gd`.
+
+## Generated art & audio
+* **Card portraits** - `tools/art/gen_card_art.py` (OpenRouter, `google/gemini-3.1-flash(-lite)-image`) writes
+  `assets/art/cards/<id>.jpg`. Evolved/hero variants reuse their base card's art; cards without art fall back to a
+  live-rendered portrait of their 3D model. The script is resumable (`OPENROUTER_API_KEY` from the environment) and
+  has a `--max-spend` guard. Only 27 of 123 cards have art so far (the account ran out of credit); re-run it after
+  topping up to fill in the rest.
+* **Sound** - `tools/art/gen_sfx.py` (ElevenLabs sound generation, `ELEVENLABS_API_KEY` from the environment) writes
+  30 effects + 2 music loops to `assets/audio/`. Played through `scripts/sfx.gd`; Menu -> Sound toggles it.
+  (ElevenLabs free-tier output is not licensed for commercial use.)

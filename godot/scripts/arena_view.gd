@@ -421,6 +421,7 @@ func _sync_towers() -> void:
 		tn["label"].text = str(maxi(0, int(ceil(t["hp"]))))
 		if t["hp"] <= 0 and not tn["dead"]:
 			tn["dead"] = true
+			Sfx.play("king_tower_fall" if t["type"] == "king" else "tower_destroyed")
 			tn["root"].visible = false
 			_explode(to3(t["x"], t["y"], 2.0), 3.5, Color("ff9a3c"))
 			_sink_tower(tn["node"])
@@ -580,8 +581,51 @@ func dist2(p: Dictionary) -> float:
 
 # ----------------------------------------------------------------------------- effects
 
+func _fx_sound(e: Dictionary) -> void:
+	match e["t"]:
+		"play":
+			if e["card"] in ["fireball", "rocket", "zap", "lightning", "arrows", "poison", "freeze", "rage", "tornado", "the_log", "snowball"]:
+				return
+			Sfx.play("card_deploy", -3.0 if not e["opp"] else -9.0, 60)
+		"attack":
+			var p := str(e.get("p", ""))
+			if p == "":
+				Sfx.play("sword_hit", -9.0, 90)
+			elif p.contains("arrow") or p.contains("spear") or p.contains("dart") or p.contains("dagger"):
+				Sfx.play("arrow_shot", -9.0, 90)
+			elif p.contains("cannon") or p.contains("bomb") or p.contains("mortar") or p.contains("bullet") or p.contains("boulder"):
+				Sfx.play("cannon_boom", -9.0, 120)
+			else:
+				Sfx.play("magic_bolt", -9.0, 100)
+		"hit":
+			Sfx.play("tower_hit", -7.0, 140)
+		"death":
+			Sfx.play("unit_death", -8.0, 80)
+		"bolt":
+			Sfx.play("spell_zap", -8.0, 120)
+		"elixir":
+			Sfx.play("coins", -12.0, 300)
+		"ability":
+			Sfx.play("ability_activate", -2.0)
+		"spell":
+			match str(e["kind"]):
+				"fireball", "rocket": Sfx.play("spell_fireball", -2.0)
+				"zap", "lightning": Sfx.play("spell_zap", -2.0)
+				"arrows": Sfx.play("spell_arrows", -2.0)
+				"freeze": Sfx.play("spell_freeze", -3.0)
+				"clone": Sfx.play("spell_heal", -4.0)
+				"rage": Sfx.play("spell_rage", -3.0)
+				_: Sfx.play("spell_fireball", -8.0, 150)
+		"zone":
+			match str(e["kind"]):
+				"poison": Sfx.play("spell_poison", -3.0)
+				"rage": Sfx.play("spell_rage", -3.0)
+				"graveyard", "curse", "void": Sfx.play("spell_poison", -6.0)
+				"freeze": Sfx.play("spell_freeze", -3.0)
+
 func _drain_fx() -> void:
 	for e in sim.fx:
+		_fx_sound(e)
 		match e["t"]:
 			"attack":
 				var rec: Variant = unit_nodes.get(e["id"])

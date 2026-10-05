@@ -75,6 +75,8 @@ func start(player_deck_ids: Array = DEFAULT_DECK, player_tower: String = "prince
 	_build_hud()
 	if intro_left > 0.0:
 		_build_intro()
+		Sfx.play("battle_start")
+	Sfx.music("music_battle")
 	for a2 in OS.get_cmdline_user_args():
 		if a2 == "--selftest":
 			call_deferred("_selftest")
@@ -139,6 +141,7 @@ func _build_camera() -> void:
 # ----------------------------------------------------------------------------- HUD
 
 var icons: CardIcons
+var evo_ready_seen: Dictionary = {}
 var enemy_crowns: Array = []
 var player_crowns: Array = []
 
@@ -366,8 +369,18 @@ func _fill_card(w: Control, card: Dictionary, affordable: bool = true) -> void:
 	var sb: StyleBoxFlat = w.get_theme_stylebox("panel")
 	sb.border_color = rc
 	sb.bg_color = Color(card["color"]).darkened(0.55).lerp(Color("2b3550"), 0.5)
-	var tex := icons.texture(card)
-	w.get_node("Icon").texture = tex
+	var art := CardArt.texture(card)
+	var ic: TextureRect = w.get_node("Icon")
+	if art != null:
+		ic.texture = art
+		ic.position = Vector2(3, 3)
+		ic.size = w.size - Vector2(6, 6)
+		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	else:
+		ic.texture = icons.texture(card)
+		ic.position = Vector2(3, 3)
+		ic.size = w.size - Vector2(6, 14)
+		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	w.get_node("Cost").text = str(int(card["cost"]))
 	w.modulate = Color.WHITE if affordable else Color(0.62, 0.62, 0.7, 1.0)
 
@@ -378,6 +391,7 @@ const RARITY_COLORS := {"common": "#7f8c8d", "rare": "#f39c12", "epic": "#9b59b6
 func _on_slot_input(ev: InputEvent, idx: int) -> void:
 	if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and ev.pressed and sim.game_over == "":
 		drag_idx = idx
+		Sfx.play("card_pick")
 		drag_card = sim.players[0]["hand"][idx]
 		ghost.visible = true
 		_fill_card(ghost, drag_card, true)
@@ -446,6 +460,7 @@ func _scan_alerts() -> void:
 		if e["t"] == "alert":
 			alert_lbl.text = e["msg"]
 			alert_lbl.modulate.a = 1.0
+			Sfx.play("elixir_double" if str(e["msg"]).begins_with("DOUBLE") else "overtime")
 			var tw := create_tween()
 			tw.tween_interval(2.0)
 			tw.tween_property(alert_lbl, "modulate:a", 0.0, 0.8)
@@ -474,6 +489,12 @@ func _update_hud() -> void:
 			continue
 		_fill_card(slot_panels[i], c, c["cost"] <= el)
 		_evo_badge(slot_panels[i], c)
+		var pg := sim.mech.evolution_progress(0, c)
+		if not pg.is_empty() and pg["ready"] and not evo_ready_seen.has(c["id"]):
+			evo_ready_seen[c["id"]] = true
+			Sfx.play("evolution_ready")
+		elif not pg.is_empty() and not pg["ready"]:
+			evo_ready_seen.erase(c["id"])
 	_fill_card(next_panel, p["next"], true)
 	next_panel.modulate.a = 0.75
 
@@ -513,6 +534,8 @@ func _update_camera(delta: float) -> void:
 		cam.transform = cam_base
 
 func _show_game_over() -> void:
+	Sfx.stop_music()
+	Sfx.play("victory" if sim.game_over == "VICTORY" else "defeat")
 	over_panel.visible = true
 	for c in over_panel.get_children():
 		c.queue_free()

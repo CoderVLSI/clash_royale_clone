@@ -804,6 +804,8 @@ func _open_menu() -> void:
 		m["body"].add_child(UI.button(entry, Color("2e86de"), func(): _toast(entry + " is coming soon"), Vector2(0, 42), 16))
 	m["body"].add_child(UI.button("Low performance mode: " + ("ON" if save.low_perf else "OFF"), Color("8e44ad"),
 		func(): save.low_perf = not save.low_perf; save.save_file(); _close_modal(m); _open_menu(), Vector2(0, 42), 14))
+	m["body"].add_child(UI.button("Sound: " + ("ON" if save.sound else "OFF"), Color("16a085"),
+		func(): save.sound = not save.sound; save.save_file(); Sfx.set_enabled(save.sound); _close_modal(m); _open_menu(), Vector2(0, 42), 14))
 	m["body"].add_child(UI.button("Close", Color("7f8c8d"), func(): _close_modal(m), Vector2(0, 40), 16))
 
 func _open_friendly() -> void:
@@ -847,6 +849,7 @@ func _open_chest(chest: Dictionary) -> void:
 		if state[0] == "closed":
 			state[0] = "opening"
 			btn.disabled = true
+			Sfx.play("chest_open")
 			var tw := create_tween()
 			tw.tween_property(icon_holder, "rotation", 0.15, 0.08)
 			tw.tween_property(icon_holder, "rotation", -0.15, 0.08)
@@ -867,6 +870,7 @@ func _open_chest(chest: Dictionary) -> void:
 				btn.text = "COLLECT"
 				state[0] = "collect")
 		elif state[0] == "collect":
+			Sfx.play("coins")
 			for r in rewards:
 				if r["type"] == "GOLD":
 					save.gold += int(r["value"])

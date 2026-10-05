@@ -81,6 +81,7 @@ func _use(u: Dictionary) -> bool:
 	var now := sim.now
 	var id := str(u["spriteId"])
 	u["lastAbilityTime"] = now
+	sim.fx.append({"t": "ability", "opp": u["opp"]})
 	if _v(u, "heroFieryFlightAbility", false):
 		var cast: float = float(_v(u, "heroCastDelay", 1000))
 		u["stunUntil"] = maxf(u["stunUntil"], now + cast)

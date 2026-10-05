@@ -22,6 +22,7 @@ var gems := 150
 var trophies := 3400
 var chests: Array = []
 var low_perf := false
+var sound := true
 
 func _init() -> void:
 	reset_defaults()
@@ -63,13 +64,14 @@ func load_file() -> void:
 	trophies = int(d.get("trophies", trophies))
 	chests = d.get("chests", chests)
 	low_perf = bool(d.get("low_perf", false))
+	sound = bool(d.get("sound", true))
 
 func save_file() -> void:
 	var f := FileAccess.open(PATH, FileAccess.WRITE)
 	if f == null:
 		return
 	f.store_string(JSON.stringify({"decks": decks, "evo_slots": evo_slots, "hero_slots": hero_slots, "selected_deck": selected_deck,
-		"tower": tower, "gold": gold, "gems": gems, "trophies": trophies, "chests": chests, "low_perf": low_perf}))
+		"tower": tower, "gold": gold, "gems": gems, "trophies": trophies, "chests": chests, "low_perf": low_perf, "sound": sound}))
 
 func current_deck_ids() -> Array:
 	return decks[selected_deck]

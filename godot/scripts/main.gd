@@ -7,6 +7,13 @@ var current: Node
 
 func _ready() -> void:
 	save = SaveData.new()
+	var sfx := Sfx.new()
+	add_child(sfx)
+	sfx.enabled = save.sound
+	get_tree().node_added.connect(func(n: Node):
+		if n is BaseButton and not n.has_meta("sfx_hooked"):
+			n.set_meta("sfx_hooked", true)
+			(n as BaseButton).pressed.connect(func(): Sfx.play("ui_click", -4.0, 40)))
 	var args := OS.get_cmdline_user_args()
 	var direct_battle := false
 	for a in args:
@@ -29,6 +36,7 @@ func _show_loading() -> void:
 	_swap(ml)
 
 func _show_lobby() -> void:
+	Sfx.music("music_lobby")
 	var lobby := Lobby.new()
 	_swap(lobby)
 	lobby.setup(save)
@@ -51,6 +59,8 @@ func _show_lobby() -> void:
 		get_tree().quit()
 
 func _start_battle(_friendly: bool) -> void:
+	Sfx.play("ui_confirm")
+	Sfx.stop_music()
 	var b := Battle.new()
 	_swap(b)
 	var ids: Array = save.current_deck_ids()
