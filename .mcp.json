@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "blender": {
+      "command": "/opt/blenv/bin/mcp-for-blender",
+      "args": [],
+      "env": {
+        "BLENDER_MCP_DISABLE_TELEMETRY": "1"
+      }
+    },
+    "godot": {
+      "command": "node",
+      "args": ["/opt/node22/lib/node_modules/@coding-solo/godot-mcp/build/index.js"],
+      "env": {
+        "GODOT_PATH": "/opt/godot/godot"
+      }
+    }
+  }
+}
