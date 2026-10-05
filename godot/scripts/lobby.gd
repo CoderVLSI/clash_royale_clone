@@ -393,6 +393,11 @@ func _build_decks() -> Control:
 		holder.add_child(hit)
 		# evolution / hero badges
 		if _is_evo_slot(c["id"]):
+			var pb := Panel.new()
+			pb.size = Vector2(78, 96)
+			pb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			pb.add_theme_stylebox_override("panel", UI.style(Color(0, 0, 0, 0), 10, Color("c04dff"), 5))
+			holder.add_child(pb)
 			var b := UI.label("EVO", 11, Color("e0b3ff"))
 			b.position = Vector2(46, 2)
 			holder.add_child(b)

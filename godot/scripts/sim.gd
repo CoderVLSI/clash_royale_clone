@@ -73,6 +73,36 @@ func _make_player(deck: Array) -> Dictionary:
 		"last_played": {}, "cycles": {}, "evo_slots": [], "hero_slot": null,
 	}
 
+## Like the real game: evolution-slot cards start in your opening hand with their evolution already charged.
+## After you play the evolved form it must cycle again (evolutionCycles) before the next evolution.
+func start_evolutions(pi: int) -> void:
+	var p: Dictionary = players[pi]
+	var evo_ids: Array = p["evo_slots"]
+	for id in evo_ids:
+		var card: Dictionary = {}
+		for c in p["deck"]:
+			if c["id"] == id:
+				card = c
+		if card.is_empty() or card.get("evolvesTo") == null:
+			continue
+		p["cycles"][id] = int(_v(card, "evolutionCycles", 2))
+		var hand: Array = p["hand"]
+		if card in hand:
+			continue
+		var slot := -1
+		for i in hand.size():
+			if not (hand[i]["id"] in evo_ids):
+				slot = i
+				break
+		if slot < 0:
+			continue
+		var q: Array = p["queue"]
+		if card == p["next"]:
+			p["next"] = hand[slot]
+		elif card in q:
+			q[q.find(card)] = hand[slot]
+		hand[slot] = card
+
 func _build_towers(player_tower: String) -> void:
 	var pt: Dictionary = TOWER_TYPES.get(player_tower, TOWER_TYPES["princess"])
 	towers = [

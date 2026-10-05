@@ -48,6 +48,7 @@ func start(player_deck_ids: Array = DEFAULT_DECK, player_tower: String = "prince
 	pdeck.shuffle()                      # App.js resetGame shuffles the player's deck each battle
 	sim = Sim.new(pdeck, enemy, player_tower)
 	sim.players[0]["evo_slots"] = evo_ids
+	sim.start_evolutions(0)
 	sim.players[0]["hero_slot"] = hero_id if hero_id != "" else null
 	if low_perf:
 		speed = 1.0
@@ -62,11 +63,15 @@ func start(player_deck_ids: Array = DEFAULT_DECK, player_tower: String = "prince
 		elif a == "--force-over":
 			sim.score = [2, 1]
 			sim.game_over = "VICTORY"
+		elif a.begins_with("--evo="):
+			sim.players[0]["evo_slots"] = Array(a.substr(6).split(","))
+			sim.start_evolutions(0)
 		elif a.begins_with("--speed="):
 			speed = float(a.substr(8))
 		elif a.begins_with("--deck="):
 			sim = Sim.new(CardDB.deck_by_ids(a.substr(7).split(",")), enemy, player_tower)
 			sim.players[0]["evo_slots"] = evo_ids
+			sim.start_evolutions(0)
 			sim.players[0]["hero_slot"] = hero_id if hero_id != "" else null
 	if auto_play:
 		sim.ai_enabled = [true, true]
@@ -405,6 +410,14 @@ func _fill_card(w: Control, card: Dictionary, affordable: bool = true) -> void:
 	sb.bg_color = Color(card["color"]).darkened(0.55).lerp(Color("2b3550"), 0.5)
 	var art := CardArt.texture(card)
 	var ic: TextureRect = w.get_node("Icon")
+	# evolution cards: purple border when the evolution is charged, dim purple while it recharges
+	var evo_prog := sim.mech.evolution_progress(0, card)
+	if not evo_prog.is_empty():
+		sb.set_border_width_all(6 if evo_prog["ready"] else 4)
+		sb.border_color = Color("c04dff") if evo_prog["ready"] else Color("6f3f8f")
+		w.modulate = Color.WHITE if affordable else Color(0.62, 0.62, 0.7, 1.0)
+	else:
+		sb.set_border_width_all(3)
 	var hex: UI.HexFrame = w.get_node("Hex")
 	var shaped := UI.is_shaped(card)
 	hex.visible = shaped
@@ -412,7 +425,7 @@ func _fill_card(w: Control, card: Dictionary, affordable: bool = true) -> void:
 		# legendary / champion / hero cards use the hexagon frame (art is drawn into the polygon)
 		sb.bg_color = Color(0, 0, 0, 0)
 		sb.border_color = Color(0, 0, 0, 0)
-		hex.col = rc
+		hex.col = Color("c04dff") if (not evo_prog.is_empty() and evo_prog["ready"]) else rc
 		hex.tex = art
 		hex.queue_redraw()
 	else:
