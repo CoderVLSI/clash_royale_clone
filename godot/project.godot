@@ -13,6 +13,8 @@ config/icon="res://assets/icon_192.png"
 
 window/size/viewport_width=390
 window/size/viewport_height=844
+window/size/window_width_override=468
+window/size/window_height_override=1014
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 window/handheld/orientation=1
