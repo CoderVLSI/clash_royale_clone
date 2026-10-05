@@ -58,6 +58,9 @@ func start(player_deck_ids: Array = DEFAULT_DECK, player_tower: String = "prince
 			shot_path = a.substr(7)
 		elif a.begins_with("--shot-time="):
 			shot_time = float(a.substr(12))
+		elif a == "--force-over":
+			sim.score = [2, 1]
+			sim.game_over = "VICTORY"
 		elif a.begins_with("--speed="):
 			speed = float(a.substr(8))
 		elif a.begins_with("--deck="):
@@ -301,14 +304,9 @@ func _build_hud() -> void:
 	# game over
 	over_panel = PanelContainer.new()
 	over_panel.visible = false
-	over_panel.set_anchors_preset(Control.PRESET_CENTER)
-	over_panel.custom_minimum_size = Vector2(300, 220)
-	over_panel.position = Vector2(45, 260)
+	over_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var osb := StyleBoxFlat.new()
-	osb.bg_color = Color(0.08, 0.1, 0.2, 0.96)
-	osb.set_corner_radius_all(24)
-	osb.border_color = Color("f5c518")
-	osb.set_border_width_all(4)
+	osb.bg_color = Color(0, 0, 0, 0.8)
 	over_panel.add_theme_stylebox_override("panel", osb)
 	root.add_child(over_panel)
 
@@ -466,7 +464,7 @@ func _process(delta: float) -> void:
 	_update_camera(delta)
 	if sim.game_over != "" and not over_panel.visible:
 		_show_game_over()
-	if shot_path != "" and not shot_taken and shot_time >= 0.0 and sim.now / 1000.0 >= shot_time:
+	if shot_path != "" and not shot_taken and shot_time >= 0.0 and (sim.now / 1000.0 >= shot_time or over_panel.visible):
 		_take_screenshot()
 
 func _scan_alerts() -> void:
@@ -547,30 +545,94 @@ func _update_camera(delta: float) -> void:
 	else:
 		cam.transform = cam_base
 
+func _crown_row(count: int, bg: Color, border: Color) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 10)
+	for i in 3:
+		var slot := UI.panel(bg, 20, border, 2)
+		slot.custom_minimum_size = Vector2(60, 40)
+		if count >= i + 1:
+			var ic := UI.icon("crown", Color("ffd34d"), Vector2(30, 30))
+			ic.position = Vector2(15, 5)
+			slot.add_child(ic)
+		row.add_child(slot)
+	return row
+
+func _name_plate(who: String, bg: Color, border: Color) -> Control:
+	var p := UI.panel(bg, 5, border, 2)
+	p.custom_minimum_size = Vector2(340, 62)
+	var v := VBoxContainer.new()
+	v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	v.alignment = BoxContainer.ALIGNMENT_CENTER
+	var n := _label(who, 20, Color.WHITE, 2)
+	n.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	var sub := _label("Maestro" if who == "YOU" else "Training Camp", 12, Color(1, 1, 1, 0.8), 0)
+	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(n)
+	v.add_child(sub)
+	p.add_child(v)
+	return p
+
+## Layout follows App.js GameOverScreen: winner block (red), VS, loser block (blue), reward, OK.
 func _show_game_over() -> void:
 	Sfx.stop_music()
-	Sfx.play("victory" if sim.game_over == "VICTORY" else "defeat")
+	var res: String = sim.game_over
+	var victory := res == "VICTORY"
+	Sfx.play("victory" if victory else "defeat")
 	over_panel.visible = true
 	for c in over_panel.get_children():
 		c.queue_free()
 	var box := VBoxContainer.new()
+	box.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	box.alignment = BoxContainer.ALIGNMENT_CENTER
-	box.add_theme_constant_override("separation", 14)
+	box.add_theme_constant_override("separation", 6)
 	over_panel.add_child(box)
-	var res: String = sim.game_over
-	var col: Color = {"VICTORY": Color("6bff9a"), "DEFEAT": Color("ff6b6b"), "DRAW": Color("ffe08a")}.get(res, Color.WHITE)
-	var title := _label(res, 44, col)
+	var title := _label("WINNER!" if victory else "DEFEAT", 48, Color.WHITE, 10)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(title)
-	var sc := _label("%d  -  %d" % [sim.score[0], sim.score[1]], 32, Color.WHITE)
-	sc.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(sc)
-	var btn := Button.new()
-	btn.text = "Back to lobby"
-	btn.custom_minimum_size = Vector2(200, 54)
-	btn.add_theme_font_size_override("font_size", 22)
-	btn.pressed.connect(func(): finished.emit(res))
-	box.add_child(btn)
+	var pc: int = sim.score[0]
+	var oc: int = sim.score[1]
+	var top_who := "YOU" if victory else "OPPONENT"
+	var bot_who := "OPPONENT" if victory else "YOU"
+	var win_row := _crown_row(pc if victory else oc, Color("c0392b"), Color("e74c3c"))
+	box.add_child(win_row)
+	var plate1 := _name_plate(top_who, Color("e74c3c"), Color("c0392b"))
+	plate1.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	box.add_child(plate1)
+	var vs := _label("VS", 24, Color.WHITE, 4)
+	vs.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(vs)
+	var plate2 := _name_plate(bot_who, Color("3498db"), Color("2980b9"))
+	plate2.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	box.add_child(plate2)
+	box.add_child(_crown_row(oc if victory else pc, Color("2980b9"), Color("3498db")))
+	if victory:
+		var rw := UI.panel(Color("f1c40f"), 10, Color("f39c12"), 3)
+		rw.custom_minimum_size = Vector2(240, 84)
+		rw.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		var rv := VBoxContainer.new()
+		rv.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		rv.alignment = BoxContainer.ALIGNMENT_CENTER
+		var rl := _label("REWARD", 14, Color("8e44ad"), 0)
+		rl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		rv.add_child(rl)
+		var rr := HBoxContainer.new()
+		rr.alignment = BoxContainer.ALIGNMENT_CENTER
+		rr.add_child(UI.icon("trophy", Color("8e44ad"), Vector2(28, 30)))
+		rr.add_child(_label(" +30", 26, Color.BLACK, 0))
+		rv.add_child(rr)
+		rw.add_child(rv)
+		var gap := Control.new()
+		gap.custom_minimum_size = Vector2(0, 24)
+		box.add_child(gap)
+		box.add_child(rw)
+	var ok := UI.button("OK", Color("2ecc71"), func(): finished.emit(res), Vector2(200, 56), 22)
+	ok.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	var gap2 := Control.new()
+	gap2.custom_minimum_size = Vector2(0, 20)
+	box.add_child(gap2)
+	box.add_child(ok)
 
 func _take_screenshot() -> void:
 	shot_taken = true
