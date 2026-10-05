@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/evolved_furnace.jpg-530470254fa5092831d9d19dc
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.6
+compress/lossy_quality=0.4
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0

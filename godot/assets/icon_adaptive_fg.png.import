@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/icon_adaptive_fg.png-7b8b6c3431d7ae1bc9499ba7
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.5
+compress/lossy_quality=0.42
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0

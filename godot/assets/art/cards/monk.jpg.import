@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/monk.jpg-35e8f114c98bf4e9f1d3bb8f5ffe268e.cte
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.6
+compress/lossy_quality=0.4
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0

@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/cannon_cart.jpg-99f1cf3a1e407fa259f1af44d78eb
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.6
+compress/lossy_quality=0.4
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0

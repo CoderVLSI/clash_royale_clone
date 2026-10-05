@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/evolved_zap.jpg-72f1a9dd524c3a8472475b159f2ee
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.6
+compress/lossy_quality=0.4
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0

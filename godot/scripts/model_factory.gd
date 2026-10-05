@@ -111,7 +111,15 @@ static func card_scale(cid: String) -> float:
 			var d = JSON.parse_string(f.get_as_text())
 			if d is Dictionary:
 				_batch2 = d
-	return float(_batch2.get(cid, 1.6))
+	if _batch2.has(cid):
+		return float(_batch2[cid])
+	if cid.begins_with("evolved_"):
+		# evolved models are baked 1.1x bigger than their base; use the base card's scale
+		var b := CardArt.base_id({"id": cid})
+		if MODEL_ALIAS.has(b):
+			b = str(MODEL_ALIAS[b][0])
+		return card_scale(b)
+	return 1.6
 
 static func card_model(card_id: String, team: Color) -> Node3D:
 	## Unique Blender model matched to the card's generated portrait (assets/models/cards/<id>.glb).
