@@ -520,23 +520,29 @@ func _card_info_text(c: Dictionary) -> String:
 			lines.append("%s: %s" % [k[1], str(c[k[0]])])
 	return "\n".join(lines)
 
+func _open_card_detail(c: Dictionary, swap_idx: int = -1) -> void:
+	var d := CardDetail.new()
+	d.setup(c, c["id"] in save.current_deck_ids())
+	modal_layer.mouse_filter = Control.MOUSE_FILTER_PASS
+	modal_layer.add_child(d)
+	var shut := func():
+		if is_instance_valid(d):
+			d.queue_free()
+		modal_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	d.closed.connect(shut)
+	d.use_pressed.connect(func():
+		shut.call()
+		if swap_idx >= 0:
+			_open_slot_swap(swap_idx)
+		else:
+			_open_add_to_slot(c))
+
 func _deck_card_tap(idx: int) -> void:
 	var c: Dictionary = _deck_cards()[idx]
-	var m := _modal("%s  (%d)" % [c["name"], int(c["cost"])])
-	m["body"].add_child(UI.label(_card_info_text(c), 15, Color("e8eefc"), 3))
-	var row := UI.hbox(8)
-	row.add_child(UI.button("Swap card", Color("2e86de"), func(): _close_modal(m); _open_slot_swap(idx), Vector2(120, 42), 15))
-	row.add_child(UI.button("Close", Color("7f8c8d"), func(): _close_modal(m), Vector2(100, 42), 15))
-	m["body"].add_child(row)
+	_open_card_detail(c, idx)
 
 func _collection_card_tap(c: Dictionary) -> void:
-	var m := _modal("%s  (%d)" % [c["name"], int(c["cost"])])
-	m["body"].add_child(UI.label(_card_info_text(c), 15, Color("e8eefc"), 3))
-	var row := UI.hbox(8)
-	if not (c["id"] in save.current_deck_ids()):
-		row.add_child(UI.button("Add to deck", Color("27ae60"), func(): _close_modal(m); _open_add_to_slot(c), Vector2(130, 42), 15))
-	row.add_child(UI.button("Close", Color("7f8c8d"), func(): _close_modal(m), Vector2(100, 42), 15))
-	m["body"].add_child(row)
+	_open_card_detail(c)
 
 func _open_add_to_slot(card: Dictionary) -> void:
 	var m := _modal("Replace which card with %s?" % card["name"])
@@ -789,7 +795,6 @@ func _modal(title: String) -> Dictionary:
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	dim.mouse_filter = Control.MOUSE_FILTER_STOP
 	modal_layer.add_child(dim)
-	modal_layer.mouse_filter = Control.MOUSE_FILTER_PASS
 	var pc := PanelContainer.new()
 	pc.add_theme_stylebox_override("panel", UI.style(Color("1d2b4a"), 20, Color("f5c518"), 3))
 	pc.set_anchors_preset(Control.PRESET_CENTER)
@@ -808,6 +813,8 @@ func _modal(title: String) -> Dictionary:
 func _close_modal(m: Dictionary) -> void:
 	if is_instance_valid(m["dim"]):
 		m["dim"].queue_free()
+	# the layer must not swallow taps once no modal is open (it used to block the nav bar)
+	modal_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 func _toast(msg: String) -> void:
 	var l := UI.label(msg, 16)

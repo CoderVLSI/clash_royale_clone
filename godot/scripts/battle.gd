@@ -332,6 +332,12 @@ func _card_widget(size: Vector2) -> Control:
 	sb.set_border_width_all(3)
 	sb.border_color = Color("7f8c8d")
 	p.add_theme_stylebox_override("panel", sb)
+	var hex := UI.HexFrame.new()
+	hex.name = "Hex"
+	hex.size = size
+	hex.visible = false
+	hex.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	p.add_child(hex)
 	var art := TextureRect.new()
 	art.name = "Icon"
 	art.position = Vector2(3, 3)
@@ -383,7 +389,21 @@ func _fill_card(w: Control, card: Dictionary, affordable: bool = true) -> void:
 	sb.bg_color = Color(card["color"]).darkened(0.55).lerp(Color("2b3550"), 0.5)
 	var art := CardArt.texture(card)
 	var ic: TextureRect = w.get_node("Icon")
-	if art != null:
+	var hex: UI.HexFrame = w.get_node("Hex")
+	var shaped := UI.is_shaped(card)
+	hex.visible = shaped
+	if shaped:
+		# legendary / champion / hero cards use the hexagon frame (art is drawn into the polygon)
+		sb.bg_color = Color(0, 0, 0, 0)
+		sb.border_color = Color(0, 0, 0, 0)
+		hex.col = rc
+		hex.tex = art
+		hex.queue_redraw()
+	else:
+		sb.bg_color = Color(card["color"]).darkened(0.55).lerp(Color("2b3550"), 0.5)
+	if art != null and shaped:
+		ic.texture = null
+	elif art != null:
 		ic.texture = art
 		ic.position = Vector2(3, 3)
 		ic.size = w.size - Vector2(6, 6)

@@ -125,29 +125,75 @@ static func icon(kind: String, color: Color, size: Vector2 = Vector2(24, 24)) ->
 	i.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return i
 
+# --- shaped (hexagon / shield) frame for legendary, champion and hero cards ---------------
+class HexFrame extends Control:
+	var col := Color("f1c40f")
+	var tex: Texture2D
+	var dark := Color("2a2f45")
+	static func shape(sz: Vector2, inset: float) -> PackedVector2Array:
+		var w := sz.x
+		var h := sz.y
+		var i := inset
+		return PackedVector2Array([Vector2(i, h * 0.15 + i * 0.5), Vector2(w * 0.5, i), Vector2(w - i, h * 0.15 + i * 0.5),
+			Vector2(w - i, h * 0.9 - i * 0.3), Vector2(w * 0.88 - i * 0.3, h - i), Vector2(w * 0.12 + i * 0.3, h - i), Vector2(i, h * 0.9 - i * 0.3)])
+	func _draw() -> void:
+		draw_colored_polygon(shape(size, 0.0), col)
+		var inner := shape(size, 3.5)
+		if tex != null:
+			var ts := tex.get_size()
+			var box := Rect2(Vector2(3, 3), size - Vector2(6, 6))
+			var sc := maxf(box.size.x / ts.x, box.size.y / ts.y)
+			var crop := box.size / sc
+			var off := (ts - crop) * 0.5
+			var uvs := PackedVector2Array()
+			for pt in inner:
+				uvs.append((off + (pt - box.position) / sc) / ts)
+			draw_colored_polygon(inner, Color.WHITE, uvs, tex)
+		else:
+			draw_colored_polygon(inner, dark)
+		# gem on the top apex
+		var c := Vector2(size.x * 0.5, 1.0)
+		draw_colored_polygon(PackedVector2Array([c + Vector2(0, -3), c + Vector2(7, 4), c + Vector2(0, 11), c + Vector2(-7, 4)]), col.lightened(0.35))
+		draw_polyline(PackedVector2Array([c + Vector2(0, -3), c + Vector2(7, 4), c + Vector2(0, 11), c + Vector2(-7, 4), c + Vector2(0, -3)]), col.darkened(0.45), 1.5)
+
+static func is_shaped(card: Dictionary) -> bool:
+	return str(card.get("rarity", "common")) in ["legendary", "champion", "hero"]
+
 # --- card widgets ------------------------------------------------------------------------
 static func card_widget(card: Dictionary, size: Vector2 = Vector2(72, 92), dim: bool = false) -> Control:
 	var p := Panel.new()
 	p.custom_minimum_size = size
 	p.size = size
-	p.add_theme_stylebox_override("panel", style(Color("353b52"), 10, rarity_color(str(card.get("rarity", "common"))), 3))
+	var shaped := is_shaped(card)
 	var art := CardArt.texture(card)
+	if shaped:
+		p.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+		var hf := HexFrame.new()
+		hf.col = Color(rarity_color(str(card.get("rarity", "common"))))
+		hf.tex = art
+		hf.size = size
+		hf.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		p.add_child(hf)
+	else:
+		p.add_theme_stylebox_override("panel", style(Color("353b52"), 10, rarity_color(str(card.get("rarity", "common"))), 3))
 	if art != null:
-		var tr := TextureRect.new()
-		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-		tr.texture = art
-		tr.position = Vector2(3, 3)
-		tr.size = size - Vector2(6, 6)
-		tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		p.add_child(tr)
+		if not shaped:
+			var tr := TextureRect.new()
+			tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+			tr.texture = art
+			tr.position = Vector2(3, 3)
+			tr.size = size - Vector2(6, 6)
+			tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			p.add_child(tr)
 		var shade := ColorRect.new()
 		shade.color = Color(0, 0, 0, 0.45)
-		shade.position = Vector2(3, size.y - 28)
-		shade.size = Vector2(size.x - 6, 25)
+		var sh_in := 10.0 if shaped else 3.0
+		shade.position = Vector2(sh_in, size.y - 28 - (3.0 if shaped else 0.0))
+		shade.size = Vector2(size.x - sh_in * 2.0, 25)
 		shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		p.add_child(shade)
-		if card.get("evolution", false) or card.get("rarity", "") == "hero":
+		if (card.get("evolution", false) or card.get("rarity", "") == "hero") and not shaped:
 			var tint := ColorRect.new()
 			tint.color = Color(Color(str(card.get("evolutionAuraColor", "#00bcd4"))), 0.22)
 			tint.position = Vector2(3, 3)
