@@ -28,7 +28,7 @@ func _init() -> void:
 		var c := CardDB.get_card(id)
 		var u := sim.make_unit(c, 0, 0, false, "LEFT")
 		var m := ModelFactory.build_unit(u)
-		m.position = Vector3((n % 4) * 4.6 - 6.9, 0, (n / 4) * 5.0 - 5.0)
+		m.position = Vector3((n % 3) * 5.4 - 5.4, 0, (n / 3) * 5.6 - 3.0)
 		m.rotation.y = PI + 0.3
 		root.add_child(m)
 		n += 1

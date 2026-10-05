@@ -87,8 +87,8 @@ static func glb(name: String, tint: Color, team: Color) -> Node3D:
 	_recolor(root, tint, team)
 	return root
 
-const CARD_SCALE := {"elixir_golem": 0.8, "golem": 0.78, "ice_golem": 0.85, "magic_archer": 0.9, "pekka": 1.1, "hog_rider": 1.25, "ice_spirit": 1.2,
-	"inferno_tower": 1.0, "tesla": 1.0, "tombstone": 1.0, "royal_ghost": 1.4, "battle_ram": 1.2}
+const CARD_SCALE := {"elixir_golem": 0.8, "golem": 0.78, "ice_golem": 0.85, "magic_archer": 0.9, "pekka": 1.1, "hog_rider": 1.0, "ice_spirit": 1.15,
+	"inferno_tower": 1.0, "tesla": 1.0, "tombstone": 1.0, "royal_ghost": 1.4, "battle_ram": 1.0}
 
 static func card_model(card_id: String, team: Color) -> Node3D:
 	## Unique Blender model matched to the card's generated portrait (assets/models/cards/<id>.glb).

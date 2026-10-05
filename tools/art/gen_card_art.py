@@ -13,7 +13,11 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 CARDS = os.path.join(ROOT, 'godot', 'data', 'cards.json')
 OUT = os.path.join(ROOT, 'godot', 'assets', 'art', 'cards')
 RAW = '/tmp/art_raw'
-MODEL = os.environ.get('ART_MODEL', 'google/gemini-3.1-flash-image')
+MODEL = os.environ.get('ART_MODEL', 'google/gemini-3.1-flash-lite-image')   # cheapest decent model (~$0.034/image)
+sys.path.insert(0, os.path.dirname(__file__))
+from card_descriptions import DESC
+EST_COST = 0.04          # per image incl. margin
+MIN_BALANCE_FLOOR = 1.0  # OpenRouter refuses image output below this balance
 BG = {'common': 'cool steel-blue and teal', 'rare': 'warm orange and amber', 'epic': 'deep purple and magenta',
       'legendary': 'shimmering emerald green and gold', 'champion': 'radiant golden', 'hero': 'cyan and electric blue'}
 DEFAULT_DECK_IDS = ['mother_witch', 'elixir_golem', 'ice_golem', 'ice_spirit', 'skeletons', 'fireball', 'zap', 'hog_rider',
@@ -22,16 +26,15 @@ DEFAULT_DECK_IDS = ['mother_witch', 'elixir_golem', 'ice_golem', 'ice_spirit', '
                     'mega_minion', 'lightning', 'elite_barbarians', 'mini_pekka', 'giant', 'prince', 'archers', 'spear_goblins', 'minions', 'valkyrie']
 
 def prompt_for(c):
-    name = c['name']
-    kind = {'spell': 'a magical spell effect illustration (no character, show the spell itself erupting)',
-            'building': 'a defensive structure/building in an arena, seen at a slight angle',
-            'flying': 'a flying creature or unit in mid-air', 'ground': 'a character or creature'}.get(c['type'], 'a character')
-    if c.get('count', 1) > 1 and c['type'] != 'spell':
-        kind += f", shown as a small group of {c['count']}" if c['count'] <= 4 else ', shown as a big swarm'
-    return (f"Stylized glossy 3D-cartoon mobile strategy game card illustration of \"{name}\" - {kind}. "
+    desc = DESC.get(c['id']) or c['name']
+    return (f"Stylized glossy 3D-cartoon mobile strategy game card illustration. Subject: {desc}. "
             f"Vertical 3:4 portrait, subject large and centered with a dynamic pose, rich saturated colors, thick clean outlines, "
             f"dramatic rim lighting, softly blurred fantasy arena background in {BG.get(c.get('rarity','common'))} tones. "
-            f"No text, no letters, no numbers, no border, no frame, no watermark.")
+            f"Keep the subject EXACTLY as described. No text, no letters, no numbers, no border, no frame, no watermark.")
+
+def balance():
+    d = json.load(urllib.request.urlopen(urllib.request.Request("https://openrouter.ai/api/v1/credits", headers={"Authorization": "Bearer " + os.environ['OPENROUTER_API_KEY']}), timeout=20))['data']
+    return d['total_credits'] - d['total_usage']
 
 spent = 0.0
 lock = threading.Lock()
@@ -83,15 +86,26 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--max-spend', type=float, default=10.0)
     ap.add_argument('--only', default='')
-    ap.add_argument('--workers', type=int, default=4)
+    ap.add_argument('--workers', type=int, default=1)
+    ap.add_argument('--dry-run', action='store_true')
     a = ap.parse_args()
     key = os.environ['OPENROUTER_API_KEY']
     os.makedirs(OUT, exist_ok=True); os.makedirs(RAW, exist_ok=True)
     cards = [c for c in json.load(open(CARDS)) if not c.get('isToken')]
+    seen = set(); cards = [c for c in cards if not (c['id'] in seen or seen.add(c['id']))]
     if a.only:
         want = a.only.split(','); cards = [c for c in cards if c['id'] in want]
     order = {cid: i for i, cid in enumerate(DEFAULT_DECK_IDS)}
     cards.sort(key=lambda c: order.get(c['id'], 999))
+    todo = [c for c in cards if not os.path.exists(os.path.join(OUT, c['id'] + '.jpg'))]
+    need = len(todo) * EST_COST
+    bal = balance()
+    print(f"{len(todo)} cards to generate, est. ${need:.2f}, balance ${bal:.2f} (model {MODEL})")
+    if a.dry_run:
+        return
+    if bal < MIN_BALANCE_FLOOR + 0.05 or bal - MIN_BALANCE_FLOOR < min(need, a.max_spend):
+        print(f"Refusing to start: need balance >= ${MIN_BALANCE_FLOOR + min(need, a.max_spend):.2f} (OpenRouter's image floor is ${MIN_BALANCE_FLOOR:.2f}). Top up and re-run.")
+        return
     ok = fail = 0
     with ThreadPoolExecutor(a.workers) as ex:
         futs = [ex.submit(process, c, key, a.max_spend) for c in cards]

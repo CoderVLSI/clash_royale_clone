@@ -48,3 +48,10 @@ the 2D sprites were replaced with 3D models authored in Blender.
 * `tools/blender/make_ui_art.py` renders the 12 UI icons (coin, gem, trophy, crown, chest, drop, tab icons, chat) and the
   castle for the lobby background; `tools/art/compose_lobby_bg.py` composites it over a painted dusk sky.
   (OpenRouter refuses image output below a $1 balance, so these were rendered in Blender instead of generated.)
+
+## Card art prompts (lesson learned)
+Early portraits were generated from only the card name + type, so the model guessed (Hog Rider became a boar-man, Ice
+Spirit a monster). `tools/art/card_descriptions.py` now holds an accurate visual description for every card, and
+`gen_card_art.py` uses it, defaults to the cheapest model, generates sequentially, and refuses to run unless the
+OpenRouter balance clears the $1 image floor plus the planned spend. The wrong portraits (Hog Rider, Ice Spirit,
+Battle Ram, Magic Archer, Princess) were removed; those cards use their corrected 3D models until regenerated.
