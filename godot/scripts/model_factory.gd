@@ -303,8 +303,8 @@ static func build_unit(u: Dictionary) -> Node3D:
 	else:
 		_build_walker(model, u, col, s, opp, proj)
 	# evolution / hero aura
-	if Sim._v(u, "evolution", false):
-		var aura := Color(str(Sim._v(u, "evolutionAuraColor", "#b66cff")))
+	if Sim._v(u, "evolution", false) or str(Sim._v(u, "rarity", "")) == "hero":
+		var aura := Color(str(Sim._v(u, "evolutionAuraColor", "#00d4ff" if str(Sim._v(u, "rarity", "")) == "hero" else "#b66cff")))
 		var halo := cyl(base_r * 1.5, base_r * 1.5, 0.05, Color(aura, 0.55), Vector3(0, 0.06, 0), 20)
 		halo.material_override = mat(Color(aura, 0.55), 0.5, 1.2)
 		root.add_child(halo)

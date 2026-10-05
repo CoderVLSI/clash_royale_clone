@@ -45,9 +45,12 @@ func _show_lobby() -> void:
 	var shot := ""
 	var detail := ""
 	var detail_page := 0
+	var detail_mode := ""
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--detail="):
 			detail = a.substr(9)
+		if a.begins_with("--detail-mode="):
+			detail_mode = a.substr(14)
 		if a.begins_with("--detail-page="):
 			detail_page = int(a.substr(14))
 		if a.begins_with("--tab="):
@@ -62,6 +65,8 @@ func _show_lobby() -> void:
 		lobby._show_tab(1)
 		lobby._open_card_detail(CardDB.get_card(detail))
 		var cd := lobby.modal_layer.get_child(lobby.modal_layer.get_child_count() - 1) as CardDetail
+		if detail_mode != "":
+			cd._switch_mode(detail_mode)
 		cd._show_page(detail_page)
 	if shot != "":
 		await get_tree().create_timer(2.5 if detail != "" else 1.2).timeout

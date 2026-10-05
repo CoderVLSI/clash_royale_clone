@@ -530,12 +530,32 @@ func _open_card_detail(c: Dictionary, swap_idx: int = -1) -> void:
 			d.queue_free()
 		modal_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	d.closed.connect(shut)
-	d.use_pressed.connect(func():
+	d.use_pressed.connect(func(mode: String):
 		shut.call()
-		if swap_idx >= 0:
+		if mode != "card":
+			_use_variant(c, mode)
+		elif swap_idx >= 0:
 			_open_slot_swap(swap_idx)
 		else:
 			_open_add_to_slot(c))
+
+func _use_variant(c: Dictionary, mode: String) -> void:
+	if not (c["id"] in save.current_deck_ids()):
+		_toast("Add %s to your deck first" % c["name"])
+		return
+	if mode == "evo":
+		var slots: Array = save.evo_slots[save.selected_deck]
+		if c["id"] in slots:
+			_toast("%s already has an evolution slot" % c["name"])
+			return
+		var free := slots.find("")
+		slots[free if free >= 0 else 0] = c["id"]
+		_toast("%s evolution slotted" % c["name"])
+	else:
+		save.hero_slots[save.selected_deck] = c["id"]
+		_toast("%s hero slotted" % c["name"])
+	save.save_file()
+	_show_tab(1)
 
 func _deck_card_tap(idx: int) -> void:
 	var c: Dictionary = _deck_cards()[idx]

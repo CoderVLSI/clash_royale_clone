@@ -4,7 +4,7 @@ extends Control
 ## rarity/type chips and three swipeable pages (battlefield preview / stats / description).
 
 signal closed
-signal use_pressed
+signal use_pressed(mode: String)
 
 const PAGES := 3
 var card: Dictionary
@@ -21,14 +21,63 @@ var dots: Array = []
 var drag_start := -1.0
 var use_btn: Button
 var sim_stub: Sim
+var base: Dictionary
+var mode := "card"   # card | evo | hero  (tabs along the bottom, like the real game)
+var tab_bar: Control
 
 func setup(c: Dictionary, deck_has: bool) -> void:
 	card = c
+	base = c
 	in_deck = deck_has
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	sim_stub = CardIcons.inst.placeholder_sim if CardIcons.inst != null else null
 	_build()
+	_build_tabs()
+
+func _variant(m: String) -> Dictionary:
+	if m == "evo" and base.get("evolvesTo") != null:
+		return CardDB.get_card(str(base["evolvesTo"]))
+	if m == "hero" and base.get("heroVariantId") != null:
+		return CardDB.get_card(str(base["heroVariantId"]))
+	return base
+
+func _switch_mode(m: String) -> void:
+	var v := _variant(m)
+	if v.is_empty() or m == mode:
+		return
+	mode = m
+	card = v
+	for c in get_children():
+		c.queue_free()
+	page_nodes = []
+	dots = []
+	stage_pivot = null
+	field_unit = null
+	page = 0
+	_build()
+	_build_tabs()
+
+func _build_tabs() -> void:
+	var has_evo := base.get("evolvesTo") != null
+	var has_hero := base.get("heroVariantId") != null
+	if not has_evo and not has_hero:
+		return
+	tab_bar = HBoxContainer.new()
+	(tab_bar as HBoxContainer).add_theme_constant_override("separation", 10)
+	tab_bar.position = Vector2(14, 804)
+	tab_bar.size = Vector2(362, 36)
+	var entries: Array = [["card", "Card", Color("2e86de")]]
+	if has_evo:
+		entries.append(["evo", "Evolution", Color("8e44ad")])
+	if has_hero:
+		entries.append(["hero", "Hero", Color("00a8b5")])
+	for e in entries:
+		var active: bool = e[0] == mode
+		var b := UI.button(str(e[1]), (e[2] as Color) if active else Color("34405f"), _switch_mode.bind(str(e[0])), Vector2(0, 36), 15)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		tab_bar.add_child(b)
+	add_child(tab_bar)
 
 # ---------------------------------------------------------------------------------------- build
 
@@ -131,6 +180,8 @@ func _build_stage() -> void:
 	stage_vp.add_child(stage_pivot)
 	var model := _build_model(3)
 	stage_pivot.add_child(model)
+	if mode != "card" or str(card.get("rarity", "")) == "hero":
+		_add_aura(stage_pivot)
 	var cam := Camera3D.new()
 	cam.fov = 32.0
 	stage_vp.add_child(cam)
@@ -145,8 +196,37 @@ func _build_stage() -> void:
 	# frame after the model has entered the tree so global AABBs are valid
 	call_deferred("_frame_stage", cam)
 
+func _add_aura(parent: Node3D) -> void:
+	## Glowing ring + orbiting sparks under evolution / hero models.
+	var col := Color(str(card.get("evolutionAuraColor", "#00d4ff" if mode == "hero" else "#b66cff")))
+	var ring := MeshInstance3D.new()
+	var tm := TorusMesh.new()
+	tm.inner_radius = 1.55
+	tm.outer_radius = 1.75
+	ring.mesh = tm
+	ring.position.y = 0.05
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = col
+	mat.emission_enabled = true
+	mat.emission = col
+	mat.emission_energy_multiplier = 2.0
+	ring.material_override = mat
+	parent.add_child(ring)
+	for i in 6:
+		var spark := MeshInstance3D.new()
+		var sm := SphereMesh.new()
+		sm.radius = 0.1
+		sm.height = 0.2
+		spark.mesh = sm
+		spark.material_override = mat
+		var a := TAU * i / 6.0
+		spark.position = Vector3(cos(a) * 1.65, 0.4 + (i % 3) * 0.9, sin(a) * 1.65)
+		parent.add_child(spark)
+
 func _frame_stage(cam: Camera3D) -> void:
 	await get_tree().process_frame
+	if not is_instance_valid(cam) or not is_instance_valid(stage_pivot) or cam.is_queued_for_deletion():
+		return
 	_frame_camera(cam, stage_pivot, deg_to_rad(12), 1.35)
 
 func _build_panel() -> void:
@@ -199,10 +279,12 @@ func _build_panel() -> void:
 		panel.add_child(d)
 		dots.append(d)
 	# buttons
-	use_btn = UI.button("In deck" if in_deck else "Use", Color("f5a623") if not in_deck else Color("6b7a99"), func(): use_pressed.emit(), Vector2(150, 54), 24)
+	var already := in_deck and mode == "card"
+	var use_text := "In deck" if already else ("Use" if mode == "card" else ("Evolve" if mode == "evo" else "Hero"))
+	use_btn = UI.button(use_text, Color("f5a623") if not already else Color("6b7a99"), func(): use_pressed.emit(mode), Vector2(150, 54), 24)
 	use_btn.position = Vector2(190, 436)
 	use_btn.size = Vector2(150, 54)
-	use_btn.disabled = in_deck
+	use_btn.disabled = already
 	panel.add_child(use_btn)
 	var cost_pill := UI.panel(Color("27ae60"), 12, Color("1e8449"), 2)
 	cost_pill.position = Vector2(22, 436)
