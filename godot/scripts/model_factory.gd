@@ -72,9 +72,85 @@ static func cone(r: float, h: float, color: Color, pos: Vector3 = Vector3.ZERO, 
 static func team_color(opp: bool) -> Color:
 	return TEAM_RED if opp else TEAM_BLUE
 
+# ----------------------------------------------------------------------------- Blender-authored GLB models
+# Authored by tools/blender/make_models.py (Blender MCP). Material slots named TINT / TEAM are recoloured here.
+static var _scenes: Dictionary = {}
+
+static func glb(name: String, tint: Color, team: Color) -> Node3D:
+	var path := "res://assets/models/%s.glb" % name
+	if not _scenes.has(name):
+		_scenes[name] = load(path) if ResourceLoader.exists(path) else null
+	var ps: PackedScene = _scenes[name]
+	if ps == null:
+		return null
+	var root := ps.instantiate() as Node3D
+	_recolor(root, tint, team)
+	return root
+
+static func _recolor(n: Node, tint: Color, team: Color) -> void:
+	if n is MeshInstance3D:
+		var mi := n as MeshInstance3D
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		for i in mi.mesh.get_surface_count():
+			var sm: Material = mi.mesh.surface_get_material(i)
+			var nm := sm.resource_name if sm != null else ""
+			if nm == "TINT":
+				mi.set_surface_override_material(i, mat(tint, 0.8))
+			elif nm == "TEAM":
+				mi.set_surface_override_material(i, mat(team, 0.7, 0.15))
+	for c in n.get_children():
+		_recolor(c, tint, team)
+
+static func archetype(u: Dictionary) -> String:
+	var id := str(u["spriteId"])
+	var typ := str(u["type"])
+	var hp := float(Sim._v(u, "hp", 300))
+	if typ == "building":
+		return "building"
+	if typ == "flying":
+		return "flyer"
+	if Sim._v(u, "kamikaze", false) and hp < 500.0 and float(Sim._v(u, "speed", 0)) >= 4.0 and "ram" not in id and "wall" not in id:
+		return "spirit"
+	for k in ["hog", "ram"]:
+		if id.contains(k):
+			return "beast"
+	if id.contains("skeleton") and hp < 700.0:
+		return "skeleton"
+	if id.contains("goblin") and hp < 1500.0:
+		return "goblin"
+	for k in ["musketeer", "hunter", "firecracker", "bomber", "cannon_cart", "sparky"]:
+		if id.contains(k):
+			return "gunner"
+	for k in ["wizard", "witch", "mage", "executioner", "prince"]:
+		if id.contains(k) and not id.contains("little") and not id.contains("dark"):
+			return "mage"
+	for k in ["archer", "dart", "princess", "queen", "ranger", "bandit"]:
+		if id.contains(k):
+			return "ranger"
+	if hp >= 2200.0:
+		return "brute"
+	return "warrior"
+
 # ----------------------------------------------------------------------------- towers
 
 static func build_tower(king: bool, opp: bool, sub: String = "princess") -> Node3D:
+	var model := glb("tower_king" if king else "tower_princess", Color("b9b2a4"), team_color(opp))
+	if model != null:
+		var holder := Node3D.new()
+		holder.add_child(model)
+		if opp:
+			model.rotation.y = PI          # cannon/face points toward the arena centre
+		if not king:
+			match sub:
+				"cannoneer":
+					var b := cyl(0.3, 0.3, 1.3, Color("2d2d2d"), Vector3(0, 4.0, 1.1 * (1.0 if opp else -1.0)), 10)
+					b.rotation.x = deg_to_rad(90)
+					holder.add_child(b)
+				"royal_chef":
+					holder.add_child(cyl(0.55, 0.5, 0.5, Color("f4f1ea"), Vector3(0, 5.9, 0), 10))
+				"dagger_duchess":
+					holder.add_child(box(Vector3(0.12, 0.9, 0.12), Color("cfd8dc"), Vector3(0.0, 4.4, 0.0), Vector3(deg_to_rad(20), 0, deg_to_rad(15))))
+		return holder
 	var root := Node3D.new()
 	var team := team_color(opp)
 	var stone := Color("b9b2a4")
@@ -133,11 +209,27 @@ static func build_unit(u: Dictionary) -> Node3D:
 	model.name = "Model"
 	root.add_child(model)
 	var base_r := 0.55 * s
+	var arch := archetype(u)
+	var glb_model := glb(arch, col, team)
 	# team ring on the ground
 	var ring := cyl(base_r * 1.15, base_r * 1.15, 0.04, team, Vector3(0, 0.03, 0), 16)
 	ring.material_override = mat(Color(team, 0.85), 0.9, 0.0)
 	root.add_child(ring)
-	if typ == "building":
+	if glb_model != null:
+		var gs := s
+		if arch == "brute":
+			gs = s * 0.75
+		elif arch == "building":
+			gs = maxf(s, 0.9)
+		elif arch == "flyer":
+			gs = s * 0.9
+			model.position.y = 2.2
+			var shadow := cyl(0.45 * s, 0.45 * s, 0.02, Color(0, 0, 0, 0.35), Vector3(0, -2.2 + 0.04, 0), 12)
+			shadow.material_override = mat(Color(0, 0, 0, 0.35), 1.0, 0.0, true)
+			model.add_child(shadow)
+		glb_model.scale = Vector3.ONE * gs * 1.2
+		model.add_child(glb_model)
+	elif typ == "building":
 		_build_building(model, u, col, s, opp)
 	elif typ == "flying":
 		_build_flyer(model, u, col, s, opp)
