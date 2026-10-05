@@ -271,6 +271,8 @@ func play_card(pi: int, hand_idx: int, x: float, y: float) -> bool:
 	if not opp and not can_deploy(card, x, y):
 		return false
 	var actual := mech.resolve_card(pi, card)
+	if actual.is_empty():
+		return false
 	var cost: float = actual["cost"]
 	if actual.get("dualForm", false):
 		cost = 6.0 if p["elixir"] >= 6.0 else 3.0
@@ -356,6 +358,8 @@ func _update_towers(dmg: Array) -> void:
 			continue
 		if t["stunUntil"] > now:
 			continue
+		if t["type"] == "king" and _king_asleep(t):
+			continue
 		if now - t["lastShot"] < t["fireRate"]:
 			continue
 		var target: Variant = null
@@ -391,6 +395,15 @@ func _update_towers(dmg: Array) -> void:
 			"splashRadius": t["splashRadius"], "attackerId": t["id"], "opp": t["opp"], "fromTower": true,
 		})
 		t["lastShot"] = now
+
+func _king_asleep(k: Dictionary) -> bool:
+	# The King only wakes once it is damaged or one of its princess towers has fallen.
+	if k["hp"] < k["maxHp"]:
+		return false
+	for t in towers:
+		if t["opp"] == k["opp"] and t["type"] == "princess" and t["hp"] <= 0:
+			return false
+	return true
 
 func _is_hidden(u: Dictionary) -> bool:
 	var h = u.get("hidden")
@@ -461,6 +474,8 @@ func _update_unit(u: Dictionary, dmg: Array, splash: Array) -> void:
 				units.append(s)
 				mech.on_spawn(s)
 	if u["stunUntil"] > now:
+		return
+	if (u["spriteId"] == "tesla" or u["spriteId"] == "evolved_tesla") and _is_hidden(u):
 		return
 	var actual_range: float = float(_v(u, "range", 0))
 	var actual_damage: float = float(_v(u, "damage", 0))
@@ -537,8 +552,18 @@ func _attack(u: Dictionary, target: Dictionary, base_damage: float, tdist: float
 			"id": _new_id(), "x": u["x"], "y": u["y"], "targetId": target["id"], "targetX": target["x"], "targetY": target["y"],
 			"speed": spd, "damage": damage, "type": ptype, "splash": _v(u, "splash", false), "splashRadius": float(_v(u, "splashRadius", 50)),
 			"slow": float(_v(u, "slow", 0)), "stun": float(_v(u, "stun", 0)), "attackerId": u["id"], "opp": u["opp"],
-			"knockback": float(_v(u, "projectileKnockback", 0)), "groundOnly": _v(u, "groundOnly", false),
+			"knockback": float(_v(u, "knockback", 0)), "groundOnly": _v(u, "groundOnly", false),
 		})
+		if _v(u, "pierce", false):
+			var pj: Dictionary = projectiles[projectiles.size() - 1]
+			var ang := atan2(target["y"] - u["y"], target["x"] - u["x"])
+			var travel: float = float(_v(u, "projectileTravelDistance", 200))
+			pj["pierce"] = true
+			pj["hitIds"] = {}
+			pj["targetId"] = -1
+			pj["targetX"] = u["x"] + cos(ang) * travel
+			pj["targetY"] = u["y"] + sin(ang) * travel
+			pj["splash"] = false
 		mech.on_ranged_attack(u, target, damage, projectiles[projectiles.size() - 1])
 	else:
 		# melee: apply to tower directly, to unit via queued event
@@ -664,8 +689,12 @@ func _update_projectiles(dmg: Array, splash: Array) -> void:
 		if tgt != null and tgt["hp"] > 0:
 			p["targetX"] = tgt["x"]
 			p["targetY"] = tgt["y"]
+		if p.get("pierce", false):
+			_pierce_hits(p, dmg)
 		var d := dist(p["x"], p["y"], p["targetX"], p["targetY"])
 		var spd: float = p["speed"]
+		if d <= spd and p.get("pierce", false):
+			continue
 		if d <= spd:
 			_projectile_hit(p, tgt, dmg, splash)
 			continue
@@ -674,6 +703,20 @@ func _update_projectiles(dmg: Array, splash: Array) -> void:
 		p["y"] += sin(a) * spd
 		keep.append(p)
 	projectiles = keep
+
+func _pierce_hits(p: Dictionary, dmg: Array) -> void:
+	for u in units:
+		if u["opp"] == p["opp"] or u["hp"] <= 0 or p["hitIds"].has(u["id"]) or _is_hidden(u):
+			continue
+		if dist(u["x"], u["y"], p["x"], p["y"]) <= 22.0:
+			p["hitIds"][u["id"]] = true
+			dmg.append({"id": u["id"], "dmg": p["damage"], "attacker": p.get("attackerId", -1), "knockback": p.get("knockback", 0.0),
+				"from_x": p["x"], "from_y": p["y"], "stun": p.get("stun", 0.0), "slow": p.get("slow", 0.0)})
+	for t in towers:
+		if t["opp"] != p["opp"] and t["hp"] > 0 and not p["hitIds"].has(t["id"]) and dist(t["x"], t["y"], p["x"], p["y"]) <= 30.0:
+			p["hitIds"][t["id"]] = true
+			t["hp"] -= p["damage"]
+			fx.append({"t": "hit", "x": t["x"], "y": t["y"], "dmg": p["damage"]})
 
 func _projectile_hit(p: Dictionary, tgt: Variant, dmg: Array, splash: Array) -> void:
 	if p.get("isSpell", false):
@@ -754,35 +797,33 @@ func _reap_dead() -> void:
 
 func _on_death(d: Dictionary) -> void:
 	var sid = d.get("deathSpawns")
-	if sid != null:
-		var sc := CardDB.get_card(str(sid))
+	if sid != null or d["spriteId"] == "tombstone":
+		var sc := CardDB.get_card(str(sid if sid != null else "skeletons"))
 		if not sc.is_empty():
-			var n := int(_v(d, "deathSpawnCount", 1))
+			var n := int(_v(d, "deathSpawnCount", 4))
 			for i in n:
 				var ang := (TAU * i) / maxf(1.0, n) + rng.randf() * 0.5
-				var s := make_unit(sc, clampf(d["x"] + cos(ang) * 14.0, 20.0, W - 20.0), clampf(d["y"] + sin(ang) * 14.0, 20.0, H - 20.0), d["opp"], d["lane"])
+				var dd := 15.0 + rng.randf() * 20.0
+				var s := make_unit(sc, clampf(d["x"] + cos(ang) * dd, 80.0, W - 80.0), clampf(d["y"] + sin(ang) * dd, 80.0, H - 80.0), d["opp"], d["lane"])
 				units.append(s)
 				mech.on_spawn(s)
-	var dd: float = float(_v(d, "deathDamage", 0))
-	if dd > 0.0:
-		var ev := {"x": d["x"], "y": d["y"], "r": float(_v(d, "deathRadius", 50)), "dmg": dd, "opp": d["opp"], "skip_id": -1,
+	var dmg_amt: float = float(_v(d, "deathDamage", 0))
+	if dmg_amt > 0.0 and float(_v(d, "deathBombDelay", 0)) <= 0.0:
+		var ev := {"x": d["x"], "y": d["y"], "r": float(_v(d, "deathRadius", 60)), "dmg": dmg_amt, "opp": d["opp"], "skip_id": -1,
 			"tower_factor": 1.0, "attacker": d["id"], "ground_only": false, "tower_hit": true}
+		if _v(d, "deathSlow", 0) != 0:
+			ev["slow"] = 0.35
+			ev["slowDuration"] = 2.0
 		var extra: Array = []
 		_apply_splash(ev, extra)
+		for e in extra:
+			if ev.has("slowDuration"):
+				e["slowDuration"] = ev["slowDuration"]
 		_apply_damage(extra)
 	mech.on_death(d)
 
 func _update_zones(dmg: Array, splash: Array) -> void:
-	var keep: Array = []
-	for z in zones:
-		if now >= z["end"]:
-			continue
-		if now - z["last"] >= z["interval"]:
-			z["last"] = now
-			splash.append({"x": z["x"], "y": z["y"], "r": z["r"], "dmg": z["dmg"], "opp": z["opp"], "skip_id": -1,
-				"tower_factor": SPELL_TOWER_FACTOR, "attacker": -1, "ground_only": false, "tower_hit": true, "slow": z.get("slow", 0.0)})
-		keep.append(z)
-	zones = keep
+	mech.update_zones(dmg, splash)
 
 # --------------------------------------------------------------------------- enemy AI (port of the App.js AI interval)
 
