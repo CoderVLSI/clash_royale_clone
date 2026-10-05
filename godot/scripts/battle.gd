@@ -124,13 +124,13 @@ func _build_intro() -> void:
 func _build_camera() -> void:
 	cam = Camera3D.new()
 	cam.keep_aspect = Camera3D.KEEP_WIDTH
-	cam.fov = 44.0
+	cam.fov = 38.0
 	cam.near = 0.5
 	cam.far = 200.0
 	add_child(cam)
-	var target := Vector3(0, 0, 4.2)
-	var pitch := deg_to_rad(62.0)
-	var dist := 36.0
+	var target := Vector3(0, 0, 2.4)
+	var pitch := deg_to_rad(74.0)
+	var dist := 33.5
 	cam.position = target + Vector3(0, sin(pitch) * dist, cos(pitch) * dist)
 	cam.look_at(target, Vector3.UP)
 	cam_base = cam.transform
@@ -138,98 +138,136 @@ func _build_camera() -> void:
 
 # ----------------------------------------------------------------------------- HUD
 
+var icons: CardIcons
+var enemy_crowns: Array = []
+var player_crowns: Array = []
+
 func _build_hud() -> void:
+	icons = CardIcons.new()
+	add_child(icons)
 	hud = CanvasLayer.new()
 	add_child(hud)
 	var root := Control.new()
 	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hud.add_child(root)
-	# top bar
-	var top := PanelContainer.new()
-	top.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	top.custom_minimum_size = Vector2(0, 56)
-	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(0.05, 0.1, 0.2, 0.72)
-	sb.corner_radius_bottom_left = 18
-	sb.corner_radius_bottom_right = 18
-	top.add_theme_stylebox_override("panel", sb)
-	root.add_child(top)
-	var row := HBoxContainer.new()
-	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	row.add_theme_constant_override("separation", 24)
-	top.add_child(row)
-	crowns_enemy = _label("0", 26, Color("ff6b6b"))
-	var crown_e := _label("♛", 26, Color("ff6b6b"))
-	timer_lbl = _label("3:00", 30, Color.WHITE)
-	var crown_p := _label("♛", 26, Color("6bb6ff"))
-	crowns_player = _label("0", 26, Color("6bb6ff"))
-	for n in [crowns_enemy, crown_e, timer_lbl, crown_p, crowns_player]:
-		row.add_child(n)
-	alert_lbl = _label("", 44, Color("ffe08a"))
-	alert_lbl.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	alert_lbl.position = Vector2(0, 90)
+	# opponent cluster (top-left): flag shield, name, clan, trophies
+	var flag := UI.panel(Color("e8ecf2"), 6, Color("8fa0b8"), 3)
+	flag.position = Vector2(8, 8)
+	flag.size = Vector2(40, 46)
+	flag.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var f2 := ColorRect.new()
+	f2.color = Color("2f5fc4")
+	f2.position = Vector2(3, 15)
+	f2.size = Vector2(34, 13)
+	flag.add_child(f2)
+	var f3 := ColorRect.new()
+	f3.color = Color("d9382c")
+	f3.position = Vector2(3, 28)
+	f3.size = Vector2(34, 15)
+	flag.add_child(f3)
+	root.add_child(flag)
+	var oname := _label("HEB", 21, Color("ff7aa8"))
+	oname.position = Vector2(56, 4)
+	root.add_child(oname)
+	var clan := _label("Training Camp", 14, Color("f1f1f1"))
+	clan.position = Vector2(56, 28)
+	root.add_child(clan)
+	var tro := UI.icon("trophy", Color("f5c518"), Vector2(22, 24))
+	tro.position = Vector2(10, 62)
+	root.add_child(tro)
+	var tr := _label("10366", 18, Color.WHITE)
+	tr.position = Vector2(36, 59)
+	root.add_child(tr)
+	# time panel (top-right)
+	var tp := UI.panel(Color(0.08, 0.08, 0.1, 0.78), 10, Color(0.25, 0.25, 0.3, 0.9), 2)
+	tp.position = Vector2(256, 8)
+	tp.size = Vector2(128, 62)
+	tp.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(tp)
+	var tl := _label("Time left:", 14, Color("f0e6a8"))
+	tl.position = Vector2(0, 2)
+	tl.size = Vector2(128, 20)
+	tl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	tp.add_child(tl)
+	timer_lbl = _label("3:00", 34, Color.WHITE)
+	timer_lbl.position = Vector2(0, 18)
+	timer_lbl.size = Vector2(128, 40)
+	timer_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	tp.add_child(timer_lbl)
+	# crown counters on the left edge (enemy crowns top, yours bottom)
+	enemy_crowns = _crown_column(root, 150, Color("e0413a"))
+	player_crowns = _crown_column(root, 470, Color("2f7de1"))
+	alert_lbl = _label("", 40, Color("ffe08a"))
+	alert_lbl.position = Vector2(0, 100)
 	alert_lbl.size = Vector2(390, 60)
 	alert_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	alert_lbl.anchor_left = 0.0
-	alert_lbl.anchor_right = 1.0
-	alert_lbl.offset_left = 0
-	alert_lbl.offset_right = 0
 	root.add_child(alert_lbl)
 	# bottom tray
-	var tray := Panel.new()
+	var tray := UI.panel(Color("1c4aa6"), 0, Color("3b78e0"), 4)
 	tray.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	tray.offset_top = -TRAY_H
 	tray.mouse_filter = Control.MOUSE_FILTER_STOP
-	var tsb := StyleBoxFlat.new()
-	tsb.bg_color = Color(0.1, 0.12, 0.2, 0.92)
-	tsb.corner_radius_top_left = 20
-	tsb.corner_radius_top_right = 20
-	tray.add_theme_stylebox_override("panel", tsb)
 	root.add_child(tray)
-	# elixir bar
-	var bar_bg := ColorRect.new()
-	bar_bg.color = Color(0.06, 0.04, 0.12)
-	bar_bg.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	bar_bg.offset_top = -30
-	bar_bg.offset_bottom = -8
-	bar_bg.offset_left = 14
-	bar_bg.offset_right = -14
-	root.add_child(bar_bg)
+	var tray_hi := ColorRect.new()
+	tray_hi.color = Color(0.45, 0.65, 1.0, 0.25)
+	tray_hi.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	tray_hi.offset_bottom = 34
+	tray_hi.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tray.add_child(tray_hi)
+	# chat button + Next card (left column)
+	var chat := UI.panel(Color("f4f4f6"), 18, Color("cfd3de"), 3)
+	chat.position = Vector2(12, 14)
+	chat.size = Vector2(56, 46)
+	chat.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for i in 3:
+		var dot := ColorRect.new()
+		dot.color = Color("2a2a30")
+		dot.position = Vector2(12 + i * 13, 20)
+		dot.size = Vector2(8, 8)
+		chat.add_child(dot)
+	tray.add_child(chat)
+	var nxt := _label("Next:", 15, Color.WHITE)
+	nxt.position = Vector2(14, 62)
+	tray.add_child(nxt)
+	next_panel = _card_widget(Vector2(48, 62))
+	next_panel.position = Vector2(16, 82)
+	tray.add_child(next_panel)
+	# hand: four portrait cards
+	for i in 4:
+		var w := _card_widget(Vector2(72, 94))
+		w.position = Vector2(80 + i * 76, 10)
+		w.gui_input.connect(_on_slot_input.bind(i))
+		tray.add_child(w)
+		slot_panels.append(w)
+	# elixir bar with the big number in a drop
+	var track := UI.panel(Color("2a1840"), 6, Color("120a22"), 2)
+	track.position = Vector2(104, TRAY_H - 34)
+	track.size = Vector2(278, 22)
+	track.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	tray.add_child(track)
 	elixir_fill = ColorRect.new()
-	elixir_fill.color = Color("c43bd9")
-	elixir_fill.size = Vector2(100, 22)
-	bar_bg.add_child(elixir_fill)
+	elixir_fill.color = Color("d23be0")
+	elixir_fill.position = Vector2(2, 2)
+	elixir_fill.size = Vector2(100, 18)
+	track.add_child(elixir_fill)
 	for i in range(1, 10):
 		var tick := ColorRect.new()
-		tick.color = Color(0, 0, 0, 0.45)
-		tick.position = Vector2(i * 36.2, 0)
-		tick.size = Vector2(2, 22)
-		bar_bg.add_child(tick)
-	elixir_lbl = _label("5", 18, Color.WHITE)
-	elixir_lbl.position = Vector2(6, -1)
-	bar_bg.add_child(elixir_lbl)
-	# hand
-	var hand_row := Control.new()
-	hand_row.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	hand_row.offset_top = -TRAY_H + 8
-	hand_row.offset_bottom = -34
-	hand_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.add_child(hand_row)
-	next_panel = _card_widget(Vector2(52, 68))
-	next_panel.position = Vector2(8, 20)
-	next_panel.modulate = Color(1, 1, 1, 0.75)
-	hand_row.add_child(next_panel)
-	var nxt := _label("NEXT", 10, Color("b0b8d0"))
-	nxt.position = Vector2(14, 2)
-	hand_row.add_child(nxt)
-	for i in 4:
-		var w := _card_widget(Vector2(70, 94))
-		w.position = Vector2(68 + i * 78, 8)
-		w.gui_input.connect(_on_slot_input.bind(i))
-		hand_row.add_child(w)
-		slot_panels.append(w)
+		tick.color = Color(0, 0, 0, 0.4)
+		tick.position = Vector2(2 + i * 27.4, 2)
+		tick.size = Vector2(2, 18)
+		track.add_child(tick)
+	var drop := UI.icon("drop", Color("e23bd6"), Vector2(40, 50))
+	drop.position = Vector2(82, TRAY_H - 56)
+	tray.add_child(drop)
+	elixir_lbl = _label("5", 24, Color.WHITE, 7)
+	elixir_lbl.position = Vector2(82, TRAY_H - 46)
+	elixir_lbl.size = Vector2(40, 36)
+	elixir_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	tray.add_child(elixir_lbl)
+	var mx := _label("Max: 10", 11, Color("f3d9ff"), 4)
+	mx.position = Vector2(80, TRAY_H - 18)
+	tray.add_child(mx)
 	ability_row = HBoxContainer.new()
 	ability_row.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	ability_row.offset_top = -TRAY_H - 52
@@ -239,7 +277,7 @@ func _build_hud() -> void:
 	ability_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(ability_row)
 	# ghost shown under the finger while dragging
-	ghost = _card_widget(Vector2(70, 94))
+	ghost = _card_widget(Vector2(72, 94))
 	ghost.visible = false
 	ghost.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(ghost)
@@ -257,66 +295,58 @@ func _build_hud() -> void:
 	over_panel.add_theme_stylebox_override("panel", osb)
 	root.add_child(over_panel)
 
-func _label(text: String, size: int, color: Color) -> Label:
-	var l := Label.new()
-	l.text = text
-	l.add_theme_font_size_override("font_size", size)
-	l.add_theme_color_override("font_color", color)
-	l.add_theme_color_override("font_outline_color", Color.BLACK)
-	l.add_theme_constant_override("outline_size", 6)
-	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	return l
+func _crown_column(root: Control, y: float, color: Color) -> Array:
+	var arr: Array = []
+	for i in 3:
+		var c := UI.icon("crown", Color(color, 0.25), Vector2(26, 22))
+		c.position = Vector2(6, y + i * 26)
+		root.add_child(c)
+		arr.append(c)
+	return arr
+
+func _label(text: String, size: int, color: Color, outline: int = 6) -> Label:
+	return UI.label(text, size, color, outline)
 
 func _card_widget(size: Vector2) -> Control:
 	var p := Panel.new()
 	p.custom_minimum_size = size
 	p.size = size
 	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color("3a3f55")
-	sb.set_corner_radius_all(10)
+	sb.bg_color = Color("2b3550")
+	sb.set_corner_radius_all(9)
 	sb.set_border_width_all(3)
 	sb.border_color = Color("7f8c8d")
 	p.add_theme_stylebox_override("panel", sb)
-	var name_l := _label("", 11, Color.WHITE)
-	name_l.name = "Name"
-	name_l.position = Vector2(2, size.y - 24)
-	name_l.size = Vector2(size.x - 4, 20)
-	name_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	p.add_child(name_l)
-	var swatch := ColorRect.new()
-	swatch.name = "Swatch"
-	swatch.position = Vector2(size.x * 0.2, size.y * 0.12)
-	swatch.size = Vector2(size.x * 0.6, size.y * 0.5)
-	swatch.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	p.add_child(swatch)
-	var cost := _label("", 16, Color.WHITE)
+	var art := TextureRect.new()
+	art.name = "Icon"
+	art.position = Vector2(3, 3)
+	art.size = size - Vector2(6, 14)
+	art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	p.add_child(art)
+	var tag := _label("", 11, Color("e0b3ff"))
+	tag.name = "EvoTag"
+	tag.position = Vector2(2, 2)
+	tag.size = Vector2(size.x - 4, 16)
+	tag.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	p.add_child(tag)
+	var cost_icon := UI.icon("drop", Color("d23be0"), Vector2(30, 34))
+	cost_icon.name = "CostIcon"
+	cost_icon.position = Vector2(size.x / 2.0 - 15, size.y - 22)
+	p.add_child(cost_icon)
+	var cost := _label("", 17, Color.WHITE, 6)
 	cost.name = "Cost"
-	cost.position = Vector2(-2, -4)
-	cost.size = Vector2(26, 26)
+	cost.position = Vector2(size.x / 2.0 - 15, size.y - 15)
+	cost.size = Vector2(30, 24)
 	cost.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	var cb := Panel.new()
-	cb.name = "CostBg"
-	cb.position = Vector2(-4, -6)
-	cb.size = Vector2(28, 28)
-	var csb := StyleBoxFlat.new()
-	csb.bg_color = Color("c43bd9")
-	csb.set_corner_radius_all(14)
-	csb.set_border_width_all(2)
-	csb.border_color = Color("f3c6ff")
-	cb.add_theme_stylebox_override("panel", csb)
-	cb.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	p.add_child(cb)
-	cb.add_child(cost)
-	cost.position = Vector2(0, 1)
+	p.add_child(cost)
 	return p
 
 func _evo_badge(w: Control, card: Dictionary) -> void:
 	var tag: Label = w.get_node_or_null("EvoTag")
 	if tag == null:
-		tag = _label("", 11, Color("e0b3ff"))
-		tag.name = "EvoTag"
-		tag.position = Vector2(34, 2)
-		w.add_child(tag)
+		return
 	var prog := sim.mech.evolution_progress(0, card)
 	if not prog.is_empty():
 		tag.text = "EVO!" if prog["ready"] else "%d/%d" % [prog["current"], prog["required"]]
@@ -332,12 +362,14 @@ func _fill_card(w: Control, card: Dictionary, affordable: bool = true) -> void:
 		w.visible = false
 		return
 	w.visible = true
-	w.get_node("Name").text = str(card["name"])
-	w.get_node("Swatch").color = Color(str(card["color"]))
-	w.get_node("CostBg/Cost").text = str(int(card["cost"]))
+	var rc := Color(str(RARITY_COLORS.get(str(card.get("rarity", "common")), "#7f8c8d")))
 	var sb: StyleBoxFlat = w.get_theme_stylebox("panel")
-	sb.border_color = Color(str(RARITY_COLORS.get(str(card.get("rarity", "common")), "#7f8c8d")))
-	w.modulate = Color.WHITE if affordable else Color(0.55, 0.55, 0.6, 1.0)
+	sb.border_color = rc
+	sb.bg_color = Color(card["color"]).darkened(0.55).lerp(Color("2b3550"), 0.5)
+	var tex := icons.texture(card)
+	w.get_node("Icon").texture = tex
+	w.get_node("Cost").text = str(int(card["cost"]))
+	w.modulate = Color.WHITE if affordable else Color(0.62, 0.62, 0.7, 1.0)
 
 const RARITY_COLORS := {"common": "#7f8c8d", "rare": "#f39c12", "epic": "#9b59b6", "legendary": "#2ecc71", "champion": "#f1c40f", "hero": "#00bcd4"}
 
@@ -426,12 +458,15 @@ func _update_hud() -> void:
 	else:
 		timer_lbl.text = "%d:%02d" % [maxi(secs, 0) / 60, maxi(secs, 0) % 60]
 	timer_lbl.add_theme_color_override("font_color", Color("ffb347") if (sim.is_double or sim.is_overtime) else Color.WHITE)
-	crowns_player.text = str(sim.score[0])
-	crowns_enemy.text = str(sim.score[1])
+	for i in 3:
+		player_crowns[i].col = Color("f5c518") if i < sim.score[0] else Color(Color("2f7de1"), 0.25)
+		player_crowns[i].queue_redraw()
+		enemy_crowns[i].col = Color("f5c518") if i < sim.score[1] else Color(Color("e0413a"), 0.25)
+		enemy_crowns[i].queue_redraw()
 	var el: float = p["elixir"]
-	elixir_fill.size.x = (362.0) * el / 10.0
+	elixir_fill.size.x = 274.0 * el / 10.0
 	elixir_lbl.text = str(int(el))
-	elixir_fill.color = Color("e056f5") if sim.is_double else Color("c43bd9")
+	elixir_fill.color = Color("ee5af2") if sim.is_double else Color("d23be0")
 	for i in 4:
 		var c: Dictionary = p["hand"][i]
 		if drag_idx == i:

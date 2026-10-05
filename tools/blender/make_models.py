@@ -20,6 +20,8 @@ PALETTE = {
     'GOLD': (0.96, 0.77, 0.10, 1), 'GREEN': (0.37, 0.75, 0.29, 1), 'DARK': (0.14, 0.14, 0.17, 1),
     'CLOTH': (0.55, 0.40, 0.70, 1), 'STONE': (0.73, 0.70, 0.64, 1), 'STONE_D': (0.55, 0.52, 0.47, 1),
     'FIRE': (1.00, 0.45, 0.10, 1), 'WHITE': (0.97, 0.97, 0.97, 1),
+    'PINK': (0.97, 0.62, 0.68, 1), 'PINK_D': (0.80, 0.42, 0.50, 1), 'ARMOR': (0.55, 0.47, 0.62, 1), 'ARMOR_D': (0.38, 0.32, 0.45, 1),
+    'PINE_D': (0.05, 0.22, 0.15, 1), 'PINE_L': (0.10, 0.34, 0.20, 1), 'ROCK': (0.64, 0.65, 0.61, 1), 'BARK': (0.50, 0.33, 0.20, 1), 'WOOD_L': (0.80, 0.60, 0.35, 1),
 }
 _mats = {}
 
@@ -216,6 +218,7 @@ def build_all():
     out['tower_king'] = finish_model('tower_king', kt)
     return out
 
-res = build_all()
-for k, (p, t) in res.items():
-    print(k, os.path.getsize(p), 'bytes', t, 'tris')
+if 'SKIP_AUTORUN' not in globals():
+    res = build_all()
+    for k, (p, t) in res.items():
+        print(k, os.path.getsize(p), 'bytes', t, 'tris')

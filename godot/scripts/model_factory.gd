@@ -87,6 +87,22 @@ static func glb(name: String, tint: Color, team: Color) -> Node3D:
 	_recolor(root, tint, team)
 	return root
 
+static func glb_mesh(name: String) -> Mesh:
+	## First mesh of a GLB (keeps its authored materials) - used for MultiMesh scenery.
+	var path := "res://assets/models/%s.glb" % name
+	if not ResourceLoader.exists(path):
+		return null
+	var root := (load(path) as PackedScene).instantiate()
+	var found: Mesh = null
+	var stack: Array = [root]
+	while not stack.is_empty() and found == null:
+		var n: Node = stack.pop_back()
+		if n is MeshInstance3D:
+			found = (n as MeshInstance3D).mesh
+		stack.append_array(n.get_children())
+	root.free()
+	return found
+
 static func _recolor(n: Node, tint: Color, team: Color) -> void:
 	if n is MeshInstance3D:
 		var mi := n as MeshInstance3D
@@ -143,13 +159,13 @@ static func build_tower(king: bool, opp: bool, sub: String = "princess") -> Node
 		if not king:
 			match sub:
 				"cannoneer":
-					var b := cyl(0.3, 0.3, 1.3, Color("2d2d2d"), Vector3(0, 4.0, 1.1 * (1.0 if opp else -1.0)), 10)
+					var b := cyl(0.3, 0.3, 1.3, Color("2d2d2d"), Vector3(0, 3.6, 1.1 * (1.0 if opp else -1.0)), 10)
 					b.rotation.x = deg_to_rad(90)
 					holder.add_child(b)
 				"royal_chef":
-					holder.add_child(cyl(0.55, 0.5, 0.5, Color("f4f1ea"), Vector3(0, 5.9, 0), 10))
+					holder.add_child(cyl(0.55, 0.5, 0.5, Color("f4f1ea"), Vector3(0, 4.4, 0), 10))
 				"dagger_duchess":
-					holder.add_child(box(Vector3(0.12, 0.9, 0.12), Color("cfd8dc"), Vector3(0.0, 4.4, 0.0), Vector3(deg_to_rad(20), 0, deg_to_rad(15))))
+					holder.add_child(box(Vector3(0.12, 0.9, 0.12), Color("cfd8dc"), Vector3(0.0, 4.2, 0.0), Vector3(deg_to_rad(20), 0, deg_to_rad(15))))
 		return holder
 	var root := Node3D.new()
 	var team := team_color(opp)
@@ -195,7 +211,7 @@ static func build_tower(king: bool, opp: bool, sub: String = "princess") -> Node
 static func unit_scale(card: Dictionary) -> float:
 	var hp := float(Sim._v(card, "hp", 300))
 	var t := clampf((hp - 80.0) / 3600.0, 0.0, 1.0)
-	return lerpf(0.85, 2.0, sqrt(t))
+	return lerpf(0.9, 2.1, sqrt(t))
 
 static func build_unit(u: Dictionary) -> Node3D:
 	var opp: bool = u["opp"]
@@ -227,7 +243,7 @@ static func build_unit(u: Dictionary) -> Node3D:
 			var shadow := cyl(0.45 * s, 0.45 * s, 0.02, Color(0, 0, 0, 0.35), Vector3(0, -2.2 + 0.04, 0), 12)
 			shadow.material_override = mat(Color(0, 0, 0, 0.35), 1.0, 0.0, true)
 			model.add_child(shadow)
-		glb_model.scale = Vector3.ONE * gs * 1.2
+		glb_model.scale = Vector3.ONE * gs * 1.45
 		model.add_child(glb_model)
 	elif typ == "building":
 		_build_building(model, u, col, s, opp)

@@ -3,7 +3,9 @@ extends Node3D
 ## Renders a Sim in 3D: builds the arena once, then mirrors units/towers/projectiles/effects every frame.
 ## Sim space (x, y in px, y down, player at bottom) -> world: X = (x - W/2)*S, Z = (y - H/2)*S.
 
-const S := 0.05
+const S := 0.05          # metres per sim px along X (and for radii)
+const SZ := 0.04         # metres per sim px along Z: the arena is compressed lengthwise to real Clash Royale proportions
+const ZR := SZ / S
 const HP_W := 1.5
 
 var sim: Sim
@@ -19,10 +21,10 @@ var _time := 0.0
 var shake := 0.0
 
 static func to3(x: float, y: float, h: float = 0.0) -> Vector3:
-	return Vector3((x - Sim.W / 2.0) * S, h, (y - Sim.H / 2.0) * S)
+	return Vector3((x - Sim.W / 2.0) * S, h, (y - Sim.H / 2.0) * SZ)
 
 static func from3(p: Vector3) -> Vector2:
-	return Vector2(p.x / S + Sim.W / 2.0, p.z / S + Sim.H / 2.0)
+	return Vector2(p.x / S + Sim.W / 2.0, p.z / SZ + Sim.H / 2.0)
 
 func setup(s: Sim) -> void:
 	sim = s
@@ -37,151 +39,333 @@ func setup(s: Sim) -> void:
 	_build_towers()
 
 # ----------------------------------------------------------------------------- environment
+const FOREST := Color("2f6a3b")
+const PLAZA_A := Color("d6d0bd")
+const PLAZA_B := Color("cec8b3")
+const PLAZA_C := Color("dcd7c6")
+const STONE := Color("c2bca6")
+const STONE_D := Color("a29c86")
+const HEART := Color("bbb59f")
+const RIVER_SHADER := """
+shader_type spatial;
+uniform vec3 col1 = vec3(0.42, 0.10, 0.66);
+uniform vec3 col2 = vec3(0.78, 0.34, 0.98);
+varying vec3 wpos;
+void vertex() { wpos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz; }
+void fragment() {
+	float t = TIME;
+	float a = sin(wpos.x * 0.6 + t * 0.3) * 0.5 + 0.5;
+	float b = sin(wpos.x * 0.35 - wpos.z * 1.2 - t * 0.4) * 0.5 + 0.5;
+	float crack = smoothstep(0.97, 1.0, sin(wpos.x * 1.1 + sin(wpos.z * 1.6 + t * 0.7) * 0.5) * 0.5 + 0.5) * 0.7;
+	vec3 c = mix(col1, col2, a * b * 0.3);
+	ALBEDO = c + crack * vec3(0.45, 0.25, 0.65);
+	EMISSION = c * 0.55 + crack * vec3(0.55, 0.35, 0.8);
+	ROUGHNESS = 0.25;
+}
+"""
 
 func _build_environment() -> void:
 	var env := Environment.new()
 	env.background_mode = Environment.BG_COLOR
-	env.background_color = Color("2b6cb0")
+	env.background_color = FOREST.darkened(0.3)
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color("fff4e0")
-	env.ambient_light_energy = 0.55
+	env.ambient_light_color = Color("f2f0ea")
+	env.ambient_light_energy = 0.3
 	env.tonemap_mode = Environment.TONE_MAPPER_LINEAR
 	var we := WorldEnvironment.new()
 	we.environment = env
 	add_child(we)
 	var sun := DirectionalLight3D.new()
-	sun.rotation = Vector3(deg_to_rad(-58), deg_to_rad(-25), 0)
-	sun.light_energy = 0.7
+	sun.rotation = Vector3(deg_to_rad(-62), deg_to_rad(-30), 0)
+	sun.light_energy = 0.42
 	sun.shadow_enabled = true
-	sun.directional_shadow_max_distance = 70.0
-	sun.light_color = Color("fff1d6")
+	sun.directional_shadow_max_distance = 80.0
+	sun.light_color = Color("fff8ee")
 	add_child(sun)
+
+static func heart_mesh() -> ArrayMesh:
+	# flat heart polygon (parametric heart curve), ~1 m wide, lying in the XZ plane
+	var pts := PackedVector2Array()
+	for i in 40:
+		var t := TAU * i / 40.0
+		pts.append(Vector2(16.0 * pow(sin(t), 3), 13.0 * cos(t) - 5.0 * cos(2 * t) - 2.0 * cos(3 * t) - cos(4 * t)) / 32.0)
+	var verts := PackedVector3Array()
+	var idx := PackedInt32Array()
+	verts.append(Vector3(0, 0, -0.05))
+	for p in pts:
+		verts.append(Vector3(p.x, 0, -p.y))
+	for i in pts.size():
+		idx.append_array([0, 1 + (i + 1) % pts.size(), 1 + i])
+	var arr := []
+	arr.resize(Mesh.ARRAY_MAX)
+	arr[Mesh.ARRAY_VERTEX] = verts
+	arr[Mesh.ARRAY_INDEX] = idx
+	var normals := PackedVector3Array()
+	normals.resize(verts.size())
+	normals.fill(Vector3.UP)
+	arr[Mesh.ARRAY_NORMAL] = normals
+	var m := ArrayMesh.new()
+	m.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr)
+	return m
+
+func _multi(mesh: Mesh, material: Material, xforms: Array, shadows: bool = false) -> MultiMeshInstance3D:
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.mesh = mesh
+	mm.instance_count = xforms.size()
+	for i in xforms.size():
+		mm.set_instance_transform(i, xforms[i])
+	var mmi := MultiMeshInstance3D.new()
+	mmi.multimesh = mm
+	if material != null:
+		mmi.material_override = material
+	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON if shadows else GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return mmi
 
 func _build_arena() -> void:
 	var half_w := Sim.W * S / 2.0
-	var half_l := Sim.H * S / 2.0
-	var river_half := 30.0 * S
-	# outer platform
-	add_child(ModelFactory.box(Vector3(half_w * 2 + 8, 1.0, half_l * 2 + 8), Color("5d6d7e"), Vector3(0, -0.62, 0)))
-	# checkered grass, each half
-	var tile := 1.0
-	var g1 := Color("7cc04f")
-	var g2 := Color("72b548")
-	var xs := int(ceil(half_w * 2 / tile))
-	var zs_half := int(ceil((half_l - river_half) / tile))
-	var grass := _tile_batch(g1, g2, xs, zs_half, tile, half_w, half_l, river_half)
-	add_child(grass)
-	# river
-	river_mat = ModelFactory.mat(Color("2f9bf0"), 0.25, 0.0)
-	var river := ModelFactory.box(Vector3(half_w * 2, 0.1, river_half * 2), Color("3aa0e8"), Vector3(0, -0.04, 0), Vector3.ZERO, 0.2)
-	river.material_override = river_mat
+	var half_l := Sim.H * SZ / 2.0
+	var river_half := 1.3
+	var princess_z := absf(to3(0, 150).z)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 11
+	# forest floor
+	add_child(ModelFactory.box(Vector3(90, 0.6, 100), FOREST, Vector3(0, -0.75, 0)))
+	for i in 18:
+		add_child(ModelFactory.box(Vector3(rng.randf_range(3, 8), 0.05, rng.randf_range(3, 8)), FOREST.lightened(rng.randf_range(0.04, 0.1)),
+			Vector3(rng.randf_range(-24, 24), -0.44, rng.randf_range(-30, 30))))
+	# stone frame (plaza border)
+	var fw := 1.3
+	add_child(ModelFactory.box(Vector3(half_w * 2 + fw * 2, 0.5, half_l * 2 + fw * 2), STONE, Vector3(0, -0.28, 0)))
+	# plaza tiles: 1 m grid, three shades, per half
+	var shades := [[], [], []]
+	var nx := int(ceil(half_w * 2))
+	var nz_half := int(ceil((half_l - river_half)))
+	for side in [-1, 1]:
+		for iz in nz_half:
+			for ix in nx:
+				var x := -half_w + 0.5 + ix
+				var z: float = side * (river_half + 0.5 + iz)
+				if absf(z) > half_l:
+					continue
+				var k := rng.randi() % 3
+				shades[k].append(Transform3D(Basis(), Vector3(x, -0.04, z)))
+	var tile := BoxMesh.new()
+	tile.size = Vector3(0.97, 0.12, 0.97)
+	var cols := [PLAZA_A, PLAZA_B, PLAZA_C]
+	for k in 3:
+		add_child(_multi(tile, ModelFactory.mat(cols[k], 0.95), shades[k]))
+	# paved lanes (lighter) with curbs, from each princess pad to the river banks
+	for lx in [-5.0, 5.0]:
+		for side in [-1, 1]:
+			var z0: float = side * (river_half + 0.1)
+			var z1: float = side * princess_z
+			var zc := (z0 + z1) / 2.0
+			var zl := absf(z1 - z0)
+			add_child(ModelFactory.box(Vector3(3.5, 0.1, zl), Color("f1ead3"), Vector3(lx, 0.02, zc), Vector3.ZERO, 0.95))
+			for cx in [-1.9, 1.9]:
+				add_child(ModelFactory.box(Vector3(0.28, 0.2, zl), Color("cfc6a8"), Vector3(lx + cx, 0.08, zc), Vector3.ZERO, 0.95))
+	# tower pads + soft purple shadow blobs
+	for t in sim.towers:
+		var king: bool = t["type"] == "king"
+		var p := to3(t["x"], t["y"])
+		var ps := 6.0 if king else 4.6
+		add_child(ModelFactory.box(Vector3(ps, 0.16, ps), Color("d4cdb8"), Vector3(p.x, 0.03, p.z), Vector3.ZERO, 0.9))
+		add_child(ModelFactory.box(Vector3(ps - 0.7, 0.18, ps - 0.7), Color("e3dcc6"), Vector3(p.x, 0.04, p.z), Vector3.ZERO, 0.9))
+		var sh := ModelFactory.cyl(ps * 0.5, ps * 0.5, 0.02, Color(0.35, 0.28, 0.6, 0.45), Vector3(p.x - 0.9, 0.2, p.z + 0.7), 14)
+		sh.material_override = ModelFactory.mat(Color(0.35, 0.28, 0.6, 0.45), 1.0, 0.0, true)
+		add_child(sh)
+	# heart tiles scattered across the plaza
+	var hm := heart_mesh()
+	var hx: Array = []
+	for i in 80:
+		var x := rng.randf_range(-half_w + 1.0, half_w - 1.0)
+		var z := rng.randf_range(-half_l + 1.0, half_l - 1.0)
+		if absf(z) < river_half + 1.0:
+			continue
+		var bad := false
+		for t in sim.towers:
+			var tp := to3(t["x"], t["y"])
+			if Vector2(x - tp.x, z - tp.z).length() < 3.2:
+				bad = true
+		if bad:
+			continue
+		var sc := rng.randf_range(0.45, 0.8)
+		hx.append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * sc), Vector3(x, 0.025, z)))
+	add_child(_multi(hm, ModelFactory.mat(HEART, 0.95), hx))
+	# river (animated purple) running out through the frame on both sides
+	var rmat := ShaderMaterial.new()
+	var rs := Shader.new()
+	rs.code = RIVER_SHADER
+	rmat.shader = rs
+	var river := MeshInstance3D.new()
+	var rq := BoxMesh.new()
+	rq.size = Vector3(half_w * 2 + 14, 0.1, river_half * 2)
+	river.mesh = rq
+	river.material_override = rmat
+	river.position = Vector3(0, -0.02, 0)
 	add_child(river)
-	# river banks
+	# river banks + gate blocks with hearts at both ends
 	for sz in [-1, 1]:
-		add_child(ModelFactory.box(Vector3(half_w * 2, 0.35, 0.35), Color("a1887f"), Vector3(0, 0.0, sz * (river_half + 0.1))))
-	# bridges
+		add_child(ModelFactory.box(Vector3(half_w * 2, 0.3, 0.3), STONE_D, Vector3(0, 0.02, sz * (river_half + 0.12))))
+	for sx in [-1, 1]:
+		var gate := ModelFactory.box(Vector3(2.2, 0.9, river_half * 2 + 3.2), STONE, Vector3(sx * (half_w + 0.5), 0.35, 0))
+		add_child(gate)
+		var gh := MeshInstance3D.new()
+		gh.mesh = hm
+		gh.material_override = ModelFactory.mat(Color("e9e1c7"), 0.9)
+		gh.position = Vector3(sx * (half_w + 0.5), 0.82, 0)
+		gh.scale = Vector3.ONE * 1.4
+		add_child(gh)
+	# frame walls (low), leaving the river gap
+	for sx in [-1, 1]:
+		for sz in [-1, 1]:
+			var len_z := half_l - river_half - 1.2
+			add_child(ModelFactory.box(Vector3(1.1, 0.7, len_z), STONE, Vector3(sx * (half_w + 0.65), 0.1, sz * (river_half + 1.6 + len_z / 2.0))))
+	for sz in [-1, 1]:
+		add_child(ModelFactory.box(Vector3(half_w * 2 + 2.4, 0.7, 1.1), STONE, Vector3(0, 0.1, sz * (half_l + 0.65))))
+	# bridges: three planks + heart inlay
 	for bx in [Sim.BRIDGE_L, Sim.BRIDGE_R]:
 		var wx: float = (bx - Sim.W / 2.0) * S
 		var bridge := Node3D.new()
 		bridge.position = Vector3(wx, 0.0, 0)
-		bridge.add_child(ModelFactory.box(Vector3(2.8, 0.25, river_half * 2 + 1.2), Color("a9784a"), Vector3(0, 0.1, 0)))
-		for i in 7:
-			bridge.add_child(ModelFactory.box(Vector3(2.7, 0.06, 0.28), Color("8d6238"), Vector3(0, 0.26, -river_half + 0.45 + i * (river_half * 2 - 0.3) / 6.0)))
-		for sx in [-1, 1]:
-			bridge.add_child(ModelFactory.box(Vector3(0.15, 0.5, river_half * 2 + 1.2), Color("7a5530"), Vector3(sx * 1.4, 0.45, 0)))
+		var blen := river_half * 2 + 1.4
+		for i in 3:
+			bridge.add_child(ModelFactory.box(Vector3(0.95, 0.3, blen), Color("b07a43") if i != 1 else Color("bd8850"), Vector3((i - 1) * 1.0, 0.12, 0), Vector3.ZERO, 0.9))
+			bridge.add_child(ModelFactory.box(Vector3(0.06, 0.34, blen), Color("6f4824"), Vector3((i - 1) * 1.0 + 0.5, 0.12, 0), Vector3.ZERO, 0.9))
+		var bh := MeshInstance3D.new()
+		bh.mesh = hm
+		bh.material_override = ModelFactory.mat(Color("e8b95c"), 0.8)
+		bh.position = Vector3(0, 0.3, 0)
+		bh.scale = Vector3.ONE * 1.5
+		bridge.add_child(bh)
+		bridge.add_child(ModelFactory.box(Vector3(3.3, 0.18, 0.4), Color("8a5a2d"), Vector3(0, 0.1, blen / 2.0 - 0.1)))
+		bridge.add_child(ModelFactory.box(Vector3(3.3, 0.18, 0.4), Color("8a5a2d"), Vector3(0, 0.1, -blen / 2.0 + 0.1)))
 		add_child(bridge)
-	# arena rim walls
-	var wall_c := Color("8d99a6")
-	add_child(ModelFactory.box(Vector3(0.5, 0.6, half_l * 2 + 1.0), wall_c, Vector3(-half_w - 0.25, 0.2, 0)))
-	add_child(ModelFactory.box(Vector3(0.5, 0.6, half_l * 2 + 1.0), wall_c, Vector3(half_w + 0.25, 0.2, 0)))
-	add_child(ModelFactory.box(Vector3(half_w * 2 + 1.0, 0.6, 0.5), wall_c, Vector3(0, 0.2, -half_l - 0.25)))
-	add_child(ModelFactory.box(Vector3(half_w * 2 + 1.0, 0.6, 0.5), wall_c, Vector3(0, 0.2, half_l + 0.25)))
-	# tower plazas (darker tile under each tower) and team-tinted base pads
-	for t in sim.towers:
-		var kind: bool = t["type"] == "king"
-		var pad := ModelFactory.box(Vector3(5.2 if kind else 4.2, 0.08, 5.2 if kind else 4.2), Color(ModelFactory.team_color(t["opp"]), 1.0).lerp(Color("c9c2b3"), 0.7), to3(t["x"], t["y"], 0.02))
-		add_child(pad)
-	# scenery trees outside the arena
-	var rng := RandomNumberGenerator.new()
-	rng.seed = 7
-	for i in 14:
-		var side := -1 if i % 2 == 0 else 1
-		var z := rng.randf_range(-half_l, half_l)
-		_tree(Vector3(side * (half_w + 2.2 + rng.randf() * 1.5), 0, z), rng.randf_range(0.8, 1.3))
+	# forest: pines (multimesh), rocks, logs
+	var pine_mesh: Mesh = ModelFactory.glb_mesh("pine")
+	if pine_mesh != null:
+		var px: Array = []
+		var tries := 0
+		while px.size() < 120 and tries < 1200:
+			tries += 1
+			var x := rng.randf_range(-27.0, 27.0)
+			var z := rng.randf_range(-33.0, 33.0)
+			if absf(x) < half_w + 3.4 and absf(z) < half_l + 3.4:
+				continue
+			var sc := rng.randf_range(0.75, 1.5)
+			px.append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3(sc, sc * rng.randf_range(0.9, 1.3), sc)), Vector3(x, -0.4, z)))
+		add_child(_multi(pine_mesh, null, px, true))
+	var rock_mesh: Mesh = ModelFactory.glb_mesh("rock")
+	if rock_mesh != null:
+		var rx: Array = []
+		for i in 26:
+			var x := rng.randf_range(-24.0, 24.0)
+			var z := rng.randf_range(-31.0, 31.0)
+			if absf(x) < half_w + 2.2 and absf(z) < half_l + 2.2:
+				continue
+			var sc := rng.randf_range(0.5, 1.5)
+			rx.append(Transform3D(Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * sc), Vector3(x, -0.3, z)))
+		add_child(_multi(rock_mesh, null, rx, true))
+	var log_mesh: Mesh = ModelFactory.glb_mesh("log")
+	if log_mesh != null:
+		var lx2: Array = [Transform3D(Basis(Vector3.UP, 0.4), Vector3(4.5, -0.1, half_l + 3.0)), Transform3D(Basis(Vector3.UP, -0.2).scaled(Vector3.ONE * 0.8), Vector3(-7.5, -0.1, half_l + 4.2))]
+		add_child(_multi(log_mesh, null, lx2, true))
 	# placement overlay (shown while dragging a card): translucent red over the area you cannot deploy in
 	place_overlay = ModelFactory.box(Vector3(half_w * 2, 0.05, 1.0), Color(1, 0.15, 0.15, 0.32), Vector3(0, 0.07, 0))
 	place_overlay.material_override = ModelFactory.mat(Color(1, 0.15, 0.15, 0.32), 1.0, 0.0, true)
 	place_overlay.visible = false
 	add_child(place_overlay)
 
-func _tile_batch(c1: Color, c2: Color, xs: int, zs_half: int, tile: float, half_w: float, half_l: float, river_half: float) -> Node3D:
-	# One BoxMesh + MultiMesh per colour keeps the checkerboard cheap on mobile.
-	var root := Node3D.new()
-	var mm1 := MultiMesh.new()
-	var mm2 := MultiMesh.new()
-	for mm in [mm1, mm2]:
-		var bm := BoxMesh.new()
-		bm.size = Vector3(tile, 0.1, tile)
-		mm.mesh = bm
-		mm.transform_format = MultiMesh.TRANSFORM_3D
-	var list1: Array = []
-	var list2: Array = []
-	var depth := half_l - river_half
-	for side in [-1, 1]:
-		var n := int(ceil(depth / tile))
-		for iz in n:
-			for ix in xs:
-				var x := -half_w + tile * 0.5 + ix * tile
-				var z: float = side * (river_half + tile * 0.5 + iz * tile)
-				if absf(z) > half_l:
-					continue
-				var tr := Transform3D(Basis(), Vector3(x, -0.05, z))
-				if (ix + iz) % 2 == 0:
-					list1.append(tr)
-				else:
-					list2.append(tr)
-	mm1.instance_count = list1.size()
-	mm2.instance_count = list2.size()
-	for i in list1.size():
-		mm1.set_instance_transform(i, list1[i])
-	for i in list2.size():
-		mm2.set_instance_transform(i, list2[i])
-	for pair in [[mm1, c1], [mm2, c2]]:
-		var mmi := MultiMeshInstance3D.new()
-		mmi.multimesh = pair[0]
-		mmi.material_override = ModelFactory.mat(pair[1], 0.95)
-		root.add_child(mmi)
-	return root
-
-func _tree(pos: Vector3, sc: float) -> void:
-	var t := Node3D.new()
-	t.position = pos
-	t.scale = Vector3.ONE * sc
-	t.add_child(ModelFactory.cyl(0.18, 0.25, 1.2, Color("7b5a3a"), Vector3(0, 0.6, 0), 8))
-	t.add_child(ModelFactory.cone(1.0, 1.6, Color("2e8b3d"), Vector3(0, 1.8, 0), 8))
-	t.add_child(ModelFactory.cone(0.8, 1.3, Color("34a047"), Vector3(0, 2.6, 0), 8))
-	add_child(t)
-
 # ----------------------------------------------------------------------------- towers
+
+static var _badge_tex: ImageTexture
+
+static func badge_texture() -> ImageTexture:
+	if _badge_tex != null:
+		return _badge_tex
+	var img := Image.create(64, 64, false, Image.FORMAT_RGBA8)
+	for y in 64:
+		for x in 64:
+			var d := Vector2(x - 32, y - 32).length()
+			var c := Color(0, 0, 0, 0)
+			if d < 30.0:
+				c = Color("f5c518") if d < 25.0 else Color("8a5a00")
+				if d < 25.0 and y < 24:
+					c = c.lightened(0.18)
+			img.set_pixel(x, y, c)
+	_badge_tex = ImageTexture.create_from_image(img)
+	return _badge_tex
 
 func _build_towers() -> void:
 	for t in sim.towers:
-		var node := ModelFactory.build_tower(t["type"] == "king", t["opp"], t["towerSubType"])
+		var king: bool = t["type"] == "king"
+		var node := ModelFactory.build_tower(king, t["opp"], t["towerSubType"])
 		node.position = to3(t["x"], t["y"])
 		add_child(node)
-		var bar := _make_hp_bar(2.6 if t["type"] == "king" else 2.2, t["opp"])
-		bar["root"].position = to3(t["x"], t["y"], 6.4 if t["type"] == "king" else 5.2)
-		add_child(bar["root"])
-		var lbl := Label3D.new()
-		lbl.text = str(int(t["hp"]))
-		lbl.font_size = 56
-		lbl.pixel_size = 0.012
-		lbl.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-		lbl.no_depth_test = true
-		lbl.outline_size = 14
-		lbl.position = Vector3(0, 0.28, 0)
-		bar["root"].add_child(lbl)
-		tower_nodes[t["id"]] = {"node": node, "fg": bar["fg"], "w": bar["w"], "label": lbl, "root": bar["root"], "dead": false}
+		var plate := _make_tower_plate(king, t["opp"], 14 if t["opp"] else 15)
+		var p := to3(t["x"], t["y"])
+		if king and not t["opp"]:
+			plate["root"].position = Vector3(p.x, 1.4, p.z + 3.6)
+		else:
+			plate["root"].position = Vector3(p.x, 7.4 if king else 5.0, p.z)
+		add_child(plate["root"])
+		plate["dead"] = false
+		plate["node"] = node
+		tower_nodes[t["id"]] = plate
+
+func _plate_mat(c: Color, tex: Texture2D = null, prio: int = 6) -> StandardMaterial3D:
+	var m := StandardMaterial3D.new()
+	m.albedo_color = c
+	if tex != null:
+		m.albedo_texture = tex
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
+	m.no_depth_test = true
+	m.render_priority = prio
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	return m
+
+func _quad(size: Vector2, mat: Material, pos: Vector3) -> MeshInstance3D:
+	var mi := MeshInstance3D.new()
+	var q := QuadMesh.new()
+	q.size = size
+	mi.mesh = q
+	mi.material_override = mat
+	mi.position = pos
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	return mi
+
+func _make_tower_plate(king: bool, opp: bool, level: int) -> Dictionary:
+	# Level badge + HP bar with the number, like the reference arena.
+	var root := Node3D.new()
+	var w := 3.4 if king else 3.0
+	var team := ModelFactory.team_color(opp).lightened(0.08)
+	root.add_child(_quad(Vector2(w + 0.12, 0.62), _plate_mat(Color(0.05, 0.05, 0.1, 0.9), null, 5), Vector3(0.35, 0, 0)))
+	var fg := _quad(Vector2(w, 0.5), _plate_mat(team, null, 6), Vector3(0.35, 0, 0.001))
+	root.add_child(fg)
+	root.add_child(_quad(Vector2(0.95, 0.95), _plate_mat(Color.WHITE, badge_texture(), 7), Vector3(-w / 2.0 - 0.15, 0.02, 0.002)))
+	var lv := Label3D.new()
+	lv.text = str(level)
+	lv.font_size = 52
+	lv.pixel_size = 0.0125
+	lv.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	lv.no_depth_test = true
+	lv.outline_size = 10
+	lv.modulate = Color("fff3b0")
+	lv.render_priority = 9
+	lv.position = Vector3(-w / 2.0 - 0.15, 0.04, 0.01)
+	root.add_child(lv)
+	var hp := Label3D.new()
+	hp.font_size = 48
+	hp.pixel_size = 0.0125
+	hp.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	hp.no_depth_test = true
+	hp.outline_size = 12
+	hp.render_priority = 9
+	hp.position = Vector3(0.45, 0.03, 0.01)
+	root.add_child(hp)
+	return {"root": root, "fg": fg, "w": w, "label": hp, "cx": 0.35}
 
 func _make_hp_bar(w: float, opp: bool) -> Dictionary:
 	var root := Node3D.new()
@@ -233,7 +417,7 @@ func _sync_towers() -> void:
 		var tn: Dictionary = tower_nodes[t["id"]]
 		var ratio := clampf(t["hp"] / t["maxHp"], 0.0, 1.0)
 		tn["fg"].scale.x = maxf(ratio, 0.001)
-		tn["fg"].position.x = -(1.0 - ratio) * tn["w"] / 2.0
+		tn["fg"].position.x = tn["cx"] - (1.0 - ratio) * tn["w"] / 2.0
 		tn["label"].text = str(maxi(0, int(ceil(t["hp"]))))
 		if t["hp"] <= 0 and not tn["dead"]:
 			tn["dead"] = true
@@ -453,7 +637,7 @@ func _explode(pos: Vector3, r: float, color: Color) -> void:
 	m.scale = Vector3.ONE * 0.2
 	fx_root.add_child(m)
 	var tw := create_tween()
-	tw.tween_property(m, "scale", Vector3.ONE, 0.18).set_ease(Tween.EASE_OUT)
+	tw.tween_property(m, "scale", Vector3(1, 1, ZR), 0.18).set_ease(Tween.EASE_OUT)
 	tw.tween_property(m, "transparency", 1.0, 0.35)
 	tw.tween_callback(m.queue_free)
 	_ring(Vector3(pos.x, 0.12, pos.z), r, color)
@@ -461,15 +645,17 @@ func _explode(pos: Vector3, r: float, color: Color) -> void:
 func _ring(pos: Vector3, r: float, color: Color) -> void:
 	var m := ModelFactory.cyl(r, r, 0.04, color, pos, 24)
 	m.material_override = ModelFactory.mat(Color(color, 0.45), 0.9, 1.0, true)
+	m.scale.z = ZR
 	fx_root.add_child(m)
 	var tw := create_tween()
-	tw.tween_property(m, "scale", Vector3(1.15, 1, 1.15), 0.4)
+	tw.tween_property(m, "scale", Vector3(1.15, 1, 1.15 * ZR), 0.4)
 	tw.parallel().tween_property(m, "transparency", 1.0, 0.4)
 	tw.tween_callback(m.queue_free)
 
 func _zone(pos: Vector3, r: float, color: Color, dur: float) -> void:
 	var m := ModelFactory.cyl(r, r, 0.05, color, pos, 24)
 	m.material_override = ModelFactory.mat(Color(color, 0.35), 0.9, 0.8, true)
+	m.scale.z = ZR
 	fx_root.add_child(m)
 	var tw := create_tween()
 	tw.tween_interval(maxf(0.1, dur - 0.5))
@@ -482,8 +668,8 @@ func show_placement(active: bool) -> void:
 	if active:
 		# red overlay across the area (enemy side, minus the 100px tolerance) where the player cannot deploy
 		var boundary := Sim.RIVER_Y - 100.0
-		var z0: float = (0.0 - Sim.H / 2.0) * S
-		var z1: float = (boundary - Sim.H / 2.0) * S
+		var z0: float = (0.0 - Sim.H / 2.0) * SZ
+		var z1: float = (boundary - Sim.H / 2.0) * SZ
 		place_overlay.scale = Vector3(1, 1, (z1 - z0))
 		place_overlay.position = Vector3(0, 0.12, (z0 + z1) / 2.0)
 	place_overlay.visible = active
