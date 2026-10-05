@@ -2,7 +2,7 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c136ksxs33r8i"
+uid="uid://ejjsyd4h6qif"
 path="res://.godot/imported/decks.png-1bcf7d71640122a89398f3bb741e61f2.ctex"
 metadata={
 "vram_texture": false
@@ -15,9 +15,9 @@ dest_files=["res://.godot/imported/decks.png-1bcf7d71640122a89398f3bb741e61f2.ct
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.8
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0

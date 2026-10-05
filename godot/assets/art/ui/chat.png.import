@@ -2,7 +2,7 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d4fq7q4t2qay2"
+uid="uid://7hmcu61xwm3u"
 path="res://.godot/imported/chat.png-07bc3d1757d280bb1120cc7036ba8632.ctex"
 metadata={
 "vram_texture": false
@@ -15,9 +15,9 @@ dest_files=["res://.godot/imported/chat.png-07bc3d1757d280bb1120cc7036ba8632.cte
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.8
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0

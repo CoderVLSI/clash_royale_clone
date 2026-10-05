@@ -2,7 +2,7 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b44eq6am235cf"
+uid="uid://cyq2j8q3081a4"
 path="res://.godot/imported/arrows.jpg-7c8b4a93b36848ed3e4132926f9b0f87.ctex"
 metadata={
 "vram_texture": false
@@ -15,9 +15,9 @@ dest_files=["res://.godot/imported/arrows.jpg-7c8b4a93b36848ed3e4132926f9b0f87.c
 
 [params]
 
-compress/mode=0
+compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.7
+compress/lossy_quality=0.8
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
