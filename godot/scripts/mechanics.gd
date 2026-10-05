@@ -13,7 +13,27 @@ static func _v(d: Dictionary, k: String, dv: Variant = 0) -> Variant:
 	return Sim._v(d, k, dv)
 
 # ---- card resolution (evolution / hero variants / mirror) -------------------------------
+func evolution_progress(pi: int, card: Dictionary) -> Dictionary:
+	## {current, required, ready} for a card sitting in an evolution slot, else {}.
+	var p: Dictionary = sim.players[pi]
+	if card.get("evolvesTo") == null or not (card["id"] in p["evo_slots"]):
+		return {}
+	var cur: int = int(p["cycles"].get(card["id"], 0))
+	var req: int = int(_v(card, "evolutionCycles", 2))
+	return {"current": cur, "required": req, "ready": cur >= req}
+
 func resolve_card(pi: int, card: Dictionary) -> Dictionary:
+	if pi == 0 and not _v(card, "isMirror", false):
+		var prog := evolution_progress(pi, card)
+		if not prog.is_empty() and prog["ready"]:
+			var evo := CardDB.get_card(str(card["evolvesTo"]))
+			if not evo.is_empty():
+				return evo
+		var hero_id = sim.players[pi]["hero_slot"]
+		if card.get("heroVariantId") != null and hero_id == card["id"]:
+			var hv := CardDB.get_card(str(card["heroVariantId"]))
+			if not hv.is_empty():
+				return hv
 	if _v(card, "isMirror", false):
 		var last: Dictionary = sim.players[pi]["last_played"]
 		if last.is_empty() or _v(last, "isMirror", false):

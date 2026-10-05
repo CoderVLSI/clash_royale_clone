@@ -279,13 +279,19 @@ func play_card(pi: int, hand_idx: int, x: float, y: float) -> bool:
 	if p["elixir"] < cost:
 		return false
 	p["elixir"] -= cost
-	p["last_played"] = card
-	# cycle
+	p["last_played"] = actual
+	if actual["id"] != card["id"] and not _v(card, "isMirror", false):
+		p["cycles"][card["id"]] = 0          # playing the evolved form resets its cycle count
+	# cycle: the played card goes to the back of the queue; the Next card enters the hand slot.
 	var q: Array = p["queue"]
 	p["hand"][hand_idx] = p["next"]
 	p["next"] = q.pop_front()
-	q.append(card)
-	p["cycles"][card["id"]] = p["cycles"].get(card["id"], 0) + 1
+	if not _v(card, "isMirror", false):
+		q.append(card)
+	else:
+		q.append(card)
+	if pi == 0:
+		p["cycles"][p["next"]["id"]] = p["cycles"].get(p["next"]["id"], 0) + 1
 	deploy_card(actual, x, y, opp)
 	fx.append({"t": "play", "card": actual["id"], "opp": opp})
 	return true

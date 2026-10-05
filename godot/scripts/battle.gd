@@ -14,6 +14,8 @@ var hud: CanvasLayer
 var acc := 0.0
 var speed := 1.0
 var paused := false
+var intro_left := 0.0
+var intro_panel: Control
 
 # hud refs
 var timer_lbl: Label
@@ -37,9 +39,13 @@ var shot_path := ""
 var shot_time := -1.0
 var shot_taken := false
 
-func start(player_deck_ids: Array = DEFAULT_DECK, player_tower: String = "princess") -> void:
+func start(player_deck_ids: Array = DEFAULT_DECK, player_tower: String = "princess", evo_ids: Array = [], hero_id: String = "", low_perf: bool = false) -> void:
 	var enemy := _random_deck()
 	sim = Sim.new(CardDB.deck_by_ids(player_deck_ids), enemy, player_tower)
+	sim.players[0]["evo_slots"] = evo_ids
+	sim.players[0]["hero_slot"] = hero_id if hero_id != "" else null
+	if low_perf:
+		speed = 1.0
 	var args := OS.get_cmdline_user_args()
 	for a in args:
 		if a == "--autoplay":
@@ -54,11 +60,15 @@ func start(player_deck_ids: Array = DEFAULT_DECK, player_tower: String = "prince
 			sim = Sim.new(CardDB.deck_by_ids(a.substr(7).split(",")), enemy, player_tower)
 	if auto_play:
 		sim.ai_enabled = [true, true]
+	else:
+		intro_left = 2.2
 	view = ArenaView.new()
 	add_child(view)
 	view.setup(sim)
 	_build_camera()
 	_build_hud()
+	if intro_left > 0.0:
+		_build_intro()
 	for a2 in OS.get_cmdline_user_args():
 		if a2 == "--selftest":
 			call_deferred("_selftest")
@@ -81,6 +91,30 @@ func _random_deck() -> Array:
 	pool.shuffle()
 	return pool.slice(0, 8)
 
+func _build_intro() -> void:
+	intro_panel = Control.new()
+	intro_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var dim := ColorRect.new()
+	dim.color = Color(0.03, 0.06, 0.16, 0.92)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	intro_panel.add_child(dim)
+	var me := UI.label("bigbangsidzrox", 30, Color("6bb6ff"))
+	me.position = Vector2(0, 250)
+	me.size = Vector2(390, 40)
+	me.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	intro_panel.add_child(me)
+	var vs := UI.label("VS", 64, Color("ffe08a"), 10)
+	vs.position = Vector2(0, 340)
+	vs.size = Vector2(390, 80)
+	vs.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	intro_panel.add_child(vs)
+	var foe := UI.label("HEB", 30, Color("ff6b6b"))
+	foe.position = Vector2(0, 450)
+	foe.size = Vector2(390, 40)
+	foe.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	intro_panel.add_child(foe)
+	hud.add_child(intro_panel)
+
 func _build_camera() -> void:
 	cam = Camera3D.new()
 	cam.keep_aspect = Camera3D.KEEP_WIDTH
@@ -102,7 +136,7 @@ func _build_hud() -> void:
 	hud = CanvasLayer.new()
 	add_child(hud)
 	var root := Control.new()
-	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hud.add_child(root)
 	# top bar
@@ -262,6 +296,23 @@ func _card_widget(size: Vector2) -> Control:
 	cost.position = Vector2(0, 1)
 	return p
 
+func _evo_badge(w: Control, card: Dictionary) -> void:
+	var tag: Label = w.get_node_or_null("EvoTag")
+	if tag == null:
+		tag = _label("", 11, Color("e0b3ff"))
+		tag.name = "EvoTag"
+		tag.position = Vector2(34, 2)
+		w.add_child(tag)
+	var prog := sim.mech.evolution_progress(0, card)
+	if not prog.is_empty():
+		tag.text = "EVO!" if prog["ready"] else "%d/%d" % [prog["current"], prog["required"]]
+		tag.add_theme_color_override("font_color", Color("ffe08a") if prog["ready"] else Color("e0b3ff"))
+	elif card.get("heroVariantId") != null and sim.players[0]["hero_slot"] == card["id"]:
+		tag.text = "HERO"
+		tag.add_theme_color_override("font_color", Color("6ee7ff"))
+	else:
+		tag.text = ""
+
 func _fill_card(w: Control, card: Dictionary, affordable: bool = true) -> void:
 	if card.is_empty():
 		w.visible = false
@@ -324,7 +375,11 @@ func screen_to_sim(pos: Vector2) -> Variant:
 func _process(delta: float) -> void:
 	if sim == null:
 		return
-	if not paused and sim.game_over == "":
+	if intro_left > 0.0:
+		intro_left -= delta
+		if intro_left <= 0.0 and intro_panel:
+			intro_panel.queue_free()
+	if not paused and sim.game_over == "" and intro_left <= 0.0:
 		acc += delta * 1000.0 * speed
 		var guard := 0
 		while acc >= Sim.TICK_MS and guard < 8 and sim.game_over == "":
@@ -368,6 +423,7 @@ func _update_hud() -> void:
 			slot_panels[i].modulate = Color(1, 1, 1, 0.35)
 			continue
 		_fill_card(slot_panels[i], c, c["cost"] <= el)
+		_evo_badge(slot_panels[i], c)
 	_fill_card(next_panel, p["next"], true)
 	next_panel.modulate.a = 0.75
 
