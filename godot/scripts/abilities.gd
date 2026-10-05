@@ -73,6 +73,26 @@ func _tick_effects(u: Dictionary) -> void:
 			u["lightningDamageBuff"] = 0.0
 			if monster != null:
 				monster["lightningDamageBuff"] = 0.0
+	# Hero Electro Wizard: Surging Strikes beams (every 0.5 s, hits the nearest targets in range)
+	if float(_v(u, "surgeUntil", 0.0)) > now and now >= float(_v(u, "surgeNext", 0.0)):
+		u["surgeNext"] = now + 500.0
+		var rr: float = float(_v(u, "heroSurgeRadius", 75))
+		var cands: Array = []
+		for e in sim.units:
+			if e["opp"] != u["opp"] and e["hp"] > 0 and Sim.dist(e["x"], e["y"], u["x"], u["y"]) <= rr:
+				cands.append(e)
+		for t in sim.towers:
+			if t["opp"] != u["opp"] and t["hp"] > 0 and Sim.dist(t["x"], t["y"], u["x"], u["y"]) <= rr + 25.0:
+				cands.append(t)
+		cands.sort_custom(func(a, b): return Sim.dist(a["x"], a["y"], u["x"], u["y"]) < Sim.dist(b["x"], b["y"], u["x"], u["y"]))
+		var per_tick: float = float(_v(u, "heroSurgeDps", 308)) * 0.5
+		for e in cands.slice(0, int(_v(u, "heroSurgeTargets", 2))):
+			var dmg: float = per_tick * (float(_v(u, "heroSurgeTowerMult", 0.5)) if e.get("isTower", false) else 1.0)
+			if e.get("isTower", false):
+				e["hp"] -= dmg
+			else:
+				sim._apply_damage([{"id": e["id"], "dmg": dmg, "attacker": u["id"]}])
+			sim.fx.append({"t": "bolt", "x": e["x"], "y": e["y"]})
 	# Golden Knight dash chain: one hop per sim tick
 	if _v(u, "dashChainActive", false):
 		_dash_step(u)
@@ -88,6 +108,17 @@ func _use(u: Dictionary) -> bool:
 		u["pendingAbility"] = {"at": now + cast, "kind": "flight"}
 		u["lastAbilityTime"] = now + cast + float(_v(u, "heroFlightDuration", 5000))
 		sim.fx.append({"t": "zone", "x": u["x"], "y": u["y"], "r": 32.0, "kind": "cast", "dur": cast / 1000.0})
+		return true
+	if _v(u, "heroSurgingAbility", false):
+		# Surging Strikes: stun everything nearby, then twin lightning beams for the duration
+		var dur: float = float(_v(u, "heroSurgeDuration", 3000))
+		u["surgeUntil"] = now + dur
+		u["surgeNext"] = now
+		var r: float = float(_v(u, "heroSurgeRadius", 75))
+		for e in sim.units:
+			if e["opp"] != u["opp"] and e["hp"] > 0 and Sim.dist(e["x"], e["y"], u["x"], u["y"]) <= r:
+				e["stunUntil"] = maxf(e["stunUntil"], now + float(_v(u, "heroSurgeStun", 0.5)) * 1000.0)
+		sim.fx.append({"t": "zone", "x": u["x"], "y": u["y"], "r": r, "kind": "cast", "dur": 0.5})
 		return true
 	if _v(u, "heroTripleThreatAbility", false):
 		var cast2: float = float(_v(u, "heroCastDelay", 1000))

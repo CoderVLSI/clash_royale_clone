@@ -27,6 +27,7 @@ PRIORITY = ['hog_rider', 'ice_spirit', 'battle_ram', 'magic_archer', 'princess']
 import colorsys
 HERO_DESC = {
  'hero_wizard': "a HERO wizard: stern dark-haired mustached wizard with spiky blond-grey lightning-shaped hair, glowing yellow eyes, blue-and-gold robes with white fur collar, crackling golden lightning around his hands, heroic dramatic pose",
+ 'hero_electro_wizard': "a HERO electro wizard: stern mustached wizard with spiky golden-blond lightning-shaped hair, glowing yellow eyes, black zigzag mustache and beard, blue robe with gold trim and gold arm rings, crackling cyan electricity between his hands, heroic dramatic pose",
  'hero_magic_archer': "a HERO magic archer: a hooded archer in glowing teal and gold armor with a huge luminous energy bow, holographic decoy copy behind him, heroic dramatic pose, golden hero aura",
 }
 def hue_name(hexcol):

@@ -3,7 +3,7 @@ extends RefCounted
 ## Small UI helper kit shared by the lobby and battle HUD (code-built Controls, no emoji glyphs so it
 ## renders identically on Android).
 
-const RARITY := {"common": "#7f8c8d", "rare": "#f39c12", "epic": "#9b59b6", "legendary": "#2ecc71", "champion": "#f1c40f", "hero": "#00bcd4"}
+const RARITY := {"common": "#7f8c8d", "rare": "#f39c12", "epic": "#9b59b6", "legendary": "#2ecc71", "champion": "#f1c40f", "hero": "#ffb020"}
 
 static func rarity_color(r: String) -> Color:
 	return Color(str(RARITY.get(r, "#7f8c8d")))
@@ -132,6 +132,7 @@ class HexFrame extends Control:
 	var col := Color("f1c40f")
 	var tex: Texture2D
 	var dark := Color("2a2f45")
+	var gem := false      # hero cards: golden frame with a diamond gem on top (like the real game)
 	static func shape(sz: Vector2, inset: float) -> PackedVector2Array:
 		var w := sz.x
 		var h := sz.y
@@ -161,6 +162,11 @@ class HexFrame extends Control:
 			draw_colored_polygon(inner, Color.WHITE, uvs, tex)
 		else:
 			draw_colored_polygon(inner, dark)
+		if gem:
+			var g := Vector2(size.x * 0.5, 2.0)
+			var gs := size.x * 0.1
+			draw_colored_polygon(PackedVector2Array([g + Vector2(0, -gs * 0.5), g + Vector2(gs, gs * 0.7), g + Vector2(0, gs * 1.9), g + Vector2(-gs, gs * 0.7)]), Color("ffc233"))
+			draw_polyline(PackedVector2Array([g + Vector2(0, -gs * 0.5), g + Vector2(gs, gs * 0.7), g + Vector2(0, gs * 1.9), g + Vector2(-gs, gs * 0.7), g + Vector2(0, -gs * 0.5)]), Color("8a5a00"), 1.5)
 
 static func is_shaped(card: Dictionary) -> bool:
 	return str(card.get("rarity", "common")) in ["legendary", "champion", "hero"]
@@ -177,6 +183,7 @@ static func card_widget(card: Dictionary, size: Vector2 = Vector2(72, 92), dim: 
 		var hf := HexFrame.new()
 		hf.col = Color(rarity_color(str(card.get("rarity", "common"))))
 		hf.tex = art
+		hf.gem = str(card.get("rarity", "")) == "hero"
 		hf.size = size
 		hf.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		p.add_child(hf)

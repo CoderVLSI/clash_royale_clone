@@ -71,7 +71,7 @@ func _build_tabs() -> void:
 	if has_evo:
 		entries.append(["evo", "Evolution", Color("8e44ad")])
 	if has_hero:
-		entries.append(["hero", "Hero", Color("00a8b5")])
+		entries.append(["hero", "Hero", Color("e08a00")])
 	for e in entries:
 		var active: bool = e[0] == mode
 		var b := UI.button(str(e[1]), (e[2] as Color) if active else Color("34405f"), _switch_mode.bind(str(e[0])), Vector2(0, 36), 15)

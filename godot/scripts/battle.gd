@@ -427,6 +427,7 @@ func _fill_card(w: Control, card: Dictionary, affordable: bool = true) -> void:
 		sb.border_color = Color(0, 0, 0, 0)
 		hex.col = Color("c04dff") if (not evo_prog.is_empty() and evo_prog["ready"]) else rc
 		hex.tex = art
+		hex.gem = str(card.get("rarity", "")) == "hero"
 		hex.queue_redraw()
 	else:
 		sb.bg_color = Color(card["color"]).darkened(0.55).lerp(Color("2b3550"), 0.5)
@@ -445,7 +446,7 @@ func _fill_card(w: Control, card: Dictionary, affordable: bool = true) -> void:
 	w.get_node("Cost").text = str(int(card["cost"]))
 	w.modulate = Color.WHITE if affordable else Color(0.62, 0.62, 0.7, 1.0)
 
-const RARITY_COLORS := {"common": "#7f8c8d", "rare": "#f39c12", "epic": "#9b59b6", "legendary": "#2ecc71", "champion": "#f1c40f", "hero": "#00bcd4"}
+const RARITY_COLORS := {"common": "#7f8c8d", "rare": "#f39c12", "epic": "#9b59b6", "legendary": "#2ecc71", "champion": "#f1c40f", "hero": "#ffb020"}
 
 # ----------------------------------------------------------------------------- input / drag
 
