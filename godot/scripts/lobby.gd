@@ -483,12 +483,15 @@ func _fill_collection(coll: Node) -> void:
 	var deck_ids := save.current_deck_ids()
 	_coll_gen += 1
 	var gen := _coll_gen
-	var n := 0
+	var t0 := Time.get_ticks_usec()
 	for c in list:
-		# build a few widgets per frame so switching to the Decks tab never freezes the game
-		n += 1
-		if n % 8 == 0:
+		# time-budgeted: never spend more than ~3 ms per frame here, and wait for the portrait to be decoded
+		# on the loader thread, so switching to the Decks tab never stalls the game
+		while Time.get_ticks_usec() - t0 > 3000 or not CardArt.is_ready(c):
 			await get_tree().process_frame
+			t0 = Time.get_ticks_usec()
+			if gen != _coll_gen or not is_instance_valid(coll):
+				return
 		if gen != _coll_gen or not is_instance_valid(coll):
 			return
 		var holder := Control.new()

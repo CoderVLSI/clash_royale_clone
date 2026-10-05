@@ -17,6 +17,15 @@ static func _build_map() -> void:
 		if c.get("heroVariantId") != null:
 			_base_of[str(c["heroVariantId"])] = str(c["id"])
 
+static var _requested: Dictionary = {}
+
+## True when the portrait is decoded (or was never requested), so reading it will not stall the main thread.
+static func is_ready(card: Dictionary) -> bool:
+	var id := art_id(card)
+	if _cache.has(id) or not _requested.has(id):
+		return true
+	return ResourceLoader.load_threaded_get_status("res://assets/art/cards/%s.jpg" % id) != ResourceLoader.THREAD_LOAD_IN_PROGRESS
+
 static func preload_all() -> void:
 	## Decode every card portrait on background threads so the collection screen opens instantly.
 	CardDB.ensure()
@@ -24,6 +33,7 @@ static func preload_all() -> void:
 		var path := "res://assets/art/cards/%s.jpg" % str(c["id"])
 		if ResourceLoader.exists(path):
 			ResourceLoader.load_threaded_request(path)
+			_requested[str(c["id"])] = true
 
 static func base_id(card: Dictionary) -> String:
 	## Base card of an evolution / hero variant (used to find the 3D model).
@@ -44,6 +54,10 @@ static func texture(card: Dictionary) -> Texture2D:
 	if _cache.has(id):
 		return _cache[id]
 	var path := "res://assets/art/cards/%s.jpg" % id
-	var tex: Texture2D = load(path) if ResourceLoader.exists(path) else null
+	var tex: Texture2D = null
+	if _requested.has(id) and ResourceLoader.load_threaded_get_status(path) == ResourceLoader.THREAD_LOAD_LOADED:
+		tex = ResourceLoader.load_threaded_get(path)
+	elif ResourceLoader.exists(path):
+		tex = load(path)
 	_cache[id] = tex
 	return tex
