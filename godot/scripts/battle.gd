@@ -146,8 +146,11 @@ var enemy_crowns: Array = []
 var player_crowns: Array = []
 
 func _build_hud() -> void:
-	icons = CardIcons.new()
-	add_child(icons)
+	if CardIcons.inst != null:
+		icons = CardIcons.inst
+	else:
+		icons = CardIcons.new()
+		add_child(icons)
 	hud = CanvasLayer.new()
 	add_child(hud)
 	var root := Control.new()
@@ -226,11 +229,11 @@ func _build_hud() -> void:
 	var chat_ic := UI.ui_tex("chat")
 	if chat_ic != null:
 		var ct := TextureRect.new()
+		ct.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		ct.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		ct.texture = chat_ic
 		ct.position = Vector2(6, 2)
 		ct.size = Vector2(44, 42)
-		ct.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		ct.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		ct.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		chat.add_child(ct)
 	else:

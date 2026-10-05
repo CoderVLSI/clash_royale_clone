@@ -5,6 +5,9 @@ extends Node
 
 signal updated
 
+static var inst: CardIcons
+static var waiting: Array = []   # [TextureRect, card] pairs waiting for their rendered portrait
+
 var vp: SubViewport
 var scene_root: Node3D
 var cam: Camera3D
@@ -14,6 +17,7 @@ var busy := false
 var placeholder_sim: Sim
 
 func _ready() -> void:
+	inst = self
 	CardDB.ensure()
 	vp = SubViewport.new()
 	vp.size = Vector2i(160, 160)
@@ -104,4 +108,13 @@ func _render(card: Dictionary) -> void:
 	await RenderingServer.frame_post_draw
 	var img := vp.get_texture().get_image()
 	cache[str(card["id"])] = ImageTexture.create_from_image(img)
+	var still: Array = []
+	for w in waiting:
+		if is_instance_valid(w[0]):
+			var t = cache.get(str(w[1]["id"]))
+			if t != null:
+				(w[0] as TextureRect).texture = t
+			else:
+				still.append(w)
+	waiting = still
 	updated.emit()

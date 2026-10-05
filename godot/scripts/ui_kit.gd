@@ -134,11 +134,11 @@ static func card_widget(card: Dictionary, size: Vector2 = Vector2(72, 92), dim: 
 	var art := CardArt.texture(card)
 	if art != null:
 		var tr := TextureRect.new()
+		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		tr.texture = art
 		tr.position = Vector2(3, 3)
 		tr.size = size - Vector2(6, 6)
-		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 		tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		p.add_child(tr)
 		var shade := ColorRect.new()
@@ -154,6 +154,20 @@ static func card_widget(card: Dictionary, size: Vector2 = Vector2(72, 92), dim: 
 			tint.size = size - Vector2(6, 6)
 			tint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			p.add_child(tint)
+	elif CardIcons.inst != null:
+		# no generated portrait yet: show a live render of the card's 3D model
+		var fb := TextureRect.new()
+		fb.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		fb.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		fb.position = Vector2(3, 3)
+		fb.size = Vector2(size.x - 6, size.y - 22)
+		fb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var tex := CardIcons.inst.texture(card)
+		if tex != null:
+			fb.texture = tex
+		else:
+			CardIcons.waiting.append([fb, card])
+		p.add_child(fb)
 	else:
 		var sw := ColorRect.new()
 		sw.color = Color(str(card.get("color", "#888888")))
