@@ -41,8 +41,10 @@ def hue_name(hexcol):
 def evo_desc(c, byid):
     if c['id'] in HERO_DESC:
         return HERO_DESC[c['id']]
-    base = next((x for x in byid.values() if x.get('evolvesTo') == c['id']), None)
+    base = next((x for x in byid.values() if x.get('evolvesTo') == c['id'] or x.get('heroVariantId') == c['id']), None)
     d = DESC.get(base['id']) if base else None
+    if c['id'].startswith('hero_'):
+        return f"a HERO version of: {d or c['name']} -- dressed in ornate golden hero armor trim, glowing golden energy aura, a heroic confident pose, rich warm gold and orange accents"
     col = hue_name(c.get('evolutionAuraColor', '#b66cff'))
     return f"an EVOLVED, more powerful, upgraded version of: {d or c['name']} -- radiating a glowing {col} energy aura with sparkling power particles, intensified glowing details, menacing heroic pose"
 
@@ -122,7 +124,7 @@ def main():
     allc = json.load(open(os.path.join(ROOT, 'godot', 'data', 'cards.json')))
     byid = {c['id']: c for c in allc}
     if a.evo:
-        cards = [c for c in allc if c.get('evolution') or c.get('rarity') == 'hero']
+        cards = [c for c in allc if c.get('evolution') or (c.get('rarity') == 'hero' and c.get('cost', 0) > 0)]
         for c in cards:
             DESC[c['id']] = evo_desc(c, byid)
     else:

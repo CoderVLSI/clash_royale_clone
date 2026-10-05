@@ -572,7 +572,7 @@ func _update_abilities() -> void:
 	for u in sim.units:
 		if u["opp"] or u["hp"] <= 0 or not sim.mech.abilities.has_ability(u):
 			continue
-		if u.get("isHeroDecoy", false):
+		if u.get("isHeroDecoy", false) or u.get("abilityUsed", false):
 			continue
 		seen[u["id"]] = true
 		var btn: Button = ability_btns.get(u["id"])

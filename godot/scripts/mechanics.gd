@@ -580,6 +580,8 @@ func _on_reveal(u: Dictionary) -> void:
 
 func modify_damage(u: Dictionary, target: Dictionary, base_damage: float, tdist: float) -> float:
 	var d := base_damage
+	if float(_v(u, "savageUntil", 0.0)) > sim.now and target.get("isTower", false):
+		d *= 0.4
 	if _v(u, "dashHit", false):
 		u["dashHit"] = false
 		d *= 2.0                      # the dash impact deals double damage

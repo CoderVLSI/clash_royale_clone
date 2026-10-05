@@ -113,11 +113,13 @@ static func card_scale(cid: String) -> float:
 				_batch2 = d
 	if _batch2.has(cid):
 		return float(_batch2[cid])
-	if cid.begins_with("evolved_"):
+	if cid.begins_with("evolved_") or cid.begins_with("hero_"):
 		# evolved models are baked 1.1x bigger than their base; use the base card's scale
 		var b := CardArt.base_id({"id": cid})
 		if MODEL_ALIAS.has(b):
 			b = str(MODEL_ALIAS[b][0])
+		if b == cid:
+			return 1.5
 		return card_scale(b)
 	return 1.6
 

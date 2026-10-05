@@ -601,6 +601,12 @@ func _update_unit(u: Dictionary, dmg: Array, splash: Array) -> void:
 	if _v(u, "dashInvincible", false) and mech.bandit_dash(u):
 		return
 	var targets := _targets_for(u, actual_range)
+	# Hero Knight's taunt: the taunted unit must attack the Knight
+	if float(_v(u, "tauntUntil", 0.0)) > now:
+		var taunter: Variant = unit_by_id(int(_v(u, "tauntedBy", -1)))
+		if taunter != null and taunter["hp"] > 0:
+			targets = [taunter]
+			u["lockedTarget"] = taunter["id"]
 	# locked target with aggro switching
 	var locked: int = u["lockedTarget"]
 	if locked != -1:
@@ -901,6 +907,8 @@ func damage_unit_basic(u: Dictionary, e: Dictionary) -> void:
 		u["currentShieldHp"] -= absorbed
 		amount -= absorbed
 	u["hp"] -= amount
+	if float(_v(u, "unkillableUntil", 0.0)) > now and u["hp"] < 1.0:
+		u["hp"] = 1.0                 # Hero Berserker: Savage Survival keeps her at 1 HP
 	u["lastHitTime"] = now
 	if e.get("stun", 0.0) > 0.0:
 		u["stunUntil"] = maxf(u["stunUntil"], now + e["stun"] * 1000.0)

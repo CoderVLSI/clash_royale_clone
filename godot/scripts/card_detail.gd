@@ -462,10 +462,35 @@ func _build_stats_page() -> void:
 	pager.add_child(holder)
 	page_nodes.append(holder)
 
+const HERO_ABILITIES := {
+	"heroFieryFlightAbility": ["Fiery Flight", "Flies for 5s with a speed boost, raining fireballs and tornados."],
+	"heroTripleThreatAbility": ["Triple Threat", "Leaps back leaving a decoy; the next shot is a triple shot."],
+	"heroSurgingAbility": ["Surging Strikes", "Stuns nearby enemies, then twin beams of lightning for 3s."],
+	"heroTauntAbility": ["Triumphant Taunt", "Gains a shield and taunts nearby enemies into attacking him for 5s."],
+	"heroHurlAbility": ["Heroic Hurl", "Grabs the highest-HP enemy troop nearby and throws it across the arena."],
+	"heroBreakfastAbility": ["Breakfast Boost", "Eats all cooked pancakes: gains levels and heals 30%."],
+	"heroTurretAbility": ["Trusty Turret", "Spawns a rapid-fire auto-turret in front of him for 10s."],
+	"heroSnowstormAbility": ["Snowstorm", "Whips up a snowstorm that slows and chills everything around."],
+	"heroBannerAbility": ["Banner Brigade", "When the last Goblin stands, a banner calls in 4 more Goblins."],
+	"heroWarpAbility": ["Wounding Warp", "Warps to the lowest-HP enemy, hitting for 468 on arrival."],
+	"heroSwishAbility": ["Stone Swish", "Plants his feet and lobs boulders from Mortar range."],
+	"heroRevivalAbility": ["Regal Revival", "Destroys the Tombstone and raises Tomb Queen."],
+	"heroCoffinAbility": ["Coffin Cadet", "Drops cadet skeletons and a bomb on the spot."],
+	"heroDismountAbility": ["Destructive Dismount", "Slams the ground, stunning and damaging nearby enemies."],
+	"heroWhirlwindAbility": ["Wild Whirlwind", "Spins for 3.5s hitting everything around her (takes 15% less damage)."],
+	"heroSavageAbility": ["Savage Survival", "Goes berserk for 4s: faster, stronger and unkillable."],
+	"heroFrostyAbility": ["Frosty Fella", "Summons a snowman that freezes nearby enemies until it falls."],
+	"heroRerollAbility": ["Rowdy Reroll", "Barrels down the lane a second time."],
+}
+
 func description_text() -> String:
 	var c := card
 	var t := str(c.get("type", "ground"))
 	var parts: Array = []
+	for k in HERO_ABILITIES:
+		if c.get(k, false):
+			var ab: Array = HERO_ABILITIES[k]
+			return "%s (%d elixir)\n\n%s\nOne use per deployment." % [ab[0], int(c.get("abilityCost", 1)), ab[1]]
 	var n := int(c.get("count", 1))
 	var nm := str(c["name"])
 	if t == "spell":
