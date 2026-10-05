@@ -17,6 +17,7 @@ const TOWERS := [
 
 var save: SaveData
 var tab := 2
+var _coll_gen := 0
 var content: Control
 var nav_buttons: Array = []
 var modal_layer: Control
@@ -176,6 +177,7 @@ func _style_nav() -> void:
 		b.add_theme_color_override("font_pressed_color", Color.WHITE)
 
 func _show_tab(i: int) -> void:
+	var _t0 := Time.get_ticks_msec()
 	tab = i
 	_style_nav()
 	UI.clear(content)
@@ -189,6 +191,8 @@ func _show_tab(i: int) -> void:
 	view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	content.add_child(view)
 	_refresh_header()
+	if OS.get_cmdline_user_args().has("--prof"):
+		print("TAB ", i, " built in ", Time.get_ticks_msec() - _t0, " ms")
 
 # ----------------------------------------------------------------------------- BATTLE tab
 
@@ -477,7 +481,16 @@ func _fill_collection(coll: Node) -> void:
 	if sort_cost:
 		list.sort_custom(func(a, b): return a["cost"] < b["cost"])
 	var deck_ids := save.current_deck_ids()
+	_coll_gen += 1
+	var gen := _coll_gen
+	var n := 0
 	for c in list:
+		# build a few widgets per frame so switching to the Decks tab never freezes the game
+		n += 1
+		if n % 8 == 0:
+			await get_tree().process_frame
+		if gen != _coll_gen or not is_instance_valid(coll):
+			return
 		var holder := Control.new()
 		holder.custom_minimum_size = Vector2(80, 98)
 		var w := UI.card_widget(c, Vector2(78, 96), c["id"] in deck_ids)

@@ -404,6 +404,13 @@ func _fill_card(w: Control, card: Dictionary, affordable: bool = true) -> void:
 		w.visible = false
 		return
 	w.visible = true
+	# this runs every frame for the hand: only rebuild when the card / evolution state changed
+	var prog0 := sim.mech.evolution_progress(0, card)
+	var fkey := "%s|%s" % [card["id"], str(prog0.get("ready", "-")) + str(prog0.get("current", ""))]
+	if w.get_meta("fk", "") == fkey:
+		w.modulate = Color.WHITE if affordable else Color(0.62, 0.62, 0.7, 1.0)
+		return
+	w.set_meta("fk", fkey)
 	var rc := Color(str(RARITY_COLORS.get(str(card.get("rarity", "common")), "#7f8c8d")))
 	var sb: StyleBoxFlat = w.get_theme_stylebox("panel")
 	sb.border_color = rc

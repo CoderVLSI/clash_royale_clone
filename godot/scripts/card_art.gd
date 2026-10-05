@@ -17,6 +17,14 @@ static func _build_map() -> void:
 		if c.get("heroVariantId") != null:
 			_base_of[str(c["heroVariantId"])] = str(c["id"])
 
+static func preload_all() -> void:
+	## Decode every card portrait on background threads so the collection screen opens instantly.
+	CardDB.ensure()
+	for c in CardDB.all:
+		var path := "res://assets/art/cards/%s.jpg" % str(c["id"])
+		if ResourceLoader.exists(path):
+			ResourceLoader.load_threaded_request(path)
+
 static func base_id(card: Dictionary) -> String:
 	## Base card of an evolution / hero variant (used to find the 3D model).
 	_build_map()

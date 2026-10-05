@@ -78,8 +78,7 @@ func _build_environment() -> void:
 	var sun := DirectionalLight3D.new()
 	sun.rotation = Vector3(deg_to_rad(-62), deg_to_rad(-30), 0)
 	sun.light_energy = 0.42
-	sun.shadow_enabled = true
-	sun.directional_shadow_max_distance = 80.0
+	sun.shadow_enabled = false     # real-time shadows are too slow on phones; units use blob shadows
 	sun.light_color = Color("fff8ee")
 	add_child(sun)
 

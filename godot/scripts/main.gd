@@ -10,6 +10,7 @@ func _ready() -> void:
 	var sfx := Sfx.new()
 	add_child(sfx)
 	add_child(CardIcons.new())
+	CardArt.preload_all()
 	sfx.enabled = save.sound
 	get_tree().node_added.connect(func(n: Node):
 		if n is BaseButton and not n.has_meta("sfx_hooked"):

@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/rascals.jpg-9a965cec67e21c2a0e51f64b54d99ab6.
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.4
+compress/lossy_quality=0.36
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0

@@ -133,7 +133,15 @@ class HexFrame extends Control:
 	var tex: Texture2D
 	var dark := Color("2a2f45")
 	var gem := false      # hero cards: golden frame with a diamond gem on top (like the real game)
+	static var _shape_cache: Dictionary = {}
 	static func shape(sz: Vector2, inset: float) -> PackedVector2Array:
+		var key := "%s_%s" % [sz, inset]
+		if _shape_cache.has(key):
+			return _shape_cache[key]
+		var res_pts := _shape(sz, inset)
+		_shape_cache[key] = res_pts
+		return res_pts
+	static func _shape(sz: Vector2, inset: float) -> PackedVector2Array:
 		var w := sz.x
 		var h := sz.y
 		var cx := w * 0.2
