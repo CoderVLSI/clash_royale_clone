@@ -3,7 +3,10 @@ extends SceneTree
 ##   godot --path godot --rendering-driver opengl3 --resolution 780x520 -s tests/gallery.gd -- /tmp/shots/gallery.png
 func _init() -> void:
 	CardDB.ensure()
-	var ids := ["knight", "archers", "musketeer", "wizard", "spear_goblins", "skeletons", "giant", "baby_dragon", "hog_rider", "cannon", "fire_spirit", "pekka"]
+	var ids := ["knight", "hog_rider", "wizard", "pekka", "bandit", "battle_ram", "dart_goblin", "electro_wizard", "elixir_golem", "golem", "ice_golem", "ice_spirit", "inferno_tower", "magic_archer", "mother_witch", "princess", "royal_ghost", "skeletons", "sword_goblins", "tesla", "tombstone"]
+	var sub := OS.get_cmdline_user_args()[1] if OS.get_cmdline_user_args().size() > 1 else ""
+	if sub != "":
+		ids = sub.split(",")
 	var sim := Sim.new(CardDB.deck_by_ids(["knight", "giant", "archers", "minions", "skeletons", "zap", "cannon", "valkyrie"]), CardDB.deck_by_ids(["knight", "giant", "archers", "minions", "skeletons", "zap", "cannon", "valkyrie"]))
 	var root := Node3D.new()
 	get_root().add_child(root)
@@ -23,16 +26,16 @@ func _init() -> void:
 	var n := 0
 	for id in ids:
 		var c := CardDB.get_card(id)
-		var u := sim.make_unit(c, 0, 0, n % 2 == 1, "LEFT")
+		var u := sim.make_unit(c, 0, 0, false, "LEFT")
 		var m := ModelFactory.build_unit(u)
-		m.position = Vector3((n % 6) * 3.2 - 8.0, 0, (n / 6) * 4.2 - 2.0)
-		m.rotation.y = 0.0 if n % 2 == 0 else PI
+		m.position = Vector3((n % 4) * 4.6 - 6.9, 0, (n / 4) * 5.0 - 5.0)
+		m.rotation.y = PI + 0.3
 		root.add_child(m)
 		n += 1
 	var cam := Camera3D.new()
 	root.add_child(cam)
-	var cpos := Vector3(0, 9.5, 11.0)
-	cam.transform = Transform3D(Basis.looking_at(Vector3(0, 1.0, 0.8) - cpos, Vector3.UP), cpos)
+	var cpos := Vector3(0, 7.5, 13.0)
+	cam.transform = Transform3D(Basis.looking_at(Vector3(0, 1.4, -1.2) - cpos, Vector3.UP), cpos)
 	cam.fov = 45
 	cam.current = true
 	await create_timer(1.0).timeout

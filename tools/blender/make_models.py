@@ -33,9 +33,16 @@ def material(name):
     bsdf = next(n for n in m.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
     bsdf.inputs['Base Color'].default_value = PALETTE[name]
     bsdf.inputs['Roughness'].default_value = 0.8
-    if name == 'FIRE':
+    if name == 'FIRE' or name.startswith('E_'):
         bsdf.inputs['Emission Color'].default_value = PALETTE[name]
-        bsdf.inputs['Emission Strength'].default_value = 1.5
+        bsdf.inputs['Emission Strength'].default_value = 1.5 if name == 'FIRE' else 0.9
+    if name.startswith('G_'):          # translucent (ghosts)
+        bsdf.inputs['Alpha'].default_value = 0.55
+        for attr, val in (('surface_render_method', 'BLENDED'), ('blend_method', 'BLEND')):
+            try:
+                setattr(m, attr, val)
+            except Exception:
+                pass
     m.diffuse_color = PALETTE[name]
     _mats[name] = m
     return m

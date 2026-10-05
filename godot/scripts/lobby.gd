@@ -41,6 +41,20 @@ func setup(s: SaveData) -> void:
 # ----------------------------------------------------------------------------- shell
 
 func _build_shell() -> void:
+	var art_bg := load("res://assets/art/ui/lobby_bg.jpg") if ResourceLoader.exists("res://assets/art/ui/lobby_bg.jpg") else null
+	if art_bg != null:
+		var pic := TextureRect.new()
+		pic.texture = art_bg
+		pic.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		pic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		pic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		pic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(pic)
+		var veil := ColorRect.new()
+		veil.color = Color(0.03, 0.05, 0.16, 0.38)
+		veil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(veil)
 	var bg := TextureRect.new()
 	var gt := GradientTexture2D.new()
 	var g := Gradient.new()
@@ -55,7 +69,8 @@ func _build_shell() -> void:
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	bg.stretch_mode = TextureRect.STRETCH_SCALE
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(bg)
+	if art_bg == null:
+		add_child(bg)
 	var col := VBoxContainer.new()
 	col.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	col.add_theme_constant_override("separation", 0)
@@ -125,7 +140,7 @@ func _refresh_header() -> void:
 
 func _build_nav() -> Control:
 	var p := PanelContainer.new()
-	p.custom_minimum_size = Vector2(0, 66)
+	p.custom_minimum_size = Vector2(0, 72)
 	p.add_theme_stylebox_override("panel", UI.style(Color(0.05, 0.08, 0.18, 0.96), 0))
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 0)
@@ -135,7 +150,15 @@ func _build_nav() -> Control:
 		var b := Button.new()
 		b.text = TABS[i]
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		b.add_theme_font_size_override("font_size", 15)
+		b.add_theme_font_size_override("font_size", 13)
+		var ic := UI.ui_tex(["shop", "decks", "battle", "social", "events"][i])
+		if ic != null:
+			b.icon = ic
+			b.expand_icon = true
+			b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+			b.add_theme_constant_override("icon_max_width", 34)
+			b.add_theme_constant_override("h_separation", 0)
 		b.pressed.connect(_show_tab.bind(i))
 		row.add_child(b)
 		nav_buttons.append(b)

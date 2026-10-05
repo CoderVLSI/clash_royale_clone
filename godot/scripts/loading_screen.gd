@@ -32,6 +32,13 @@ func _ready() -> void:
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	bg.stretch_mode = TextureRect.STRETCH_SCALE
 	add_child(bg)
+	if ResourceLoader.exists("res://assets/art/ui/lobby_bg.jpg"):
+		var pic := TextureRect.new()
+		pic.texture = load("res://assets/art/ui/lobby_bg.jpg")
+		pic.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		pic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		pic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+		add_child(pic)
 	# 3D logo crown tower spinning
 	var holder := SubViewportContainer.new()
 	holder.stretch = true

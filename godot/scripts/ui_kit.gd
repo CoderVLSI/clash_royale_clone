@@ -67,6 +67,10 @@ static func scroll(content: Control) -> ScrollContainer:
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	return s
 
+static func ui_tex(name: String) -> Texture2D:
+	var path := "res://assets/art/ui/%s.png" % name
+	return load(path) if ResourceLoader.exists(path) else null
+
 static func clear(node: Node) -> void:
 	for c in node.get_children():
 		node.remove_child(c)
@@ -76,8 +80,13 @@ static func clear(node: Node) -> void:
 class Icon extends Control:
 	var kind := "crown"
 	var col := Color("f5c518")
+	var tex: Texture2D
 	func _draw() -> void:
 		var s := size
+		if tex != null:
+			# Blender-rendered icon (assets/art/ui/<kind>.png); the colour's alpha dims it (crown counters)
+			draw_texture_rect(tex, Rect2(Vector2.ZERO, s), false, Color(1, 1, 1, col.a))
+			return
 		match kind:
 			"crown":
 				var pts := PackedVector2Array([Vector2(s.x * 0.08, s.y * 0.85), Vector2(s.x * 0.04, s.y * 0.25), Vector2(s.x * 0.3, s.y * 0.55), Vector2(s.x * 0.5, s.y * 0.1),
@@ -106,6 +115,9 @@ static func icon(kind: String, color: Color, size: Vector2 = Vector2(24, 24)) ->
 	var i := Icon.new()
 	i.kind = kind
 	i.col = color
+	var path := "res://assets/art/ui/%s.png" % kind
+	if ResourceLoader.exists(path):
+		i.tex = load(path)
 	i.custom_minimum_size = size
 	i.size = size
 	i.size_flags_vertical = Control.SIZE_SHRINK_CENTER

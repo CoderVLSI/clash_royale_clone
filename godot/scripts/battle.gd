@@ -219,16 +219,27 @@ func _build_hud() -> void:
 	tray_hi.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tray.add_child(tray_hi)
 	# chat button + Next card (left column)
-	var chat := UI.panel(Color("f4f4f6"), 18, Color("cfd3de"), 3)
+	var chat := UI.panel(Color("2d4f9e"), 18, Color("7fa6ff"), 3)
 	chat.position = Vector2(12, 14)
 	chat.size = Vector2(56, 46)
 	chat.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for i in 3:
-		var dot := ColorRect.new()
-		dot.color = Color("2a2a30")
-		dot.position = Vector2(12 + i * 13, 20)
-		dot.size = Vector2(8, 8)
-		chat.add_child(dot)
+	var chat_ic := UI.ui_tex("chat")
+	if chat_ic != null:
+		var ct := TextureRect.new()
+		ct.texture = chat_ic
+		ct.position = Vector2(6, 2)
+		ct.size = Vector2(44, 42)
+		ct.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		ct.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		ct.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		chat.add_child(ct)
+	else:
+		for i in 3:
+			var dot := ColorRect.new()
+			dot.color = Color("2a2a30")
+			dot.position = Vector2(12 + i * 13, 20)
+			dot.size = Vector2(8, 8)
+			chat.add_child(dot)
 	tray.add_child(chat)
 	var nxt := _label("Next:", 15, Color.WHITE)
 	nxt.position = Vector2(14, 62)

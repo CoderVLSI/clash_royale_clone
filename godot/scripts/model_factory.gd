@@ -87,6 +87,21 @@ static func glb(name: String, tint: Color, team: Color) -> Node3D:
 	_recolor(root, tint, team)
 	return root
 
+const CARD_SCALE := {"elixir_golem": 0.8, "golem": 0.78, "ice_golem": 0.85, "magic_archer": 0.9, "pekka": 1.1, "hog_rider": 1.25, "ice_spirit": 1.2,
+	"inferno_tower": 1.0, "tesla": 1.0, "tombstone": 1.0, "royal_ghost": 1.4, "battle_ram": 1.2}
+
+static func card_model(card_id: String, team: Color) -> Node3D:
+	## Unique Blender model matched to the card's generated portrait (assets/models/cards/<id>.glb).
+	var path := "res://assets/models/cards/%s.glb" % card_id
+	if not _scenes.has(path):
+		_scenes[path] = load(path) if ResourceLoader.exists(path) else null
+	var ps: PackedScene = _scenes[path]
+	if ps == null:
+		return null
+	var root := ps.instantiate() as Node3D
+	_recolor(root, Color.WHITE, team)
+	return root
+
 static func glb_mesh(name: String) -> Mesh:
 	## First mesh of a GLB (keeps its authored materials) - used for MultiMesh scenery.
 	var path := "res://assets/models/%s.glb" % name
@@ -226,12 +241,21 @@ static func build_unit(u: Dictionary) -> Node3D:
 	root.add_child(model)
 	var base_r := 0.55 * s
 	var arch := archetype(u)
-	var glb_model := glb(arch, col, team)
+	var cid := CardArt.art_id({"id": str(u.get("cid", u["spriteId"]))})
+	var glb_model := card_model(cid, team)
+	var unique := glb_model != null
+	if glb_model == null:
+		glb_model = glb(arch, col, team)
 	# team ring on the ground
 	var ring := cyl(base_r * 1.15, base_r * 1.15, 0.04, team, Vector3(0, 0.03, 0), 16)
 	ring.material_override = mat(Color(team, 0.85), 0.9, 0.0)
 	root.add_child(ring)
-	if glb_model != null:
+	if unique:
+		glb_model.scale = Vector3.ONE * float(CARD_SCALE.get(cid, 1.6))
+		if typ == "flying":
+			model.position.y = 2.2
+		model.add_child(glb_model)
+	elif glb_model != null:
 		var gs := s
 		if arch == "brute":
 			gs = s * 0.75
@@ -354,6 +378,11 @@ static func build_projectile(p: Dictionary) -> Node3D:
 	var r := 0.14
 	var emissive := 1.0
 	if p.get("isSpell", false):
+		var sm := card_model(str(p["card"]["id"]), Color.WHITE)
+		if sm != null:
+			sm.scale = Vector3.ONE * (1.4 if str(p["card"]["id"]) != "arrows" else 1.0)
+			root.add_child(sm)
+			return root
 		c = Color("ff7a1a")
 		r = 0.7
 		emissive = 1.6

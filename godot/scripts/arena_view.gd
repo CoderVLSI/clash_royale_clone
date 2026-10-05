@@ -643,7 +643,7 @@ func _drain_fx() -> void:
 				_explode(to3(e["x"], e["y"], 0.8), e["r"] * S * 1.1, Color("ff7a1a") if e["kind"] in ["fireball", "rocket"] else Color("a5d6ff"))
 				shake = maxf(shake, 0.25)
 			"zone":
-				_zone(to3(e["x"], e["y"], 0.1), e["r"] * S, Color("7ed957"), e["dur"])
+				_zone(to3(e["x"], e["y"], 0.1), e["r"] * S, Color("7ed957"), e["dur"], str(e["kind"]))
 			"death":
 				_burst(to3(e["x"], e["y"], 0.8), 1.0, Color("ffffff"))
 			"alert":
@@ -696,7 +696,17 @@ func _ring(pos: Vector3, r: float, color: Color) -> void:
 	tw.parallel().tween_property(m, "transparency", 1.0, 0.4)
 	tw.tween_callback(m.queue_free)
 
-func _zone(pos: Vector3, r: float, color: Color, dur: float) -> void:
+func _zone(pos: Vector3, r: float, color: Color, dur: float, kind: String = "") -> void:
+	if kind == "poison":
+		var pm := ModelFactory.card_model("poison", Color.WHITE)
+		if pm != null:
+			pm.position = Vector3(pos.x, 0.0, pos.z)
+			pm.scale = Vector3(r / 0.95, 0.9, r / 0.95 * ZR)
+			fx_root.add_child(pm)
+			var ptw := create_tween()
+			ptw.tween_interval(maxf(0.1, dur - 0.4))
+			ptw.tween_property(pm, "scale", Vector3.ZERO, 0.4)
+			ptw.tween_callback(pm.queue_free)
 	var m := ModelFactory.cyl(r, r, 0.05, color, pos, 24)
 	m.material_override = ModelFactory.mat(Color(color, 0.35), 0.9, 0.8, true)
 	m.scale.z = ZR

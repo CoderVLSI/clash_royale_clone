@@ -39,3 +39,12 @@ the 2D sprites were replaced with 3D models authored in Blender.
 * **Sound** - `tools/art/gen_sfx.py` (ElevenLabs sound generation, `ELEVENLABS_API_KEY` from the environment) writes
   30 effects + 2 music loops to `assets/audio/`. Played through `scripts/sfx.gd`; Menu -> Sound toggles it.
   (ElevenLabs free-tier output is not licensed for commercial use.)
+
+## Unique card models, icons and lobby art (Blender)
+* `tools/blender/make_card_models.py` builds 27 unique models matched to the generated card portraits
+  (`assets/models/cards/<card id>.glb`: 21 units/buildings + 6 spell visuals). Only the `TEAM` material slot is
+  recoloured at runtime; evolved/hero variants reuse their base card's model. Cards without a model use the shared
+  archetypes from `make_models.py`.
+* `tools/blender/make_ui_art.py` renders the 12 UI icons (coin, gem, trophy, crown, chest, drop, tab icons, chat) and the
+  castle for the lobby background; `tools/art/compose_lobby_bg.py` composites it over a painted dusk sky.
+  (OpenRouter refuses image output below a $1 balance, so these were rendered in Blender instead of generated.)
