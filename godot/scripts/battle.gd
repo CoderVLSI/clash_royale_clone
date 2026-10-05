@@ -25,6 +25,8 @@ var elixir_fill: ColorRect
 var elixir_lbl: Label
 var alert_lbl: Label
 var slot_panels: Array = []
+var ability_row: HBoxContainer
+var ability_btns: Dictionary = {}
 var next_panel: Control
 var over_panel: Control
 var ghost: Control
@@ -41,7 +43,9 @@ var shot_taken := false
 
 func start(player_deck_ids: Array = DEFAULT_DECK, player_tower: String = "princess", evo_ids: Array = [], hero_id: String = "", low_perf: bool = false) -> void:
 	var enemy := _random_deck()
-	sim = Sim.new(CardDB.deck_by_ids(player_deck_ids), enemy, player_tower)
+	var pdeck := CardDB.deck_by_ids(player_deck_ids)
+	pdeck.shuffle()                      # App.js resetGame shuffles the player's deck each battle
+	sim = Sim.new(pdeck, enemy, player_tower)
 	sim.players[0]["evo_slots"] = evo_ids
 	sim.players[0]["hero_slot"] = hero_id if hero_id != "" else null
 	if low_perf:
@@ -58,6 +62,8 @@ func start(player_deck_ids: Array = DEFAULT_DECK, player_tower: String = "prince
 			speed = float(a.substr(8))
 		elif a.begins_with("--deck="):
 			sim = Sim.new(CardDB.deck_by_ids(a.substr(7).split(",")), enemy, player_tower)
+			sim.players[0]["evo_slots"] = evo_ids
+			sim.players[0]["hero_slot"] = hero_id if hero_id != "" else null
 	if auto_play:
 		sim.ai_enabled = [true, true]
 	else:
@@ -224,6 +230,14 @@ func _build_hud() -> void:
 		w.gui_input.connect(_on_slot_input.bind(i))
 		hand_row.add_child(w)
 		slot_panels.append(w)
+	ability_row = HBoxContainer.new()
+	ability_row.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	ability_row.offset_top = -TRAY_H - 52
+	ability_row.offset_bottom = -TRAY_H - 6
+	ability_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	ability_row.add_theme_constant_override("separation", 8)
+	ability_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(ability_row)
 	# ghost shown under the finger while dragging
 	ghost = _card_widget(Vector2(70, 94))
 	ghost.visible = false
@@ -388,6 +402,7 @@ func _process(delta: float) -> void:
 			guard += 1
 			_scan_alerts()
 	_update_hud()
+	_update_abilities()
 	_update_camera(delta)
 	if sim.game_over != "" and not over_panel.visible:
 		_show_game_over()
@@ -426,6 +441,33 @@ func _update_hud() -> void:
 		_evo_badge(slot_panels[i], c)
 	_fill_card(next_panel, p["next"], true)
 	next_panel.modulate.a = 0.75
+
+func _update_abilities() -> void:
+	var seen := {}
+	for u in sim.units:
+		if u["opp"] or u["hp"] <= 0 or not sim.mech.abilities.has_ability(u):
+			continue
+		if u.get("isHeroDecoy", false):
+			continue
+		seen[u["id"]] = true
+		var btn: Button = ability_btns.get(u["id"])
+		if btn == null:
+			btn = UI.button("", Color("8e44ad"), func(): sim.request_ability(u["id"]), Vector2(0, 46), 14)
+			btn.custom_minimum_size = Vector2(150, 46)
+			ability_row.add_child(btn)
+			ability_btns[u["id"]] = btn
+		var left := (sim.mech.abilities.ready_at(u) - sim.now) / 1000.0
+		var cost := int(Sim._v(u, "abilityCost", 0))
+		if left > 0.0:
+			btn.text = "%s  %.0fs" % [str(u["name"]).substr(0, 10), left]
+			btn.disabled = true
+		else:
+			btn.text = "%s  (%d)" % [str(u["name"]).substr(0, 10), cost]
+			btn.disabled = sim.players[0]["elixir"] < cost
+	for id in ability_btns.keys():
+		if not seen.has(id):
+			ability_btns[id].queue_free()
+			ability_btns.erase(id)
 
 func _update_camera(delta: float) -> void:
 	if view.shake > 0.0:

@@ -5,9 +5,13 @@ extends RefCounted
 ## Batch A (this file): all spell cards + the most common unit flags. Evolutions / heroes / champions follow.
 
 var sim: Sim
+var abilities: Abilities
+var evo: EvoMechanics
 
 func _init(s: Sim) -> void:
 	sim = s
+	abilities = Abilities.new(s)
+	evo = EvoMechanics.new(s, self)
 
 static func _v(d: Dictionary, k: String, dv: Variant = 0) -> Variant:
 	return Sim._v(d, k, dv)
@@ -242,6 +246,8 @@ func _in_r(u: Dictionary, z: Dictionary, extra: float = 0.0) -> bool:
 func _tick_zone(z: Dictionary, _dmg: Array, splash: Array) -> bool:
 	var kind: String = z["kind"]
 	var now: float = sim.now
+	if evo.tick_zone(z):
+		return z["keep"]
 	if kind == "log":
 		return _tick_log(z)
 	if kind == "delivery":
@@ -354,6 +360,9 @@ func post_update() -> void:
 func on_spawn(u: Dictionary) -> void:
 	if _v(u, "hidden", false) == true:
 		u["hidden"] = {"active": true, "lastCombatTime": sim.now}
+	if abilities.has_ability(u):
+		u["lastAbilityTime"] = sim.now - float(_v(u, "abilityCooldown", 0))
+	evo.on_spawn(u)
 	if _v(u, "generatesElixir", false):
 		u["elixirGenerationTime"] = sim.now
 	var sd: float = float(_v(u, "spawnDamage", 0))
@@ -387,6 +396,8 @@ func update_unit_pre(u: Dictionary, _dmg: Array, _splash: Array) -> void:
 	var h = u.get("hidden")
 	if h is Dictionary:
 		_update_hidden(u, h)
+	abilities.tick(u)
+	evo.update(u)
 
 func _update_hidden(u: Dictionary, h: Dictionary) -> void:
 	var now := sim.now
@@ -420,6 +431,7 @@ func _update_hidden(u: Dictionary, h: Dictionary) -> void:
 		if h["active"]:
 			if enemy_in or tower_in:
 				h["active"] = false
+				_on_reveal(u)
 		else:
 			var far := true
 			for e in sim.units:
@@ -434,8 +446,31 @@ func _update_hidden(u: Dictionary, h: Dictionary) -> void:
 			if far:
 				h["active"] = true
 
+func _on_reveal(u: Dictionary) -> void:
+	if float(_v(u, "revealDamage", 0)) > 0.0:
+		var ev := {"x": u["x"], "y": u["y"], "r": float(_v(u, "revealRadius", 50)), "dmg": float(u["revealDamage"]), "opp": u["opp"], "skip_id": -1,
+			"tower_factor": 1.0, "attacker": u["id"], "ground_only": false, "tower_hit": true}
+		var out: Array = []
+		sim._apply_splash(ev, out)
+		sim._apply_damage(out)
+	if _v(u, "spawnsSouldiers", false):
+		var n := int(_v(u, "souldiersPerReveal", 2))
+		for i in n:
+			var a := (TAU * i) / n
+			var so := sim.make_unit(CardDB.get_card("skeletons"), u["x"] + cos(a) * 30.0, u["y"] + sin(a) * 30.0, u["opp"], u["lane"])
+			so["hp"] = float(_v(u, "souldierHp", 75))
+			so["maxHp"] = so["hp"]
+			so["damage"] = float(_v(u, "souldierDamage", 40))
+			so["lifetime"] = float(_v(u, "souldierLifetime", 5))
+			so["type"] = "ground"
+			so["spriteId"] = "souldier"
+			sim.units.append(so)
+
 func modify_damage(u: Dictionary, target: Dictionary, base_damage: float, tdist: float) -> float:
 	var d := base_damage
+	if _v(u, "dashHit", false):
+		u["dashHit"] = false
+		d *= 2.0                      # the dash impact deals double damage
 	if _v(u, "damageRamp", false):
 		if int(_v(u, "lastRampTarget", -1)) != int(target["id"]):
 			u["lastRampTarget"] = target["id"]
@@ -446,9 +481,14 @@ func modify_damage(u: Dictionary, target: Dictionary, base_damage: float, tdist:
 		d = floorf(d * float(u["powerShotMultiplier"]))
 	if _v(u, "shotgunSpread", false):
 		d = floorf(base_damage * maxf(0.3, 1.0 - tdist / 150.0))
-	return d
+	return evo.modify_damage(u, target, d, tdist)
 
 func on_attack(u: Dictionary, target: Dictionary, damage: float, dmg: Array, splash: Array) -> void:
+	var hh = u.get("hidden")
+	if hh is Dictionary and hh.has("until"):
+		hh["active"] = false           # Archer Queen / Boss Bandit reveal when they strike
+		hh.erase("until")
+	evo.on_attack(u, target, damage, dmg, splash)
 	# Heal Spirit: heals friendly units around it on its explosion
 	var heal: float = float(_v(u, "healsOnAttack", 0))
 	if heal > 0.0:
@@ -494,13 +534,62 @@ func _chain(u: Dictionary, primary: Dictionary, damage: float, count: int, stun:
 		dmg.append({"id": chained[i]["id"], "dmg": damage, "attacker": u["id"], "stun": stun})
 		sim.fx.append({"t": "bolt", "x": chained[i]["x"], "y": chained[i]["y"]})
 
-func on_ranged_attack(_u: Dictionary, _target: Dictionary, _damage: float, _proj: Dictionary) -> void:
-	pass
+func on_ranged_attack(u: Dictionary, target: Dictionary, damage: float, proj: Dictionary) -> void:
+	evo.on_ranged_attack(u, target, damage, proj)
 
-func on_projectile_hit(_p: Dictionary, _tgt: Variant, _dmg: Array, _splash: Array) -> void:
-	pass
+func on_projectile_hit(p: Dictionary, tgt: Variant, dmg: Array, splash: Array) -> void:
+	evo.on_projectile_hit(p, tgt, dmg, splash)
+
+func bandit_dash(u: Dictionary) -> bool:
+	## Bandit / Boss Bandit: dash at the nearest enemy within dashRange, invincible, hitting for double damage.
+	var now := sim.now
+	if _v(u, "isDashing", false):
+		if now >= float(_v(u, "dashEndTime", 0)):
+			u["isDashing"] = false
+			return false
+		var t: Variant = sim.target_by_id(int(u["lockedTarget"]))
+		if t == null or t["hp"] <= 0:
+			u["isDashing"] = false
+			return false
+		var d := Sim.dist(t["x"], t["y"], u["x"], u["y"])
+		if d < 25.0:
+			u["isDashing"] = false
+			u["lastAttack"] = -99999.0
+			u["dashHit"] = true
+			return false
+		var a := atan2(t["y"] - u["y"], t["x"] - u["x"])
+		u["x"] = clampf(u["x"] + cos(a) * 12.0, 10.0, Sim.W - 10.0)
+		u["y"] = clampf(u["y"] + sin(a) * 12.0, 10.0, Sim.H - 10.0)
+		return true
+	if now < float(_v(u, "nextDash", 0.0)):
+		return false
+	var best: Variant = null
+	var bd: float = float(_v(u, "dashRange", 80))
+	for e in sim.units:
+		if e["opp"] != u["opp"] and e["hp"] > 0 and not sim._is_hidden(e) and e["type"] != "flying":
+			var d2 := Sim.dist(e["x"], e["y"], u["x"], u["y"])
+			if d2 <= bd and d2 > 35.0:
+				bd = d2
+				best = e
+	if best != null:
+		u["isDashing"] = true
+		u["dashEndTime"] = now + 750.0
+		u["lockedTarget"] = best["id"]
+		u["nextDash"] = now + 3000.0
+		return true
+	return false
+
+func kamikaze_dies(u: Dictionary) -> bool:
+	## Evolved Wall Breakers survive their first (barrel) blast; Evolved Battle Ram rams twice.
+	if _v(u, "barrelExplosionFirst", false) and not _v(u, "barrelExploded", false):
+		return false
+	if _v(u, "repeatedRammng", false):
+		u["rams"] = int(_v(u, "rams", 0)) + 1
+		return int(u["rams"]) >= 2
+	return true
 
 func on_death(d: Dictionary) -> void:
+	evo.on_death(d)
 	var now := sim.now
 	var opp: bool = d["opp"]
 	# elixir golem family hands the opponent elixir
@@ -531,7 +620,17 @@ func is_raged(u: Dictionary) -> bool:
 	return float(_v(u, "rageUntil", 0.0)) > sim.now or _v(u, "permRage", false)
 
 func damage_unit(u: Dictionary, e: Dictionary) -> void:
+	var shield_before: float = float(_v(u, "currentShieldHp", 0))
+	if e.get("attacker", -1) != -1:
+		u["lastHitBy"] = e["attacker"]
 	sim.damage_unit_basic(u, e)
+	# Evolved Wizard: shield break burst
+	if shield_before > 0.0 and float(_v(u, "currentShieldHp", 0)) <= 0.0 and float(_v(u, "shieldBreakDamage", 0)) > 0.0:
+		var ev := {"x": u["x"], "y": u["y"], "r": float(_v(u, "shieldBreakRadius", 48)), "dmg": float(u["shieldBreakDamage"]), "opp": u["opp"], "skip_id": -1,
+			"tower_factor": 1.0, "attacker": u["id"], "ground_only": false, "knockback": float(_v(u, "shieldBreakKnockback", 0)), "tower_hit": true}
+		var out: Array = []
+		sim._apply_splash(ev, out)
+		sim._apply_damage(out)
 	# Electro Giant: shocks (damages + stuns) melee attackers
 	if _v(u, "shockOnHit", false) and e.get("attacker", -1) != -1:
 		var a: Variant = sim.unit_by_id(int(e["attacker"]))

@@ -275,7 +275,13 @@ func play_card(pi: int, hand_idx: int, x: float, y: float) -> bool:
 		return false
 	var cost: float = actual["cost"]
 	if actual.get("dualForm", false):
-		cost = 6.0 if p["elixir"] >= 6.0 else 3.0
+		if p["elixir"] >= 6.0:
+			cost = 6.0
+			var fly := CardDB.get_card("spirit_empress_flying")
+			if not fly.is_empty():
+				actual = fly
+		else:
+			cost = 3.0
 	if p["elixir"] < cost:
 		return false
 	p["elixir"] -= cost
@@ -325,10 +331,27 @@ func deploy_card(card: Dictionary, x: float, y: float, opp: bool) -> void:
 			u_lane = "RIGHT" if lane == "LEFT" else "LEFT"
 			sx = (70.0 if u_lane == "LEFT" else W - 70.0) + ox
 		var u := make_unit(card, sx, sy, opp, u_lane)
+		if i == 0 and card.get("spawnsExtra") != null and int(_v(card, "extraCount", 0)) > 0:
+			var ec := CardDB.get_card(str(card["spawnsExtra"]))
+			var behind := -30.0 if opp else 30.0
+			for k in int(card["extraCount"]):
+				var ex := make_unit(ec, sx + (k - (int(card["extraCount"]) - 1) / 2.0) * 22.0, sy + behind, opp, u_lane)
+				units.append(ex)
+				mech.on_spawn(ex)
 		if _v(card, "burrows", false):
 			u["burrowing"] = {"active": true, "targetX": tx, "targetY": ty}
 		units.append(u)
 		mech.on_spawn(u)
+
+func request_ability(unit_id: int) -> bool:
+	## Player taps the champion/hero ability button.
+	var u: Variant = unit_by_id(unit_id)
+	if u == null or u["opp"] or u["hp"] <= 0 or not mech.abilities.is_ready(u):
+		return false
+	if players[0]["elixir"] < float(_v(u, "abilityCost", 0)):
+		return false
+	u["abilityActiveRequest"] = true
+	return true
 
 func make_unit(card: Dictionary, x: float, y: float, opp: bool, lane: String) -> Dictionary:
 	var u: Dictionary = card.duplicate(true)
@@ -477,6 +500,7 @@ func _update_unit(u: Dictionary, dmg: Array, splash: Array) -> void:
 			for i in int(_v(u, "spawnCount", 1)):
 				var off := Vector2(rng.randf_range(-15.0, 15.0), 25.0 if u["opp"] == false else -25.0)
 				var s := make_unit(sc, u["x"] + off.x + (i * 6.0 - 6.0), u["y"] + off.y, u["opp"], u["lane"])
+				s["summonerId"] = u["id"]
 				units.append(s)
 				mech.on_spawn(s)
 	if u["stunUntil"] > now:
@@ -498,6 +522,8 @@ func _update_unit(u: Dictionary, dmg: Array, splash: Array) -> void:
 		if ch["active"]:
 			actual_damage = float(u["damage"]) * 2.0
 	if actual_range <= 0.0 and float(_v(u, "damage", 0)) <= 0.0 and float(_v(u, "speed", 0)) <= 0.0:
+		return
+	if _v(u, "dashInvincible", false) and mech.bandit_dash(u):
 		return
 	var targets := _targets_for(u, actual_range)
 	# locked target with aggro switching
@@ -531,8 +557,13 @@ func _update_unit(u: Dictionary, dmg: Array, splash: Array) -> void:
 			atk_speed /= (1.0 - u["slowAmount"])
 		if rage:
 			atk_speed /= 1.35
-		if atk_speed > 0.0 and now - u["lastAttack"] > atk_speed and actual_damage > 0.0:
+		var charged := true
+		if float(_v(u, "chargeTime", 0)) > 0.0:
+			charged = now - float(_v(u, "chargeStart", u["spawnTime"])) >= float(u["chargeTime"])
+		if atk_speed > 0.0 and now - u["lastAttack"] > atk_speed and actual_damage > 0.0 and charged:
 			u["lastAttack"] = now
+			if float(_v(u, "chargeTime", 0)) > 0.0:
+				u["chargeStart"] = now
 			_attack(u, closest, actual_damage, min_dist, dmg, splash)
 			if u["hp"] <= 0:
 				return
@@ -581,7 +612,7 @@ func _attack(u: Dictionary, target: Dictionary, base_damage: float, tdist: float
 		if _v(u, "splash", false) or _v(u, "frontalSplash", false):
 			splash.append({"x": target["x"], "y": target["y"], "r": float(_v(u, "splashRadius", 40)), "dmg": damage,
 				"opp": u["opp"], "skip_id": target["id"], "tower_factor": 1.0, "attacker": u["id"], "ground_only": _v(u, "groundOnly", false)})
-		if _v(u, "kamikaze", false):
+		if _v(u, "kamikaze", false) and mech.kamikaze_dies(u):
 			u["hp"] = 0.0
 	mech.on_attack(u, target, damage, dmg, splash)
 
@@ -643,7 +674,7 @@ func _steer_ground(u: Dictionary, nx: float, ny: float, eff: float) -> void:
 		if t["type"] == "princess" and t["opp"] != u["opp"] and ((u["lane"] == "LEFT" and t["x"] < W / 2) or (u["lane"] == "RIGHT" and t["x"] > W / 2)):
 			lane_princess = t
 	var princess_destroyed: bool = lane_princess == null or lane_princess["hp"] <= 0
-	var princess_y: float = (H - 150.0 - 80.0) if u["opp"] else 150.0
+	var princess_y: float = (H - 150.0) if u["opp"] else 150.0
 	var past_princess: bool = (ny > princess_y + 30.0) if u["opp"] else (ny < princess_y - 30.0)
 	if princess_destroyed and past_princess and enemy_king["hp"] > 0:
 		var dx: float = enemy_king["x"] - nx
@@ -699,6 +730,14 @@ func _update_projectiles(dmg: Array, splash: Array) -> void:
 			_pierce_hits(p, dmg)
 		var d := dist(p["x"], p["y"], p["targetX"], p["targetY"])
 		var spd: float = p["speed"]
+		if d <= spd and p.get("boomerang", false) and not p.get("returning", false):
+			var owner: Variant = unit_by_id(int(p.get("attackerId", -1)))
+			p["returning"] = true
+			p["hitIds"] = {}
+			p["targetX"] = owner["x"] if owner != null else p["originX"]
+			p["targetY"] = owner["y"] if owner != null else p["originY"]
+			keep.append(p)
+			continue
 		if d <= spd and p.get("pierce", false):
 			continue
 		if d <= spd:
@@ -727,6 +766,8 @@ func _pierce_hits(p: Dictionary, dmg: Array) -> void:
 func _projectile_hit(p: Dictionary, tgt: Variant, dmg: Array, splash: Array) -> void:
 	if p.get("isSpell", false):
 		mech.spell_land(p)
+		return
+	if tgt != null and tgt.has("isUnit") and mech.abilities.reflect_projectile(p, tgt):
 		return
 	if p.get("splash", false):
 		splash.append({"x": p["targetX"], "y": p["targetY"], "r": float(p.get("splashRadius", 50)), "dmg": p["damage"], "opp": p["opp"],
@@ -768,6 +809,8 @@ func _apply_damage(events: Array) -> void:
 		mech.damage_unit(u, e)
 
 func damage_unit_basic(u: Dictionary, e: Dictionary) -> void:
+	if _v(u, "dashInvincible", false) and _v(u, "isDashing", false):
+		return
 	var amount: float = e["dmg"]
 	var red: float = float(_v(u, "damageReduction", 0))
 	if red > 0.0:

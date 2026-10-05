@@ -17,6 +17,11 @@ func _init() -> void:
 		sim.deploy_card(CardDB.get_card("knight"), 150.0, 380.0, true)
 		sim.deploy_card(CardDB.get_card("minions"), 240.0, 360.0, true)
 		for t in 600:
+			if t == 60:
+				for u in sim.units:
+					if sim.mech.abilities.has_ability(u):
+						u["abilityActiveRequest"] = true
+						sim.players[0]["elixir"] = 10.0
 			sim.step()
 			sim.fx.clear()
 		var ok := true

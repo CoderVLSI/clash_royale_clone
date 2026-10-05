@@ -296,6 +296,21 @@ func _sync_units(delta: float) -> void:
 			model.scale = Vector3.ONE * (1.0 + sin(rec["lunge"] * PI) * 0.18)
 		else:
 			model.scale = Vector3.ONE
+		# status markers + cloaking
+		var st: Node3D = rec["status"]
+		st.get_node("Ice").visible = u["stunUntil"] > sim.now and float(u.get("frozenUntil", 0.0)) > sim.now
+		st.get_node("Rage").visible = float(u.get("rageUntil", 0.0)) > sim.now
+		st.get_node("Shield").visible = u["currentShieldHp"] > 0.0
+		st.get_node("Curse").visible = float(u.get("cursedUntil", 0.0)) > sim.now
+		var hid: Variant = u.get("hidden")
+		var cloaked: bool = hid is Dictionary and hid.get("active", false)
+		node.visible = true
+		model.visible = not cloaked or str(u["spriteId"]).contains("tesla") == false
+		if cloaked and str(u["spriteId"]).contains("tesla"):
+			node.position.y = -1.6
+		elif u.get("isClone", false):
+			model.scale = Vector3.ONE * 0.85
+		rec["bar"].visible = rec["bar"].visible and not cloaked
 		# hp bar
 		var ratio := clampf(u["hp"] / u["maxHp"], 0.0, 1.0)
 		rec["fg"].scale.x = maxf(ratio, 0.001)
@@ -322,7 +337,34 @@ func _make_unit_node(u: Dictionary) -> Dictionary:
 	node.scale = Vector3.ONE * 0.2
 	var tw := create_tween()
 	tw.tween_property(node, "scale", Vector3.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	return {"node": node, "fg": bar["fg"], "w": w, "bar": bar["root"], "phase": randf() * TAU, "lunge": 0.0, "first": true, "face_to": null}
+	var status := _make_status(s, u["type"] == "flying")
+	node.add_child(status)
+	return {"node": node, "fg": bar["fg"], "w": w, "bar": bar["root"], "phase": randf() * TAU, "lunge": 0.0, "first": true, "face_to": null, "status": status}
+
+func _make_status(s: float, flying: bool) -> Node3D:
+	var root := Node3D.new()
+	root.position.y = 2.2 if flying else 0.0
+	var ice := ModelFactory.box(Vector3(1.4 * s, 2.0 * s, 1.4 * s), Color("9fe3ff"), Vector3(0, 1.0 * s, 0))
+	ice.material_override = ModelFactory.mat(Color(0.6, 0.9, 1.0, 0.55), 0.2, 0.4)
+	ice.name = "Ice"
+	ice.visible = false
+	root.add_child(ice)
+	var rage := ModelFactory.cyl(0.9 * s, 0.9 * s, 0.05, Color("ff3b3b"), Vector3(0, 0.1, 0), 16)
+	rage.material_override = ModelFactory.mat(Color(1, 0.2, 0.2, 0.5), 0.9, 0.9, true)
+	rage.name = "Rage"
+	rage.visible = false
+	root.add_child(rage)
+	var shield := ModelFactory.sphere(0.95 * s, Color("c0d4ff"), Vector3(0, 0.9 * s, 0))
+	shield.material_override = ModelFactory.mat(Color(0.7, 0.8, 1.0, 0.35), 0.2, 0.3)
+	shield.name = "Shield"
+	shield.visible = false
+	root.add_child(shield)
+	var curse := ModelFactory.cyl(0.7 * s, 0.7 * s, 0.05, Color("b66cff"), Vector3(0, 0.12, 0), 16)
+	curse.material_override = ModelFactory.mat(Color(0.7, 0.4, 1.0, 0.6), 0.9, 1.0, true)
+	curse.name = "Curse"
+	curse.visible = false
+	root.add_child(curse)
+	return root
 
 func _sync_projectiles(delta: float) -> void:
 	var alive := {}
