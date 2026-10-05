@@ -61,6 +61,9 @@ func cast_spell(card: Dictionary, x: float, y: float, opp: bool) -> void:
 			_cast_lightning(card, x, y, opp)
 		"zap", "evolved_zap":
 			_cast_zap(card, x, y, opp)
+			if id == "evolved_zap":
+				sim.zones.append({"kind": "lingering_zap", "x": x, "y": y, "opp": opp, "card": card, "r": float(_v(card, "radius", 35)), "grow": float(_v(card, "lingeringZapGrowth", 0.5)) * 20.0,
+					"end": sim.now + float(_v(card, "lingeringZapDuration", 4)) * 1000.0, "interval": float(_v(card, "lingeringZapInterval", 0.5)) * 1000.0, "last": sim.now})
 		"the_log":
 			_start_log(card, x, y, opp, 150.0, 15.0)
 		"barb_barrel":
@@ -129,6 +132,15 @@ func spell_land(p: Dictionary) -> void:
 	if float(_v(card, "slow", 0)) > 0.0:
 		extra["slowDuration"] = float(_v(card, "slowDuration", 2.5))
 	_aoe(card, x, y, opp, extra)
+	if float(_v(card, "pullDistance", 0)) > 0.0:
+		# Evolved Snowball drags nearby troops toward the impact
+		for u in sim.units:
+			if u["opp"] != opp and u["hp"] > 0 and u["type"] != "building":
+				var d := Sim.dist(u["x"], u["y"], x, y)
+				if d > 4.0 and d <= float(card["pullDistance"]) * 20.0:
+					var step := minf(d, float(_v(card, "pullStrength", 8)) * 5.0)
+					u["x"] += (x - u["x"]) / d * step
+					u["y"] += (y - u["y"]) / d * step
 	sim.fx.append({"t": "spell", "x": x, "y": y, "r": float(_v(card, "radius", 40)), "kind": id})
 
 func _aoe(card: Dictionary, x: float, y: float, opp: bool, extra: Dictionary) -> void:
@@ -279,7 +291,16 @@ func _tick_zone(z: Dictionary, _dmg: Array, splash: Array) -> bool:
 	match kind:
 		"poison":
 			splash.append({"x": z["x"], "y": z["y"], "r": z["r"], "dmg": z["dmg"], "opp": z["opp"], "skip_id": -1,
-				"tower_factor": Sim.SPELL_TOWER_FACTOR, "attacker": -1, "ground_only": false, "tower_hit": true})
+				"tower_factor": Sim.SPELL_TOWER_FACTOR, "attacker": -1, "ground_only": false, "tower_hit": true, "slow": z.get("slow", 0.0)})
+		"lingering_zap":
+			z["r"] = minf(float(z["r"]) + float(z["grow"]), float(_v(z["card"], "radius", 35)) * 2.5)
+			for u in sim.units:
+				if u["opp"] != z["opp"] and u["hp"] > 0 and _in_r(u, z):
+					u["stunUntil"] = maxf(u["stunUntil"], now + 500.0)
+			for t in sim.towers:
+				if t["opp"] != z["opp"] and t["hp"] > 0 and Sim.dist(t["x"], t["y"], z["x"], z["y"]) <= z["r"] + 30.0:
+					t["stunUntil"] = maxf(t["stunUntil"], now + 500.0)
+			sim.fx.append({"t": "zone", "x": z["x"], "y": z["y"], "r": z["r"], "kind": "zap", "dur": 0.4})
 		"rage":
 			_tick_rage(z)
 		"vines":
@@ -398,6 +419,97 @@ func update_unit_pre(u: Dictionary, _dmg: Array, _splash: Array) -> void:
 		_update_hidden(u, h)
 	abilities.tick(u)
 	evo.update(u)
+	_special_update(u)
+
+func _special_update(u: Dictionary) -> void:
+	var now := sim.now
+	var id := str(u["spriteId"])
+	# Goblin Demolisher: enrages below half HP (double speed)
+	if id == "goblin_demolisher" and u["hp"] < u["maxHp"] * 0.5 and not _v(u, "isEnraged", false):
+		u["isEnraged"] = true
+		u["speed"] = float(_v(u, "speed", 2)) * 2.0
+	# Phoenix egg hatches into a (non-reviving) Phoenix
+	if u.get("hatchesInto") != null and float(_v(u, "hatchTime", 0.0)) > 0.0 and now >= float(u["hatchTime"]) and u["hp"] > 0:
+		var hc := CardDB.get_card(str(u["hatchesInto"]))
+		if not hc.is_empty():
+			var ph := sim.make_unit(hc, u["x"], u["y"], u["opp"], u["lane"])
+			ph["revivesAsEgg"] = false
+			sim.units.append(ph)
+			on_spawn(ph)
+			sim.fx.append({"t": "spell", "x": u["x"], "y": u["y"], "r": 60.0, "kind": "fireball"})
+		u["noDeathFx"] = true
+		u["hp"] = 0.0
+		return
+	# Cannon Cart turns into a stationary cannon next to an enemy princess tower
+	if _v(u, "transformsToBuilding", false) and not _v(u, "hasTransformed", false):
+		for t in sim.towers:
+			if t["opp"] != u["opp"] and t["hp"] > 0 and t["type"] == "princess" and Sim.dist(u["x"], u["y"], t["x"], t["y"]) <= float(_v(u, "range", 70)) + 20.0:
+				u["hasTransformed"] = true
+				u["speed"] = 0.0
+				u["type"] = "building"
+				u["hp"] = u["hp"] + float(_v(u, "shieldHp", 0))
+				u["maxHp"] = u["hp"]
+				u["currentShieldHp"] = 0.0
+				u["hasShield"] = false
+				break
+	# Rune Giant enchants nearby allies: every third hit they deal +220
+	if _v(u, "enchantAbility", false):
+		var list: Array = u.get("enchantedUnits", [])
+		list = list.filter(func(i): var e = sim.unit_by_id(int(i)); return e != null and e["hp"] > 0)
+		if list.size() < int(_v(u, "enchantCount", 2)):
+			for e in sim.units:
+				if e["opp"] == u["opp"] and e["id"] != u["id"] and e["hp"] > 0 and e["type"] != "building" and not _v(e, "isEnchanted", false) and Sim.dist(e["x"], e["y"], u["x"], u["y"]) <= 180.0:
+					e["isEnchanted"] = true
+					e["enchanterId"] = u["id"]
+					list.append(e["id"])
+					sim.fx.append({"t": "bolt", "x": e["x"], "y": e["y"]})
+					break
+		u["enchantedUnits"] = list
+	# Goblin Machine fires a rocket every few seconds
+	if _v(u, "rocketAbility", false) and now - float(_v(u, "lastRocketTime", u["spawnTime"])) >= float(_v(u, "rocketInterval", 3000)):
+		var rr: float = float(_v(u, "rocketRange", 120))
+		var tgt: Variant = null
+		for t in sim.towers:
+			if t["opp"] != u["opp"] and t["hp"] > 0 and Sim.dist(t["x"], t["y"], u["x"], u["y"]) <= rr:
+				tgt = t
+				break
+		if tgt == null:
+			for e in sim.units:
+				if e["opp"] != u["opp"] and e["hp"] > 0 and not sim._is_hidden(e) and Sim.dist(e["x"], e["y"], u["x"], u["y"]) <= rr:
+					tgt = e
+					break
+		if tgt != null:
+			sim.projectiles.append({"id": sim._new_id(), "x": u["x"], "y": u["y"] - 20.0, "targetId": tgt["id"], "targetX": tgt["x"], "targetY": tgt["y"], "speed": 15.0,
+				"damage": float(_v(u, "rocketDamage", 250)), "type": "rocket", "splash": true, "splashRadius": 40.0, "attackerId": u["id"], "opp": u["opp"]})
+			u["lastRocketTime"] = now
+
+func mega_jump(u: Dictionary, closest: Variant, min_dist: float) -> bool:
+	## Mega Knight leaps at a target 50-150 px away and lands for double damage + knockback.
+	var id := str(u["spriteId"])
+	if id != "mega_knight" and id != "evolved_mega_knight":
+		return false
+	if _v(u, "isJumping", false):
+		var t: Variant = sim.target_by_id(int(_v(u, "jumpTargetId", -1)))
+		if t == null or t["hp"] <= 0:
+			u["isJumping"] = false
+			return false
+		var a := atan2(t["y"] - u["y"], t["x"] - u["x"])
+		u["x"] = clampf(u["x"] + cos(a) * 10.0, 10.0, Sim.W - 10.0)
+		u["y"] = clampf(u["y"] + sin(a) * 10.0, 10.0, Sim.H - 10.0)
+		if Sim.dist(t["x"], t["y"], u["x"], u["y"]) < 20.0:
+			u["isJumping"] = false
+			var ev := {"x": u["x"], "y": u["y"], "r": 60.0, "dmg": float(_v(u, "baseDamage", u["damage"])) * 2.0, "opp": u["opp"], "skip_id": -1,
+				"tower_factor": 1.0, "attacker": u["id"], "ground_only": false, "tower_hit": true, "knockback": 40.0}
+			var out: Array = []
+			sim._apply_splash(ev, out)
+			sim._apply_damage(out)
+			sim.fx.append({"t": "spell", "x": u["x"], "y": u["y"], "r": 70.0, "kind": "fireball"})
+		return true
+	if closest != null and min_dist > 50.0 and min_dist < 150.0:
+		u["isJumping"] = true
+		u["jumpTargetId"] = closest["id"]
+		return true
+	return false
 
 func _update_hidden(u: Dictionary, h: Dictionary) -> void:
 	var now := sim.now
@@ -416,7 +528,7 @@ func _update_hidden(u: Dictionary, h: Dictionary) -> void:
 			h["active"] = false
 		elif (now - h.get("lastCombatTime", now)) / 1000.0 > 3.0:
 			h["active"] = true
-	elif id == "royal_ghost" or id == "evolved_royal_ghost":
+	elif id == "royal_ghost" or id == "evolved_royal_ghost" or id == "suspicious_bush":
 		var rng_px := float(_v(u, "range", 25)) + 50.0
 		var enemy_in := false
 		for e in sim.units:
@@ -471,10 +583,23 @@ func modify_damage(u: Dictionary, target: Dictionary, base_damage: float, tdist:
 	if _v(u, "dashHit", false):
 		u["dashHit"] = false
 		d *= 2.0                      # the dash impact deals double damage
+	if _v(u, "isEnchanted", false):
+		var ench: Variant = sim.unit_by_id(int(_v(u, "enchanterId", -1)))
+		if ench == null or ench["hp"] <= 0:
+			u["isEnchanted"] = false
+		else:
+			u["attackCount"] = int(_v(u, "attackCount", 0)) + 1
+			if int(u["attackCount"]) % 3 == 0:
+				d += 220.0
+				sim.fx.append({"t": "bolt", "x": u["x"], "y": u["y"]})
 	if _v(u, "damageRamp", false):
+		var persist: float = float(_v(u, "rampPersistDuration", 0))
 		if int(_v(u, "lastRampTarget", -1)) != int(target["id"]):
 			u["lastRampTarget"] = target["id"]
-			u["lastRampTime"] = sim.now
+			if not (persist > 0.0 and sim.now < float(_v(u, "rampHoldUntil", 0.0))):
+				u["lastRampTime"] = sim.now
+		if persist > 0.0:
+			u["rampHoldUntil"] = sim.now + persist
 		var secs := (sim.now - float(_v(u, "lastRampTime", sim.now))) / 1000.0
 		d = floorf(base_damage + minf(350.0, secs * 60.0))
 	if float(_v(u, "powerShotMultiplier", 0)) > 0.0 and tdist >= float(_v(u, "powerShotMinRange", 0)) and tdist <= float(_v(u, "powerShotMaxRange", INF)):
@@ -539,6 +664,30 @@ func on_ranged_attack(u: Dictionary, target: Dictionary, damage: float, proj: Di
 
 func on_projectile_hit(p: Dictionary, tgt: Variant, dmg: Array, splash: Array) -> void:
 	evo.on_projectile_hit(p, tgt, dmg, splash)
+	if tgt != null and not tgt.has("isTower") and tgt["hp"] > 0:
+		# Fisherman: hook yanks the target next to him and slows it
+		if p.get("pull", false):
+			var f: Variant = sim.unit_by_id(int(p.get("attackerId", -1)))
+			if f != null:
+				var a := atan2(f["y"] - tgt["y"], f["x"] - tgt["x"])
+				var dd := Sim.dist(f["x"], f["y"], tgt["x"], tgt["y"])
+				var pull := minf(dd - 25.0, 120.0)
+				if pull > 0.0:
+					tgt["x"] = clampf(tgt["x"] + cos(a) * pull, 10.0, Sim.W - 10.0)
+					tgt["y"] = clampf(tgt["y"] + sin(a) * pull, 10.0, Sim.H - 10.0)
+				tgt["wasPushed"] = true
+				if float(p.get("pullSlowDuration", 0)) > 0.0:
+					tgt["slowUntil"] = sim.now + float(p["pullSlowDuration"])
+					tgt["slowAmount"] = float(p.get("pullSlow", 0.35))
+		# Mother Witch: hit units are cursed and become Cursed Hogs for her side when they die
+		if p.get("turnsToPig", false) and tgt["type"] != "building":
+			tgt["cursedUntil"] = sim.now + 5000.0
+			tgt["cursedBySide"] = p["opp"]
+	# Evolved Firecracker: rockets leave a slowing poison spark
+	if float(p.get("sparkPoisonDamage", 0)) > 0.0:
+		sim.zones.append({"kind": "poison", "x": p["targetX"], "y": p["targetY"], "opp": p["opp"], "card": {}, "r": float(p.get("sparkPoisonRadius", 20)),
+			"dmg": float(p["sparkPoisonDamage"]), "end": sim.now + float(p.get("sparkPoisonDuration", 2.5)) * 1000.0, "interval": 500.0, "last": sim.now,
+			"slow": float(p.get("sparkPoisonSlow", 0))})
 
 func bandit_dash(u: Dictionary) -> bool:
 	## Bandit / Boss Bandit: dash at the nearest enemy within dashRange, invincible, hitting for double damage.
@@ -589,8 +738,18 @@ func kamikaze_dies(u: Dictionary) -> bool:
 	return true
 
 func on_death(d: Dictionary) -> void:
+	if _v(d, "noDeathFx", false):
+		return
 	evo.on_death(d)
 	var now := sim.now
+	if _v(d, "revivesAsEgg", false) and float(_v(d, "eggHp", 0)) > 0.0:
+		var ec := CardDB.get_card("phoenix_egg")
+		if not ec.is_empty():
+			var egg := sim.make_unit(ec, d["x"], d["y"], d["opp"], d["lane"])
+			egg["hp"] = float(d["eggHp"])
+			egg["maxHp"] = egg["hp"]
+			egg["hatchTime"] = now + float(_v(d, "eggDuration", 3000))
+			sim.units.append(egg)
 	var opp: bool = d["opp"]
 	# elixir golem family hands the opponent elixir
 	if _v(d, "givesOpponentElixir", false):
@@ -624,6 +783,8 @@ func damage_unit(u: Dictionary, e: Dictionary) -> void:
 	if e.get("attacker", -1) != -1:
 		u["lastHitBy"] = e["attacker"]
 	sim.damage_unit_basic(u, e)
+	if shield_before > 0.0 and float(_v(u, "currentShieldHp", 0)) <= 0.0 and str(u["spriteId"]) == "guards":
+		u["spriteId"] = "skeletons"
 	# Evolved Wizard: shield break burst
 	if shield_before > 0.0 and float(_v(u, "currentShieldHp", 0)) <= 0.0 and float(_v(u, "shieldBreakDamage", 0)) > 0.0:
 		var ev := {"x": u["x"], "y": u["y"], "r": float(_v(u, "shieldBreakRadius", 48)), "dmg": float(u["shieldBreakDamage"]), "opp": u["opp"], "skip_id": -1,

@@ -389,6 +389,8 @@ func _update_towers(dmg: Array) -> void:
 			continue
 		if t["type"] == "king" and _king_asleep(t):
 			continue
+		if t["towerSubType"] == "royal_chef":
+			_chef_tick(t)
 		if now - t["lastShot"] < t["fireRate"]:
 			continue
 		var target: Variant = null
@@ -418,12 +420,52 @@ func _update_towers(dmg: Array) -> void:
 				t["lastReload"] = now
 				t["currentAmmo"] = 1
 			t["currentAmmo"] -= 1
+		if t["projectileType"] == "melee":
+			# Royal Chef: frying-pan swing, instant hit
+			dmg.append({"id": target["id"], "dmg": t["damage"], "attacker": t["id"]})
+			fx.append({"t": "attack", "id": -1, "x": t["x"], "y": t["y"], "tx": target["x"], "ty": target["y"], "p": ""})
+			t["lastShot"] = now
+			continue
 		projectiles.append({
 			"id": _new_id(), "x": t["x"], "y": t["y"], "targetId": target["id"], "targetX": target["x"], "targetY": target["y"],
 			"speed": t["projectileSpeed"], "damage": t["damage"], "type": t["projectileType"], "splash": t["splash"],
 			"splashRadius": t["splashRadius"], "attackerId": t["id"], "opp": t["opp"], "fromTower": true,
 		})
 		t["lastShot"] = now
+
+func _chef_tick(t: Dictionary) -> void:
+	## Royal Chef: cooks a pancake (28 s base) that gives one ally a +1 level buff. Cooks slower while attacking
+	## (x0.6) and when a princess tower has fallen (x0.5); stops when both are gone. (App.js added 16 ms per 66 ms
+	## tick, which stretched cooking to ~2 minutes; the 28 s design value is used here.)
+	var princesses := towers.filter(func(x): return x["opp"] == t["opp"] and x["type"] == "princess" and x["hp"] > 0)
+	if princesses.is_empty():
+		t["pancakeTimer"] = 0.0
+		return
+	var mult := 1.0
+	if t["lockedTarget"] != -1 or now - t["lastShot"] < t["fireRate"] * 2.0:
+		mult = 0.6
+	if princesses.size() < 2:
+		mult *= 0.5
+	t["pancakeTimer"] = float(t.get("pancakeTimer", 0.0)) + TICK_MS * mult
+	var cook: float = float(TOWER_TYPES["royal_chef"]["pancakeCookTime"])
+	if t["pancakeTimer"] < cook:
+		return
+	var fed: Array = t.get("fedUnits", [])
+	var allies := units.filter(func(u): return u["opp"] == t["opp"] and u["hp"] > 0 and u["hp"] > u["maxHp"] * 0.33 and not fed.has(u["id"]) and u["type"] != "building")
+	if allies.is_empty():
+		t["pancakeTimer"] = cook
+		return
+	allies.sort_custom(func(a, b): return a["hp"] > b["hp"])
+	var tgt: Dictionary = allies[0]
+	tgt["hp"] = minf(tgt["hp"] * 1.1, tgt["maxHp"] * 1.1)
+	tgt["maxHp"] = tgt["maxHp"] * 1.1
+	if tgt.get("damage") != null:
+		tgt["damage"] = float(tgt["damage"]) * 1.1
+	tgt["pancakeBuffed"] = true
+	fed.append(tgt["id"])
+	t["fedUnits"] = fed
+	t["pancakeTimer"] = 0.0
+	fx.append({"t": "spell", "x": tgt["x"], "y": tgt["y"], "r": 30.0, "kind": "clone"})
 
 func _king_asleep(k: Dictionary) -> bool:
 	# The King only wakes once it is damaged or one of its princess towers has fallen.
@@ -499,6 +541,9 @@ func _update_unit(u: Dictionary, dmg: Array, splash: Array) -> void:
 		if not sc.is_empty():
 			for i in int(_v(u, "spawnCount", 1)):
 				var off := Vector2(rng.randf_range(-15.0, 15.0), 25.0 if u["opp"] == false else -25.0)
+				if _v(u, "alternatingSides", false):
+					u["spawnIndex"] = int(_v(u, "spawnIndex", 0)) + 1
+					off.x = 28.0 if int(u["spawnIndex"]) % 2 == 0 else -28.0
 				var s := make_unit(sc, u["x"] + off.x + (i * 6.0 - 6.0), u["y"] + off.y, u["opp"], u["lane"])
 				s["summonerId"] = u["id"]
 				units.append(s)
@@ -569,6 +614,8 @@ func _update_unit(u: Dictionary, dmg: Array, splash: Array) -> void:
 				return
 		if not _moves_while_attacking(u):
 			return
+	elif mech.mega_jump(u, closest, min_dist):
+		return
 	_move_unit(u, closest, min_dist, actual_range, rage)
 
 func _moves_while_attacking(u: Dictionary) -> bool:
@@ -590,6 +637,10 @@ func _attack(u: Dictionary, target: Dictionary, base_damage: float, tdist: float
 			"speed": spd, "damage": damage, "type": ptype, "splash": _v(u, "splash", false), "splashRadius": float(_v(u, "splashRadius", 50)),
 			"slow": float(_v(u, "slow", 0)), "stun": float(_v(u, "stun", 0)), "attackerId": u["id"], "opp": u["opp"],
 			"knockback": float(_v(u, "knockback", 0)), "groundOnly": _v(u, "groundOnly", false),
+			"pull": _v(u, "pull", false), "pullSlow": float(_v(u, "pullSlow", 0)), "pullSlowDuration": float(_v(u, "pullSlowDuration", 0)),
+			"turnsToPig": _v(u, "turnsToPig", false), "sparkPoisonDamage": float(_v(u, "sparkPoisonDamage", 0)),
+			"sparkPoisonDuration": float(_v(u, "sparkPoisonDuration", 0)), "sparkPoisonRadius": float(_v(u, "sparkPoisonRadius", 0)),
+			"sparkPoisonSlow": float(_v(u, "sparkPoisonSlow", 0)),
 		})
 		if _v(u, "pierce", false):
 			var pj: Dictionary = projectiles[projectiles.size() - 1]
