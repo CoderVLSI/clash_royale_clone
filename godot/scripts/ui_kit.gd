@@ -127,21 +127,31 @@ static func icon(kind: String, color: Color, size: Vector2 = Vector2(24, 24)) ->
 
 # --- shaped (hexagon / shield) frame for legendary, champion and hero cards ---------------
 class HexFrame extends Control:
+	## Legendary / champion / hero card frame: an octagon-style "hexagon" (flat top and bottom, big chamfered corners, vertical sides)
+	## with a dark steel bevel, a thin light inner edge and a soft rarity-coloured glow.
 	var col := Color("f1c40f")
 	var tex: Texture2D
 	var dark := Color("2a2f45")
 	static func shape(sz: Vector2, inset: float) -> PackedVector2Array:
 		var w := sz.x
 		var h := sz.y
-		var i := inset
-		return PackedVector2Array([Vector2(i, h * 0.15 + i * 0.5), Vector2(w * 0.5, i), Vector2(w - i, h * 0.15 + i * 0.5),
-			Vector2(w - i, h * 0.9 - i * 0.3), Vector2(w * 0.88 - i * 0.3, h - i), Vector2(w * 0.12 + i * 0.3, h - i), Vector2(i, h * 0.9 - i * 0.3)])
+		var cx := w * 0.2
+		var cy := h * 0.12
+		var pts := PackedVector2Array([Vector2(cx, 0), Vector2(w - cx, 0), Vector2(w, cy), Vector2(w, h - cy), Vector2(w - cx, h), Vector2(cx, h), Vector2(0, h - cy), Vector2(0, cy)])
+		if inset <= 0.0:
+			return pts
+		var res: Array = Geometry2D.offset_polygon(pts, -inset, Geometry2D.JOIN_MITER)
+		return res[0] if not res.is_empty() else pts
 	func _draw() -> void:
-		draw_colored_polygon(shape(size, 0.0), col)
-		var inner := shape(size, 3.5)
+		draw_colored_polygon(shape(size, 0.0), Color(col, 0.55))              # glow band
+		draw_colored_polygon(shape(size, 2.0), Color("3c4049"))              # steel bevel
+		var edge := shape(size, 2.0)
+		draw_polyline(edge + PackedVector2Array([edge[0]]), Color("8d93a0"), 1.5)
+		var inner := shape(size, 6.0)
+		draw_colored_polygon(shape(size, 5.0), Color("c9d6e8"))              # light inner edge
 		if tex != null:
 			var ts := tex.get_size()
-			var box := Rect2(Vector2(3, 3), size - Vector2(6, 6))
+			var box := Rect2(Vector2(6, 6), size - Vector2(12, 12))
 			var sc := maxf(box.size.x / ts.x, box.size.y / ts.y)
 			var crop := box.size / sc
 			var off := (ts - crop) * 0.5
@@ -151,10 +161,6 @@ class HexFrame extends Control:
 			draw_colored_polygon(inner, Color.WHITE, uvs, tex)
 		else:
 			draw_colored_polygon(inner, dark)
-		# gem on the top apex
-		var c := Vector2(size.x * 0.5, 1.0)
-		draw_colored_polygon(PackedVector2Array([c + Vector2(0, -3), c + Vector2(7, 4), c + Vector2(0, 11), c + Vector2(-7, 4)]), col.lightened(0.35))
-		draw_polyline(PackedVector2Array([c + Vector2(0, -3), c + Vector2(7, 4), c + Vector2(0, 11), c + Vector2(-7, 4), c + Vector2(0, -3)]), col.darkened(0.45), 1.5)
 
 static func is_shaped(card: Dictionary) -> bool:
 	return str(card.get("rarity", "common")) in ["legendary", "champion", "hero"]
