@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/battle.png-a09930f5df03f0779f83bb38d168a463.c
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.8
+compress/lossy_quality=0.5
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0

@@ -34,8 +34,8 @@ func _init() -> void:
 		n += 1
 	var cam := Camera3D.new()
 	root.add_child(cam)
-	var cpos := Vector3(0, 7.5, 13.0)
-	cam.transform = Transform3D(Basis.looking_at(Vector3(0, 1.4, -1.2) - cpos, Vector3.UP), cpos)
+	var cpos := Vector3(0, 13.0, 19.0)
+	cam.transform = Transform3D(Basis.looking_at(Vector3(0, 0.8, -1.5) - cpos, Vector3.UP), cpos)
 	cam.fov = 45
 	cam.current = true
 	await create_timer(1.0).timeout

@@ -90,6 +90,29 @@ static func glb(name: String, tint: Color, team: Color) -> Node3D:
 const CARD_SCALE := {"elixir_golem": 0.8, "golem": 0.78, "ice_golem": 0.85, "magic_archer": 0.9, "pekka": 1.1, "hog_rider": 1.0, "ice_spirit": 1.15,
 	"inferno_tower": 1.0, "tesla": 1.0, "tombstone": 1.0, "royal_ghost": 1.4, "battle_ram": 1.0}
 
+## Spawned tokens / squad variants that reuse another card's unique model: id -> [model id, scale multiplier]
+const MODEL_ALIAS := {"skeleton_army": ["skeletons", 1.0], "minion_horde": ["minions", 1.0], "goblin_gang": ["sword_goblins", 1.0], "barbarian_single": ["barbarians", 1.0],
+	"barbarian_brothers": ["barbarians", 1.0], "royal_recruit_single": ["royal_recruits", 1.0], "rascal_girls": ["rascals", 1.0], "lava_pups": ["lava_hound", 0.45],
+	"golemite": ["golem", 0.55], "elixir_golemite": ["elixir_golem", 0.6], "elixir_blob": ["elixir_golem", 0.4], "goblin_single": ["spear_goblins", 1.0], "decoy_goblin": ["spear_goblins", 1.0],
+	"goblin_brawler": ["sword_goblins", 1.0], "goblin_bruteth": ["goblin_giant", 0.8], "cursed_hog": ["royal_hogs", 1.0], "goblinstein_monster": ["goblinstein", 1.0], "guardian": ["guards", 1.0],
+	"spirit_empress_flying": ["spirit_empress", 1.0], "hero_wizard": ["wizard", 1.0], "hero_magic_archer": ["magic_archer", 1.0]}
+
+static var _batch2: Dictionary = {}
+static var _batch2_loaded := false
+
+static func card_scale(cid: String) -> float:
+	## Models from make_card_models2.py are authored at real scale (listed in batch2.json).
+	if CARD_SCALE.has(cid):
+		return float(CARD_SCALE[cid])
+	if not _batch2_loaded:
+		_batch2_loaded = true
+		var f := FileAccess.open("res://assets/models/cards/batch2.json", FileAccess.READ)
+		if f != null:
+			var d = JSON.parse_string(f.get_as_text())
+			if d is Dictionary:
+				_batch2 = d
+	return float(_batch2.get(cid, 1.6))
+
 static func card_model(card_id: String, team: Color) -> Node3D:
 	## Unique Blender model matched to the card's generated portrait (assets/models/cards/<id>.glb).
 	var path := "res://assets/models/cards/%s.glb" % card_id
@@ -242,6 +265,10 @@ static func build_unit(u: Dictionary) -> Node3D:
 	var base_r := 0.55 * s
 	var arch := archetype(u)
 	var cid := CardArt.art_id({"id": str(u.get("cid", u["spriteId"]))})
+	var alias_mult := 1.0
+	if MODEL_ALIAS.has(cid):
+		alias_mult = float(MODEL_ALIAS[cid][1])
+		cid = str(MODEL_ALIAS[cid][0])
 	var glb_model := card_model(cid, team)
 	var unique := glb_model != null
 	if glb_model == null:
@@ -251,7 +278,7 @@ static func build_unit(u: Dictionary) -> Node3D:
 	ring.material_override = mat(Color(team, 0.85), 0.9, 0.0)
 	root.add_child(ring)
 	if unique:
-		glb_model.scale = Vector3.ONE * float(CARD_SCALE.get(cid, 1.6))
+		glb_model.scale = Vector3.ONE * float(card_scale(cid)) * alias_mult
 		if typ == "flying":
 			model.position.y = 2.2
 		model.add_child(glb_model)

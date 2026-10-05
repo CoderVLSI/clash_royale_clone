@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/golem.jpg-3231b1aea5c6b39dae114a8c0f05b5b0.ct
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.8
+compress/lossy_quality=0.5
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0

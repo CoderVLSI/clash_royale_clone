@@ -17,7 +17,7 @@ dest_files=["res://.godot/imported/dart_goblin.jpg-51de42e093c14c3d9f979125be4a9
 
 compress/mode=1
 compress/high_quality=false
-compress/lossy_quality=0.8
+compress/lossy_quality=0.5
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0

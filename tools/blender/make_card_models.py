@@ -403,7 +403,7 @@ CARDS = {'knight': knight, 'hog_rider': hog_rider, 'wizard': wizard, 'pekka': pe
          'magic_archer': magic_archer, 'mother_witch': mother_witch, 'princess': princess, 'royal_ghost': royal_ghost, 'skeletons': skeletons, 'sword_goblins': sword_goblins,
          'tesla': tesla, 'tombstone': tombstone, 'arrows': arrows, 'fireball': fireball, 'poison': poison, 'rocket': rocket, 'zap': zap, 'goblin_barrel': goblin_barrel}
 
-_only = globals().get('ONLY') or list(CARDS)
+_only = globals()['ONLY'] if 'ONLY' in globals() else list(CARDS)
 _res = {}
 for _id in _only:
     reset()

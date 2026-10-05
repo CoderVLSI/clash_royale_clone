@@ -44,6 +44,21 @@ cd "$ROOT/godot"
 godot --headless --path . --import
 mkdir -p ../build ../release
 godot --headless --path . --export-debug Android ../build/clash-royale-3d-debug.apk
-cp ../build/clash-royale-3d-debug.apk ../release/clash-royale-3d-debug.apk
+# Godot stores imported resources uncompressed; deflate them (keeps native libs/resources.arsc as-is), re-align and re-sign.
+python3 - ../build/clash-royale-3d-debug.apk ../build/recompressed.apk <<'PY'
+import sys, zipfile
+src, dst = sys.argv[1], sys.argv[2]
+with zipfile.ZipFile(src) as zi, zipfile.ZipFile(dst, 'w') as zo:
+    for info in zi.infolist():
+        data = zi.read(info.filename)
+        if info.filename.startswith('META-INF/'):
+            continue   # signatures are recreated below
+        comp = zipfile.ZIP_DEFLATED if info.filename.startswith('assets/') or info.filename.endswith('.dex') else info.compress_type
+        zo.writestr(zipfile.ZipInfo(info.filename, info.date_time), data, compress_type=comp, compresslevel=9 if comp == zipfile.ZIP_DEFLATED else None)
+PY
+"$SDK/build-tools/34.0.0/zipalign" -f -p 4 ../build/recompressed.apk ../build/aligned.apk
+"$SDK/build-tools/34.0.0/apksigner" sign --ks "$HOME/.android/debug.keystore" --ks-pass pass:android --key-pass pass:android --ks-key-alias androiddebugkey \
+  --out ../release/clash-royale-3d-debug.apk ../build/aligned.apk
+rm -f ../release/clash-royale-3d-debug.apk.idsig
 apksigner verify --verbose ../release/clash-royale-3d-debug.apk | head -4
 echo "APK: $ROOT/release/clash-royale-3d-debug.apk"
