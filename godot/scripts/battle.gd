@@ -304,8 +304,9 @@ func _build_hud() -> void:
 	ability_row.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	ability_row.offset_top = -TRAY_H - 96
 	ability_row.offset_bottom = -TRAY_H - 8
-	ability_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	ability_row.add_theme_constant_override("separation", 8)
+	ability_row.alignment = BoxContainer.ALIGNMENT_BEGIN     # left edge, right above the hand (like real CR)
+	ability_row.offset_left = 6
+	ability_row.add_theme_constant_override("separation", 2)
 	ability_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(ability_row)
 	# ghost shown under the finger while dragging
