@@ -59,14 +59,16 @@ func _draw() -> void:
 		draw_colored_polygon(pts, Color("8e44ad") if enabled else Color("40304a"))
 	# elixir cost drop
 	var dp := Vector2(58, 60)
-	if drop != null:
+	if cost < 0:
+		pass
+	elif drop != null:
 		draw_texture_rect(drop, Rect2(dp - Vector2(15, 18), Vector2(30, 36)), false, Color.WHITE if enabled else Color(0.6, 0.6, 0.6))
 	else:
 		draw_circle(dp, 13, Color("c43bd9"))
 	var font := ThemeDB.fallback_font
-	draw_string(font, dp + Vector2(-5, 8), str(cost), HORIZONTAL_ALIGNMENT_CENTER, 12, 20, Color.WHITE)
-	draw_string_outline(font, dp + Vector2(-5, 8), str(cost), HORIZONTAL_ALIGNMENT_CENTER, 12, 20, 4, Color(0, 0, 0, 0.8))
-	draw_string(font, dp + Vector2(-5, 8), str(cost), HORIZONTAL_ALIGNMENT_CENTER, 12, 20, Color.WHITE)
+	if cost >= 0:
+		draw_string_outline(font, dp + Vector2(-5, 8), str(cost), HORIZONTAL_ALIGNMENT_CENTER, 12, 20, 4, Color(0, 0, 0, 0.8))
+		draw_string(font, dp + Vector2(-5, 8), str(cost), HORIZONTAL_ALIGNMENT_CENTER, 12, 20, Color.WHITE)
 	if caption != "":
 		draw_string_outline(font, Vector2(0, 80), caption, HORIZONTAL_ALIGNMENT_CENTER, 76, 11, 4, Color(0, 0, 0, 0.9))
 		draw_string(font, Vector2(0, 80), caption, HORIZONTAL_ALIGNMENT_CENTER, 76, 11, Color.WHITE)

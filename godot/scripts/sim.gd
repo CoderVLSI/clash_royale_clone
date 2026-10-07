@@ -48,6 +48,7 @@ var second_acc: float = 0.0
 var is_double := false
 var is_overtime := false
 var is_decay := false
+var chaos: Chaos = null
 var game_over: String = ""     # "", "VICTORY", "DEFEAT", "DRAW"
 var score: Array = [0, 0]      # [opponent towers destroyed, player towers destroyed]
 
@@ -103,6 +104,20 @@ func start_evolutions(pi: int) -> void:
 			q[q.find(card)] = hand[slot]
 		hand[slot] = card
 
+## Chaos mode mutates cards, so every player gets private copies of the deck dictionaries (the CardDB stays untouched).
+func make_decks_private() -> void:
+	for p in players:
+		var copies := {}
+		var new_deck: Array = []
+		for c in p["deck"]:
+			var d: Dictionary = c.duplicate(true)
+			copies[c["id"]] = d
+			new_deck.append(d)
+		p["deck"] = new_deck
+		p["hand"] = p["hand"].map(func(c): return copies[c["id"]])
+		p["next"] = copies[p["next"]["id"]]
+		p["queue"] = p["queue"].map(func(c): return copies[c["id"]])
+
 func _build_towers(player_tower: String) -> void:
 	var pt: Dictionary = TOWER_TYPES.get(player_tower, TOWER_TYPES["princess"])
 	towers = [
@@ -145,6 +160,8 @@ func step() -> void:
 	if game_over != "":
 		return
 	mech.pre_update()
+	if chaos != null:
+		chaos.tick()
 	var dmg: Array = []        # queued unit damage events {id, dmg, attacker}
 	var splash: Array = []     # queued area events
 	_update_towers(dmg)
@@ -210,7 +227,8 @@ func _finish_by_hp() -> void:
 func _tick_elixir() -> void:
 	var gain := (0.0007 if is_double else 0.00035) * TICK_MS
 	for p in players:
-		p["elixir"] = minf(10.0, p["elixir"] + gain)
+		var g := gain * (2.0 if float(p.get("elixirBoostUntil", 0.0)) > now else 1.0)
+		p["elixir"] = minf(10.0, p["elixir"] + g)
 
 func _check_crowns_and_decay() -> void:
 	var od := 0
@@ -695,7 +713,13 @@ func _attack(u: Dictionary, target: Dictionary, base_damage: float, tdist: float
 			target["hp"] -= damage
 			fx.append({"t": "hit", "x": target["x"], "y": target["y"], "dmg": damage})
 		else:
-			dmg.append({"id": target["id"], "dmg": damage, "attacker": u["id"]})
+			var melee_ev := {"id": target["id"], "dmg": damage, "attacker": u["id"]}
+			if float(_v(u, "slow", 0)) > 0.0:
+				melee_ev["slow"] = float(u["slow"])
+				melee_ev["slowDuration"] = float(_v(u, "slowDuration", 2.0))
+			if float(_v(u, "stun", 0)) > 0.0 and u["type"] != "building":
+				melee_ev["stun"] = float(u["stun"])
+			dmg.append(melee_ev)
 		if _v(u, "splash", false) or _v(u, "frontalSplash", false):
 			splash.append({"x": target["x"], "y": target["y"], "r": float(_v(u, "splashRadius", 40)), "dmg": damage,
 				"opp": u["opp"], "skip_id": target["id"], "tower_factor": 1.0, "attacker": u["id"], "ground_only": _v(u, "groundOnly", false)})
@@ -925,6 +949,10 @@ func damage_unit_basic(u: Dictionary, e: Dictionary) -> void:
 		u["charge"]["active"] = false
 
 func _reap_dead() -> void:
+	if chaos != null:
+		for u in units:
+			if u["hp"] <= 0:
+				chaos.revive(u)
 	var dead: Array = units.filter(func(u): return u["hp"] <= 0)
 	if dead.is_empty():
 		return

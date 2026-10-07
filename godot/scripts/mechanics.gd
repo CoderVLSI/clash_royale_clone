@@ -611,6 +611,8 @@ func modify_damage(u: Dictionary, target: Dictionary, base_damage: float, tdist:
 	return evo.modify_damage(u, target, d, tdist)
 
 func on_attack(u: Dictionary, target: Dictionary, damage: float, dmg: Array, splash: Array) -> void:
+	if sim.chaos != null:
+		sim.chaos.on_attack(u, target, damage)
 	var hh = u.get("hidden")
 	if hh is Dictionary and hh.has("until"):
 		hh["active"] = false           # Archer Queen / Boss Bandit reveal when they strike

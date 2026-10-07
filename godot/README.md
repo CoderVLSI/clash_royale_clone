@@ -61,3 +61,10 @@ Battle Ram, Magic Archer, Princess) were removed; those cards use their correcte
 * Evolutions that the 2D app lacked: Evo **Princess**, **Minion Horde**, **Elite Barbarians**, **Electro Giant** (effects for Minion Horde / Electro Giant are approximations - sources gave no numbers).
 * Heroes: all 18 (see `tools/heroes/gen_heroes.py`), one use per deployment, round ability buttons beside the hand.
 * Still not implemented: real online friendly battles (local mock only), card levels / upgrades / gold-spend collection progress, the AI opponent using heroes, evolution slots for the AI.
+
+## CHAOS mode (our own take)
+Lobby -> battle tab -> **CHAOS** button. Every 45 s of battle time (first at 30 s) the battle pauses and you pick 1 of 3 offers: two **card modifiers**
+(common -> rare -> epic as the match goes on, one upgrade per card, max 5) or a one-shot **power** (our twist): Meteor Shower, Elixir Surge, Deep Freeze, Rally Cry, Aegis, Overclock.
+The AI picks too. 20 modifiers in `scripts/chaos.gd` (Swift, Sturdy, Sharp, Longshot, Cheap, Swarm, Wide Blast, Shielded, Vampiric, Frostbite, Splash Zone, Twin Deploy, Overload,
+Titan, Phoenix Soul, Chain Zap, Explosive, Cloner, Blink, Magnetic) are generic and apply by card traits - the real event has hand-made modifiers per card (not copied).
+Tests: `godot --headless --path godot -s tests/chaos.gd`.

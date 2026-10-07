@@ -554,7 +554,7 @@ func _make_unit_node(u: Dictionary) -> Dictionary:
 	# spawn pop animation
 	node.scale = Vector3.ONE * 0.2
 	var tw := create_tween()
-	tw.tween_property(node, "scale", Vector3.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(node, "scale", Vector3.ONE * float(Sim._v(u, "chaosScale", 1.0)), 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	var status := _make_status(s, u["type"] == "flying")
 	node.add_child(status)
 	var rec := {"node": node, "fg": bar["fg"], "w": w, "bar": bar["root"], "phase": randf() * TAU, "lunge": 0.0, "first": true, "face_to": null, "status": status,

@@ -65,6 +65,7 @@ func _show_lobby() -> void:
 		lobby._show_tab(tab)
 	lobby.start_battle.connect(_start_battle.bind(false))
 	lobby.start_friendly.connect(_start_battle.bind(true))
+	lobby.start_chaos.connect(_start_battle.bind(false, true))
 	if detail != "":
 		lobby._show_tab(1)
 		lobby._open_card_detail(CardDB.get_card(detail))
@@ -85,7 +86,7 @@ func _show_lobby() -> void:
 		print("SCREENSHOT saved ", shot)
 		get_tree().quit()
 
-func _start_battle(_friendly: bool) -> void:
+func _start_battle(_friendly: bool, chaos_mode: bool = false) -> void:
 	Sfx.play("ui_confirm")
 	Sfx.stop_music()
 	var b := Battle.new()
@@ -93,7 +94,7 @@ func _start_battle(_friendly: bool) -> void:
 	var ids: Array = save.current_deck_ids()
 	var evo: Array = save.evo_slots[save.selected_deck].filter(func(x): return x != "")
 	var hero: String = save.hero_slots[save.selected_deck]
-	b.start(ids, save.tower, evo, hero, save.low_perf)
+	b.start(ids, save.tower, evo, hero, save.low_perf, chaos_mode)
 	b.finished.connect(_on_battle_finished)
 
 func _on_battle_finished(result: String) -> void:

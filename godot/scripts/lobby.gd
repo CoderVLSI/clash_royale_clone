@@ -6,6 +6,7 @@ extends Control
 
 signal start_battle
 signal start_friendly
+signal start_chaos
 
 const TABS := ["Shop", "Decks", "Battle", "Social", "Events"]
 const TOWERS := [
@@ -250,7 +251,7 @@ func _build_battle() -> Control:
 	act.add_child(UI.button("Friend", Color("2e86de"), func(): _open_friendly(), Vector2(76, 64), 15))
 	var battle := UI.button("BATTLE", Color("f39c12"), func(): start_battle.emit(), Vector2(190, 74), 34)
 	act.add_child(battle)
-	act.add_child(UI.button("2v2", Color("2e86de"), func(): _toast("2v2 mode is not available yet"), Vector2(76, 64), 15))
+	act.add_child(UI.button("CHAOS", Color("8e44ad"), func(): start_chaos.emit(), Vector2(76, 64), 15))
 	root.add_child(act)
 	# chests
 	root.add_child(_chest_slots())

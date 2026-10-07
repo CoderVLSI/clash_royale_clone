@@ -11,6 +11,8 @@ var sim: Sim
 var view: ArenaView
 var cam: Camera3D
 var emotes: Emotes
+var chaos_ui: ChaosUI
+var chaos_on := false
 var hud: CanvasLayer
 var acc := 0.0
 var speed := 1.0
@@ -42,7 +44,7 @@ var shot_path := ""
 var shot_time := -1.0
 var shot_taken := false
 
-func start(player_deck_ids: Array = DEFAULT_DECK, player_tower: String = "princess", evo_ids: Array = [], hero_id: String = "", low_perf: bool = false) -> void:
+func start(player_deck_ids: Array = DEFAULT_DECK, player_tower: String = "princess", evo_ids: Array = [], hero_id: String = "", low_perf: bool = false, chaos_mode: bool = false) -> void:
 	var enemy := _random_deck()
 	var pdeck := CardDB.deck_by_ids(player_deck_ids)
 	pdeck.shuffle()                      # App.js resetGame shuffles the player's deck each battle
@@ -73,6 +75,19 @@ func start(player_deck_ids: Array = DEFAULT_DECK, player_tower: String = "prince
 			sim.players[0]["evo_slots"] = evo_ids
 			sim.start_evolutions(0)
 			sim.players[0]["hero_slot"] = hero_id if hero_id != "" else null
+	for a3 in OS.get_cmdline_user_args():
+		if a3 == "--chaos":
+			chaos_mode = true
+	if chaos_mode:
+		chaos_on = true
+		sim.make_decks_private()
+		sim.chaos = Chaos.new(sim)
+		for a4 in OS.get_cmdline_user_args():
+			if a4.begins_with("--chaos-at="):
+				sim.chaos.next_at = float(a4.substr(11))
+			if a4.begins_with("--chaos-power="):
+				for pw in a4.substr(14).split(","):
+					sim.chaos.powers[0].append(pw)
 	if auto_play:
 		sim.ai_enabled = [true, true]
 	else:
@@ -325,6 +340,15 @@ func _build_hud() -> void:
 	emotes = Emotes.new()
 	hud.add_child(emotes)
 	emotes.setup(self, cam, sim)
+	if chaos_on:
+		chaos_ui = ChaosUI.new()
+		hud.add_child(chaos_ui)
+		chaos_ui.setup(sim.chaos)
+		chaos_ui.picked.connect(func(offer: Dictionary):
+			sim.chaos.choose(0, offer)
+			sim.chaos.waiting = false
+			chaos_ui.close()
+			paused = false)
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--spawn-hero="):
 			for hid in a.substr(13).split(","):
@@ -522,12 +546,15 @@ func _process(delta: float) -> void:
 			sim.step()
 			guard += 1
 			_scan_alerts()
+		if chaos_on and sim.game_over == "" and sim.chaos.update_clock():
+			paused = true                       # CHAOS pick: the battle freezes until you choose
+			chaos_ui.show_offers(sim.chaos.options)
 	_update_hud()
 	_update_abilities()
 	_update_camera(delta)
 	if sim.game_over != "" and not over_panel.visible:
 		_show_game_over()
-	if shot_path != "" and not shot_taken and shot_time >= 0.0 and (sim.now / 1000.0 >= shot_time or over_panel.visible):
+	if shot_path != "" and not shot_taken and shot_time >= 0.0 and (sim.now / 1000.0 >= shot_time or over_panel.visible or (chaos_ui != null and chaos_ui.panel != null)):
 		_take_screenshot()
 
 func _scan_alerts() -> void:
@@ -599,6 +626,18 @@ func _update_abilities() -> void:
 		var cost := int(Sim._v(u, "abilityCost", 0))
 		var left := (sim.mech.abilities.ready_at(u) - sim.now) / 1000.0
 		btn.set_state(left <= 0.0 and sim.players[0]["elixir"] >= cost, cost)
+	if chaos_on:
+		for pid in sim.chaos.powers[0]:
+			var key := "pow_" + str(pid)
+			seen[key] = true
+			if not ability_btns.has(key):
+				var pb := AbilityButton.new()
+				var ppath := "res://assets/art/powers/%s.jpg" % str(pid)
+				pb.setup(load(ppath) if ResourceLoader.exists(ppath) else null, -1, str(Chaos.POWERS[pid][0]).split(" ")[0])
+				var pid_c: String = str(pid)
+				pb.pressed.connect(func(): sim.chaos.use_power(0, pid_c))
+				ability_row.add_child(pb)
+				ability_btns[key] = pb
 	for id in ability_btns.keys():
 		if not seen.has(id):
 			ability_btns[id].queue_free()
