@@ -56,6 +56,30 @@ func _link_monster(u: Dictionary) -> void:
 # ---- per-tick --------------------------------------------------------------------------------
 func update(u: Dictionary) -> void:
 	var now := sim.now
+	# Evolved Minion Horde (~): the bigger the surviving swarm, the faster each minion attacks
+	var swarm: float = float(_v(u, "swarmBonus", 0.0))
+	if swarm > 0.0:
+		if not u.has("baseAttackSpeed"):
+			u["baseAttackSpeed"] = float(u["attackSpeed"])
+		var mates := 0
+		for m in sim.units:
+			if m["opp"] == u["opp"] and m["hp"] > 0 and m["cid"] == u["cid"]:
+				mates += 1
+		u["attackSpeed"] = float(u["baseAttackSpeed"]) * maxf(0.65, 1.0 - swarm * float(mates - 1))
+	# Evolved Electro Giant (~): chain lightning to the nearest enemies every few seconds
+	var chain_every: float = float(_v(u, "chainEvery", 0.0))
+	if chain_every > 0.0 and now - float(_v(u, "lastChain", 0.0)) >= chain_every:
+		var near: Array = []
+		for e in sim.units:
+			if e["opp"] != u["opp"] and e["hp"] > 0 and Sim.dist(e["x"], e["y"], u["x"], u["y"]) <= 95.0:
+				near.append(e)
+		if not near.is_empty():
+			u["lastChain"] = now
+			near.sort_custom(func(a, b): return Sim.dist(a["x"], a["y"], u["x"], u["y"]) < Sim.dist(b["x"], b["y"], u["x"], u["y"]))
+			for e in near.slice(0, int(_v(u, "chainTargets", 3))):
+				sim._apply_damage([{"id": e["id"], "dmg": float(_v(u, "chainDamage", 150)), "attacker": u["id"]}])
+				e["stunUntil"] = maxf(e["stunUntil"], now + float(_v(u, "chainStun", 0.5)) * 1000.0)
+				sim.fx.append({"t": "bolt", "x": e["x"], "y": e["y"]})
 	# Evolved Goblin Giant: spawns goblins when low on HP
 	var thr: float = float(_v(u, "lowHpSpawnThreshold", 0))
 	if thr > 0.0 and u["hp"] < u["maxHp"] * thr and now - float(_v(u, "lastLowSpawn", 0.0)) >= float(_v(u, "lowHpSpawnInterval", 2000)):
@@ -214,6 +238,18 @@ func _freeze_area(x: float, y: float, r: float, dur: float, opp: bool) -> void:
 
 # ---- projectile modifiers --------------------------------------------------------------------
 func on_ranged_attack(u: Dictionary, target: Dictionary, damage: float, proj: Dictionary) -> void:
+	# Evolved Princess: icy arrow on the first attack and after every third one (slows the target)
+	var icy: int = int(_v(u, "icyArrowEvery", 0))
+	if icy > 0:
+		var cnt: int = int(_v(u, "icyCount", 0))
+		if cnt % icy == 0:
+			proj["slow"] = 0.35
+			proj["slowDuration"] = 3.0
+			proj["icy"] = true
+		u["icyCount"] = cnt + 1
+	# Evolved Elite Barbarians: rage-tipped spear leaves an enraging patch where it lands
+	if _v(u, "rageSpear", false):
+		proj["rageTrail"] = true
 	proj["chain"] = int(_v(u, "chain", 0))
 	proj["infiniteChain"] = _v(u, "infiniteChain", false)
 	proj["chainDecay"] = float(_v(u, "chainDecay", 0.4))
@@ -290,6 +326,14 @@ func on_ranged_attack(u: Dictionary, target: Dictionary, damage: float, proj: Di
 		u["y"] = clampf(ny, 10.0, Sim.H - 10.0)
 
 func on_projectile_hit(p: Dictionary, tgt: Variant, dmg: Array, _splash: Array) -> void:
+	if p.get("rageTrail", false):
+		var cx: float = float(p.get("targetX", 0.0))
+		var cy: float = float(p.get("targetY", 0.0))
+		if tgt != null:
+			cx = tgt["x"]
+			cy = tgt["y"]
+		sim.zones.append({"kind": "rage", "x": cx, "y": cy, "opp": p["opp"], "card": {}, "r": 34.0, "end": sim.now + 3500.0, "boost": 0.35, "interval": 100.0, "last": sim.now})
+		sim.fx.append({"t": "zone", "x": cx, "y": cy, "r": 34.0, "kind": "rage", "dur": 3.5})
 	# Chain lightning (Electro Dragon & evolved infinite chain)
 	var chain := int(p.get("chain", 0))
 	if chain > 0 and tgt != null and not tgt.has("isTower") and p.get("attackerId", -1) != -1:

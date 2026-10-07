@@ -915,7 +915,7 @@ func damage_unit_basic(u: Dictionary, e: Dictionary) -> void:
 	if e.get("slow", 0.0) > 0.0:
 		u["slowUntil"] = now + float(_v(e, "slowDuration", 2.5)) * 1000.0
 		u["slowAmount"] = e["slow"]
-	if e.get("knockback", 0.0) > 0.0 and u["type"] != "building":
+	if e.get("knockback", 0.0) > 0.0 and u["type"] != "building" and not _v(u, "noKnockback", false):
 		var a := atan2(u["y"] - e.get("from_y", u["y"]), u["x"] - e.get("from_x", u["x"]))
 		u["x"] = clampf(u["x"] + cos(a) * e["knockback"], 10.0, W - 10.0)
 		u["y"] = clampf(u["y"] + sin(a) * e["knockback"], 10.0, H - 10.0)

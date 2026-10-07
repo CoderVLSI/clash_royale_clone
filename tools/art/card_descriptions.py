@@ -123,4 +123,6 @@ DESC = {
  'goblin_curse': "a green-purple cursed goblin mark spell with skulls and wisps",
  'void': "a dark purple void portal sucking in light with black energy tendrils",
  'vines': "thick green vines bursting out of the ground and wrapping around",
+ 'ronin': "a lone samurai ronin: a masked swordsman in a wide straw hat with a red scarf, dark armor and a long glowing katana held low in a parrying stance",
+ 'minion_giant': "a big chubby green flying minion giant with small wings, a wide mouth spitting green toxin, floating menacingly",
 }

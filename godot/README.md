@@ -55,3 +55,9 @@ Spirit a monster). `tools/art/card_descriptions.py` now holds an accurate visual
 `gen_card_art.py` uses it, defaults to the cheapest model, generates sequentially, and refuses to run unless the
 OpenRouter balance clears the $1 image floor plus the planned spend. The wrong portraits (Hog Rider, Ice Spirit,
 Battle Ram, Magic Archer, Princess) were removed; those cards use their corrected 3D models until regenerated.
+
+## Research pass (Oct 2026) - added from public sources
+* Cards: **Ronin** (Jul 2026; Parry blocks a melee hit every 3.5 s, reflects 2x) and **Minion Giant** (Sep 2026; flying, buildings only, ranged toxin, no knockback).
+* Evolutions that the 2D app lacked: Evo **Princess**, **Minion Horde**, **Elite Barbarians**, **Electro Giant** (effects for Minion Horde / Electro Giant are approximations - sources gave no numbers).
+* Heroes: all 18 (see `tools/heroes/gen_heroes.py`), one use per deployment, round ability buttons beside the hand.
+* Still not implemented: real online friendly battles (local mock only), card levels / upgrades / gold-spend collection progress, the AI opponent using heroes, evolution slots for the AI.

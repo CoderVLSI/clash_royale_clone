@@ -781,6 +781,14 @@ func is_raged(u: Dictionary) -> bool:
 	return float(_v(u, "rageUntil", 0.0)) > sim.now or _v(u, "permRage", false)
 
 func damage_unit(u: Dictionary, e: Dictionary) -> void:
+	# Ronin: Parry - blocks one melee hit every 3.5 s and returns double damage
+	if _v(u, "parryAbility", false) and e.get("attacker", -1) != -1 and sim.now >= float(_v(u, "parryReadyAt", 0.0)):
+		var pa: Variant = sim.unit_by_id(int(e["attacker"]))
+		if pa != null and pa["hp"] > 0 and pa["opp"] != u["opp"] and pa.get("projectile") == null and pa["type"] != "building" and Sim.dist(pa["x"], pa["y"], u["x"], u["y"]) <= 70.0:
+			u["parryReadyAt"] = sim.now + float(_v(u, "parryCooldown", 3500))
+			sim._apply_damage([{"id": pa["id"], "dmg": float(e["dmg"]) * 2.0, "attacker": u["id"]}])
+			sim.fx.append({"t": "bolt", "x": pa["x"], "y": pa["y"]})
+			return
 	var shield_before: float = float(_v(u, "currentShieldHp", 0))
 	if e.get("attacker", -1) != -1:
 		u["lastHitBy"] = e["attacker"]

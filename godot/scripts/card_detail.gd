@@ -239,7 +239,7 @@ func _build_panel() -> void:
 	var cw := UI.card_widget(card, Vector2(96, 120))
 	cw.position = Vector2(14, -8)
 	panel.add_child(cw)
-	var title := UI.label(str(card["name"]), 26)
+	var title := UI.label(str(card["name"]), 26 if str(card["name"]).length() <= 13 else (21 if str(card["name"]).length() <= 18 else 17))
 	title.position = Vector2(124, 10)
 	title.size = Vector2(226, 36)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

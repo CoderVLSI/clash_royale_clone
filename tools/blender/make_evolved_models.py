@@ -11,7 +11,7 @@ import mathutils
 
 CARDS_JSON = json.load(open('/home/user/clash_royale_clone/godot/data/cards.json'))
 BY_ID = {c['id']: c for c in CARDS_JSON}
-ALIAS = {'skeleton_army': 'skeletons'}
+ALIAS = {'skeleton_army': 'skeletons', 'minion_horde': 'minions'}
 SWAP = {'STEEL', 'STEEL_D', 'METAL', 'DSTEEL', 'DSTEEL_L', 'ARMOR', 'ARMOR_D', 'CLOTH', 'BLUE_M', 'BLUE_S', 'BLUE_D', 'BLUE_L', 'GREEN_C', 'GREEN_D', 'ROBE', 'ROBE_P', 'RED', 'PLAID',
         'PURPLE_H', 'NAVY', 'TINT', 'BROWN_R', 'GREY_B', 'STONE_T', 'WHITE_S', 'PURP_D', 'CRYS', 'ORANGE_D', 'YELLOW', 'E_SWORD', 'PINK', 'SKIN_G'}
 SWAP -= {'SKIN_G', 'PINK'}   # keep skin / hog colours recognisable
