@@ -321,6 +321,9 @@ func play_card(pi: int, hand_idx: int, x: float, y: float) -> bool:
 	var actual := mech.resolve_card(pi, card)
 	if actual.is_empty():
 		return false
+	if chaos != null and card.has("chaosTier") and actual["id"] != card["id"] and not actual.has("chaosTier"):
+		actual = actual.duplicate(true)       # evolved / hero form keeps the Chaos modifier picked for its base card
+		Chaos.apply(actual, Chaos.mod_for(str(card["id"]), str(card["chaosTier"])))
 	var cost: float = actual["cost"]
 	if actual.get("dualForm", false):
 		if p["elixir"] >= 6.0:
@@ -354,6 +357,7 @@ func deploy_card(card: Dictionary, x: float, y: float, opp: bool) -> void:
 	if card["type"] == "spell":
 		mech.cast_spell(card, x, y, opp)
 		return
+	var spawned: Array = []
 	var lane := "LEFT" if x < W / 2 else "RIGHT"
 	var count: int = int(_v(card, "count", 1))
 	for i in count:
@@ -389,7 +393,10 @@ func deploy_card(card: Dictionary, x: float, y: float, opp: bool) -> void:
 		if _v(card, "burrows", false):
 			u["burrowing"] = {"active": true, "targetX": tx, "targetY": ty}
 		units.append(u)
+		spawned.append(u)
 		mech.on_spawn(u)
+	if chaos != null and card.has("cx"):
+		chaos.on_deploy(card, x, y, opp, spawned)
 
 func request_ability(unit_id: int) -> bool:
 	## Player taps the champion/hero ability button.
@@ -719,6 +726,10 @@ func _attack(u: Dictionary, target: Dictionary, base_damage: float, tdist: float
 				melee_ev["slowDuration"] = float(_v(u, "slowDuration", 2.0))
 			if float(_v(u, "stun", 0)) > 0.0 and u["type"] != "building":
 				melee_ev["stun"] = float(u["stun"])
+			if u.has("chaosTier") and float(_v(u, "knockback", 0)) > 0.0:
+				melee_ev["knockback"] = float(_v(u, "knockback", 0))
+				melee_ev["from_x"] = u["x"]
+				melee_ev["from_y"] = u["y"]
 			dmg.append(melee_ev)
 		if _v(u, "splash", false) or _v(u, "frontalSplash", false):
 			splash.append({"x": target["x"], "y": target["y"], "r": float(_v(u, "splashRadius", 40)), "dmg": damage,
@@ -987,6 +998,8 @@ func _on_death(d: Dictionary) -> void:
 				e["slowDuration"] = ev["slowDuration"]
 		_apply_damage(extra)
 	mech.on_death(d)
+	if chaos != null:
+		chaos.on_death(d)
 
 func _update_zones(dmg: Array, splash: Array) -> void:
 	mech.update_zones(dmg, splash)

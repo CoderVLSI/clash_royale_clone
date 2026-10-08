@@ -1,0 +1,4414 @@
+{
+ "knight": [
+  {
+   "tier": "common",
+   "name": "Iron Plating",
+   "desc": "+200% hitpoints, -20% movement speed",
+   "fx": {
+    "hp": 3.0,
+    "speed": 0.8
+   },
+   "src": true
+  },
+  {
+   "tier": "rare",
+   "name": "Shield Bash",
+   "desc": "Stuns for 0.9s",
+   "fx": {
+    "stun": 0.9
+   },
+   "src": true
+  },
+  {
+   "tier": "epic",
+   "name": "Mega Summons",
+   "desc": "Deploys with 1x Mega Knight",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "mega_knight",
+      1
+     ]
+    ]
+   },
+   "src": true
+  }
+ ],
+ "archers": [
+  {
+   "tier": "common",
+   "name": "Weakening Shots",
+   "desc": "Hits weaken enemies 20% for 4s",
+   "fx": {
+    "weaken": [
+     0.2,
+     4
+    ]
+   },
+   "src": true
+  },
+  {
+   "tier": "rare",
+   "name": "Piercing Arrows",
+   "desc": "Piercing shots, +15% damage",
+   "fx": {
+    "pierce": 1,
+    "dmg": 1.15
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Archer Company",
+   "desc": "+2 units, +20% hit speed",
+   "fx": {
+    "count": 2,
+    "hit": 1.2
+   },
+   "src": false
+  }
+ ],
+ "giant": [
+  {
+   "tier": "common",
+   "name": "Sprint Giant",
+   "desc": "+250% movement speed",
+   "fx": {
+    "speed": 3.5
+   },
+   "src": true
+  },
+  {
+   "tier": "rare",
+   "name": "Charging Giant",
+   "desc": "Charges up for a huge hit",
+   "fx": {
+    "charge": 1
+   },
+   "src": true
+  },
+  {
+   "tier": "epic",
+   "name": "Giant Barrel",
+   "desc": "Casts Barb Barrel (200% power) on deploy",
+   "fx": {
+    "castDeploy": [
+     [
+      "barb_barrel",
+      2.0,
+      1.6
+     ]
+    ]
+   },
+   "src": true
+  }
+ ],
+ "mini_pekka": [
+  {
+   "tier": "common",
+   "name": "Pancake Rush",
+   "desc": "+35% hit speed, +15% movement speed",
+   "fx": {
+    "hit": 1.35,
+    "speed": 1.15
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Heavy Metal",
+   "desc": "+60% hitpoints, can't be knocked back",
+   "fx": {
+    "hp": 1.6,
+    "noKB": 1
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Pekka Twins",
+   "desc": "Deploys with 1x Mini P",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "mini_pekka",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "spear_goblins": [
+  {
+   "tier": "common",
+   "name": "Quick Gobs",
+   "desc": "+30% movement speed, +25% range",
+   "fx": {
+    "speed": 1.3,
+    "range": 1.25
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Poison Spears",
+   "desc": "Slows 30% for 2.5s, +20% damage",
+   "fx": {
+    "slow": [
+     0.3,
+     2.5
+    ],
+    "dmg": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Gob Horde",
+   "desc": "+3 units, +20% hit speed",
+   "fx": {
+    "count": 3,
+    "hit": 1.2
+   },
+   "src": false
+  }
+ ],
+ "musketeer": [
+  {
+   "tier": "common",
+   "name": "Spread Shot",
+   "desc": "Splash damage",
+   "fx": {
+    "splash": 30
+   },
+   "src": true
+  },
+  {
+   "tier": "rare",
+   "name": "Heavy Rounds",
+   "desc": "+100% damage",
+   "fx": {
+    "dmg": 2.0
+   },
+   "src": true
+  },
+  {
+   "tier": "epic",
+   "name": "Elite Squad",
+   "desc": "Deploys with 2x Musket",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "musketeer",
+      2
+     ]
+    ]
+   },
+   "src": true
+  }
+ ],
+ "barbarians": [
+  {
+   "tier": "common",
+   "name": "Berserk Rush",
+   "desc": "+30% movement speed, +30% hit speed",
+   "fx": {
+    "speed": 1.3,
+    "hit": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Barbarian Chiefs",
+   "desc": "+50% hitpoints, +40% damage, grows bigger",
+   "fx": {
+    "hp": 1.5,
+    "dmg": 1.4,
+    "scale": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Barbarian Horde",
+   "desc": "+4 units, enraged for 6s on deploy",
+   "fx": {
+    "count": 4,
+    "rageSelf": 6
+   },
+   "src": false
+  }
+ ],
+ "skeleton_army": [
+  {
+   "tier": "common",
+   "name": "Bone Sprint",
+   "desc": "+35% movement speed",
+   "fx": {
+    "speed": 1.35
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Bone Armor",
+   "desc": "+90 shield",
+   "fx": {
+    "shield": 90
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Skeleton Legion",
+   "desc": "+12 units",
+   "fx": {
+    "count": 12
+   },
+   "src": false
+  }
+ ],
+ "skeletons": [
+  {
+   "tier": "common",
+   "name": "Fast Bones",
+   "desc": "+40% movement speed",
+   "fx": {
+    "speed": 1.4
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Skeleton Pack",
+   "desc": "+3 units",
+   "fx": {
+    "count": 3
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Necro Surge",
+   "desc": "Every 3rd attack spawns 2x Skelly",
+   "fx": {
+    "spawnHit": [
+     "skeletons",
+     2,
+     3
+    ]
+   },
+   "src": false
+  }
+ ],
+ "valkyrie": [
+  {
+   "tier": "common",
+   "name": "Whirlwind",
+   "desc": "+40% radius, +20% hit speed",
+   "fx": {
+    "radius": 1.4,
+    "hit": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Spin Stun",
+   "desc": "Stuns for 0.6s, +20% hitpoints",
+   "fx": {
+    "stun": 0.6,
+    "hp": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Valkyrie Sisters",
+   "desc": "Deploys with 1x Valkyrie",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "valkyrie",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "witch": [
+  {
+   "tier": "common",
+   "name": "Skeleton Surge",
+   "desc": "+80% spawn speed",
+   "fx": {
+    "rate": 1.8
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Hex",
+   "desc": "Hits weaken enemies 25% for 5s, +25% damage",
+   "fx": {
+    "weaken": [
+     0.25,
+     5
+    ],
+    "dmg": 1.25
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Army Caller",
+   "desc": "Every 14s spawns 1x Skeleton Army",
+   "fx": {
+    "spawnEvery": [
+     "skeleton_army",
+     1,
+     14
+    ]
+   },
+   "src": false
+  }
+ ],
+ "hog_rider": [
+  {
+   "tier": "common",
+   "name": "Hog Sprint",
+   "desc": "+30% movement speed, +20% hitpoints",
+   "fx": {
+    "speed": 1.3,
+    "hp": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Battering Ram",
+   "desc": "Knocks enemies back, stuns for 0.4s",
+   "fx": {
+    "kb": 35,
+    "stun": 0.4
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Hog Squad",
+   "desc": "Deploys with 1x Hog",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "hog_rider",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "prince": [
+  {
+   "tier": "common",
+   "name": "Royal Charge",
+   "desc": "+25% movement speed, +20% damage",
+   "fx": {
+    "speed": 1.25,
+    "dmg": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Lancer's Resolve",
+   "desc": "+50% hitpoints, can't be knocked back",
+   "fx": {
+    "hp": 1.5,
+    "noKB": 1
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Prince Alliance",
+   "desc": "Deploys with 1x Dark Prince",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "dark_prince",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "wizard": [
+  {
+   "tier": "common",
+   "name": "Arcane Focus",
+   "desc": "+25% range, +20% hit speed",
+   "fx": {
+    "range": 1.25,
+    "hit": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Flame Burst",
+   "desc": "Every 5th attack casts Fireball (35% power)",
+   "fx": {
+    "castHit": [
+     "fireball",
+     5,
+     0.35,
+     0.6
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Archmage",
+   "desc": "Casts Fireball (60% power) on deploy, +50% damage, splash damage",
+   "fx": {
+    "castDeploy": [
+     [
+      "fireball",
+      0.6,
+      1.0
+     ]
+    ],
+    "dmg": 1.5,
+    "splash": 45
+   },
+   "src": false
+  }
+ ],
+ "sword_goblins": [
+  {
+   "tier": "common",
+   "name": "Sharp Swords",
+   "desc": "+30% damage, +20% movement speed",
+   "fx": {
+    "dmg": 1.3,
+    "speed": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Goblin Mob",
+   "desc": "+2 units",
+   "fx": {
+    "count": 2
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Brawler Backup",
+   "desc": "Deploys with 2x Goblin Brawler",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "goblin_brawler",
+      2
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "ice_wizard": [
+  {
+   "tier": "common",
+   "name": "Chill Aura",
+   "desc": "Slows 45% for 3.0s",
+   "fx": {
+    "slow": [
+     0.45,
+     3
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Frostbite",
+   "desc": "Hits weaken enemies 20% for 4s, stuns for 0.3s",
+   "fx": {
+    "weaken": [
+     0.2,
+     4
+    ],
+    "stun": 0.3
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Blizzard",
+   "desc": "Every 4s slows nearby enemies",
+   "fx": {
+    "pulse": [
+     "slow",
+     4,
+     80,
+     0.4
+    ]
+   },
+   "src": false
+  }
+ ],
+ "royal_hogs": [
+  {
+   "tier": "common",
+   "name": "Royal Rush",
+   "desc": "+25% movement speed, +20% hitpoints",
+   "fx": {
+    "speed": 1.25,
+    "hp": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Royal Squad",
+   "desc": "+2 units",
+   "fx": {
+    "count": 2
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Mini Hog Riders",
+   "desc": "Deploys with 2x Hog",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "hog_rider",
+      2
+     ]
+    ]
+   },
+   "src": true
+  }
+ ],
+ "miner": [
+  {
+   "tier": "common",
+   "name": "Deep Digger",
+   "desc": "+40% movement speed, +20% hitpoints",
+   "fx": {
+    "speed": 1.4,
+    "hp": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Tunnel Blast",
+   "desc": "Deploy shockwave (200 dmg, stun)",
+   "fx": {
+    "blast": [
+     60,
+     200,
+     0.6,
+     25
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Mining Crew",
+   "desc": "Deploys with 1x Miner",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "miner",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "goblin_giant": [
+  {
+   "tier": "common",
+   "name": "Heavy Backpack",
+   "desc": "+35% hitpoints",
+   "fx": {
+    "hp": 1.35
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Goblin Platoon",
+   "desc": "Deploys with 3x Spear Gobs",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "spear_goblins",
+      3
+     ]
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Gobbo Colossus",
+   "desc": "Grows bigger, +50% hitpoints, on destroyed: 3x Sword Gobs",
+   "fx": {
+    "scale": 1.3,
+    "hp": 1.5,
+    "spawnDeath": [
+     [
+      "sword_goblins",
+      3
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "three_musketeers": [
+  {
+   "tier": "common",
+   "name": "Triple Barrel",
+   "desc": "+25% hit speed, +15% range",
+   "fx": {
+    "hit": 1.25,
+    "range": 1.15
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Rapid Reload",
+   "desc": "+35% damage, -1 elixir cost",
+   "fx": {
+    "dmg": 1.35,
+    "cost": -1
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Squad Reinforcements",
+   "desc": "Deploys with 2x Musket",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "musketeer",
+      2
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "royal_giant": [
+  {
+   "tier": "common",
+   "name": "Long Cannon",
+   "desc": "+40% range",
+   "fx": {
+    "range": 1.4
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Cannon Shells",
+   "desc": "Splash damage, +20% damage",
+   "fx": {
+    "splash": 35,
+    "dmg": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Royal Barrage",
+   "desc": "Every 4th attack casts Fireball (50% power)",
+   "fx": {
+    "castHit": [
+     "fireball",
+     4,
+     0.5,
+     0.7
+    ]
+   },
+   "src": false
+  }
+ ],
+ "dark_prince": [
+  {
+   "tier": "common",
+   "name": "Quick Charge",
+   "desc": "+25% movement speed",
+   "fx": {
+    "speed": 1.25
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Shield Renewal",
+   "desc": "Every 5s shields nearby allies",
+   "fx": {
+    "pulse": [
+     "shield",
+     5,
+     25,
+     250
+    ]
+   },
+   "src": true
+  },
+  {
+   "tier": "epic",
+   "name": "Bat Prince",
+   "desc": "Every 2nd attack spawns 2x Bats",
+   "fx": {
+    "spawnHit": [
+     "bats",
+     2,
+     2
+    ]
+   },
+   "src": true
+  }
+ ],
+ "elite_barbarians": [
+  {
+   "tier": "common",
+   "name": "Elite Speed",
+   "desc": "+25% movement speed, +20% hit speed",
+   "fx": {
+    "speed": 1.25,
+    "hit": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Elite Armor",
+   "desc": "+50% hitpoints, +200 shield",
+   "fx": {
+    "hp": 1.5,
+    "shield": 200
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Elite Warband",
+   "desc": "Deploys with 1x Barbarians",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "barbarians",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "golem": [
+  {
+   "tier": "common",
+   "name": "Rocky Road",
+   "desc": "+35% hitpoints, +15% movement speed",
+   "fx": {
+    "hp": 1.35,
+    "speed": 1.15
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Earthquake Stomp",
+   "desc": "Every 6s stuns nearby enemies",
+   "fx": {
+    "pulse": [
+     "stun",
+     6,
+     60,
+     0.5
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Golem Brood",
+   "desc": "Every 7s spawns 1x Golemite",
+   "fx": {
+    "spawnEvery": [
+     "golemite",
+     1,
+     7
+    ]
+   },
+   "src": false
+  }
+ ],
+ "pekka": [
+  {
+   "tier": "common",
+   "name": "Heavy Hits",
+   "desc": "+30% damage",
+   "fx": {
+    "dmg": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Pekka Armor",
+   "desc": "+40% hitpoints, can't be knocked back",
+   "fx": {
+    "hp": 1.4,
+    "noKB": 1
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Pancake Storm",
+   "desc": "Every 4th attack spawns 1x Mini P",
+   "fx": {
+    "spawnHit": [
+     "mini_pekka",
+     1,
+     4
+    ]
+   },
+   "src": false
+  }
+ ],
+ "mega_knight": [
+  {
+   "tier": "common",
+   "name": "Bigger Leap",
+   "desc": "Leaps onto enemies, +30% radius",
+   "fx": {
+    "jumps": 1,
+    "radius": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Landing Quake",
+   "desc": "Deploy shockwave (500 dmg, stun)",
+   "fx": {
+    "blast": [
+     90,
+     500,
+     1.0,
+     40
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Mega Rebirth",
+   "desc": "Returns once with 60% HP, grows bigger",
+   "fx": {
+    "revive": 0.6,
+    "scale": 1.15
+   },
+   "src": false
+  }
+ ],
+ "electro_wizard": [
+  {
+   "tier": "common",
+   "name": "Electro Spirits",
+   "desc": "Deploys with 2x Electro Spirit",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "electro_spirit",
+      2
+     ]
+    ]
+   },
+   "src": true
+  },
+  {
+   "tier": "rare",
+   "name": "Electro Pentachain",
+   "desc": "Chains to 4 more enemies",
+   "fx": {
+    "zap": [
+     4,
+     0.9
+    ]
+   },
+   "src": true
+  },
+  {
+   "tier": "epic",
+   "name": "Electro Storm",
+   "desc": "Chains to 8 more enemies, +20% hit speed",
+   "fx": {
+    "zap": [
+     8,
+     0.8
+    ],
+    "hit": 1.2
+   },
+   "src": true
+  }
+ ],
+ "fire_spirit": [
+  {
+   "tier": "common",
+   "name": "Spirit Swarm",
+   "desc": "+2 units",
+   "fx": {
+    "count": 2
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Wide Burn",
+   "desc": "+30% damage, +40% radius",
+   "fx": {
+    "dmg": 1.3,
+    "radius": 1.4
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Inferno Spirits",
+   "desc": "Casts Fireball (50% power) when destroyed",
+   "fx": {
+    "castDeath": [
+     [
+      "fireball",
+      0.5,
+      0.8
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "ice_spirit": [
+  {
+   "tier": "common",
+   "name": "Longer Freeze",
+   "desc": "+1.0s freeze",
+   "fx": {
+    "freeze": 1.0
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Spirit Pair",
+   "desc": "+1 units",
+   "fx": {
+    "count": 1
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Blizzard Spirit",
+   "desc": "Casts Freeze (100% power) when destroyed",
+   "fx": {
+    "castDeath": [
+     [
+      "freeze",
+      1.0,
+      0.45
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "electro_spirit": [
+  {
+   "tier": "common",
+   "name": "Long Chain",
+   "desc": "Chains to 3 more enemies",
+   "fx": {
+    "zap": [
+     3,
+     1.0
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Spirit Pair",
+   "desc": "+1 units",
+   "fx": {
+    "count": 1
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Overload",
+   "desc": "Chains to 6 more enemies, stuns for 0.8s",
+   "fx": {
+    "zap": [
+     6,
+     1.0
+    ],
+    "stun": 0.8
+   },
+   "src": false
+  }
+ ],
+ "heal_spirit": [
+  {
+   "tier": "common",
+   "name": "Quick Heal",
+   "desc": "+40% radius",
+   "fx": {
+    "radius": 1.4
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Jump Strike",
+   "desc": "Deploy shockwave (150 dmg)",
+   "fx": {
+    "blast": [
+     40,
+     150,
+     0,
+     0
+    ]
+   },
+   "src": true
+  },
+  {
+   "tier": "epic",
+   "name": "Heal Spirit Trio",
+   "desc": "+2 units",
+   "fx": {
+    "count": 2
+   },
+   "src": true
+  }
+ ],
+ "bomber": [
+  {
+   "tier": "common",
+   "name": "Long Fuse",
+   "desc": "+30% range",
+   "fx": {
+    "range": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Bomb Cluster",
+   "desc": "Splash damage, +30% damage",
+   "fx": {
+    "splash": 50,
+    "dmg": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Bomb Barrage",
+   "desc": "Every 3rd attack casts Fireball (35% power)",
+   "fx": {
+    "castHit": [
+     "fireball",
+     3,
+     0.35,
+     0.5
+    ]
+   },
+   "src": false
+  }
+ ],
+ "furnace": [
+  {
+   "tier": "common",
+   "name": "Hot Coals",
+   "desc": "+50% spawn speed",
+   "fx": {
+    "rate": 1.5
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Fire Fortress",
+   "desc": "+50% hitpoints, +200 shield",
+   "fx": {
+    "hp": 1.5,
+    "shield": 200
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Lava Spirits",
+   "desc": "Every 6s spawns 2x Fire Spirit",
+   "fx": {
+    "spawnEvery": [
+     "fire_spirit",
+     2,
+     6
+    ]
+   },
+   "src": false
+  }
+ ],
+ "spirit_empress": [
+  {
+   "tier": "common",
+   "name": "Soul Boost",
+   "desc": "+20% movement speed, +20% hit speed",
+   "fx": {
+    "speed": 1.2,
+    "hit": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Spirit Guard",
+   "desc": "+300 shield, +20% hitpoints",
+   "fx": {
+    "shield": 300,
+    "hp": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Empress Court",
+   "desc": "Deploys with 1x Fire Spirit, 1x Ice Spirit, 1x Electro Spirit",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "fire_spirit",
+      1
+     ],
+     [
+      "ice_spirit",
+      1
+     ],
+     [
+      "electro_spirit",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "lumberjack": [
+  {
+   "tier": "common",
+   "name": "Axe Fury",
+   "desc": "+30% hit speed",
+   "fx": {
+    "hit": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Stump Rage",
+   "desc": "Every 5s enrages nearby allies",
+   "fx": {
+    "pulse": [
+     "rage",
+     5,
+     60,
+     1
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Double Axe",
+   "desc": "Deploys with 1x Lumberjack",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "lumberjack",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "guards": [
+  {
+   "tier": "common",
+   "name": "Guard Shields",
+   "desc": "+120 shield",
+   "fx": {
+    "shield": 120
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Rapid Spears",
+   "desc": "+40% hit speed, +15% range",
+   "fx": {
+    "hit": 1.4,
+    "range": 1.15
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Royal Guard",
+   "desc": "Deploys with 1x Guards",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "guards",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "ram_rider": [
+  {
+   "tier": "common",
+   "name": "Faster Ram",
+   "desc": "+25% movement speed",
+   "fx": {
+    "speed": 1.25
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Bola Snare",
+   "desc": "Slows 50% for 2.5s, stuns for 0.3s",
+   "fx": {
+    "slow": [
+     0.5,
+     2.5
+    ],
+    "stun": 0.3
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Double Ram",
+   "desc": "Deploys with 1x Battle Ram",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "battle_ram",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "battle_healer": [
+  {
+   "tier": "common",
+   "name": "Healing Aura",
+   "desc": "Every 3s heals nearby allies",
+   "fx": {
+    "pulse": [
+     "heal",
+     3,
+     70,
+     150
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Holy Armor",
+   "desc": "+250 shield, +25% hitpoints",
+   "fx": {
+    "shield": 250,
+    "hp": 1.25
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Revival Pulse",
+   "desc": "Every 2s heals nearby allies, returns once with 50% HP",
+   "fx": {
+    "pulse": [
+     "heal",
+     2,
+     90,
+     300
+    ],
+    "revive": 0.5
+   },
+   "src": false
+  }
+ ],
+ "ice_golem": [
+  {
+   "tier": "common",
+   "name": "Cold Snap",
+   "desc": "Slows 50% for 3.0s, +20% hitpoints",
+   "fx": {
+    "slow": [
+     0.5,
+     3
+    ],
+    "hp": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Frozen Blast",
+   "desc": "Deploy shockwave (120 dmg, stun)",
+   "fx": {
+    "blast": [
+     60,
+     120,
+     0.8,
+     0
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Glacier Core",
+   "desc": "Casts Freeze (100% power) when destroyed",
+   "fx": {
+    "castDeath": [
+     [
+      "freeze",
+      1.0,
+      0.55
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "dart_goblin": [
+  {
+   "tier": "common",
+   "name": "Double Darts",
+   "desc": "+100% hit speed",
+   "fx": {
+    "hit": 2.0
+   },
+   "src": true
+  },
+  {
+   "tier": "rare",
+   "name": "Magic Darts",
+   "desc": "Piercing shots, +30% damage",
+   "fx": {
+    "pierce": 1,
+    "dmg": 1.3
+   },
+   "src": true
+  },
+  {
+   "tier": "epic",
+   "name": "Sparky Darts",
+   "desc": "+300% damage, -50% hit speed, splash damage",
+   "fx": {
+    "dmg": 4.0,
+    "hit": 0.5,
+    "splash": 50
+   },
+   "src": true
+  }
+ ],
+ "princess": [
+  {
+   "tier": "common",
+   "name": "Long Shot",
+   "desc": "+30% range",
+   "fx": {
+    "range": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Fire Arrows",
+   "desc": "Every 3rd attack casts Arrows (50% power)",
+   "fx": {
+    "castHit": [
+     "arrows",
+     3,
+     0.5,
+     0.6
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Princess Barrage",
+   "desc": "Piercing shots, splash damage, +30% hit speed",
+   "fx": {
+    "pierce": 1,
+    "splash": 55,
+    "hit": 1.3
+   },
+   "src": false
+  }
+ ],
+ "bandit": [
+  {
+   "tier": "common",
+   "name": "Dash Strike",
+   "desc": "+20% movement speed",
+   "fx": {
+    "speed": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Heist",
+   "desc": "+50% damage, heals 25% of damage dealt",
+   "fx": {
+    "dmg": 1.5,
+    "lifesteal": 0.25
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Ghost Dash",
+   "desc": "Invisible until it strikes, +60% damage",
+   "fx": {
+    "hidden": 1,
+    "dmg": 1.6
+   },
+   "src": false
+  }
+ ],
+ "battle_ram": [
+  {
+   "tier": "common",
+   "name": "Ram Boost",
+   "desc": "+30% movement speed",
+   "fx": {
+    "speed": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Ram Impact",
+   "desc": "Deploy shockwave (350 dmg, stun)",
+   "fx": {
+    "blast": [
+     70,
+     350,
+     0.8,
+     30
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Barbarian Ram",
+   "desc": "Deploys with 1x Barbarians",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "barbarians",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "hunter": [
+  {
+   "tier": "common",
+   "name": "Wider Spread",
+   "desc": "+20% range, +20% damage",
+   "fx": {
+    "range": 1.2,
+    "dmg": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Hunter's Mark",
+   "desc": "Hits weaken enemies 30% for 5s",
+   "fx": {
+    "weaken": [
+     0.3,
+     5
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Hunter Salvo",
+   "desc": "+60% hit speed, +30% damage",
+   "fx": {
+    "hit": 1.6,
+    "dmg": 1.3
+   },
+   "src": false
+  }
+ ],
+ "electro_giant": [
+  {
+   "tier": "common",
+   "name": "Wider Shock",
+   "desc": "+60% shock power",
+   "fx": {
+    "shock": 1.6
+   },
+   "src": true
+  },
+  {
+   "tier": "rare",
+   "name": "Spirit Escort",
+   "desc": "Deploys with 2x Electro Spirit",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "electro_spirit",
+      2
+     ]
+    ]
+   },
+   "src": true
+  },
+  {
+   "tier": "epic",
+   "name": "Tornado Pull",
+   "desc": "Every 4s pulls enemies in",
+   "fx": {
+    "pulse": [
+     "pull",
+     4,
+     100,
+     40
+    ]
+   },
+   "src": true
+  }
+ ],
+ "night_witch": [
+  {
+   "tier": "common",
+   "name": "Dark Swarm",
+   "desc": "Every 3rd attack spawns 2x Bats",
+   "fx": {
+    "spawnHit": [
+     "bats",
+     2,
+     3
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Night Stalker",
+   "desc": "+40% hitpoints, invisible until it strikes",
+   "fx": {
+    "hp": 1.4,
+    "hidden": 1
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Bat Legion",
+   "desc": "Every 8s spawns 4x Bats",
+   "fx": {
+    "spawnEvery": [
+     "bats",
+     4,
+     8
+    ]
+   },
+   "src": false
+  }
+ ],
+ "elixir_golem": [
+  {
+   "tier": "common",
+   "name": "Elixir Refund",
+   "desc": "+1 elixir when destroyed",
+   "fx": {
+    "elixirDeath": 1
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Golem Split",
+   "desc": "On destroyed: 2x Elixir Golemite",
+   "fx": {
+    "spawnDeath": [
+     [
+      "elixir_golemite",
+      2
+     ]
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Elixir Surge",
+   "desc": "+2 elixir on deploy, +30% hitpoints",
+   "fx": {
+    "elixirDeploy": 2,
+    "hp": 1.3
+   },
+   "src": false
+  }
+ ],
+ "firecracker": [
+  {
+   "tier": "common",
+   "name": "Knockback Sparks",
+   "desc": "Knocks enemies back",
+   "fx": {
+    "kb": 35
+   },
+   "src": true
+  },
+  {
+   "tier": "rare",
+   "name": "Split Shot",
+   "desc": "Splash damage, +20% damage",
+   "fx": {
+    "splash": 55,
+    "dmg": 1.2
+   },
+   "src": true
+  },
+  {
+   "tier": "epic",
+   "name": "Firecracker Clones",
+   "desc": "Every 8th attack spawns 1x Firecracker",
+   "fx": {
+    "spawnHit": [
+     "firecracker",
+     1,
+     8
+    ]
+   },
+   "src": true
+  }
+ ],
+ "giant_skeleton": [
+  {
+   "tier": "common",
+   "name": "Bone Bomb",
+   "desc": "Explodes when destroyed",
+   "fx": {
+    "boom": [
+     3.0,
+     90
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Giant Bones",
+   "desc": "+50% hitpoints, grows bigger",
+   "fx": {
+    "hp": 1.5,
+    "scale": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Skeleton Burst",
+   "desc": "On destroyed: 1x Skeleton Army",
+   "fx": {
+    "spawnDeath": [
+     [
+      "skeleton_army",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "magic_archer": [
+  {
+   "tier": "common",
+   "name": "Magic Pierce",
+   "desc": "+20% range, +20% damage",
+   "fx": {
+    "range": 1.2,
+    "dmg": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Magic Chain",
+   "desc": "Chains to 2 more enemies",
+   "fx": {
+    "zap": [
+     2,
+     0.8
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Arcane Barrage",
+   "desc": "+50% hit speed, piercing shots",
+   "fx": {
+    "hit": 1.5,
+    "pierce": 1
+   },
+   "src": false
+  }
+ ],
+ "royal_ghost": [
+  {
+   "tier": "common",
+   "name": "Ghost Speed",
+   "desc": "+25% movement speed",
+   "fx": {
+    "speed": 1.25
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Spectral Blade",
+   "desc": "+40% damage, heals 30% of damage dealt",
+   "fx": {
+    "dmg": 1.4,
+    "lifesteal": 0.3
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Ghost Squad",
+   "desc": "Deploys with 3x Bats",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "bats",
+      3
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "sparky": [
+  {
+   "tier": "common",
+   "name": "Double Health",
+   "desc": "+100% hitpoints",
+   "fx": {
+    "hp": 2.0
+   },
+   "src": true
+  },
+  {
+   "tier": "rare",
+   "name": "Fast Recharge",
+   "desc": "+60% hit speed",
+   "fx": {
+    "hit": 1.6
+   },
+   "src": true
+  },
+  {
+   "tier": "epic",
+   "name": "Piercing Shot",
+   "desc": "Piercing shots, +20% damage",
+   "fx": {
+    "pierce": 1,
+    "dmg": 1.2
+   },
+   "src": true
+  }
+ ],
+ "mother_witch": [
+  {
+   "tier": "common",
+   "name": "Curse Boost",
+   "desc": "+20% range, +20% hit speed",
+   "fx": {
+    "range": 1.2,
+    "hit": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Hog Curse",
+   "desc": "Every 4th attack spawns 1x Cursed Hog",
+   "fx": {
+    "spawnHit": [
+     "cursed_hog",
+     1,
+     4
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Witch Coven",
+   "desc": "Deploys with 1x Witch",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "witch",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "wall_breakers": [
+  {
+   "tier": "common",
+   "name": "Faster Breakers",
+   "desc": "+30% movement speed",
+   "fx": {
+    "speed": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Big Blast",
+   "desc": "+50% damage, +40% radius",
+   "fx": {
+    "dmg": 1.5,
+    "radius": 1.4
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Wall Breaker Squad",
+   "desc": "+2 units",
+   "fx": {
+    "count": 2
+   },
+   "src": false
+  }
+ ],
+ "bowler": [
+  {
+   "tier": "common",
+   "name": "Longer Throw",
+   "desc": "+30% range, +30% hit speed",
+   "fx": {
+    "range": 1.3,
+    "hit": 1.3
+   },
+   "src": true
+  },
+  {
+   "tier": "rare",
+   "name": "Chain Boulders",
+   "desc": "Chains to 3 more enemies",
+   "fx": {
+    "zap": [
+     3,
+     0.9
+    ]
+   },
+   "src": true
+  },
+  {
+   "tier": "epic",
+   "name": "Explosive Boulders",
+   "desc": "Splash damage, +35% damage, stuns for 0.4s",
+   "fx": {
+    "splash": 55,
+    "dmg": 1.35,
+    "stun": 0.4
+   },
+   "src": true
+  }
+ ],
+ "executioner": [
+  {
+   "tier": "common",
+   "name": "Long Handle",
+   "desc": "+25% range",
+   "fx": {
+    "range": 1.25
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Boomerang Edge",
+   "desc": "+30% damage, piercing shots",
+   "fx": {
+    "dmg": 1.3,
+    "pierce": 1
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Executioner's Verdict",
+   "desc": "+50% damage, +30% hit speed",
+   "fx": {
+    "dmg": 1.5,
+    "hit": 1.3
+   },
+   "src": false
+  }
+ ],
+ "zappies": [
+  {
+   "tier": "common",
+   "name": "Static Zap",
+   "desc": "Stuns for 0.6s",
+   "fx": {
+    "stun": 0.6
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Zappy Quartet",
+   "desc": "+1 units",
+   "fx": {
+    "count": 1
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Zappies Surge",
+   "desc": "Chains to 3 more enemies, +20% hit speed",
+   "fx": {
+    "zap": [
+     3,
+     0.8
+    ],
+    "hit": 1.2
+   },
+   "src": false
+  }
+ ],
+ "rascals": [
+  {
+   "tier": "common",
+   "name": "Boy Buff",
+   "desc": "+30% hitpoints",
+   "fx": {
+    "hp": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Girl Volley",
+   "desc": "+2 units",
+   "fx": {
+    "count": 2
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Rascal Squad",
+   "desc": "Deploys with 1x Goblin Gang",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "goblin_gang",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "royal_recruits": [
+  {
+   "tier": "common",
+   "name": "Recruit Shields",
+   "desc": "+150 shield",
+   "fx": {
+    "shield": 150
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Recruit Charge",
+   "desc": "+25% movement speed, +20% hitpoints",
+   "fx": {
+    "speed": 1.25,
+    "hp": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Recruit Squad",
+   "desc": "+2 units",
+   "fx": {
+    "count": 2
+   },
+   "src": false
+  }
+ ],
+ "cannon_cart": [
+  {
+   "tier": "common",
+   "name": "Cart Armor",
+   "desc": "+40% hitpoints",
+   "fx": {
+    "hp": 1.4
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Mobile Cannon",
+   "desc": "+30% range, +30% damage",
+   "fx": {
+    "range": 1.3,
+    "dmg": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Cannon Convoy",
+   "desc": "Deploys with 1x Cannon",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "cannon",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "goblin_drill": [
+  {
+   "tier": "common",
+   "name": "Rapid Drill",
+   "desc": "+50% spawn speed",
+   "fx": {
+    "rate": 1.5
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Drill Quake",
+   "desc": "Deploy shockwave (250 dmg, stun)",
+   "fx": {
+    "blast": [
+     70,
+     250,
+     0.7,
+     30
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Goblin Quarry",
+   "desc": "Every 5s spawns 1x Goblin Brawler",
+   "fx": {
+    "spawnEvery": [
+     "goblin_brawler",
+     1,
+     5
+    ]
+   },
+   "src": false
+  }
+ ],
+ "fisherman": [
+  {
+   "tier": "common",
+   "name": "Thick Line",
+   "desc": "+40% hitpoints",
+   "fx": {
+    "hp": 1.4
+   },
+   "src": true
+  },
+  {
+   "tier": "rare",
+   "name": "Steel Hook",
+   "desc": "+40% damage, slows 40% for 2.0s",
+   "fx": {
+    "dmg": 1.4,
+    "slow": [
+     0.4,
+     2
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Endless Hook",
+   "desc": "+100% range",
+   "fx": {
+    "range": 2.0
+   },
+   "src": true
+  }
+ ],
+ "goblin_gang": [
+  {
+   "tier": "common",
+   "name": "Gang Speed",
+   "desc": "+25% movement speed",
+   "fx": {
+    "speed": 1.25
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Spear Support",
+   "desc": "+2 units",
+   "fx": {
+    "count": 2
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Brawler Boss",
+   "desc": "Deploys with 2x Goblin Brawler",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "goblin_brawler",
+      2
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "goblin_demolisher": [
+  {
+   "tier": "common",
+   "name": "Reinforced Fuse",
+   "desc": "+30% hitpoints",
+   "fx": {
+    "hp": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Blast Radius",
+   "desc": "+40% radius, +20% damage",
+   "fx": {
+    "radius": 1.4,
+    "dmg": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Demolition Crew",
+   "desc": "Casts Fireball (100% power) when destroyed",
+   "fx": {
+    "castDeath": [
+     [
+      "fireball",
+      1.0,
+      1.0
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "goblin_machine": [
+  {
+   "tier": "common",
+   "name": "Reinforced Frame",
+   "desc": "+35% hitpoints",
+   "fx": {
+    "hp": 1.35
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Mini Rockets",
+   "desc": "Every 4th attack casts Rocket (15% power)",
+   "fx": {
+    "castHit": [
+     "rocket",
+     4,
+     0.15,
+     0.5
+    ]
+   },
+   "src": true
+  },
+  {
+   "tier": "epic",
+   "name": "Fireball Charge",
+   "desc": "Charges up for a huge hit, every 3rd attack casts Fireball (50% power)",
+   "fx": {
+    "charge": 1,
+    "castHit": [
+     "fireball",
+     3,
+     0.5,
+     0.7
+    ]
+   },
+   "src": true
+  }
+ ],
+ "rune_giant": [
+  {
+   "tier": "common",
+   "name": "Rune Armor",
+   "desc": "+35% hitpoints",
+   "fx": {
+    "hp": 1.35
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Enchant Boost",
+   "desc": "+40% damage",
+   "fx": {
+    "dmg": 1.4
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Rune Surge",
+   "desc": "Every 6s enrages nearby allies",
+   "fx": {
+    "pulse": [
+     "rage",
+     6,
+     80,
+     1
+    ]
+   },
+   "src": false
+  }
+ ],
+ "suspicious_bush": [
+  {
+   "tier": "common",
+   "name": "Thick Bush",
+   "desc": "+50% hitpoints",
+   "fx": {
+    "hp": 1.5
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Prickly Bush",
+   "desc": "Deploy shockwave (150 dmg, stun)",
+   "fx": {
+    "blast": [
+     50,
+     150,
+     0.5,
+     20
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Goblin Ambush",
+   "desc": "Deploys with 1x Goblin Gang",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "goblin_gang",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "berserker": [
+  {
+   "tier": "common",
+   "name": "Frenzy",
+   "desc": "+30% hit speed",
+   "fx": {
+    "hit": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Blood Rage",
+   "desc": "Heals 35% of damage dealt",
+   "fx": {
+    "lifesteal": 0.35
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Berserker Duo",
+   "desc": "Deploys with 1x Berserker",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "berserker",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "golden_knight": [
+  {
+   "tier": "common",
+   "name": "Gilded Armor",
+   "desc": "+30% hitpoints",
+   "fx": {
+    "hp": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Golden Dash",
+   "desc": "+30% damage, +15% movement speed",
+   "fx": {
+    "dmg": 1.3,
+    "speed": 1.15
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Dash Quake",
+   "desc": "Deploy shockwave (300 dmg, stun)",
+   "fx": {
+    "blast": [
+     70,
+     300,
+     0.6,
+     30
+    ]
+   },
+   "src": false
+  }
+ ],
+ "skeleton_king": [
+  {
+   "tier": "common",
+   "name": "Royal Bones",
+   "desc": "+30% hitpoints",
+   "fx": {
+    "hp": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Soul Harvest",
+   "desc": "Every 3rd attack spawns 3x Skelly",
+   "fx": {
+    "spawnHit": [
+     "skeletons",
+     3,
+     3
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Undead Court",
+   "desc": "Deploys with 1x Skeleton Army",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "skeleton_army",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "archer_queen": [
+  {
+   "tier": "common",
+   "name": "Quick Draw",
+   "desc": "+30% hit speed",
+   "fx": {
+    "hit": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Crossbow Pierce",
+   "desc": "Piercing shots, +25% damage",
+   "fx": {
+    "pierce": 1,
+    "dmg": 1.25
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Royal Barrage",
+   "desc": "Every 4th attack casts Arrows (70% power)",
+   "fx": {
+    "castHit": [
+     "arrows",
+     4,
+     0.7,
+     0.7
+    ]
+   },
+   "src": false
+  }
+ ],
+ "monk": [
+  {
+   "tier": "common",
+   "name": "Monk Armor",
+   "desc": "+35% hitpoints",
+   "fx": {
+    "hp": 1.35
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Palm Strike",
+   "desc": "Knocks enemies back, +30% damage",
+   "fx": {
+    "kb": 30,
+    "dmg": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Inner Peace",
+   "desc": "Every 4s heals nearby allies, +200 shield",
+   "fx": {
+    "pulse": [
+     "heal",
+     4,
+     100,
+     250
+    ],
+    "shield": 200
+   },
+   "src": false
+  }
+ ],
+ "mighty_miner": [
+  {
+   "tier": "common",
+   "name": "Drill Power",
+   "desc": "+35% damage",
+   "fx": {
+    "dmg": 1.35
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Bomb Drop",
+   "desc": "Every 4th attack casts Fireball (35% power)",
+   "fx": {
+    "castHit": [
+     "fireball",
+     4,
+     0.35,
+     0.5
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Mine Collapse",
+   "desc": "Deploy shockwave (450 dmg, stun)",
+   "fx": {
+    "blast": [
+     80,
+     450,
+     0.8,
+     35
+    ]
+   },
+   "src": false
+  }
+ ],
+ "little_prince": [
+  {
+   "tier": "common",
+   "name": "Royal Guardian",
+   "desc": "+30% hitpoints",
+   "fx": {
+    "hp": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Quick Shot",
+   "desc": "+35% hit speed",
+   "fx": {
+    "hit": 1.35
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Prince's Guard",
+   "desc": "Deploys with 1x Knight",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "knight",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "boss_bandit": [
+  {
+   "tier": "common",
+   "name": "Heavy Loot",
+   "desc": "+30% hitpoints",
+   "fx": {
+    "hp": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Ghost Dash",
+   "desc": "Invisible until it strikes, +35% damage",
+   "fx": {
+    "hidden": 1,
+    "dmg": 1.35
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Bandit Gang",
+   "desc": "Deploys with 1x Bandit",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "bandit",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "goblinstein": [
+  {
+   "tier": "common",
+   "name": "Monster Mash",
+   "desc": "+30% hitpoints",
+   "fx": {
+    "hp": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Lightning Rod",
+   "desc": "Chains to 3 more enemies",
+   "fx": {
+    "zap": [
+     3,
+     0.8
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Doctor's Orders",
+   "desc": "Deploys with 2x Goblin Brawler, +300 shield",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "goblin_brawler",
+      2
+     ]
+    ],
+    "shield": 300
+   },
+   "src": false
+  }
+ ],
+ "ronin": [
+  {
+   "tier": "common",
+   "name": "Sharp Katana",
+   "desc": "+30% damage",
+   "fx": {
+    "dmg": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Iron Resolve",
+   "desc": "+30% hitpoints, can't be knocked back",
+   "fx": {
+    "hp": 1.3,
+    "noKB": 1
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Ronin's Duel",
+   "desc": "Heals 30% of damage dealt, +40% damage",
+   "fx": {
+    "lifesteal": 0.3,
+    "dmg": 1.4
+   },
+   "src": false
+  }
+ ],
+ "baby_dragon": [
+  {
+   "tier": "common",
+   "name": "Fast Wings",
+   "desc": "+35% movement speed",
+   "fx": {
+    "speed": 1.35
+   },
+   "src": true
+  },
+  {
+   "tier": "rare",
+   "name": "Fireball Breath",
+   "desc": "Every 5th attack casts Fireball (50% power)",
+   "fx": {
+    "castHit": [
+     "fireball",
+     5,
+     0.5,
+     0.6
+    ]
+   },
+   "src": true
+  },
+  {
+   "tier": "epic",
+   "name": "Dragon Egg",
+   "desc": "On destroyed: 1x Baby D",
+   "fx": {
+    "spawnDeath": [
+     [
+      "baby_dragon",
+      1
+     ]
+    ]
+   },
+   "src": true
+  }
+ ],
+ "minions": [
+  {
+   "tier": "common",
+   "name": "Swarm Speed",
+   "desc": "+25% movement speed",
+   "fx": {
+    "speed": 1.25
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Minion Pack",
+   "desc": "+1 units",
+   "fx": {
+    "count": 1
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Minion Legion",
+   "desc": "+3 units, +20% hitpoints",
+   "fx": {
+    "count": 3,
+    "hp": 1.2
+   },
+   "src": false
+  }
+ ],
+ "minion_horde": [
+  {
+   "tier": "common",
+   "name": "Horde Rush",
+   "desc": "+25% movement speed",
+   "fx": {
+    "speed": 1.25
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Horde Bolts",
+   "desc": "+30% damage",
+   "fx": {
+    "dmg": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Minion Tide",
+   "desc": "+3 units",
+   "fx": {
+    "count": 3
+   },
+   "src": false
+  }
+ ],
+ "lava_hound": [
+  {
+   "tier": "common",
+   "name": "Molten Hide",
+   "desc": "+40% hitpoints",
+   "fx": {
+    "hp": 1.4
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Pup Pack",
+   "desc": "On destroyed: 4x Lava Pups",
+   "fx": {
+    "spawnDeath": [
+     [
+      "lava_pups",
+      4
+     ]
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Lava Rain",
+   "desc": "Every 6s casts Fireball (30% power)",
+   "fx": {
+    "castEvery": [
+     "fireball",
+     6,
+     0.3,
+     0.5
+    ]
+   },
+   "src": false
+  }
+ ],
+ "bats": [
+  {
+   "tier": "common",
+   "name": "Bat Boost",
+   "desc": "+30% movement speed",
+   "fx": {
+    "speed": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Bat Wave",
+   "desc": "+2 units",
+   "fx": {
+    "count": 2
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Vampire Bats",
+   "desc": "Heals 50% of damage dealt, +2 units",
+   "fx": {
+    "lifesteal": 0.5,
+    "count": 2
+   },
+   "src": false
+  }
+ ],
+ "skeleton_barrel": [
+  {
+   "tier": "common",
+   "name": "Barrel Armor",
+   "desc": "+40% hitpoints",
+   "fx": {
+    "hp": 1.4
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Skeleton Drop",
+   "desc": "On destroyed: 1x Skeleton Army",
+   "fx": {
+    "spawnDeath": [
+     [
+      "skeleton_army",
+      1
+     ]
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Barrel Blast",
+   "desc": "Explodes when destroyed",
+   "fx": {
+    "boom": [
+     2.0,
+     80
+    ]
+   },
+   "src": false
+  }
+ ],
+ "mega_minion": [
+  {
+   "tier": "common",
+   "name": "Cloaked Minion",
+   "desc": "Invisible until it strikes",
+   "fx": {
+    "hidden": 1
+   },
+   "src": true
+  },
+  {
+   "tier": "rare",
+   "name": "Frost Strike",
+   "desc": "Slows 35% for 2.5s",
+   "fx": {
+    "slow": [
+     0.35,
+     2.5
+    ]
+   },
+   "src": true
+  },
+  {
+   "tier": "epic",
+   "name": "Mega Squad",
+   "desc": "Deploys with 3x Mega Minion",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "mega_minion",
+      3
+     ]
+    ]
+   },
+   "src": true
+  }
+ ],
+ "balloon": [
+  {
+   "tier": "common",
+   "name": "Fast Balloon",
+   "desc": "+30% movement speed, splash damage",
+   "fx": {
+    "speed": 1.3,
+    "splash": 50
+   },
+   "src": true
+  },
+  {
+   "tier": "rare",
+   "name": "Heavy Payload",
+   "desc": "+30% damage, explodes when destroyed",
+   "fx": {
+    "dmg": 1.3,
+    "boom": [
+     1.5,
+     70
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Double Bomb",
+   "desc": "+100% damage",
+   "fx": {
+    "dmg": 2.0
+   },
+   "src": true
+  }
+ ],
+ "inferno_dragon": [
+  {
+   "tier": "common",
+   "name": "Inferno Heat",
+   "desc": "+30% damage",
+   "fx": {
+    "dmg": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Dragon Scorch",
+   "desc": "+20% range, +20% hitpoints",
+   "fx": {
+    "range": 1.2,
+    "hp": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Twin Inferno",
+   "desc": "Deploys with 1x Inferno Dragon",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "inferno_dragon",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "electro_dragon": [
+  {
+   "tier": "common",
+   "name": "Static Wings",
+   "desc": "+20% movement speed, +20% hitpoints",
+   "fx": {
+    "speed": 1.2,
+    "hp": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Longer Chain",
+   "desc": "Chains to 3 more enemies",
+   "fx": {
+    "zap": [
+     3,
+     0.9
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Thunder Dragon",
+   "desc": "Chains to 6 more enemies, stuns for 0.5s",
+   "fx": {
+    "zap": [
+     6,
+     0.9
+    ],
+    "stun": 0.5
+   },
+   "src": false
+  }
+ ],
+ "flying_machine": [
+  {
+   "tier": "common",
+   "name": "Light Frame",
+   "desc": "+25% movement speed, +20% hitpoints",
+   "fx": {
+    "speed": 1.25,
+    "hp": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Gatling Shots",
+   "desc": "+40% hit speed",
+   "fx": {
+    "hit": 1.4
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Machine Squadron",
+   "desc": "Deploys with 1x Flying Machine",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "flying_machine",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "skeleton_dragons": [
+  {
+   "tier": "common",
+   "name": "Dragon Dash",
+   "desc": "+25% movement speed",
+   "fx": {
+    "speed": 1.25
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Bone Fire",
+   "desc": "+35% damage",
+   "fx": {
+    "dmg": 1.35
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Dragon Hoard",
+   "desc": "+1 units, on destroyed: 4x Skelly",
+   "fx": {
+    "count": 1,
+    "spawnDeath": [
+     [
+      "skeletons",
+      4
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "phoenix": [
+  {
+   "tier": "common",
+   "name": "Quick Hatch",
+   "desc": "Hatches 45% faster",
+   "fx": {
+    "egg": 0.55
+   },
+   "src": true
+  },
+  {
+   "tier": "rare",
+   "name": "Twin Eggs",
+   "desc": "On destroyed: 1x Phoenix",
+   "fx": {
+    "spawnDeath": [
+     [
+      "phoenix",
+      1
+     ]
+    ]
+   },
+   "src": true
+  },
+  {
+   "tier": "epic",
+   "name": "Rebirth",
+   "desc": "Returns once with 80% HP",
+   "fx": {
+    "revive": 0.8
+   },
+   "src": true
+  }
+ ],
+ "minion_giant": [
+  {
+   "tier": "common",
+   "name": "Giant Wings",
+   "desc": "+30% hitpoints",
+   "fx": {
+    "hp": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Minion Escort",
+   "desc": "Deploys with 1x Minions",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "minions",
+      1
+     ]
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Dive Bomb",
+   "desc": "Explodes when destroyed",
+   "fx": {
+    "boom": [
+     3.0,
+     80
+    ]
+   },
+   "src": false
+  }
+ ],
+ "cannon": [
+  {
+   "tier": "common",
+   "name": "Long Barrel",
+   "desc": "+30% range",
+   "fx": {
+    "range": 1.3
+   },
+   "src": true
+  },
+  {
+   "tier": "rare",
+   "name": "Splash Shells",
+   "desc": "Splash damage",
+   "fx": {
+    "splash": 50
+   },
+   "src": true
+  },
+  {
+   "tier": "epic",
+   "name": "Mini Cannon Cart",
+   "desc": "On destroyed: 1x Cannon Cart",
+   "fx": {
+    "spawnDeath": [
+     [
+      "cannon_cart",
+      1
+     ]
+    ]
+   },
+   "src": true
+  }
+ ],
+ "tesla": [
+  {
+   "tier": "common",
+   "name": "Super Charge",
+   "desc": "+30% damage",
+   "fx": {
+    "dmg": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Coil Storm",
+   "desc": "Chains to 3 more enemies",
+   "fx": {
+    "zap": [
+     3,
+     0.8
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Thunder Tower",
+   "desc": "+20% range, +50% hit speed, chains to 5 more enemies",
+   "fx": {
+    "range": 1.2,
+    "hit": 1.5,
+    "zap": [
+     5,
+     0.7
+    ]
+   },
+   "src": false
+  }
+ ],
+ "tombstone": [
+  {
+   "tier": "common",
+   "name": "Longer Life",
+   "desc": "+50% duration",
+   "fx": {
+    "dur": 1.5
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Skeleton Spawn",
+   "desc": "+50% spawn speed",
+   "fx": {
+    "rate": 1.5
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Skeleton Horde",
+   "desc": "On destroyed: 1x Skeleton Army",
+   "fx": {
+    "spawnDeath": [
+     [
+      "skeleton_army",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "goblin_cage": [
+  {
+   "tier": "common",
+   "name": "Cage Armor",
+   "desc": "+50% hitpoints",
+   "fx": {
+    "hp": 1.5
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Reinforced Bars",
+   "desc": "+300 shield",
+   "fx": {
+    "shield": 300
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Brawler Pair",
+   "desc": "On destroyed: 2x Goblin Brawler",
+   "fx": {
+    "spawnDeath": [
+     [
+      "goblin_brawler",
+      2
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "x_bow": [
+  {
+   "tier": "common",
+   "name": "Longer Draw",
+   "desc": "+20% range",
+   "fx": {
+    "range": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Rapid Fire",
+   "desc": "+50% hit speed",
+   "fx": {
+    "hit": 1.5
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Bolt Storm",
+   "desc": "Piercing shots, +50% damage",
+   "fx": {
+    "pierce": 1,
+    "dmg": 1.5
+   },
+   "src": false
+  }
+ ],
+ "elixir_collector": [
+  {
+   "tier": "common",
+   "name": "Fast Pump",
+   "desc": "+1 elixir every 6s",
+   "fx": {
+    "elixirEvery": [
+     1,
+     6
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Fortified Pump",
+   "desc": "+50% hitpoints, +40% duration",
+   "fx": {
+    "hp": 1.5,
+    "dur": 1.4
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Double Pump",
+   "desc": "+2 elixir every 6s",
+   "fx": {
+    "elixirEvery": [
+     2,
+     6
+    ]
+   },
+   "src": false
+  }
+ ],
+ "goblin_hut": [
+  {
+   "tier": "common",
+   "name": "Fast Huts",
+   "desc": "+40% spawn speed",
+   "fx": {
+    "rate": 1.4
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Spear Barrage",
+   "desc": "Every 8s spawns 1x Spear Gobs",
+   "fx": {
+    "spawnEvery": [
+     "spear_goblins",
+     1,
+     8
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Hut Fortress",
+   "desc": "+60% hitpoints, on destroyed: 1x Goblin Gang",
+   "fx": {
+    "hp": 1.6,
+    "spawnDeath": [
+     [
+      "goblin_gang",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "barbarian_hut": [
+  {
+   "tier": "common",
+   "name": "Fast Camp",
+   "desc": "+40% spawn speed",
+   "fx": {
+    "rate": 1.4
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Barbarian Brothers",
+   "desc": "Every 18s spawns 1x Barbarians",
+   "fx": {
+    "spawnEvery": [
+     "barbarians",
+     1,
+     18
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Barracks",
+   "desc": "+50% hitpoints, on destroyed: 1x Barbarians",
+   "fx": {
+    "hp": 1.5,
+    "spawnDeath": [
+     [
+      "barbarians",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "inferno_tower": [
+  {
+   "tier": "common",
+   "name": "Hotter Beam",
+   "desc": "+30% damage",
+   "fx": {
+    "dmg": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Beam Reach",
+   "desc": "+25% range, +20% hitpoints",
+   "fx": {
+    "range": 1.25,
+    "hp": 1.2
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Twin Beams",
+   "desc": "+50% hit speed, +30% damage",
+   "fx": {
+    "hit": 1.5,
+    "dmg": 1.3
+   },
+   "src": false
+  }
+ ],
+ "bomb_tower": [
+  {
+   "tier": "common",
+   "name": "Heavy Bombs",
+   "desc": "+30% damage",
+   "fx": {
+    "dmg": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Cluster Bombs",
+   "desc": "+40% radius",
+   "fx": {
+    "radius": 1.4
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Bomb Barrage",
+   "desc": "Every 4th attack casts Fireball (40% power), explodes when destroyed",
+   "fx": {
+    "castHit": [
+     "fireball",
+     4,
+     0.4,
+     0.5
+    ],
+    "boom": [
+     2.0,
+     80
+    ]
+   },
+   "src": false
+  }
+ ],
+ "mortar": [
+  {
+   "tier": "common",
+   "name": "Long Range",
+   "desc": "+25% range",
+   "fx": {
+    "range": 1.25
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Big Shells",
+   "desc": "+30% damage, +30% radius",
+   "fx": {
+    "dmg": 1.3,
+    "radius": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Mortar Volley",
+   "desc": "+50% hit speed, every 5th attack casts Fireball (40% power)",
+   "fx": {
+    "hit": 1.5,
+    "castHit": [
+     "fireball",
+     5,
+     0.4,
+     0.6
+    ]
+   },
+   "src": false
+  }
+ ],
+ "fireball": [
+  {
+   "tier": "common",
+   "name": "Bigger Blast",
+   "desc": "+30% radius",
+   "fx": {
+    "radius": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Burning Ground",
+   "desc": "Also casts Poison (50% power)",
+   "fx": {
+    "castAlso": [
+     [
+      "poison",
+      0.5,
+      0.6,
+      0.2
+     ]
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Twin Meteors",
+   "desc": "A second Fireball 0.8s later",
+   "fx": {
+    "castAlso": [
+     [
+      "fireball",
+      0.7,
+      0.9,
+      0.8
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "the_log": [
+  {
+   "tier": "common",
+   "name": "Rolling Thunder",
+   "desc": "+30% damage, knocks enemies back",
+   "fx": {
+    "dmg": 1.3,
+    "kb": 20
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Log Tornado",
+   "desc": "Also casts Tornado (100% power)",
+   "fx": {
+    "castAlso": [
+     [
+      "tornado",
+      1.0,
+      0.8,
+      0.0
+     ]
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Double Log",
+   "desc": "A second The Log 0.9s later",
+   "fx": {
+    "castAlso": [
+     [
+      "the_log",
+      1.0,
+      1.0,
+      0.9
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "arrows": [
+  {
+   "tier": "common",
+   "name": "Wide Volley",
+   "desc": "+30% radius",
+   "fx": {
+    "radius": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Poison Tips",
+   "desc": "Also casts Poison (50% power)",
+   "fx": {
+    "castAlso": [
+     [
+      "poison",
+      0.5,
+      0.7,
+      0.1
+     ]
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Arrow Storm",
+   "desc": "A second Arrows 0.7s later",
+   "fx": {
+    "castAlso": [
+     [
+      "arrows",
+      1.0,
+      1.0,
+      0.7
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "zap": [
+  {
+   "tier": "common",
+   "name": "Weakening Zap",
+   "desc": "Hits weaken enemies 25% for 5s",
+   "fx": {
+    "weaken": [
+     0.25,
+     5
+    ]
+   },
+   "src": true
+  },
+  {
+   "tier": "rare",
+   "name": "Zap + Lightning",
+   "desc": "Also casts Lightning (50% power)",
+   "fx": {
+    "castAlso": [
+     [
+      "lightning",
+      0.5,
+      1.0,
+      0.5
+     ]
+    ]
+   },
+   "src": true
+  },
+  {
+   "tier": "epic",
+   "name": "Chain Zap",
+   "desc": "Stuns for 1.0s, +40% radius, a second Zap 0.5s later",
+   "fx": {
+    "stun": 1.0,
+    "radius": 1.4,
+    "castAlso": [
+     [
+      "zap",
+      1.0,
+      1.0,
+      0.5
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "poison": [
+  {
+   "tier": "common",
+   "name": "Longer Poison",
+   "desc": "+40% duration",
+   "fx": {
+    "dur": 1.4
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Toxic Cloud",
+   "desc": "+30% radius, +25% damage",
+   "fx": {
+    "radius": 1.3,
+    "dmg": 1.25
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Plague",
+   "desc": "A second Poison 3.0s later",
+   "fx": {
+    "castAlso": [
+     [
+      "poison",
+      0.8,
+      1.0,
+      3.0
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "rocket": [
+  {
+   "tier": "common",
+   "name": "Heavier Rocket",
+   "desc": "+30% damage",
+   "fx": {
+    "dmg": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Blast Radius",
+   "desc": "+40% radius, knocks enemies back",
+   "fx": {
+    "radius": 1.4,
+    "kb": 30
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Twin Rockets",
+   "desc": "A second Rocket 1.0s later",
+   "fx": {
+    "castAlso": [
+     [
+      "rocket",
+      0.6,
+      0.8,
+      1.0
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "lightning": [
+  {
+   "tier": "common",
+   "name": "Voltage Boost",
+   "desc": "+30% damage",
+   "fx": {
+    "dmg": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Wide Bolt",
+   "desc": "+40% radius",
+   "fx": {
+    "radius": 1.4
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Thunderstorm",
+   "desc": "A second Lightning 1.2s later",
+   "fx": {
+    "castAlso": [
+     [
+      "lightning",
+      0.6,
+      1.0,
+      1.2
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "goblin_barrel": [
+  {
+   "tier": "common",
+   "name": "Extra Gobs",
+   "desc": "+2 units",
+   "fx": {
+    "count": 2
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Barrel Blast",
+   "desc": "Also casts Zap (80% power)",
+   "fx": {
+    "castAlso": [
+     [
+      "zap",
+      0.8,
+      0.8,
+      0.0
+     ]
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Brawler Barrel",
+   "desc": "Deploys with 3x Goblin Brawler",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "goblin_brawler",
+      3
+     ]
+    ]
+   },
+   "src": true
+  }
+ ],
+ "earthquake": [
+  {
+   "tier": "common",
+   "name": "Wider Quake",
+   "desc": "+30% radius",
+   "fx": {
+    "radius": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Deep Quake",
+   "desc": "+50% damage",
+   "fx": {
+    "dmg": 1.5
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Aftershock",
+   "desc": "A second Earthquake 1.5s later",
+   "fx": {
+    "castAlso": [
+     [
+      "earthquake",
+      0.8,
+      1.0,
+      1.5
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "graveyard": [
+  {
+   "tier": "common",
+   "name": "Fast Graves",
+   "desc": "+10 units",
+   "fx": {
+    "count": 10
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Bigger Graveyard",
+   "desc": "+30% radius, +5 units",
+   "fx": {
+    "radius": 1.3,
+    "count": 5
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Grave King",
+   "desc": "Deploys with 1x Skeleton King",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "skeleton_king",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "clone": [
+  {
+   "tier": "common",
+   "name": "Wider Clone",
+   "desc": "+30% radius",
+   "fx": {
+    "radius": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Quick Clone",
+   "desc": "-1 elixir cost",
+   "fx": {
+    "cost": -1
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Triple Clone",
+   "desc": "A second Clone 0.6s later",
+   "fx": {
+    "castAlso": [
+     [
+      "clone",
+      1.0,
+      1.0,
+      0.6
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "freeze": [
+  {
+   "tier": "common",
+   "name": "Longer Freeze",
+   "desc": "+30% duration",
+   "fx": {
+    "dur": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Wide Freeze",
+   "desc": "+35% radius",
+   "fx": {
+    "radius": 1.35
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Freeze + Zap",
+   "desc": "Also casts Zap (100% power)",
+   "fx": {
+    "castAlso": [
+     [
+      "zap",
+      1.0,
+      1.2,
+      0.0
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "rage": [
+  {
+   "tier": "common",
+   "name": "Longer Rage",
+   "desc": "+40% duration",
+   "fx": {
+    "dur": 1.4
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Stronger Rage",
+   "desc": "+30% radius, -1 elixir cost",
+   "fx": {
+    "radius": 1.3,
+    "cost": -1
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Rage Storm",
+   "desc": "A second Rage 3.0s later",
+   "fx": {
+    "castAlso": [
+     [
+      "rage",
+      1.0,
+      1.0,
+      3.0
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "snowball": [
+  {
+   "tier": "common",
+   "name": "Bigger Ball",
+   "desc": "+30% radius",
+   "fx": {
+    "radius": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Cold Snap",
+   "desc": "Slows 70% for 3.5s",
+   "fx": {
+    "slow": [
+     0.7,
+     3.5
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Triple Snow",
+   "desc": "A second Snowball 0.6s later",
+   "fx": {
+    "castAlso": [
+     [
+      "snowball",
+      1.0,
+      1.0,
+      0.6
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "barb_barrel": [
+  {
+   "tier": "common",
+   "name": "Heavy Barrel",
+   "desc": "+30% damage",
+   "fx": {
+    "dmg": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Barbarian Drop",
+   "desc": "Deploys with 1x Barbarians",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "barbarians",
+      1
+     ]
+    ]
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Triple Barrel",
+   "desc": "A second Barb Barrel 0.5s later",
+   "fx": {
+    "castAlso": [
+     [
+      "barb_barrel",
+      1.0,
+      1.0,
+      0.5
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "royal_delivery": [
+  {
+   "tier": "common",
+   "name": "Big Delivery",
+   "desc": "+30% radius",
+   "fx": {
+    "radius": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Heavy Delivery",
+   "desc": "+60% damage",
+   "fx": {
+    "dmg": 1.6
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Royal Backup",
+   "desc": "Deploys with 1x Royal Recruits",
+   "fx": {
+    "spawnDeploy": [
+     [
+      "royal_recruits",
+      1
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "tornado": [
+  {
+   "tier": "common",
+   "name": "Long Tornado",
+   "desc": "+50% duration",
+   "fx": {
+    "dur": 1.5
+   },
+   "src": true
+  },
+  {
+   "tier": "rare",
+   "name": "Bigger Pull",
+   "desc": "+30% radius",
+   "fx": {
+    "radius": 1.3
+   },
+   "src": true
+  },
+  {
+   "tier": "epic",
+   "name": "Roaming Tornado",
+   "desc": "2 more Tornados sweep forward after it",
+   "fx": {
+    "castAlso": [
+     [
+      "tornado",
+      1.0,
+      1.0,
+      1.0,
+      -50
+     ],
+     [
+      "tornado",
+      1.0,
+      1.0,
+      2.0,
+      -100
+     ]
+    ]
+   },
+   "src": true
+  }
+ ],
+ "goblin_curse": [
+  {
+   "tier": "common",
+   "name": "Longer Curse",
+   "desc": "+40% duration",
+   "fx": {
+    "dur": 1.4
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Wider Curse",
+   "desc": "+30% radius",
+   "fx": {
+    "radius": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Curse Echo",
+   "desc": "A second Goblin Curse 2.5s later",
+   "fx": {
+    "castAlso": [
+     [
+      "goblin_curse",
+      1.0,
+      1.0,
+      2.5
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "void": [
+  {
+   "tier": "common",
+   "name": "Bigger Void",
+   "desc": "+30% radius",
+   "fx": {
+    "radius": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Lasting Void",
+   "desc": "+50% duration",
+   "fx": {
+    "dur": 1.5
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Void Echo",
+   "desc": "A second Void 2.5s later",
+   "fx": {
+    "castAlso": [
+     [
+      "void",
+      0.8,
+      1.0,
+      2.5
+     ]
+    ]
+   },
+   "src": false
+  }
+ ],
+ "vines": [
+  {
+   "tier": "common",
+   "name": "Longer Vines",
+   "desc": "+40% duration",
+   "fx": {
+    "dur": 1.4
+   },
+   "src": false
+  },
+  {
+   "tier": "rare",
+   "name": "Tight Grip",
+   "desc": "+30% radius",
+   "fx": {
+    "radius": 1.3
+   },
+   "src": false
+  },
+  {
+   "tier": "epic",
+   "name": "Vines Echo",
+   "desc": "A second Vines 3.0s later",
+   "fx": {
+    "castAlso": [
+     [
+      "vines",
+      1.0,
+      1.0,
+      3.0
+     ]
+    ]
+   },
+   "src": false
+  }
+ ]
+}

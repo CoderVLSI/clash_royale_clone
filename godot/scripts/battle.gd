@@ -85,9 +85,10 @@ func start(player_deck_ids: Array = DEFAULT_DECK, player_tower: String = "prince
 		for a4 in OS.get_cmdline_user_args():
 			if a4.begins_with("--chaos-at="):
 				sim.chaos.next_at = float(a4.substr(11))
-			if a4.begins_with("--chaos-power="):
-				for pw in a4.substr(14).split(","):
-					sim.chaos.powers[0].append(pw)
+			if a4.begins_with("--chaos-pick="):          # debug: --chaos-pick=knight:epic,giant:rare applies those modifiers up front
+				for pk in a4.substr(13).split(","):
+					var parts := pk.split(":")
+					sim.chaos.choose(0, {"card": parts[0], "tier": parts[1], "name": parts[0]})
 	if auto_play:
 		sim.ai_enabled = [true, true]
 	else:
@@ -426,6 +427,9 @@ func _evo_badge(w: Control, card: Dictionary) -> void:
 	elif card.get("heroVariantId") != null and sim.players[0]["hero_slot"] == card["id"]:
 		tag.text = "HERO"
 		tag.add_theme_color_override("font_color", Color("6ee7ff"))
+	elif card.has("chaosTier"):
+		tag.text = "CHAOS"
+		tag.add_theme_color_override("font_color", {"common": Color("b8c2c4"), "rare": Color("ffb347"), "epic": Color("d9a6ff")}[str(card["chaosTier"])])
 	else:
 		tag.text = ""
 
@@ -436,7 +440,7 @@ func _fill_card(w: Control, card: Dictionary, affordable: bool = true) -> void:
 	w.visible = true
 	# this runs every frame for the hand: only rebuild when the card / evolution state changed
 	var prog0 := sim.mech.evolution_progress(0, card)
-	var fkey := "%s|%s" % [card["id"], str(prog0.get("ready", "-")) + str(prog0.get("current", ""))]
+	var fkey := "%s|%s|%s" % [card["id"], str(prog0.get("ready", "-")) + str(prog0.get("current", "")), str(card.get("chaosTier", ""))]
 	if w.get_meta("fk", "") == fkey:
 		w.modulate = Color.WHITE if affordable else Color(0.62, 0.62, 0.7, 1.0)
 		return
@@ -626,18 +630,6 @@ func _update_abilities() -> void:
 		var cost := int(Sim._v(u, "abilityCost", 0))
 		var left := (sim.mech.abilities.ready_at(u) - sim.now) / 1000.0
 		btn.set_state(left <= 0.0 and sim.players[0]["elixir"] >= cost, cost)
-	if chaos_on:
-		for pid in sim.chaos.powers[0]:
-			var key := "pow_" + str(pid)
-			seen[key] = true
-			if not ability_btns.has(key):
-				var pb := AbilityButton.new()
-				var ppath := "res://assets/art/powers/%s.jpg" % str(pid)
-				pb.setup(load(ppath) if ResourceLoader.exists(ppath) else null, -1, str(Chaos.POWERS[pid][0]).split(" ")[0])
-				var pid_c: String = str(pid)
-				pb.pressed.connect(func(): sim.chaos.use_power(0, pid_c))
-				ability_row.add_child(pb)
-				ability_btns[key] = pb
 	for id in ability_btns.keys():
 		if not seen.has(id):
 			ability_btns[id].queue_free()

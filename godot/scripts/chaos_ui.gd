@@ -44,7 +44,7 @@ func show_offers(offers: Array) -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	panel.add_child(title)
 	var tier := chaos.tier_for(int(chaos.picks[0]))
-	var sub := UI.label("Pick one upgrade  -  %s tier" % tier.capitalize(), 18, Color("ffe08a"), 4)
+	var sub := UI.label("Pick one modifier  -  %s tier" % tier.capitalize(), 18, Color("ffe08a"), 4)
 	sub.position = Vector2(0, 88)
 	sub.size = Vector2(390, 26)
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -55,62 +55,36 @@ func show_offers(offers: Array) -> void:
 		y += 200.0
 
 func _offer_row(o: Dictionary, y: float) -> Control:
-	var is_mod: bool = o["kind"] == "mod"
-	var col := Color("9b59b6")
-	var head := ""
-	var desc := ""
-	var tier_txt := ""
-	if is_mod:
-		var m: Array = Chaos.MODS[o["mod"]]
-		col = {"common": Color("7f8c8d"), "rare": Color("f39c12"), "epic": Color("9b59b6")}[m[0]]
-		head = m[1]
-		desc = m[2]
-		tier_txt = str(m[0]).to_upper()
-	else:
-		var pw: Array = Chaos.POWERS[o["power"]]
-		col = Color("00bcd4")
-		head = pw[0]
-		desc = pw[1]
-		tier_txt = "POWER"
+	var col: Color = {"common": Color("7f8c8d"), "rare": Color("f39c12"), "epic": Color("9b59b6")}[str(o["tier"])]
 	var btn := Button.new()
 	btn.position = Vector2(20, y)
 	btn.size = Vector2(350, 184)
-	var sb := UI.style(Color(0.12, 0.1, 0.25, 0.95), 16, col, 4)
-	btn.add_theme_stylebox_override("normal", sb)
+	btn.add_theme_stylebox_override("normal", UI.style(Color(0.12, 0.1, 0.25, 0.95), 16, col, 4))
 	btn.add_theme_stylebox_override("hover", UI.style(Color(0.2, 0.16, 0.4, 0.98), 16, col.lightened(0.3), 4))
 	btn.add_theme_stylebox_override("pressed", UI.style(Color(0.07, 0.06, 0.18), 16, col, 4))
 	btn.pressed.connect(func(): picked.emit(o))
-	var chip := UI.label(tier_txt, 13, col.lightened(0.4), 3)
-	chip.position = Vector2(150, 12)
+	var card: Dictionary = CardDB.get_card(str(o["card"]))
+	var cw := UI.card_widget(card, Vector2(110, 140))
+	cw.position = Vector2(20, 22)
+	cw.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	btn.add_child(cw)
+	var chip := UI.label("%s  -  %s" % [str(card.get("name", "")).to_upper(), str(o["tier"]).to_upper()], 12, col.lightened(0.4), 3)
+	chip.position = Vector2(145, 10)
+	chip.size = Vector2(195, 18)
 	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	btn.add_child(chip)
-	var nm := UI.label(head, 26, Color.WHITE, 4)
-	nm.position = Vector2(150, 34)
-	nm.size = Vector2(190, 34)
+	var nm := UI.label(str(o["name"]), 24, Color.WHITE, 4)
+	nm.position = Vector2(145, 30)
+	nm.size = Vector2(195, 34)
 	nm.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	btn.add_child(nm)
-	var ds := UI.label(_wrap(desc, 27), 15, Color("d7dff5"), 0)
-	ds.position = Vector2(150, 74)
-	ds.size = Vector2(190, 100)
+	var ds := UI.label(_wrap(str(o["desc"]), 24), 15, Color("d7dff5"), 0)
+	ds.position = Vector2(145, 70)
+	ds.size = Vector2(195, 106)
 	ds.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	ds.custom_minimum_size = Vector2(185, 0)
+	ds.custom_minimum_size = Vector2(190, 0)
 	ds.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	btn.add_child(ds)
-	if is_mod:
-		var card: Dictionary = CardDB.get_card(str(o["card"]))
-		var cw := UI.card_widget(card, Vector2(110, 140))
-		cw.position = Vector2(20, 22)
-		cw.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		btn.add_child(cw)
-	else:
-		var path := "res://assets/art/powers/%s.jpg" % str(o["power"])
-		var tex: Texture2D = load(path) if ResourceLoader.exists(path) else null
-		var ab := AbilityButton.new()
-		ab.setup(tex, -1, "")
-		ab.position = Vector2(30, 40)
-		ab.scale = Vector2(1.4, 1.4)
-		ab.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		btn.add_child(ab)
 	return btn
 
 func close() -> void:

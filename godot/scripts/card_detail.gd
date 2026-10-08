@@ -6,7 +6,7 @@ extends Control
 signal closed
 signal use_pressed(mode: String)
 
-const PAGES := 3
+const PAGES := 4
 var card: Dictionary
 var in_deck := false
 var page := 0
@@ -271,10 +271,11 @@ func _build_panel() -> void:
 	_build_field_page()
 	_build_stats_page()
 	_build_desc_page()
+	_build_chaos_page()
 	for i in PAGES:
 		var d := Panel.new()
 		d.size = Vector2(16, 16)
-		d.position = Vector2(169 - 24 + i * 24 - 0, 410)
+		d.position = Vector2(169 - 36 + i * 24, 410)
 		d.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		panel.add_child(d)
 		dots.append(d)
@@ -544,6 +545,49 @@ func _build_desc_page() -> void:
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	holder.add_child(l)
+	pager.add_child(holder)
+	page_nodes.append(holder)
+
+## Last page: the card's three CHAOS modifiers (Common / Rare / Epic).
+func _build_chaos_page() -> void:
+	var holder := Control.new()
+	holder.size = pager.size
+	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var head := UI.label("CHAOS MODIFIERS", 17, Color("7d3cb0"), 0)
+	head.position = Vector2(0, 8)
+	head.size = Vector2(pager.size.x, 24)
+	head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	holder.add_child(head)
+	Chaos.ensure()
+	var mods: Array = Chaos.DATA.get(str(card.get("id", "")).trim_prefix("evolved_").trim_prefix("hero_"), [])
+	var cols := {"common": Color("7f8c8d"), "rare": Color("e08e0b"), "epic": Color("8e44ad")}
+	var y := 32.0
+	for m in mods:
+		var row := UI.panel(Color("f3f5fa"), 10, cols[str(m["tier"])], 3)
+		row.position = Vector2(10, y)
+		row.size = Vector2(pager.size.x - 20, 76)
+		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var tl := UI.label(str(m["tier"]).to_upper(), 11, cols[str(m["tier"])], 0)
+		tl.position = Vector2(10, 4)
+		tl.size = Vector2(80, 16)
+		row.add_child(tl)
+		var nl := UI.label(str(m["name"]), 17, Color("2a3550"), 0)
+		nl.position = Vector2(10, 18)
+		nl.size = Vector2(row.size.x - 20, 22)
+		row.add_child(nl)
+		var dl := UI.label(ChaosUI._wrap(str(m["desc"]), 40), 12, Color("46526e"), 0)
+		dl.position = Vector2(10, 38)
+		dl.size = Vector2(row.size.x - 20, 34)
+		dl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		row.add_child(dl)
+		holder.add_child(row)
+		y += 82.0
+	if mods.is_empty():
+		var none := UI.label("No Chaos modifiers for this card.", 16, Color("46526e"), 0)
+		none.position = Vector2(20, 120)
+		none.size = Vector2(300, 40)
+		none.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		holder.add_child(none)
 	pager.add_child(holder)
 	page_nodes.append(holder)
 

@@ -1,8 +1,50 @@
 extends SceneTree
-## Plays AI-vs-AI chaos matches (random picks for both sides) and applies every modifier / power once.
+## Chaos v2 test: every modifier of every card is applied to a private copy of its card, deployed/cast in a live sim against a dummy enemy
+## and stepped for a few seconds; plus full AI-vs-AI chaos matches. Prints "CHAOS BAD:" with anything that errored or did nothing.
 func _init() -> void:
 	CardDB.ensure()
+	Chaos.ensure()
 	var bad: Array = []
+	var base_ids: Array = []
+	for c in CardDB.all:
+		if c.get("isToken", false) or c.get("isMirror", false) or str(c["id"]).begins_with("hero_") or str(c["id"]).begins_with("evolved_"):
+			continue
+		if not (c["id"] in base_ids):
+			base_ids.append(c["id"])
+	for id in base_ids:
+		if not Chaos.DATA.has(id) or Chaos.DATA[id].size() != 3:
+			bad.append(id + ":no-mods")
+	print("cards with mods: ", Chaos.DATA.size(), " / ", base_ids.size())
+	var spawned_total := 0
+	for id in Chaos.DATA:
+		for m in Chaos.DATA[id]:
+			var deck := CardDB.deck_by_ids(["knight", "giant", "archers", "minions", "skeletons", "zap", "cannon", "valkyrie"])
+			var deck2 := CardDB.deck_by_ids(["pekka", "hog_rider", "musketeer", "baby_dragon", "fireball", "mini_pekka", "goblin_barrel", "bomber"])
+			var sim := Sim.new(deck, deck2, "princess", 7)
+			sim.make_decks_private()
+			sim.chaos = Chaos.new(sim)
+			var card: Dictionary = CardDB.get_card(id).duplicate(true)
+			var before: Dictionary = card.duplicate(true)
+			Chaos.apply(card, m)
+			if card.hash() == before.hash():
+				bad.append("%s/%s: apply changed nothing" % [id, m["tier"]])
+			# enemy dummies in front of the deploy point
+			for i in 3:
+				sim.units.append(sim.make_unit(CardDB.get_card("knight"), 150.0 + i * 40.0, 330.0, true, "LEFT"))
+			var n0: int = sim.units.size()
+			sim.now = 5000.0
+			sim.deploy_card(card, 195.0, 420.0, false)
+			var u0 := sim.units.size()
+			for i in 140:
+				sim.step()
+				if sim.game_over != "":
+					break
+			spawned_total += sim.units.size() - n0
+			# attack hooks on a hit-point-bearing unit are exercised implicitly by the steps above
+			if u0 == n0 and card["type"] != "spell":
+				bad.append("%s/%s: nothing deployed" % [id, m["tier"]])
+	print("spawned across all modifier runs: ", spawned_total)
+	# full AI-vs-AI matches with random picks for both sides
 	for seed_i in 3:
 		var deck := CardDB.deck_by_ids(["knight", "giant", "archers", "minions", "skeletons", "zap", "cannon", "valkyrie"])
 		var deck2 := CardDB.deck_by_ids(["pekka", "hog_rider", "musketeer", "baby_dragon", "fireball", "mini_pekka", "goblin_barrel", "bomber"])
@@ -11,48 +53,14 @@ func _init() -> void:
 		sim.make_decks_private()
 		sim.chaos = Chaos.new(sim)
 		sim.chaos.next_at = 8.0
+		sim.chaos.update_clock()
 		var guard := 0
-		while sim.game_over == "" and guard < 3000:
+		while sim.game_over == "" and guard < 4000:
 			sim.step()
 			guard += 1
 			if sim.chaos.update_clock():
-				var offers: Array = sim.chaos.options
-				var o: Dictionary = offers[randi() % offers.size()]
-				sim.chaos.choose(0, o)
+				sim.chaos.choose(0, sim.chaos.options[randi() % sim.chaos.options.size()])
 				sim.chaos.waiting = false
-				for pid in sim.chaos.powers[0].duplicate():
-					sim.chaos.use_power(0, pid)
 		print("MATCH ", seed_i, " ticks=", guard, " picks=", sim.chaos.picks, " mods=", sim.chaos.upgraded)
-	# every modifier on a fitting card
-	for id in Chaos.MODS:
-		var found := false
-		for c in CardDB.all:
-			if not c.get("isToken", false) and Chaos.eligible(c, id):
-				print("MOD ", id, " on ", c["id"])
-				var cc: Dictionary = c.duplicate(true)
-				Chaos.apply(cc, id)
-				var d2 := CardDB.deck_by_ids(["knight", "giant", "archers", "minions", "skeletons", "zap", "cannon", "valkyrie"])
-				var sim2 := Sim.new(d2, d2)
-				sim2.make_decks_private()
-				sim2.chaos = Chaos.new(sim2)
-				var u := sim2.make_unit(cc, 195, 500, false, "LEFT") if cc["type"] != "spell" else {}
-				if not u.is_empty():
-					sim2.units.append(u)
-					for i in 200:
-						sim2.step()
-				found = true
-				break
-		if not found:
-			bad.append(id + ":no-card")
-	for pid in Chaos.POWERS:
-		var d3 := CardDB.deck_by_ids(["knight", "giant", "archers", "minions", "skeletons", "zap", "cannon", "valkyrie"])
-		var sim3 := Sim.new(d3, d3)
-		sim3.chaos = Chaos.new(sim3)
-		sim3.units.append(sim3.make_unit(CardDB.get_card("knight"), 195, 300, true, "LEFT"))
-		sim3.chaos.powers[0].append(pid)
-		if not sim3.chaos.use_power(0, pid):
-			bad.append(pid + ":power")
-		for i in 40:
-			sim3.step()
 	print("CHAOS BAD: ", bad)
 	quit(0)
