@@ -66,6 +66,11 @@ func _show_lobby() -> void:
 	lobby.start_battle.connect(_start_battle.bind(false))
 	lobby.start_friendly.connect(_start_battle.bind(true))
 	lobby.start_chaos.connect(_start_battle.bind(false, true))
+	lobby.start_draft.connect(_start_draft)
+	for a2 in OS.get_cmdline_user_args():
+		if a2 == "--draft":
+			_start_draft()
+			return
 	if detail != "":
 		lobby._show_tab(1)
 		lobby._open_card_detail(CardDB.get_card(detail))
@@ -86,7 +91,14 @@ func _show_lobby() -> void:
 		print("SCREENSHOT saved ", shot)
 		get_tree().quit()
 
-func _start_battle(_friendly: bool, chaos_mode: bool = false) -> void:
+func _start_draft() -> void:
+	var d := ChaosDraft.new()
+	_swap(d)
+	d.setup()
+	d.cancelled.connect(_show_lobby)
+	d.finished.connect(func(mine: Array, theirs: Array): _start_battle(false, true, mine, theirs))
+
+func _start_battle(_friendly: bool, chaos_mode: bool = false, draft_mine: Array = [], draft_theirs: Array = []) -> void:
 	Sfx.play("ui_confirm")
 	Sfx.stop_music()
 	var b := Battle.new()
@@ -94,7 +106,11 @@ func _start_battle(_friendly: bool, chaos_mode: bool = false) -> void:
 	var ids: Array = save.current_deck_ids()
 	var evo: Array = save.evo_slots[save.selected_deck].filter(func(x): return x != "")
 	var hero: String = save.hero_slots[save.selected_deck]
-	b.start(ids, save.tower, evo, hero, save.low_perf, chaos_mode)
+	if draft_mine.size() == 8:               # a drafted deck has no evolution / hero slots
+		ids = draft_mine
+		evo = []
+		hero = ""
+	b.start(ids, save.tower, evo, hero, save.low_perf, chaos_mode, draft_theirs)
 	b.finished.connect(_on_battle_finished)
 
 func _on_battle_finished(result: String) -> void:

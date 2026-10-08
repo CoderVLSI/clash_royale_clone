@@ -44,8 +44,8 @@ var shot_path := ""
 var shot_time := -1.0
 var shot_taken := false
 
-func start(player_deck_ids: Array = DEFAULT_DECK, player_tower: String = "princess", evo_ids: Array = [], hero_id: String = "", low_perf: bool = false, chaos_mode: bool = false) -> void:
-	var enemy := _random_deck()
+func start(player_deck_ids: Array = DEFAULT_DECK, player_tower: String = "princess", evo_ids: Array = [], hero_id: String = "", low_perf: bool = false, chaos_mode: bool = false, enemy_ids: Array = []) -> void:
+	var enemy := CardDB.deck_by_ids(enemy_ids) if enemy_ids.size() == 8 else _random_deck()
 	var pdeck := CardDB.deck_by_ids(player_deck_ids)
 	pdeck.shuffle()                      # App.js resetGame shuffles the player's deck each battle
 	sim = Sim.new(pdeck, enemy, player_tower)

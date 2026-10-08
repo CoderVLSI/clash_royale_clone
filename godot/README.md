@@ -76,4 +76,7 @@ Modifiers are card specific (Knight: *Iron Plating* +200% HP / *Shield Bash* stu
 Cannon, Mega Minion, Phoenix, Tornado ...); the guides disagree with each other and no complete official list is available, so every other modifier is our own, written in the
 same style. Spell-casting modifiers reuse the real spell cards, spawn modifiers reuse the real troop cards.
 
+**Chaos Draft** (lobby -> CHAOS -> CHAOS DRAFT, `scripts/chaos_draft.gd`): eight rounds, each shows four random cards; you take one and the opponent takes one of the remaining three
+(it prefers type variety, e.g. avoids stacking spells). The two drafted 8-card decks (no evolution / hero slots) then play a normal Chaos match. Test: `tests/draft.gd`.
+
 Tests: `godot --headless --path godot -s tests/chaos.gd` (every modifier of every card, plus full AI matches) and `-s tests/chaos_behaviour.gd` (spot checks of the behavioural effects).

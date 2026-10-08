@@ -7,6 +7,7 @@ extends Control
 signal start_battle
 signal start_friendly
 signal start_chaos
+signal start_draft
 
 const TABS := ["Shop", "Decks", "Battle", "Social", "Events"]
 const TOWERS := [
@@ -251,7 +252,7 @@ func _build_battle() -> Control:
 	act.add_child(UI.button("Friend", Color("2e86de"), func(): _open_friendly(), Vector2(76, 64), 15))
 	var battle := UI.button("BATTLE", Color("f39c12"), func(): start_battle.emit(), Vector2(190, 74), 34)
 	act.add_child(battle)
-	act.add_child(UI.button("CHAOS", Color("8e44ad"), func(): start_chaos.emit(), Vector2(76, 64), 15))
+	act.add_child(UI.button("CHAOS", Color("8e44ad"), func(): _open_chaos_menu(), Vector2(76, 64), 15))
 	root.add_child(act)
 	# chests
 	root.add_child(_chest_slots())
@@ -888,6 +889,20 @@ func _open_menu() -> void:
 	m["body"].add_child(UI.button("Sound: " + ("ON" if save.sound else "OFF"), Color("16a085"),
 		func(): save.sound = not save.sound; save.save_file(); Sfx.set_enabled(save.sound); _close_modal(m); _open_menu(), Vector2(0, 42), 14))
 	m["body"].add_child(UI.button("Close", Color("7f8c8d"), func(): _close_modal(m), Vector2(0, 40), 16))
+
+func _open_chaos_menu() -> void:
+	var m := _modal("CHAOS")
+	var note := UI.label("Every card has Common, Rare and Epic modifiers you pick during the match.", 14, Color("b9d6ff"), 2)
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	note.custom_minimum_size = Vector2(300, 0)
+	m["body"].add_child(note)
+	m["body"].add_child(UI.button("CHAOS  (my deck)", Color("8e44ad"), func():
+		_close_modal(m)
+		start_chaos.emit(), Vector2(0, 50), 18))
+	m["body"].add_child(UI.button("CHAOS DRAFT", Color("d35400"), func():
+		_close_modal(m)
+		start_draft.emit(), Vector2(0, 50), 18))
+	m["body"].add_child(UI.button("Cancel", Color("7f8c8d"), func(): _close_modal(m), Vector2(0, 40), 16))
 
 func _open_friendly() -> void:
 	var m := _modal("FRIENDLY BATTLE")
