@@ -888,6 +888,10 @@ func _open_menu() -> void:
 		func(): save.low_perf = not save.low_perf; save.save_file(); _close_modal(m); _open_menu(), Vector2(0, 42), 14))
 	m["body"].add_child(UI.button("Sound: " + ("ON" if save.sound else "OFF"), Color("16a085"),
 		func(): save.sound = not save.sound; save.save_file(); Sfx.set_enabled(save.sound); _close_modal(m); _open_menu(), Vector2(0, 42), 14))
+	var cr := UI.label("Models: \"Guard Tower\" by Maxim Silkov, \"Stylized Magic Tower\" by Alex.Latigun (Sketchfab, CC BY 4.0)", 11, Color("b9d6ff"), 2)
+	cr.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	cr.custom_minimum_size = Vector2(300, 0)
+	m["body"].add_child(cr)
 	m["body"].add_child(UI.button("Close", Color("7f8c8d"), func(): _close_modal(m), Vector2(0, 40), 16))
 
 func _open_chaos_menu() -> void:

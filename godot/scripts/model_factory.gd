@@ -291,6 +291,12 @@ static func build_tower(king: bool, opp: bool, sub: String = "princess") -> Node
 		holder.add_child(model)
 		if opp:
 			model.rotation.y = PI          # cannon/face points toward the arena centre
+		# team flag on a pole (the Sketchfab tower models are untinted stone)
+		var top := 9.0 if king else 6.2
+		var team := team_color(opp)
+		holder.add_child(box(Vector3(0.08, 1.5, 0.08), Color("3d3d3d"), Vector3(0, top + 0.55, 0)))
+		holder.add_child(box(Vector3(0.9, 0.55, 0.05), team, Vector3(0.45, top + 1.0, 0)))
+		holder.add_child(cyl((2.3 if king else 1.7), (2.4 if king else 1.8), 0.12, team.darkened(0.15), Vector3(0, 0.06, 0), 16))
 		if not king:
 			match sub:
 				"cannoneer":
